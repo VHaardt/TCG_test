@@ -1,0 +1,22 @@
+{
+ "name": "arden_rosso_verde",
+ "leader": "arden",
+ "cards": {
+  "scudiera": 3,
+  "carica": 2,
+  "vesh": 3,
+  "lince": 3,
+  "esca": 3,
+  "matriarca": 2,
+  "t_r2": 3,
+  "t_r3": 3,
+  "t_r6": 2,
+  "t_g3": 3,
+  "t_g4": 3,
+  "t_n2": 3,
+  "t_n4": 3,
+  "colpo": 2,
+  "recluta": 2
+ },
+ "note": "Mazzo di prova per il simulatore v0 (carte del regolamento §12.3 + riempitivi [test])."
+}
