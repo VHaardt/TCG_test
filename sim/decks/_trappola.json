@@ -1,0 +1,21 @@
+{
+ "name": "trappola",
+ "leader": "arden",
+ "cards": {
+  "x_titano": 3,
+  "t_r2": 3,
+  "t_r3": 3,
+  "t_n2": 3,
+  "t_n4": 3,
+  "scudiera": 3,
+  "lince": 3,
+  "t_g3": 3,
+  "t_g4": 3,
+  "esca": 3,
+  "colpo": 3,
+  "t_r6": 2,
+  "t_g6": 2,
+  "vesh": 3
+ },
+ "note": "Mazzo trappola (strategia §6): contiene [trappola] Titano, costo 1 Forza 7. Deve vincere >80%. Escluso dai tornei normali."
+}

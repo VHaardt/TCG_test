@@ -1,0 +1,69 @@
+# Variante default
+
+- Regole: `v0.1-condiviso`; moduli attivi: primo_turno, scintilla, saldo, clessidra, crepuscolo_terminale, risveglio, rimarginare, ultimo_respiro
+- Parametri diversi dal default: nessuno
+- Partite: 2000; IA: semplice; tempo 10s
+- Tra parentesi quadre: intervallo di confidenza al 95%.
+
+## Metriche dei pilastri
+| Metrica | Valore | Obiettivo | |
+|---|---|---|---|
+| Durata mediana (turni per giocatore) | 10.0 [10.0–11.0] (media 10.6) | 8–10 | ✅ |
+| Partite tra 5 e 15 turni | 100.0% [99.7–100.0] | ≥90% | ✅ |
+| Partite oltre il turno 15 | 0.1% [0.0–0.3] | <2% | ✅ |
+| Vittorie del primo giocatore | 63.6% [61.5–65.7] | 48–52% | ❌ |
+| Rimonte (sotto di ≥2 Vite al turno 6, n=672) | 26.0% [22.9–29.5] | 20–35% | ✅ |
+| Attacchi al Leader fermati da una reazione (su 28163 minacce) | 24.3% [23.8–24.8] | 30–45% | ❌ |
+| Partite chiuse dal Crepuscolo | 0.7% [0.4–1.2] | <15% | ✅ |
+| Rimarginare usato quando possibile | 32.6% [31.8–33.4] | <70% | ✅ |
+| Quota di Vite perse per attacchi del Leader | 4.8% | <40% | ✅ |
+
+## Vittorie per mazzo (escluse le partite speculari)
+| Mazzo | Vittorie | Obiettivo 45–55% |
+|---|---|---|
+| maera_blu_nero | 68.5% [64.7–72.1] | ❌ |
+| thorn_verde_blu | 61.8% [57.9–65.6] | ❌ |
+| arden_rosso_verde | 37.2% [33.4–41.1] | ❌ |
+| vey_nero_rosso | 32.5% [28.9–36.3] | ❌ |
+
+## Dettagli
+- Fine partita: {"colpo_finale": 1986, "crepuscolo": 14}
+- Durata (turni per giocatore → partite): {"7": 3, "8": 124, "9": 470, "10": 421, "11": 441, "12": 257, "13": 220, "14": 46, "15": 17, "16": 1}
+- Attacchi al Leader andati a segno: 63.9% [63.3–64.4]
+- Partite toccate dal Crepuscolo terminale: 0.9% [0.6–1.4]
+- Vite perse per fonte: attacco_unita 87%, costo 8%, attacco_leader 5%, crepuscolo 0%
+- Reazioni usate: {"parata": 5708, "muro": 2149, "leader": 380, "grido@cicatrice": 410, "grido": 2033, "muro@cicatrice": 309}
+- Guardia accantonata in media per turno: 0.72
+
+## Statistiche per carta
+| Carta | Partite in cui pescata | Giocata quando pescata | Vittorie se giocata | Vittorie se rimasta in mano |
+|---|---|---|---|---|
+| Il Bastione Vivente | 1401 | 76% | 64% | 57% |
+| [test] Guardiano Blu | 1551 | 93% | 59% | 81% |
+| [test] Leviatano Blu | 695 | 74% | 58% | 69% |
+| [test] Custode Blu | 1709 | 92% | 56% | 86% |
+| Lanterna del Pellegrino | 1377 | 93% | 56% | 69% |
+| [test] Antico Verde | 670 | 70% | 55% | 66% |
+| Sentinella del Guado | 1634 | 81% | 54% | 81% |
+| [test] Spettro Nero | 1665 | 97% | 51% | 73% |
+| [test] Orso Verde | 1660 | 94% | 50% | 69% |
+| Esca | 1639 | 96% | 49% | 63% |
+| [test] Flagellante Nero | 1632 | 94% | 47% | 79% |
+| [test] Cacciatore Verde | 1623 | 90% | 47% | 73% |
+| Recluta del Crocevia | 2219 | 82% | 46% | 60% |
+| [test] Veterano | 2310 | 93% | 46% | 72% |
+| Penitente delle Mille Ferite | 1616 | 86% | 46% | 72% |
+| Patto di Sangue | 1476 | 75% | 46% | 51% |
+| Lince del Sottobosco | 1610 | 79% | 45% | 68% |
+| [test] Mercenario | 3233 | 81% | 45% | 71% |
+| Matriarca del Branco | 1344 | 71% | 45% | 59% |
+| Colpo Mirato | 2856 | 85% | 44% | 79% |
+| Carica della Fornace | 1344 | 75% | 43% | 35% |
+| [test] Colosso Rosso | 710 | 73% | 42% | 46% |
+| Scudiera di Brace | 1562 | 83% | 40% | 53% |
+| Vesh, Lama Rovente | 1476 | 95% | 40% | 68% |
+| [test] Fabbro Rosso | 1634 | 92% | 39% | 67% |
+| [test] Razziatore Rosso | 1587 | 79% | 38% | 51% |
+| [test] Orrore Nero | 611 | 73% | 37% | 47% |
+| Muro di Scudi | 1634 | 0% | – | 60% |
+| Grido dalla Cicatrice | 1570 | 0% | – | 50% |

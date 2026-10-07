@@ -1,0 +1,22 @@
+{
+ "name": "vey_nero_rosso",
+ "leader": "vey",
+ "cards": {
+  "penitente": 3,
+  "patto": 3,
+  "grido": 3,
+  "scudiera": 3,
+  "vesh": 2,
+  "carica": 2,
+  "t_k3": 3,
+  "t_k4": 3,
+  "t_k6": 2,
+  "t_r2": 3,
+  "t_r3": 3,
+  "recluta": 3,
+  "t_n2": 3,
+  "t_n4": 2,
+  "colpo": 2
+ },
+ "note": "Mazzo di prova per il simulatore v0 (carte del regolamento §12.3 + riempitivi [test])."
+}

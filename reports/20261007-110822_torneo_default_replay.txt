@@ -1,0 +1,1045 @@
+===== seed 0 | arden_rosso_verde (P1) vs arden_rosso_verde (P2) | colpo_finale | turni [12, 11]
+--- Turno 1 di P1 | Vite 5-5
+  P1 gioca Scudiera di Brace
+--- Turno 1 di P2 | Vite 5-5
+--- Turno 2 di P1 | Vite 5-5
+  P1 gioca [test] Razziatore Rosso
+--- Turno 2 di P2 | Vite 5-5
+  P2 gioca [test] Cacciatore Verde
+--- Turno 3 di P1 | Vite 5-5
+  P1 gioca [test] Cacciatore Verde
+--- Turno 3 di P2 | Vite 5-5
+  P2 gioca [test] Razziatore Rosso
+--- Turno 4 di P1 | Vite 5-5
+  P1 gioca [test] Orso Verde
+--- Turno 4 di P2 | Vite 5-5
+  P2 gioca [test] Orso Verde
+--- Turno 5 di P1 | Vite 5-5
+  P1 gioca Vesh, Lama Rovente
+  P1 attacca: [test] Orso Verde -> Arden
+    P2 perde 1 Vita (attacco_unita): restano 4
+--- Turno 5 di P2 | Vite 5-4
+  P2 gioca Matriarca del Branco
+  P2 attacca: [test] Orso Verde -> Arden
+    P1 reagisce: ('parry', 1)
+--- Turno 6 di P1 | Vite 5-4
+  P1 attacca: [test] Orso Verde -> Arden
+    P2 perde 1 Vita (attacco_unita): restano 3
+  P1 attacca: Vesh, Lama Rovente -> Arden
+    P2 perde 1 Vita (attacco_unita): restano 2
+    Arden (P2) si Risveglia
+  P1 gioca Carica della Fornace
+  P1 attacca: [test] Razziatore Rosso -> [test] Orso Verde
+    [test] Orso Verde (P2) sconfitta
+  P1 attacca: [test] Razziatore Rosso -> Arden
+--- Turno 6 di P2 | Vite 5-2
+  P2 gioca [test] Colosso Rosso
+  P2 attacca: Matriarca del Branco -> Vesh, Lama Rovente
+    P1 reagisce: ('parry', 1)
+    Matriarca del Branco (P2) sconfitta
+  P2 attacca: [test] Cacciatore Verde -> Vesh, Lama Rovente
+    Vesh, Lama Rovente (P1) sconfitta
+  P2 attacca: Arden -> [test] Razziatore Rosso
+    [test] Razziatore Rosso (P1) sconfitta
+--- Turno 7 di P1 | Vite 5-2
+  P1 gioca Colpo Mirato
+  P1 gioca [test] Cacciatore Verde
+  P1 attacca: [test] Orso Verde -> Arden
+    P2 perde 1 Vita (attacco_unita): restano 1
+--- Turno 7 di P2 | Vite 5-1
+  P2 gioca [test] Veterano
+  P2 gioca Lince del Sottobosco
+  P2 gioca Recluta del Crocevia
+  P2 attacca: [test] Colosso Rosso -> [test] Orso Verde
+    [test] Orso Verde (P1) sconfitta
+--- Turno 8 di P1 | Vite 5-1
+  P1 gioca [test] Veterano
+  P1 gioca [test] Mercenario
+--- Turno 8 di P2 | Vite 5-1
+  P2 attacca: [test] Colosso Rosso -> Arden
+    P1 reagisce: ('parry', 2)
+  P2 attacca: [test] Veterano -> Arden
+    P1 perde 1 Vita (attacco_unita): restano 4
+  P2 gioca Carica della Fornace
+  P2 attacca: [test] Razziatore Rosso -> Arden
+    P1 perde 1 Vita (attacco_unita): restano 3
+  P2 attacca: [test] Razziatore Rosso -> Arden
+  P2 attacca: Arden -> Arden
+--- Turno 9 di P1 | Vite 3-1
+  P1 attacca: [test] Veterano -> [test] Razziatore Rosso
+    [test] Razziatore Rosso (P2) sconfitta
+  P1 attacca: [test] Cacciatore Verde -> [test] Veterano
+    P2 reagisce: ('parry', 1)
+    [test] Cacciatore Verde (P1) sconfitta
+  P1 gioca [test] Razziatore Rosso
+  P1 gioca Carica della Fornace
+  P1 attacca: [test] Mercenario -> [test] Veterano
+    [test] Veterano (P2) sconfitta
+  P1 attacca: [test] Mercenario -> Arden
+    P2 intercetta con Recluta del Crocevia
+    Recluta del Crocevia (P2) sconfitta
+--- Turno 9 di P2 | Vite 3-1
+  P2 gioca [test] Colosso Rosso
+  P2 gioca Scudiera di Brace
+  P2 attacca: [test] Colosso Rosso -> [test] Veterano
+    [test] Veterano (P1) sconfitta
+  P2 attacca: Lince del Sottobosco -> [test] Mercenario
+    [test] Mercenario (P1) sconfitta
+--- Turno 10 di P1 | Vite 3-1
+  P1 gioca [test] Veterano
+  P1 gioca Lince del Sottobosco
+  P1 attacca: [test] Cacciatore Verde -> Lince del Sottobosco
+    Lince del Sottobosco (P2) sconfitta
+--- Turno 10 di P2 | Vite 3-1
+  P2 gioca [test] Veterano
+  P2 gioca [test] Orso Verde
+  P2 attacca: [test] Colosso Rosso -> [test] Cacciatore Verde
+    [test] Cacciatore Verde (P1) sconfitta
+  P2 attacca: [test] Colosso Rosso -> Arden
+    P1 perde 1 Vita (attacco_unita): restano 2
+    Arden (P1) si Risveglia
+--- Turno 11 di P1 | Vite 2-1
+  P1 gioca [test] Mercenario
+  P1 gioca Esca
+  P1 attacca: [test] Veterano -> Scudiera di Brace
+    Scudiera di Brace (P2) sconfitta
+  P1 attacca: Scudiera di Brace -> Arden
+    P2 perde 1 Vita (attacco_unita): restano 0
+  P1 attacca: [test] Razziatore Rosso -> Arden
+--- Turno 11 di P2 | Vite 2-0
+  P2 gioca Vesh, Lama Rovente
+  P2 attacca: [test] Colosso Rosso -> [test] Veterano
+    [test] Veterano (P1) sconfitta
+  P2 attacca: [test] Colosso Rosso -> [test] Razziatore Rosso
+    [test] Razziatore Rosso (P1) sconfitta
+  P2 attacca: Vesh, Lama Rovente -> Scudiera di Brace
+    Scudiera di Brace (P1) sconfitta
+  P2 attacca: [test] Orso Verde -> Arden
+    P1 reagisce: ('parry', 1)
+  P2 attacca: [test] Veterano -> Arden
+    P1 perde 1 Vita (attacco_unita): restano 1
+  P2 attacca: Arden -> Arden
+    P1 perde 1 Vita (attacco_leader): restano 0
+--- Turno 12 di P1 | Vite 0-0
+  P1 attacca: Arden -> Arden
+P1 vince (colpo_finale)
+
+===== seed 100000 | arden_rosso_verde (P1) vs maera_blu_nero (P2) | colpo_finale | turni [13, 13]
+--- Turno 1 di P1 | Vite 5-5
+  P1 gioca Scudiera di Brace
+--- Turno 1 di P2 | Vite 5-5
+  P2 gioca Recluta del Crocevia
+--- Turno 2 di P1 | Vite 5-5
+  P1 gioca [test] Mercenario
+--- Turno 2 di P2 | Vite 5-5
+  P2 gioca [test] Flagellante Nero
+--- Turno 3 di P1 | Vite 5-5
+  P1 gioca [test] Cacciatore Verde
+--- Turno 3 di P2 | Vite 5-5
+  P2 gioca [test] Flagellante Nero
+--- Turno 4 di P1 | Vite 5-5
+  P1 gioca Vesh, Lama Rovente
+--- Turno 4 di P2 | Vite 5-5
+  P2 gioca [test] Spettro Nero
+--- Turno 5 di P1 | Vite 5-5
+  P1 gioca [test] Veterano
+--- Turno 5 di P2 | Vite 5-5
+  P2 gioca [test] Spettro Nero
+  P2 attacca: [test] Spettro Nero -> Arden
+    P1 reagisce: ('parry', 1)
+--- Turno 6 di P1 | Vite 5-5
+  P1 attacca: [test] Veterano -> Maera
+    P2 reagisce: ('reaction', 'muro', 'hand')
+  P1 attacca: Vesh, Lama Rovente -> Maera
+    P2 intercetta con Recluta del Crocevia
+    Recluta del Crocevia (P2) sconfitta
+  P1 gioca Carica della Fornace
+  P1 attacca: [test] Mercenario -> [test] Spettro Nero
+    [test] Spettro Nero (P2) sconfitta
+  P1 attacca: [test] Mercenario -> Maera
+    P2 perde 1 Vita (attacco_unita): restano 4
+--- Turno 6 di P2 | Vite 5-4
+  P2 gioca [test] Guardiano Blu
+  P2 gioca [test] Mercenario
+  P2 attacca: [test] Spettro Nero -> Vesh, Lama Rovente
+    P1 reagisce: ('parry', 1)
+    [test] Spettro Nero (P2) sconfitta
+  P2 attacca: Maera -> [test] Mercenario
+    [test] Mercenario (P1) sconfitta
+--- Turno 7 di P1 | Vite 5-4
+  P1 gioca [test] Colosso Rosso
+  P1 attacca: [test] Veterano -> Maera
+    P2 intercetta con [test] Guardiano Blu
+    [test] Guardiano Blu (P2) sconfitta
+    [test] Veterano (P1) sconfitta
+--- Turno 7 di P2 | Vite 5-4
+  P2 gioca [test] Custode Blu
+  P2 gioca Sentinella del Guado
+  P2 gioca Lanterna del Pellegrino
+--- Turno 8 di P1 | Vite 5-4
+  P1 gioca [test] Fabbro Rosso
+  P1 attacca: [test] Colosso Rosso -> Maera
+    P2 intercetta con Sentinella del Guado
+    Sentinella del Guado (P2) sconfitta
+  P1 attacca: Vesh, Lama Rovente -> Maera
+    P2 reagisce: ('leader_reaction', 0)
+  P1 attacca: [test] Cacciatore Verde -> Maera
+    P2 perde 1 Vita (attacco_unita): restano 3
+--- Turno 8 di P2 | Vite 5-3
+  P2 gioca [test] Leviatano Blu
+  P2 attacca: [test] Custode Blu -> [test] Cacciatore Verde
+    P1 reagisce: ('parry', 1)
+    [test] Custode Blu (P2) sconfitta
+  P2 gioca Sentinella del Guado
+  P2 attacca: Maera -> [test] Cacciatore Verde
+    [test] Cacciatore Verde (P1) sconfitta
+--- Turno 9 di P1 | Vite 5-3
+  P1 gioca [test] Fabbro Rosso
+  P1 attacca: [test] Colosso Rosso -> Maera
+    P2 intercetta con Sentinella del Guado
+    Sentinella del Guado (P2) sconfitta
+  P1 attacca: [test] Fabbro Rosso -> Maera
+    P2 reagisce: ('reaction', 'grido', 'scar')
+  P1 attacca: Vesh, Lama Rovente -> Maera
+    P2 perde 1 Vita (attacco_unita): restano 2
+    Maera (P2) si Risveglia
+  P1 gioca Carica della Fornace
+  P1 attacca: Vesh, Lama Rovente -> Maera
+    P2 perde 1 Vita (attacco_unita): restano 1
+--- Turno 9 di P2 | Vite 5-1
+  P2 attacca: [test] Leviatano Blu -> Vesh, Lama Rovente
+    Vesh, Lama Rovente (P1) sconfitta
+  P2 attacca: [test] Flagellante Nero -> [test] Fabbro Rosso
+    P1 reagisce: ('parry', 1)
+    [test] Flagellante Nero (P2) sconfitta
+  P2 attacca: [test] Flagellante Nero -> [test] Fabbro Rosso
+    [test] Fabbro Rosso (P1) sconfitta
+  P2 attacca: [test] Mercenario -> Arden
+    P1 perde 1 Vita (attacco_unita): restano 4
+  P2 attacca: Maera -> Arden
+    P1 perde 1 Vita (attacco_leader): restano 3
+--- Turno 10 di P1 | Vite 3-1
+  P1 gioca [test] Fabbro Rosso
+  P1 gioca [test] Razziatore Rosso
+  P1 attacca: [test] Colosso Rosso -> [test] Flagellante Nero
+    P2 reagisce: ('parry', 1)
+    [test] Colosso Rosso (P1) sconfitta
+  P1 gioca [test] Razziatore Rosso
+  P1 attacca: [test] Fabbro Rosso -> [test] Mercenario
+    [test] Mercenario (P2) sconfitta
+--- Turno 10 di P2 | Vite 3-1
+  P2 gioca [test] Leviatano Blu
+  P2 attacca: [test] Leviatano Blu -> [test] Fabbro Rosso
+    [test] Fabbro Rosso (P1) sconfitta
+  P2 attacca: [test] Flagellante Nero -> Arden
+    P1 perde 1 Vita (attacco_unita): restano 2
+    Arden (P1) si Risveglia
+--- Turno 11 di P1 | Vite 2-1
+  P1 gioca Matriarca del Branco
+  P1 attacca: [test] Fabbro Rosso -> [test] Flagellante Nero
+    P2 reagisce: ('parry', 1)
+    [test] Fabbro Rosso (P1) sconfitta
+  P1 gioca Recluta del Crocevia
+  P1 attacca: Arden -> [test] Flagellante Nero
+    [test] Flagellante Nero (P2) sconfitta
+--- Turno 11 di P2 | Vite 2-1
+  P2 gioca [test] Spettro Nero
+  P2 attacca: [test] Leviatano Blu -> Arden
+    P1 reagisce: ('parry', 2)
+  P2 attacca: [test] Leviatano Blu -> Arden
+    P1 intercetta con Recluta del Crocevia
+    Recluta del Crocevia (P1) sconfitta
+  P2 attacca: Maera -> Arden
+    P1 perde 1 Vita (attacco_leader): restano 1
+--- Turno 12 di P1 | Vite 1-1
+  P1 gioca Vesh, Lama Rovente
+  P1 attacca: Matriarca del Branco -> Maera
+    P2 reagisce: ('parry', 1)
+  P1 attacca: Vesh, Lama Rovente -> Maera
+    P2 perde 1 Vita (attacco_unita): restano 0
+  P1 attacca: Scudiera di Brace -> Maera
+  P1 attacca: Arden -> Maera
+--- Turno 12 di P2 | Vite 1-0
+  P2 gioca Colpo Mirato
+  P2 gioca Recluta del Crocevia
+  P2 attacca: [test] Leviatano Blu -> Matriarca del Branco
+    Matriarca del Branco (P1) sconfitta
+  P2 attacca: [test] Leviatano Blu -> Vesh, Lama Rovente
+    Vesh, Lama Rovente (P1) sconfitta
+  P2 attacca: [test] Spettro Nero -> Arden
+    P1 reagisce: ('parry', 1)
+  P2 attacca: Maera -> Arden
+    P1 perde 1 Vita (attacco_leader): restano 0
+--- Turno 13 di P1 | Vite 0-0
+  P1 attacca: Arden -> Maera
+    P2 intercetta con Recluta del Crocevia
+    Recluta del Crocevia (P2) sconfitta
+  P1 attacca: [test] Razziatore Rosso -> Maera
+    P2 reagisce: ('parry', 1)
+  P1 attacca: [test] Razziatore Rosso -> Maera
+    P2 reagisce: ('parry', 1)
+--- Turno 13 di P2 | Vite 0-0
+  P2 attacca: [test] Leviatano Blu -> Arden
+P2 vince (colpo_finale)
+
+===== seed 200000 | arden_rosso_verde (P1) vs thorn_verde_blu (P2) | colpo_finale | turni [9, 8]
+--- Turno 1 di P1 | Vite 5-5
+  P1 gioca Scudiera di Brace
+--- Turno 1 di P2 | Vite 5-5
+--- Turno 2 di P1 | Vite 5-5
+  P1 gioca Lince del Sottobosco
+--- Turno 2 di P2 | Vite 5-5
+  P2 gioca [test] Custode Blu
+--- Turno 3 di P1 | Vite 5-5
+  P1 gioca [test] Fabbro Rosso
+--- Turno 3 di P2 | Vite 5-5
+  P2 gioca Lince del Sottobosco
+--- Turno 4 di P1 | Vite 5-5
+  P1 gioca Vesh, Lama Rovente
+--- Turno 4 di P2 | Vite 5-5
+  P2 gioca [test] Orso Verde
+--- Turno 5 di P1 | Vite 5-5
+  P1 gioca [test] Orso Verde
+--- Turno 5 di P2 | Vite 5-5
+  P2 gioca [test] Custode Blu
+  P2 gioca Lince del Sottobosco
+  P2 attacca: [test] Orso Verde -> Arden
+    P1 reagisce: ('parry', 1)
+--- Turno 6 di P1 | Vite 5-5
+  P1 attacca: [test] Orso Verde -> Thorn
+    P2 perde 1 Vita (attacco_unita): restano 4
+  P1 attacca: [test] Fabbro Rosso -> Thorn
+    P2 perde 1 Vita (attacco_unita): restano 3
+  P1 attacca: Vesh, Lama Rovente -> Thorn
+  P1 attacca: Arden -> [test] Orso Verde
+    [test] Orso Verde (P2) sconfitta
+--- Turno 6 di P2 | Vite 5-3
+  P2 gioca Colpo Mirato
+  P2 gioca Colpo Mirato
+--- Turno 7 di P1 | Vite 5-3
+  P1 gioca [test] Veterano
+  P1 gioca [test] Cacciatore Verde
+  P1 attacca: [test] Orso Verde -> Thorn
+    P2 perde 1 Vita (attacco_unita): restano 2
+    Thorn (P2) si Risveglia
+--- Turno 7 di P2 | Vite 5-2
+  P2 gioca [test] Veterano
+  P2 gioca Esca
+  P2 gioca Lanterna del Pellegrino
+  P2 attacca: [test] Custode Blu -> Scudiera di Brace
+    Scudiera di Brace (P1) sconfitta
+--- Turno 8 di P1 | Vite 5-2
+  P1 gioca Colpo Mirato
+  P1 gioca [test] Veterano
+  P1 attacca: [test] Orso Verde -> Thorn
+    P2 perde 1 Vita (attacco_unita): restano 1
+  P1 attacca: [test] Veterano -> Thorn
+    P2 perde 1 Vita (attacco_unita): restano 0
+--- Turno 8 di P2 | Vite 5-0
+  P2 gioca [test] Veterano
+  P2 gioca Esca
+  P2 gioca Colpo Mirato
+  P2 attacca: [test] Veterano -> Arden
+    P1 reagisce: ('parry', 1)
+--- Turno 9 di P1 | Vite 5-0
+  P1 attacca: [test] Orso Verde -> Thorn
+P1 vince (colpo_finale)
+
+===== seed 300000 | arden_rosso_verde (P1) vs vey_nero_rosso (P2) | colpo_finale | turni [10, 9]
+--- Turno 1 di P1 | Vite 5-5
+  P1 gioca Scudiera di Brace
+--- Turno 1 di P2 | Vite 5-5
+--- Turno 2 di P1 | Vite 5-5
+  P1 gioca [test] Razziatore Rosso
+--- Turno 2 di P2 | Vite 5-5
+  P2 gioca [test] Fabbro Rosso
+--- Turno 3 di P1 | Vite 5-5
+  P1 gioca [test] Fabbro Rosso
+--- Turno 3 di P2 | Vite 5-5
+  P2 gioca [test] Flagellante Nero
+--- Turno 4 di P1 | Vite 5-5
+  P1 gioca [test] Veterano
+--- Turno 4 di P2 | Vite 5-5
+  P2 gioca Vesh, Lama Rovente
+--- Turno 5 di P1 | Vite 5-5
+  P1 gioca Vesh, Lama Rovente
+  P1 attacca: [test] Veterano -> Sorella Vey
+    P2 perde 1 Vita (attacco_unita): restano 4
+--- Turno 5 di P2 | Vite 5-4
+  P2 gioca [test] Flagellante Nero
+  P2 gioca [test] Razziatore Rosso
+--- Turno 6 di P1 | Vite 5-4
+  P1 attacca: [test] Veterano -> Sorella Vey
+    P2 perde 1 Vita (attacco_unita): restano 3
+  P1 attacca: [test] Fabbro Rosso -> Sorella Vey
+    P2 perde 1 Vita (attacco_unita): restano 2
+    Sorella Vey (P2) si Risveglia
+  P1 attacca: Vesh, Lama Rovente -> Sorella Vey
+  P1 gioca Carica della Fornace
+  P1 attacca: Vesh, Lama Rovente -> Sorella Vey
+--- Turno 6 di P2 | Vite 5-2
+  P2 gioca Colpo Mirato
+  P2 attacca: [test] Flagellante Nero -> Vesh, Lama Rovente
+    P1 reagisce: ('parry', 1)
+    [test] Flagellante Nero (P2) sconfitta
+  P2 gioca [test] Fabbro Rosso
+  P2 attacca: [test] Flagellante Nero -> Vesh, Lama Rovente
+    Vesh, Lama Rovente (P1) sconfitta
+--- Turno 7 di P1 | Vite 5-2
+  P1 gioca [test] Colosso Rosso
+  P1 gioca Recluta del Crocevia
+  P1 attacca: [test] Veterano -> Sorella Vey
+    P2 perde 1 Vita (attacco_unita): restano 1
+--- Turno 7 di P2 | Vite 5-1
+  P2 attacca: [test] Flagellante Nero -> Arden
+    P1 intercetta con Recluta del Crocevia
+    Recluta del Crocevia (P1) sconfitta
+  P2 attacca: [test] Fabbro Rosso -> Arden
+    P1 perde 1 Vita (attacco_unita): restano 4
+  P2 attacca: [test] Fabbro Rosso -> Arden
+    P1 perde 1 Vita (attacco_unita): restano 3
+  P2 attacca: Vesh, Lama Rovente -> Arden
+  P2 attacca: [test] Razziatore Rosso -> Arden
+--- Turno 8 di P1 | Vite 3-1
+  P1 gioca [test] Veterano
+  P1 attacca: [test] Colosso Rosso -> Vesh, Lama Rovente
+    Vesh, Lama Rovente (P2) sconfitta
+  P1 attacca: [test] Veterano -> [test] Fabbro Rosso
+    P2 reagisce: ('parry', 1)
+    [test] Veterano (P1) sconfitta
+  P1 gioca [test] Razziatore Rosso
+  P1 attacca: Arden -> [test] Razziatore Rosso
+    [test] Razziatore Rosso (P2) sconfitta
+--- Turno 8 di P2 | Vite 3-1
+  P2 gioca Penitente delle Mille Ferite
+  P2 gioca Penitente delle Mille Ferite
+  P2 attacca: [test] Flagellante Nero -> Arden
+    P1 reagisce: ('parry', 1)
+  P2 attacca: [test] Fabbro Rosso -> Arden
+    P1 perde 1 Vita (attacco_unita): restano 2
+    Arden (P1) si Risveglia
+  P2 attacca: [test] Fabbro Rosso -> Arden
+    P1 perde 1 Vita (attacco_unita): restano 1
+--- Turno 9 di P1 | Vite 1-1
+  P1 attacca: [test] Colosso Rosso -> [test] Fabbro Rosso
+    [test] Fabbro Rosso (P2) sconfitta
+  P1 attacca: [test] Veterano -> [test] Fabbro Rosso
+    P2 reagisce: ('parry', 1)
+    [test] Veterano (P1) sconfitta
+  P1 gioca Lince del Sottobosco
+  P1 attacca: Scudiera di Brace -> [test] Fabbro Rosso
+    [test] Fabbro Rosso (P2) sconfitta
+  P1 attacca: [test] Razziatore Rosso -> Sorella Vey
+    P2 perde 1 Vita (attacco_unita): restano 0
+  P1 attacca: Arden -> [test] Flagellante Nero
+    [test] Flagellante Nero (P2) sconfitta
+--- Turno 9 di P2 | Vite 1-0
+  P2 gioca Vesh, Lama Rovente
+  P2 gioca [test] Mercenario
+  P2 gioca [test] Razziatore Rosso
+  P2 attacca: Penitente delle Mille Ferite -> [test] Razziatore Rosso
+    [test] Razziatore Rosso (P1) sconfitta
+  P2 attacca: Penitente delle Mille Ferite -> Scudiera di Brace
+    Scudiera di Brace (P1) sconfitta
+--- Turno 10 di P1 | Vite 1-0
+  P1 attacca: [test] Colosso Rosso -> Sorella Vey
+P1 vince (colpo_finale)
+
+===== seed 400000 | maera_blu_nero (P1) vs maera_blu_nero (P2) | colpo_finale | turni [12, 11]
+--- Turno 1 di P1 | Vite 5-5
+--- Turno 1 di P2 | Vite 5-5
+  P2 gioca Recluta del Crocevia
+--- Turno 2 di P1 | Vite 5-5
+  P1 gioca Penitente delle Mille Ferite
+--- Turno 2 di P2 | Vite 5-5
+  P2 gioca [test] Custode Blu
+--- Turno 3 di P1 | Vite 5-5
+  P1 gioca [test] Flagellante Nero
+--- Turno 3 di P2 | Vite 5-5
+  P2 gioca [test] Custode Blu
+--- Turno 4 di P1 | Vite 5-5
+  P1 gioca [test] Custode Blu
+--- Turno 4 di P2 | Vite 5-5
+  P2 gioca [test] Guardiano Blu
+--- Turno 5 di P1 | Vite 5-5
+  P1 gioca Il Bastione Vivente
+--- Turno 5 di P2 | Vite 5-5
+  P2 gioca [test] Mercenario
+  P2 gioca Lanterna del Pellegrino
+  P2 attacca: [test] Guardiano Blu -> Maera
+    P1 intercetta con Il Bastione Vivente
+    [test] Guardiano Blu (P2) sconfitta
+--- Turno 6 di P1 | Vite 5-5
+  P1 gioca Sentinella del Guado
+  P1 gioca Lanterna del Pellegrino
+  P1 attacca: Il Bastione Vivente -> Maera
+    P2 reagisce: ('reaction', 'muro', 'hand')
+--- Turno 6 di P2 | Vite 5-5
+  P2 gioca [test] Guardiano Blu
+--- Turno 7 di P1 | Vite 5-5
+  P1 attacca: Il Bastione Vivente -> Maera
+    P2 reagisce: ('reaction', 'muro', 'hand')
+  P1 attacca: [test] Custode Blu -> Maera
+    P2 intercetta con [test] Guardiano Blu
+    [test] Guardiano Blu (P2) sconfitta
+    [test] Custode Blu (P1) sconfitta
+  P1 gioca [test] Guardiano Blu
+--- Turno 7 di P2 | Vite 5-5
+  P2 gioca [test] Flagellante Nero
+  P2 attacca: [test] Custode Blu -> Maera
+    P1 intercetta con [test] Guardiano Blu
+    P1 reagisce: ('reaction', 'grido', 'hand')
+    [test] Custode Blu (P2) sconfitta
+  P2 gioca Penitente delle Mille Ferite
+--- Turno 8 di P1 | Vite 5-5
+  P1 attacca: Il Bastione Vivente -> Maera
+    P2 reagisce: ('leader_reaction', 0)
+  P1 attacca: [test] Guardiano Blu -> Maera
+    P2 intercetta con Recluta del Crocevia
+    Recluta del Crocevia (P2) sconfitta
+  P1 attacca: Sentinella del Guado -> Maera
+    P2 perde 1 Vita (attacco_unita): restano 4
+  P1 attacca: [test] Flagellante Nero -> Maera
+    P2 perde 1 Vita (attacco_unita): restano 3
+  P1 attacca: Maera -> Maera
+--- Turno 8 di P2 | Vite 5-3
+  P2 gioca Colpo Mirato
+  P2 gioca [test] Spettro Nero
+  P2 attacca: [test] Custode Blu -> Sentinella del Guado
+    Sentinella del Guado (P1) sconfitta
+--- Turno 9 di P1 | Vite 5-3
+  P1 gioca Colpo Mirato
+  P1 gioca Sentinella del Guado
+  P1 gioca [test] Mercenario
+  P1 gioca Patto di Sangue
+    P1 perde 1 Vita (costo): restano 4
+  P1 attacca: Il Bastione Vivente -> Maera
+    P2 perde 1 Vita (attacco_unita): restano 2
+    Maera (P2) si Risveglia
+  P1 attacca: [test] Guardiano Blu -> Maera
+    P2 perde 1 Vita (attacco_unita): restano 1
+--- Turno 9 di P2 | Vite 4-1
+  P2 gioca [test] Flagellante Nero
+  P2 attacca: [test] Flagellante Nero -> Maera
+    P1 intercetta con Sentinella del Guado
+    Sentinella del Guado (P1) sconfitta
+  P2 attacca: [test] Spettro Nero -> Maera
+    P1 reagisce: ('reaction', 'muro', 'hand')
+  P2 attacca: Penitente delle Mille Ferite -> Maera
+    P1 perde 1 Vita (attacco_unita): restano 3
+  P2 attacca: [test] Mercenario -> Maera
+    P1 perde 1 Vita (attacco_unita): restano 2
+    Maera (P1) si Risveglia
+--- Turno 10 di P1 | Vite 2-1
+  P1 gioca Recluta del Crocevia
+  P1 gioca Lanterna del Pellegrino
+  P1 attacca: Il Bastione Vivente -> [test] Spettro Nero
+    P2 reagisce: ('reaction', 'grido', 'scar')
+    Il Bastione Vivente (P1) sconfitta
+  P1 attacca: [test] Guardiano Blu -> [test] Flagellante Nero
+    [test] Flagellante Nero (P2) sconfitta
+  P1 attacca: Penitente delle Mille Ferite -> [test] Mercenario
+    [test] Mercenario (P2) sconfitta
+  P1 attacca: [test] Mercenario -> Penitente delle Mille Ferite
+    Penitente delle Mille Ferite (P2) sconfitta
+  P1 attacca: Maera -> [test] Spettro Nero
+    [test] Spettro Nero (P2) sconfitta
+--- Turno 10 di P2 | Vite 2-1
+  P2 gioca [test] Mercenario
+  P2 gioca Penitente delle Mille Ferite
+  P2 gioca Recluta del Crocevia
+  P2 attacca: Maera -> [test] Guardiano Blu
+    P1 reagisce: ('parry', 1)
+--- Turno 11 di P1 | Vite 2-1
+  P1 gioca [test] Spettro Nero
+  P1 attacca: [test] Guardiano Blu -> Maera
+    P2 intercetta con Recluta del Crocevia
+    Recluta del Crocevia (P2) sconfitta
+  P1 attacca: Penitente delle Mille Ferite -> Maera
+    P2 reagisce: ('parry', 1)
+  P1 attacca: Maera -> Maera
+    P2 perde 1 Vita (attacco_leader): restano 0
+--- Turno 11 di P2 | Vite 2-0
+  P2 attacca: Penitente delle Mille Ferite -> Penitente delle Mille Ferite
+    Penitente delle Mille Ferite (P1) sconfitta
+  P2 attacca: [test] Flagellante Nero -> Maera
+    P1 reagisce: ('parry', 1)
+  P2 attacca: [test] Mercenario -> Maera
+    P1 perde 1 Vita (attacco_unita): restano 1
+  P2 attacca: Maera -> [test] Guardiano Blu
+    [test] Guardiano Blu (P1) sconfitta
+--- Turno 12 di P1 | Vite 1-0
+  P1 attacca: [test] Spettro Nero -> Maera
+P1 vince (colpo_finale)
+
+===== seed 500000 | maera_blu_nero (P1) vs thorn_verde_blu (P2) | colpo_finale | turni [10, 10]
+--- Turno 1 di P1 | Vite 5-5
+  P1 gioca Recluta del Crocevia
+--- Turno 1 di P2 | Vite 5-5
+--- Turno 2 di P1 | Vite 5-5
+  P1 gioca Sentinella del Guado
+--- Turno 2 di P2 | Vite 5-5
+  P2 gioca [test] Custode Blu
+--- Turno 3 di P1 | Vite 5-5
+  P1 gioca Sentinella del Guado
+  P1 gioca Patto di Sangue
+    P1 perde 1 Vita (costo): restano 4
+--- Turno 3 di P2 | Vite 4-5
+  P2 gioca [test] Custode Blu
+--- Turno 4 di P1 | Vite 4-5
+  P1 gioca [test] Spettro Nero
+--- Turno 4 di P2 | Vite 4-5
+  P2 gioca [test] Veterano
+--- Turno 5 di P1 | Vite 4-5
+  P1 gioca [test] Spettro Nero
+  P1 attacca: [test] Spettro Nero -> Thorn
+    P2 perde 1 Vita (attacco_unita): restano 4
+--- Turno 5 di P2 | Vite 4-4
+  P2 gioca Il Bastione Vivente
+  P2 attacca: [test] Veterano -> Maera
+    P1 reagisce: ('reaction', 'muro', 'hand')
+--- Turno 6 di P1 | Vite 4-4
+  P1 attacca: [test] Spettro Nero -> Thorn
+    P2 intercetta con Il Bastione Vivente
+    [test] Spettro Nero (P1) sconfitta
+  P1 gioca [test] Flagellante Nero
+  P1 attacca: [test] Spettro Nero -> Thorn
+    P2 perde 1 Vita (attacco_unita): restano 3
+--- Turno 6 di P2 | Vite 4-3
+  P2 gioca [test] Antico Verde
+  P2 attacca: Il Bastione Vivente -> [test] Spettro Nero
+    P1 reagisce: ('reaction', 'grido', 'scar')
+    Il Bastione Vivente (P2) sconfitta
+  P2 attacca: [test] Veterano -> Maera
+    P1 perde 1 Vita (attacco_unita): restano 3
+--- Turno 7 di P1 | Vite 3-3
+  P1 attacca: [test] Spettro Nero -> Thorn
+    P2 perde 1 Vita (attacco_unita): restano 2
+    Thorn (P2) si Risveglia
+  P1 attacca: Sentinella del Guado -> Thorn
+    P2 perde 1 Vita (attacco_unita): restano 1
+  P1 attacca: [test] Flagellante Nero -> Thorn
+--- Turno 7 di P2 | Vite 3-1
+  P2 gioca Colpo Mirato
+  P2 gioca [test] Orso Verde
+  P2 attacca: [test] Antico Verde -> [test] Spettro Nero
+    [test] Spettro Nero (P1) sconfitta
+  P2 attacca: [test] Veterano -> [test] Flagellante Nero
+    [test] Flagellante Nero (P1) sconfitta
+--- Turno 8 di P1 | Vite 3-1
+  P1 gioca [test] Leviatano Blu
+  P1 gioca Sentinella del Guado
+--- Turno 8 di P2 | Vite 3-1
+  P2 gioca Esca
+  P2 gioca Lanterna del Pellegrino
+  P2 attacca: [test] Antico Verde -> Recluta del Crocevia
+    Recluta del Crocevia (P1) sconfitta
+  P2 attacca: [test] Veterano -> Maera
+    P1 intercetta con Sentinella del Guado
+    Sentinella del Guado (P1) sconfitta
+  P2 attacca: [test] Orso Verde -> Maera
+    P1 reagisce: ('leader_reaction', 0)
+  P2 attacca: [test] Custode Blu -> Maera
+    P1 intercetta con Sentinella del Guado
+    Sentinella del Guado (P1) sconfitta
+  P2 attacca: [test] Custode Blu -> Maera
+    P1 perde 1 Vita (attacco_unita): restano 2
+    Maera (P1) si Risveglia
+  P2 attacca: Thorn -> Maera
+    P1 perde 1 Vita (attacco_leader): restano 1
+--- Turno 9 di P1 | Vite 1-1
+  P1 gioca Colpo Mirato
+  P1 gioca Colpo Mirato
+  P1 gioca Penitente delle Mille Ferite
+  P1 attacca: [test] Leviatano Blu -> [test] Veterano
+    P2 reagisce: ('reaction', 'muro', 'hand')
+    [test] Leviatano Blu (P1) sconfitta
+--- Turno 9 di P2 | Vite 1-1
+  P2 gioca Matriarca del Branco
+  P2 gioca [test] Cacciatore Verde
+  P2 attacca: [test] Antico Verde -> Maera
+    P1 perde 1 Vita (attacco_unita): restano 0
+  P2 attacca: [test] Orso Verde -> Maera
+  P2 attacca: [test] Veterano -> Maera
+--- Turno 10 di P1 | Vite 0-1
+  P1 gioca [test] Guardiano Blu
+  P1 gioca Recluta del Crocevia
+  P1 attacca: Penitente delle Mille Ferite -> Thorn
+    P2 perde 1 Vita (attacco_unita): restano 0
+--- Turno 10 di P2 | Vite 0-0
+  P2 attacca: [test] Antico Verde -> Maera
+    P1 intercetta con Recluta del Crocevia
+    Recluta del Crocevia (P1) sconfitta
+  P2 attacca: [test] Veterano -> Maera
+    P1 intercetta con [test] Guardiano Blu
+    [test] Guardiano Blu (P1) sconfitta
+  P2 attacca: Matriarca del Branco -> Maera
+P2 vince (colpo_finale)
+
+===== seed 600000 | maera_blu_nero (P1) vs vey_nero_rosso (P2) | colpo_finale | turni [10, 9]
+--- Turno 1 di P1 | Vite 5-5
+--- Turno 1 di P2 | Vite 5-5
+--- Turno 2 di P1 | Vite 5-5
+  P1 gioca Penitente delle Mille Ferite
+--- Turno 2 di P2 | Vite 5-5
+  P2 gioca [test] Razziatore Rosso
+--- Turno 3 di P1 | Vite 5-5
+  P1 gioca [test] Flagellante Nero
+--- Turno 3 di P2 | Vite 5-5
+  P2 gioca [test] Fabbro Rosso
+--- Turno 4 di P1 | Vite 5-5
+  P1 gioca [test] Guardiano Blu
+--- Turno 4 di P2 | Vite 5-5
+  P2 gioca [test] Veterano
+--- Turno 5 di P1 | Vite 5-5
+  P1 gioca [test] Guardiano Blu
+  P1 attacca: [test] Guardiano Blu -> Sorella Vey
+    P2 perde 1 Vita (attacco_unita): restano 4
+--- Turno 5 di P2 | Vite 5-4
+  P2 gioca Vesh, Lama Rovente
+  P2 attacca: [test] Veterano -> Maera
+    P1 intercetta con [test] Guardiano Blu
+    P1 reagisce: ('reaction', 'muro', 'hand')
+    [test] Veterano (P2) sconfitta
+--- Turno 6 di P1 | Vite 5-4
+  P1 gioca [test] Leviatano Blu
+  P1 attacca: [test] Guardiano Blu -> Sorella Vey
+    P2 reagisce: ('parry', 1)
+  P1 attacca: [test] Guardiano Blu -> Sorella Vey
+    P2 perde 1 Vita (attacco_unita): restano 3
+--- Turno 6 di P2 | Vite 5-3
+  P2 gioca [test] Spettro Nero
+  P2 gioca [test] Razziatore Rosso
+--- Turno 7 di P1 | Vite 5-3
+  P1 attacca: [test] Leviatano Blu -> Sorella Vey
+    P2 perde 1 Vita (attacco_unita): restano 2
+    Sorella Vey (P2) si Risveglia
+  P1 attacca: [test] Guardiano Blu -> Sorella Vey
+    P2 perde 1 Vita (attacco_unita): restano 1
+  P1 attacca: [test] Guardiano Blu -> Sorella Vey
+  P1 attacca: [test] Flagellante Nero -> Sorella Vey
+  P1 attacca: Maera -> Sorella Vey
+--- Turno 7 di P2 | Vite 5-1
+  P2 gioca Colpo Mirato
+  P2 attacca: [test] Spettro Nero -> Maera
+    P1 reagisce: ('reaction', 'muro', 'hand')
+  P2 attacca: [test] Fabbro Rosso -> Maera
+    P1 perde 1 Vita (attacco_unita): restano 4
+  P2 attacca: Vesh, Lama Rovente -> Maera
+    P1 perde 1 Vita (attacco_unita): restano 3
+--- Turno 8 di P1 | Vite 3-1
+  P1 gioca [test] Guardiano Blu
+  P1 attacca: [test] Leviatano Blu -> Vesh, Lama Rovente
+    Vesh, Lama Rovente (P2) sconfitta
+  P1 attacca: [test] Guardiano Blu -> [test] Fabbro Rosso
+    P2 reagisce: ('parry', 1)
+    [test] Guardiano Blu (P1) sconfitta
+  P1 gioca [test] Flagellante Nero
+  P1 attacca: [test] Guardiano Blu -> [test] Fabbro Rosso
+    [test] Fabbro Rosso (P2) sconfitta
+--- Turno 8 di P2 | Vite 3-1
+  P2 gioca Vesh, Lama Rovente
+  P2 gioca [test] Spettro Nero
+  P2 attacca: [test] Spettro Nero -> Maera
+    P1 intercetta con [test] Guardiano Blu
+    [test] Guardiano Blu (P1) sconfitta
+    [test] Spettro Nero (P2) sconfitta
+--- Turno 9 di P1 | Vite 3-1
+  P1 gioca [test] Custode Blu
+  P1 attacca: [test] Leviatano Blu -> Sorella Vey
+    P2 perde 1 Vita (attacco_unita): restano 0
+  P1 attacca: [test] Guardiano Blu -> Sorella Vey
+  P1 attacca: [test] Flagellante Nero -> Sorella Vey
+--- Turno 9 di P2 | Vite 3-0
+  P2 gioca Colpo Mirato
+  P2 gioca [test] Veterano
+  P2 attacca: [test] Spettro Nero -> Maera
+    P1 reagisce: ('reaction', 'grido', 'scar')
+--- Turno 10 di P1 | Vite 3-0
+  P1 attacca: [test] Leviatano Blu -> Sorella Vey
+    P2 reagisce: ('reaction', 'grido', 'hand')
+  P1 attacca: [test] Guardiano Blu -> Sorella Vey
+P1 vince (colpo_finale)
+
+===== seed 700000 | thorn_verde_blu (P1) vs thorn_verde_blu (P2) | colpo_finale | turni [10, 10]
+--- Turno 1 di P1 | Vite 5-5
+--- Turno 1 di P2 | Vite 5-5
+--- Turno 2 di P1 | Vite 5-5
+  P1 gioca [test] Mercenario
+--- Turno 2 di P2 | Vite 5-5
+  P2 gioca [test] Cacciatore Verde
+--- Turno 3 di P1 | Vite 5-5
+  P1 gioca [test] Custode Blu
+--- Turno 3 di P2 | Vite 5-5
+  P2 gioca [test] Custode Blu
+--- Turno 4 di P1 | Vite 5-5
+  P1 gioca [test] Veterano
+--- Turno 4 di P2 | Vite 5-5
+  P2 gioca [test] Veterano
+--- Turno 5 di P1 | Vite 5-5
+  P1 gioca [test] Orso Verde
+  P1 gioca Esca
+  P1 attacca: [test] Veterano -> [test] Cacciatore Verde
+    [test] Cacciatore Verde (P2) sconfitta
+--- Turno 5 di P2 | Vite 5-5
+  P2 gioca Il Bastione Vivente
+  P2 attacca: [test] Veterano -> Thorn
+    P1 perde 1 Vita (attacco_unita): restano 4
+--- Turno 6 di P1 | Vite 4-5
+  P1 gioca Matriarca del Branco
+  P1 attacca: [test] Veterano -> Thorn
+    P2 intercetta con Il Bastione Vivente
+    [test] Veterano (P1) sconfitta
+  P1 attacca: [test] Orso Verde -> Thorn
+    P2 perde 1 Vita (attacco_unita): restano 4
+--- Turno 6 di P2 | Vite 4-4
+  P2 gioca [test] Antico Verde
+  P2 attacca: Il Bastione Vivente -> [test] Orso Verde
+    [test] Orso Verde (P1) sconfitta
+  P2 attacca: [test] Veterano -> Thorn
+    P1 perde 1 Vita (attacco_unita): restano 3
+--- Turno 7 di P1 | Vite 3-4
+  P1 gioca [test] Antico Verde
+  P1 attacca: Matriarca del Branco -> Thorn
+    P2 perde 1 Vita (attacco_unita): restano 3
+--- Turno 7 di P2 | Vite 3-3
+  P2 gioca Il Bastione Vivente
+  P2 gioca Lanterna del Pellegrino
+  P2 attacca: [test] Antico Verde -> Matriarca del Branco
+    P1 reagisce: ('reaction', 'muro', 'hand')
+    [test] Antico Verde (P2) sconfitta
+  P2 attacca: Il Bastione Vivente -> Matriarca del Branco
+    Matriarca del Branco (P1) sconfitta
+  P2 attacca: [test] Veterano -> Thorn
+    P1 perde 1 Vita (attacco_unita): restano 2
+    Thorn (P1) si Risveglia
+--- Turno 8 di P1 | Vite 2-3
+  P1 gioca Il Bastione Vivente
+  P1 gioca [test] Mercenario
+  P1 attacca: [test] Antico Verde -> Il Bastione Vivente
+    Il Bastione Vivente (P2) sconfitta
+--- Turno 8 di P2 | Vite 2-3
+  P2 gioca [test] Orso Verde
+  P2 gioca [test] Guardiano Blu
+  P2 attacca: Il Bastione Vivente -> Thorn
+    P1 intercetta con Il Bastione Vivente
+    Il Bastione Vivente (P1) sconfitta
+    Il Bastione Vivente (P2) sconfitta
+  P2 attacca: [test] Veterano -> Thorn
+    P1 perde 1 Vita (attacco_unita): restano 1
+--- Turno 9 di P1 | Vite 1-3
+  P1 gioca [test] Veterano
+  P1 gioca Esca
+  P1 gioca Colpo Mirato
+  P1 attacca: [test] Antico Verde -> [test] Veterano
+    [test] Veterano (P2) sconfitta
+--- Turno 9 di P2 | Vite 1-3
+  P2 gioca [test] Antico Verde
+  P2 gioca Sentinella del Guado
+  P2 attacca: [test] Guardiano Blu -> Thorn
+    P1 perde 1 Vita (attacco_unita): restano 0
+  P2 attacca: [test] Orso Verde -> Thorn
+--- Turno 10 di P1 | Vite 0-3
+  P1 attacca: [test] Antico Verde -> [test] Orso Verde
+    [test] Orso Verde (P2) sconfitta
+  P1 attacca: [test] Veterano -> Thorn
+    P2 intercetta con Sentinella del Guado
+    Sentinella del Guado (P2) sconfitta
+  P1 attacca: [test] Custode Blu -> Thorn
+    P2 reagisce: ('parry', 1)
+  P1 attacca: [test] Mercenario -> Thorn
+    P2 perde 1 Vita (attacco_unita): restano 2
+    Thorn (P2) si Risveglia
+  P1 attacca: [test] Mercenario -> Thorn
+    P2 perde 1 Vita (attacco_unita): restano 1
+  P1 attacca: Thorn -> [test] Guardiano Blu
+    [test] Guardiano Blu (P2) sconfitta
+--- Turno 10 di P2 | Vite 0-1
+  P2 attacca: [test] Antico Verde -> Thorn
+P2 vince (colpo_finale)
+
+===== seed 800000 | thorn_verde_blu (P1) vs vey_nero_rosso (P2) | colpo_finale | turni [9, 8]
+--- Turno 1 di P1 | Vite 5-5
+--- Turno 1 di P2 | Vite 5-5
+  P2 gioca Scudiera di Brace
+--- Turno 2 di P1 | Vite 5-5
+  P1 gioca [test] Mercenario
+--- Turno 2 di P2 | Vite 5-5
+  P2 gioca [test] Razziatore Rosso
+  P2 gioca Scudiera di Brace
+--- Turno 3 di P1 | Vite 5-5
+  P1 gioca [test] Cacciatore Verde
+--- Turno 3 di P2 | Vite 5-5
+  P2 gioca [test] Razziatore Rosso
+  P2 gioca Recluta del Crocevia
+--- Turno 4 di P1 | Vite 5-5
+  P1 gioca [test] Orso Verde
+--- Turno 4 di P2 | Vite 5-5
+  P2 attacca: [test] Razziatore Rosso -> Thorn
+    P1 perde 1 Vita (attacco_unita): restano 4
+--- Turno 5 di P1 | Vite 4-5
+  P1 gioca Il Bastione Vivente
+  P1 attacca: [test] Orso Verde -> [test] Razziatore Rosso
+    [test] Razziatore Rosso (P2) sconfitta
+--- Turno 5 di P2 | Vite 4-5
+  P2 gioca [test] Spettro Nero
+  P2 gioca Patto di Sangue
+    P2 perde 1 Vita (costo): restano 4
+--- Turno 6 di P1 | Vite 4-4
+  P1 gioca [test] Custode Blu
+  P1 gioca Esca
+  P1 attacca: Il Bastione Vivente -> Scudiera di Brace
+    Scudiera di Brace (P2) sconfitta
+  P1 attacca: [test] Orso Verde -> Sorella Vey
+    P2 intercetta con Recluta del Crocevia
+    Recluta del Crocevia (P2) sconfitta
+--- Turno 6 di P2 | Vite 4-4
+  P2 gioca [test] Spettro Nero
+  P2 gioca [test] Razziatore Rosso
+  P2 attacca: [test] Spettro Nero -> Thorn
+    P1 reagisce: ('reaction', 'muro', 'hand')
+--- Turno 7 di P1 | Vite 4-4
+  P1 attacca: Il Bastione Vivente -> [test] Spettro Nero
+    [test] Spettro Nero (P2) sconfitta
+  P1 attacca: [test] Orso Verde -> Sorella Vey
+    P2 perde 1 Vita (attacco_unita): restano 3
+  P1 attacca: [test] Custode Blu -> Sorella Vey
+    P2 perde 1 Vita (attacco_unita): restano 2
+    Sorella Vey (P2) si Risveglia
+  P1 attacca: [test] Mercenario -> Sorella Vey
+  P1 attacca: [test] Cacciatore Verde -> Sorella Vey
+--- Turno 7 di P2 | Vite 4-2
+  P2 gioca Colpo Mirato
+  P2 gioca [test] Veterano
+  P2 attacca: [test] Spettro Nero -> [test] Cacciatore Verde
+    P1 reagisce: ('reaction', 'muro', 'hand')
+    [test] Spettro Nero (P2) sconfitta
+  P2 attacca: Sorella Vey -> [test] Cacciatore Verde
+    [test] Cacciatore Verde (P1) sconfitta
+--- Turno 8 di P1 | Vite 4-2
+  P1 gioca [test] Antico Verde
+  P1 gioca Lince del Sottobosco
+  P1 attacca: Il Bastione Vivente -> Sorella Vey
+    P2 perde 1 Vita (attacco_unita): restano 1
+  P1 attacca: [test] Orso Verde -> Sorella Vey
+    P2 perde 1 Vita (attacco_unita): restano 0
+--- Turno 8 di P2 | Vite 4-0
+  P2 gioca [test] Veterano
+  P2 attacca: [test] Veterano -> Thorn
+    P1 perde 1 Vita (attacco_unita): restano 3
+  P2 attacca: [test] Razziatore Rosso -> Thorn
+    P1 perde 1 Vita (attacco_unita): restano 2
+    Thorn (P1) si Risveglia
+--- Turno 9 di P1 | Vite 2-0
+  P1 attacca: [test] Antico Verde -> Sorella Vey
+P1 vince (colpo_finale)
+
+===== seed 900000 | vey_nero_rosso (P1) vs vey_nero_rosso (P2) | colpo_finale | turni [10, 10]
+--- Turno 1 di P1 | Vite 5-5
+  P1 gioca Recluta del Crocevia
+--- Turno 1 di P2 | Vite 5-5
+  P2 gioca Recluta del Crocevia
+--- Turno 2 di P1 | Vite 5-5
+  P1 gioca Penitente delle Mille Ferite
+--- Turno 2 di P2 | Vite 5-5
+  P2 gioca [test] Flagellante Nero
+--- Turno 3 di P1 | Vite 5-5
+  P1 gioca Recluta del Crocevia
+--- Turno 3 di P2 | Vite 5-5
+  P2 gioca [test] Mercenario
+  P2 gioca Recluta del Crocevia
+--- Turno 4 di P1 | Vite 5-5
+  P1 gioca [test] Spettro Nero
+--- Turno 4 di P2 | Vite 5-5
+  P2 gioca [test] Veterano
+--- Turno 5 di P1 | Vite 5-5
+  P1 gioca [test] Veterano
+  P1 attacca: [test] Spettro Nero -> Sorella Vey
+    P2 intercetta con Recluta del Crocevia
+    Recluta del Crocevia (P2) sconfitta
+--- Turno 5 di P2 | Vite 5-5
+  P2 gioca [test] Flagellante Nero
+  P2 attacca: [test] Veterano -> Sorella Vey
+    P1 reagisce: ('parry', 1)
+--- Turno 6 di P1 | Vite 5-5
+  P1 attacca: [test] Spettro Nero -> Sorella Vey
+    P2 reagisce: ('parry', 1)
+  P1 attacca: [test] Veterano -> Sorella Vey
+    P2 perde 1 Vita (attacco_unita): restano 4
+  P1 gioca Carica della Fornace
+--- Turno 6 di P2 | Vite 5-4
+  P2 attacca: [test] Veterano -> Sorella Vey
+    P1 reagisce: ('parry', 1)
+  P2 attacca: [test] Flagellante Nero -> Sorella Vey
+    P1 perde 1 Vita (attacco_unita): restano 4
+  P2 attacca: [test] Flagellante Nero -> Sorella Vey
+    P1 perde 1 Vita (attacco_unita): restano 3
+--- Turno 7 di P1 | Vite 3-4
+  P1 gioca Colpo Mirato
+  P1 attacca: [test] Spettro Nero -> [test] Flagellante Nero
+    [test] Flagellante Nero (P2) sconfitta
+  P1 attacca: [test] Veterano -> Sorella Vey
+    P2 reagisce: ('parry', 1)
+  P1 attacca: Penitente delle Mille Ferite -> Sorella Vey
+    P2 perde 1 Vita (attacco_unita): restano 3
+--- Turno 7 di P2 | Vite 3-3
+  P2 gioca [test] Spettro Nero
+  P2 gioca Penitente delle Mille Ferite
+  P2 attacca: [test] Veterano -> Penitente delle Mille Ferite
+    Penitente delle Mille Ferite (P1) sconfitta
+--- Turno 8 di P1 | Vite 3-3
+  P1 gioca [test] Orrore Nero
+  P1 attacca: [test] Spettro Nero -> Sorella Vey
+    P2 intercetta con Recluta del Crocevia
+    Recluta del Crocevia (P2) sconfitta
+  P1 attacca: [test] Veterano -> Sorella Vey
+    P2 perde 1 Vita (attacco_unita): restano 2
+    Sorella Vey (P2) si Risveglia
+--- Turno 8 di P2 | Vite 3-2
+  P2 gioca [test] Spettro Nero
+  P2 attacca: [test] Veterano -> Sorella Vey
+    P1 reagisce: ('parry', 1)
+  P2 attacca: [test] Spettro Nero -> Sorella Vey
+    P1 perde 1 Vita (attacco_unita): restano 2
+    Sorella Vey (P1) si Risveglia
+  P2 attacca: Penitente delle Mille Ferite -> Sorella Vey
+    P1 perde 1 Vita (attacco_unita): restano 1
+  P2 attacca: Sorella Vey -> [test] Spettro Nero
+    [test] Spettro Nero (P1) sconfitta
+--- Turno 9 di P1 | Vite 1-2
+  P1 gioca [test] Spettro Nero
+  P1 attacca: [test] Orrore Nero -> [test] Veterano
+    P2 reagisce: ('reaction', 'grido', 'hand')
+    [test] Orrore Nero (P1) sconfitta
+  P1 gioca [test] Flagellante Nero
+  P1 attacca: [test] Veterano -> Penitente delle Mille Ferite
+    Penitente delle Mille Ferite (P2) sconfitta
+--- Turno 9 di P2 | Vite 1-2
+  P2 gioca [test] Razziatore Rosso
+  P2 attacca: [test] Veterano -> Sorella Vey
+    P1 intercetta con Recluta del Crocevia
+    Recluta del Crocevia (P1) sconfitta
+  P2 attacca: [test] Spettro Nero -> Sorella Vey
+    P1 intercetta con Recluta del Crocevia
+    Recluta del Crocevia (P1) sconfitta
+  P2 attacca: [test] Spettro Nero -> Sorella Vey
+    P1 reagisce: ('reaction', 'grido', 'hand')
+  P2 gioca Carica della Fornace
+  P2 attacca: [test] Mercenario -> Sorella Vey
+    P1 perde 1 Vita (attacco_unita): restano 0
+  P2 attacca: [test] Mercenario -> Sorella Vey
+--- Turno 10 di P1 | Vite 0-2
+  P1 gioca [test] Mercenario
+  P1 gioca [test] Razziatore Rosso
+  P1 attacca: [test] Spettro Nero -> [test] Mercenario
+    [test] Mercenario (P2) sconfitta
+  P1 attacca: [test] Flagellante Nero -> Sorella Vey
+    P2 reagisce: ('reaction', 'grido', 'hand')
+  P1 attacca: [test] Veterano -> Sorella Vey
+    P2 perde 1 Vita (attacco_unita): restano 1
+  P1 attacca: Sorella Vey -> [test] Veterano
+    [test] Veterano (P2) sconfitta
+--- Turno 10 di P2 | Vite 0-1
+  P2 attacca: [test] Spettro Nero -> Sorella Vey
+P2 vince (colpo_finale)
+
