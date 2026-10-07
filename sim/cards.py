@@ -23,6 +23,7 @@ class Card:
     abilities: tuple = ()         # triggers / statics (dicts)
     play: dict = field(default=None, hash=False, compare=False)    # tactics
     react: dict = field(default=None, hash=False, compare=False)   # reactions
+    costs: tuple = field(default=(), hash=False, compare=False)    # extra costs on any card type (R-002 #1)
     text: str = ""
     test: bool = False
 
@@ -60,6 +61,7 @@ def load(path=None):
             colors=_tuple(c.get("colors")), power=c.get("power", 0),
             keywords=frozenset(c.get("keywords", [])), kw_params=c.get("kw_params", {}),
             abilities=_tuple(c.get("abilities")), play=c.get("play"), react=c.get("react"),
+            costs=_tuple(c.get("costs")),
             text=c.get("text", ""), test=c.get("test", False))
     leaders = {}
     for l in raw["leaders"]:

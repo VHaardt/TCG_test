@@ -63,14 +63,18 @@ Una carta è un oggetto json:
 - `keywords`: `assalto`, `scudo`, `bracconiere` (valore in `kw_params`), più parole descrittive libere (`furia`, `infuso`).
 - `abilities`: lista di abilità.
   - Trigger: `{"trigger": EVENTO, "if": [CONDIZIONI], "once_per_turn": true, "do": [OPERAZIONI]}`.
-    Eventi: `on_enter`, `on_attack`, `on_intercept`, `on_infuse`, `on_defeats_attacker`, `on_own_unit_defeats_exposed`.
-  - Statiche: `{"static": "power", "value": 3, "if": [{"furia": 2}]}` (sulla carta stessa) oppure con `"applies_to": SELETTORE` (aura su altre Unità); `{"static": "guard_max", "value": 1}`.
+    Eventi: `on_enter`, `on_attack`, `on_intercept`, `on_intercepted` (sull'Unità attaccante quando viene intercettata, dopo `on_intercept`), `on_infuse`, `on_defeats_attacker`, `on_own_unit_defeats_exposed`, `on_guard_discarded` (nel Ripristino, se la Guardia scartata è almeno 1; il numero è `"@n"`).
+  - Statiche: `{"static": "power", "value": 3, "if": [{"furia": 2}]}` (sulla carta stessa) oppure con `"applies_to": SELETTORE` (aura su altre Unità); `{"static": "guard_max", "value": 1, "cap": 4}` (`cap` facoltativo: il massimo di Guardia non supera 4 per effetto di questa carta; vale da Leader, Reliquie e Unità).
 - `play` (Tattiche): `{"target": SELETTORE, "costs": [{"lose_life": 1, "floor": 1}], "do": [...]}`.
-- `react` (Reazioni): `{"do": [...], "do_from_scars": [...]}`; il costo in Guardia è `cost`.
-- Condizioni: `furia N`, `scars_ge N`, `infusion_count N`, `awakened true/false`.
-- Selettori: `{"side": "own"|"opp", "kind": "unit", "cost_le": 3, "exposed": true, "power_le": 4, "inf_ge": 2, "keyword": "assalto"}`.
-- Operazioni: `draw`, `gain_guard`, `temp_power`, `perm_power`, `expose`, `defeat`, `give_renew`, `att_mod`, `def_mod`, `after_combat_ready_interceptor`, `steal_infusion`. Bersagli: `self`, `infused`, `chosen`.
-- Un numero può essere scritto `"@nome"` (o `"-@nome"`): legge il parametro `nome` da `Rules`, così un valore da tarare resta nella configurazione.
+- `react` (Reazioni): `{"costs": [...], "do": [...], "do_from_scars": [...]}`; il costo in Guardia è `cost`.
+- Costi extra su qualsiasi carta: `"costs": [{"lose_life": N, "floor": F}]` al livello della carta (Unità, Reliquie, Tattiche, Reazioni) o dentro `play`/`react`. La carta è giocabile solo se restano almeno F Vite e il Saldo lo permette; le Vite pagate contano nel Saldo e diventano Cicatrici.
+- Condizioni: `furia N`, `scars_ge N`, `infusion_count N`, `awakened true/false`, `is_second_player true/false` (il proprietario è G2), `life_behind_ge N` (Vite avversarie − Vite proprie ≥ N), `life_le N`.
+- Selettori: `{"side": "own"|"opp", "kind": "unit", "cost_le": 3, "exposed": true, "power_le": 4, "inf_ge": 2, "keyword": "assalto"}`. `cost_le` e `power_le` accettano anche valori dinamici, per esempio `"power_le": "@scars"`.
+- Operazioni: `draw`, `gain_guard`, `temp_power`, `perm_power`, `expose`, `defeat`, `give_renew`, `att_mod`, `def_mod`, `after_combat_ready_interceptor`, `steal_infusion`, `unblockable` (il bersaglio non può essere intercettato fino a fine turno; usata in `on_attack` vale già per quell'attacco). Bersagli: `self`, `infused`, `chosen`.
+- Un numero può essere scritto `"@nome"` (o `"-@nome"`):
+  - valori dinamici visti dal proprietario della carta: `@scars`, `@opp_scars`, `@life`, `@opp_life`, `@hand`, `@guard`;
+  - `@n`: il numero portato dall'evento (per esempio la Guardia scartata);
+  - qualsiasi altro nome legge il parametro da `Rules`, così un valore da tarare resta nella configurazione.
 
 I Leader hanno `base` e `awakened`, liste di abilità con in più: `{"activated": true, "exhaust": true, "cost": 2, "target": ..., "do": [...]}`, `{"reaction": true, "guard_cost": 1, "do": [...]}` e `{"modifier": NOME, "value": ...}` (`parry_per_guard`, `rim_free_once`, `rim_keeps_furia`).
 

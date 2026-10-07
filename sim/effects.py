@@ -9,19 +9,38 @@ A card or Leader side carries a list of abilities. Each ability is one of:
 Tactics carry "play": {"target": SELECTOR, "costs": [...], "do": [OP...]}.
 Reactions carry "react": {"do": [...], "do_from_scars": [...]}.
 
-Numbers may be written as "@param" or "-@param" to read a value from the rule config.
+Numbers may be written as "@name" or "-@name". Dynamic names are read from the game
+(DYNAMIC below, from the point of view of the card's owner), "@n" reads the number
+carried by the event (e.g. Guardia scartata), anything else reads the rule config.
 """
 from .cards import CARDS, LEADERS
 
 # Events fired only on the card that caused them (the "self" of the ability).
-SELF_EVENTS = {"on_enter", "on_attack", "on_intercept", "on_defeats_attacker"}
+SELF_EVENTS = {"on_enter", "on_attack", "on_intercept", "on_intercepted", "on_defeats_attacker"}
+
+# "@name" values computed from the game state, seen by player q
+DYNAMIC = {
+    "scars": lambda s, q: len(s.p[q].scars),
+    "opp_scars": lambda s, q: len(s.p[1 - q].scars),
+    "life": lambda s, q: len(s.p[q].life),
+    "opp_life": lambda s, q: len(s.p[1 - q].life),
+    "hand": lambda s, q: len(s.p[q].hand),
+    "guard": lambda s, q: s.p[q].guard,
+}
 
 
-def num(s, v):
+def num(s, v, owner=None, ctx=None):
     if isinstance(v, str):
         neg = v.startswith("-")
         name = v.lstrip("-@")
-        v = getattr(s.r, name)
+        if name in DYNAMIC:
+            if owner is None:
+                raise ValueError(f"@{name} richiede il proprietario della carta")
+            v = DYNAMIC[name](s, owner)
+        elif name == "n":
+            v = (ctx or {}).get("n", 0)
+        else:
+            v = getattr(s.r, name)
         return -v if neg else v
     return v
 
@@ -38,17 +57,26 @@ def cond_ok(s, owner, conds, ctx):
             return False
         if k == "awakened" and s.p[owner].awakened != v:
             return False
+        if k == "is_second_player" and (owner == 1) != v:
+            return False
+        if k == "life_behind_ge" and len(s.p[1 - owner].life) - len(s.p[owner].life) < num(s, v, owner, ctx):
+            return False
+        if k == "life_le" and len(s.p[owner].life) > num(s, v, owner, ctx):
+            return False
     return True
 
 
 # --------------------------------------------------------------------- selectors
-def matches(s, owner_of_unit, u, sel):
+def matches(s, owner_of_unit, u, sel, chooser=None):
+    """chooser: the player whose card does the selecting (for "@scars" etc.);
+    defaults to the unit's owner for auras on own units."""
     c = CARDS[u.cid]
-    if "cost_le" in sel and c.cost > sel["cost_le"]:
+    q = owner_of_unit if chooser is None else chooser
+    if "cost_le" in sel and c.cost > num(s, sel["cost_le"], q):
         return False
     if "exposed" in sel and u.exposed != sel["exposed"]:
         return False
-    if "power_le" in sel and s.unit_power(owner_of_unit, u) > sel["power_le"]:
+    if "power_le" in sel and s.unit_power(owner_of_unit, u) > num(s, sel["power_le"], q):
         return False
     if "inf_ge" in sel and u.inf < sel["inf_ge"]:
         return False
@@ -59,7 +87,7 @@ def matches(s, owner_of_unit, u, sel):
 
 def select(s, owner, sel):
     side = owner if sel.get("side", "own") == "own" else 1 - owner
-    return [u.uid for u in s.p[side].units if matches(s, side, u, sel)]
+    return [u.uid for u in s.p[side].units if matches(s, side, u, sel, chooser=owner)]
 
 
 # --------------------------------------------------------------------- abilities lookup
@@ -81,7 +109,7 @@ def static_power(s, owner, u):
     c = CARDS[u.cid]
     for ab in c.abilities:
         if ab.get("static") == "power" and "applies_to" not in ab and cond_ok(s, owner, ab.get("if"), {}):
-            bonus += num(s, ab["value"])
+            bonus += num(s, ab["value"], owner)
     sources = list(leader_abilities(s, owner))
     for rid in s.p[owner].relics:
         sources += CARDS[rid].abilities
@@ -91,20 +119,27 @@ def static_power(s, owner, u):
         if ab.get("static") == "power" and "applies_to" in ab:
             sel = ab["applies_to"]
             if sel.get("side", "own") == "own" and matches(s, owner, u, sel) and cond_ok(s, owner, ab.get("if"), {}):
-                bonus += num(s, ab["value"])
+                bonus += num(s, ab["value"], owner)
     return bonus
 
 
 def static_total(s, owner, stat):
-    """Static bonuses to a player-level stat (e.g. guard_max) from Leader and relics."""
-    total = 0
+    """Static bonuses to a player-level stat (e.g. guard_max) from Leader, relics and units.
+    Returns (total, cap): cap is the lowest "cap" among the applying abilities, or None
+    ({"static": "guard_max", "value": 1, "cap": 4} = +1, but never above 4)."""
+    total, cap = 0, None
     sources = list(leader_abilities(s, owner))
     for rid in s.p[owner].relics:
         sources += CARDS[rid].abilities
+    for u in s.p[owner].units:
+        sources += CARDS[u.cid].abilities
     for ab in sources:
         if ab.get("static") == stat and cond_ok(s, owner, ab.get("if"), {}):
-            total += num(s, ab["value"])
-    return total
+            total += num(s, ab["value"], owner)
+            if "cap" in ab:
+                c = num(s, ab["cap"], owner)
+                cap = c if cap is None else min(cap, c)
+    return total, cap
 
 
 # --------------------------------------------------------------------- triggers
@@ -167,7 +202,7 @@ def run_ops(s, owner, ops, ctx):
         if s.over:
             return
         kind = op["op"]
-        n = num(s, op.get("n", 0))
+        n = num(s, op.get("n", 0), owner, ctx)
         if kind == "draw":
             s.draw(owner, n)
         elif kind == "gain_guard":
@@ -204,6 +239,10 @@ def run_ops(s, owner, ops, ctx):
             s.combat.att_mod += n
         elif kind == "def_mod":
             s.combat.def_mod += n
+        elif kind == "unblockable":
+            # the target cannot be intercepted until end of turn (R-002 #3)
+            q, ref = _target(s, owner, op.get("target", "self"), ctx)
+            s.p[q].set_flag(("unblockable", ref))
         elif kind == "after_combat_ready_interceptor":
             s.combat.ready_interceptor_after = True
         elif kind == "steal_infusion":
@@ -220,13 +259,20 @@ def run_ops(s, owner, ops, ctx):
 
 
 def pay_costs(s, owner, costs, check_only=False):
+    """Extra costs ({"lose_life": N, "floor": F}): legal only if the player keeps at least
+    F Vite and the Saldo allows it; the lost Vite count in the Saldo."""
     for c in costs or ():
         if "lose_life" in c:
-            if not s.can_pay_life(owner, c["lose_life"], c.get("floor", 0)):
+            if not s.can_pay_life(owner, num(s, c["lose_life"], owner), num(s, c.get("floor", 0), owner)):
                 return False
     if check_only:
         return True
     for c in costs or ():
         if "lose_life" in c:
-            s.lose_life(owner, c["lose_life"], "costo")
+            s.lose_life(owner, num(s, c["lose_life"], owner), "costo")
     return True
+
+
+def card_costs(c, spec=None):
+    """All extra costs of a card: top-level "costs" plus those of its play/react spec."""
+    return list(c.costs) + list((spec or {}).get("costs") or ())

@@ -252,9 +252,9 @@ class RuleAgent:
         return ("end",)
 
 
-def _num(s, v):
+def _num(s, v, owner=None):
     from .effects import num
-    return num(s, v)
+    return num(s, v, owner)
 
 
 # ---------------------------------------------------------------------------- MCTS

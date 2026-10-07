@@ -225,7 +225,8 @@ class GameState:
 
     def guard_max(self, q):
         g = self.r.guard_max_awakened if self.p[q].awakened else self.r.guard_max
-        return g + effects.static_total(self, q, "guard_max")
+        bonus, cap = effects.static_total(self, q, "guard_max")
+        return g + bonus if cap is None else min(g + bonus, max(g, cap))
 
     def furia_count(self, q):
         return len(self.p[q].scars) + self.p[q].furia_bonus
@@ -368,7 +369,12 @@ class GameState:
             m.on_turn_start(self, a)
             if self.over:
                 return
+        discarded = pl.guard
         pl.guard = 0                                    # step 4
+        if discarded:
+            effects.fire(self, "on_guard_discarded", a, {"n": discarded})
+            if self.over:
+                return
         pl.l_exposed = False                            # step 5
         pl.l_attacks = 0
         for u in pl.units:
@@ -457,6 +463,8 @@ class GameState:
             c = CARDS[cid]
             if c.cost > pl.brace or c.type == "reaction":
                 continue
+            if c.costs and not effects.pay_costs(self, a, c.costs, check_only=True):
+                continue
             if c.type == "unit":
                 if len(pl.units) < self.r.max_units:
                     acts.append(("play", cid, None))
@@ -464,7 +472,7 @@ class GameState:
                 if len(pl.relics) < self.r.max_relics:
                     acts.append(("play", cid, None))
             elif c.type == "tactic":
-                for t in self._play_targets(a, c.play or {}):
+                for t in self._play_targets(a, c.play or {}, c):
                     acts.append(("play", cid, t))
         if pl.brace >= 1:
             cap = self.r.infusion_cap
@@ -483,8 +491,9 @@ class GameState:
                 acts.append(("attack", att, t))
         return acts
 
-    def _play_targets(self, a, spec):
-        if not effects.pay_costs(self, a, spec.get("costs"), check_only=True):
+    def _play_targets(self, a, spec, card=None):
+        costs = effects.card_costs(card, spec) if card else spec.get("costs")
+        if not effects.pay_costs(self, a, costs, check_only=True):
             return []
         sel = spec.get("target")
         if sel is None:
@@ -495,6 +504,10 @@ class GameState:
         d = 1 - self.active
         return [("no_intercept",)] + [("intercept", u.uid) for u in self.p[d].units
                                        if not u.exposed and CARDS[u.cid].has("scudo")]
+
+    def can_be_intercepted(self):
+        a = self.active
+        return not self.p[a].flag(("unblockable", self.combat.att))
 
     def reaction_limit(self, d):
         lim = self.r.reactions_per_turn
@@ -515,7 +528,8 @@ class GameState:
         for src, pile in (("hand", pl.hand), ("scar", pl.scars)):
             for cid in pile:
                 c = CARDS[cid]
-                if c.type == "reaction" and (src, cid) not in seen and max(c.cost, 1) <= pl.guard:
+                if (c.type == "reaction" and (src, cid) not in seen and max(c.cost, 1) <= pl.guard
+                        and effects.pay_costs(self, d, effects.card_costs(c, c.react), check_only=True)):
                     seen.add((src, cid))
                     acts.append(("reaction", cid, src))
         if not pl.l_exposed:
@@ -571,6 +585,8 @@ class GameState:
         pl.brace -= c.cost
         self.stat("cards_played", a, 1, cid)
         self.say(f"  P{a+1} gioca {c.name}")
+        if c.type != "tactic":
+            effects.pay_costs(self, a, c.costs)
         if c.type == "unit":
             u = Unit(self.next_uid, cid, pl.turn_no)
             self.next_uid += 1
@@ -580,7 +596,7 @@ class GameState:
             pl.relics.append(cid)
         elif c.type == "tactic":
             spec = c.play or {}
-            effects.pay_costs(self, a, spec.get("costs"))
+            effects.pay_costs(self, a, effects.card_costs(c, spec))
             effects.run_ops(self, a, spec.get("do", []), self._ctx_chosen(a, spec, target))
             pl.discard.append(cid)
 
@@ -616,7 +632,9 @@ class GameState:
         self.say(f"  P{a+1} attacca: {self.describe(a, att)} -> {self.describe(1 - a, tgt)}")
         if att != "L":                                   # step 2
             effects.fire(self, "on_attack", a, {"self": att})
-        if any(not v.exposed and CARDS[v.cid].has("scudo") for v in op.units):
+        if self.over:
+            return
+        if self.can_be_intercepted() and any(not v.exposed and CARDS[v.cid].has("scudo") for v in op.units):
             self.phase = "intercept"                     # step 3
             return
         self._to_react()
@@ -633,6 +651,8 @@ class GameState:
             cb.interceptor = u.uid
             self.say(f"    P{d+1} intercetta con {CARDS[u.cid].name}")
             effects.fire(self, "on_intercept", d, {"self": u.uid})    # step 4
+            if cb.att != "L" and not self.over:
+                effects.fire(self, "on_intercepted", a, {"self": cb.att})
         self._to_react()
 
     def _to_react(self):
@@ -662,6 +682,7 @@ class GameState:
                 pl.guard -= max(c.cost, 1)
                 (pl.hand if src == "hand" else pl.scars).remove(cid)
                 pl.discard.append(cid)
+                effects.pay_costs(self, d, effects.card_costs(c, c.react))
                 ops = c.react.get("do_from_scars", c.react["do"]) if src == "scar" else c.react["do"]
                 effects.run_ops(self, d, ops, {"self": None})
                 self.stat("reactions", d, 1, cid + ("@cicatrice" if src == "scar" else ""))
