@@ -244,7 +244,7 @@ def cmd_torneo(a):
     m = metrics(recs)
     text = render(f"Torneo v0.2 — {a.variante}", m, a.variante, a.ia, el)
     print(text)
-    print("report:", save(f"torneo_{a.variante}", text, recs, a.out))
+    print("report:", save(f"torneo_{os.path.splitext(os.path.basename(a.variante))[0]}", text, recs, a.out))
 
 
 def head_to_head(spec, x, y, games, decks=None, seed0=7):
