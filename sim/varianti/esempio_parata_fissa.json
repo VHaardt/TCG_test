@@ -1,0 +1,7 @@
+{
+  "_doc": "Esempio di variante scritta come file: Parata a costo fisso (1 Guardia, +2), come nella bozza. Usata per l'introduzione in sequenza del regolamento §16.3 (E-001).",
+  "base": "default",
+  "set": {"parry_max_guard": 1},
+  "add": [],
+  "remove": []
+}

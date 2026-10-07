@@ -1,102 +1,672 @@
 {
-  "_doc": "Carte e Leader del set di prova v0. Gli effetti sono scritti nel linguaggio descritto in sim/README.md (sezione 'Linguaggio delle carte'). Le carte [test] sono riempitivi senza testo per costruire mazzi da 40.",
-  "leaders": [
-    {"id": "arden", "name": "Arden, Fabbro di Guerra", "colors": ["R", "G"],
-     "base": [
-       {"trigger": "on_infuse", "if": [{"infusion_count": 2}], "do": [{"op": "temp_power", "n": 1, "target": "infused"}],
-        "text": "La seconda volta che infondi in uno stesso personaggio in un turno, +1 Forza aggiuntiva fino a fine turno."}],
-     "awakened": [
-       {"static": "power", "applies_to": {"side": "own", "kind": "unit", "keyword": "assalto"}, "value": 1,
-        "text": "Le tue Unita con Assalto hanno +1 Forza."}]},
-    {"id": "maera", "name": "Maera, Custode del Passo", "colors": ["B", "K"],
-     "base": [
-       {"reaction": true, "guard_cost": 1, "do": [{"op": "att_mod", "n": -3}],
-        "text": "Reazione: spendi 1 Guardia, l'attaccante ha -3 Forza per questo combattimento."}],
-     "awakened": [
-       {"modifier": "parry_per_guard", "value": 3, "text": "La tua Parata da +3 per ogni Guardia spesa invece di +2."}]},
-    {"id": "vey", "name": "Sorella Vey, la Segnata", "colors": ["K", "R"],
-     "base": [
-       {"modifier": "rim_keeps_furia", "text": "Le Cicatrici che Rimargini continuano a contare per la tua Furia fino a fine turno."}],
-     "awakened": [
-       {"modifier": "rim_free_once", "text": "Una volta per turno, Rimarginare costa 0 Brace."}]},
-    {"id": "thorn", "name": "Thorn, Voce del Branco", "colors": ["G", "B"],
-     "base": [
-       {"activated": true, "exhaust": true, "cost": 2,
-        "target": {"side": "opp", "kind": "unit", "cost_le": 2, "exposed": false},
-        "do": [{"op": "expose", "target": "chosen"}],
-        "text": "Esaurisci (si Espone), 2 Brace: un'Unita avversaria con costo <=2 diventa Esposta."}],
-     "awakened": [
-       {"static": "power", "applies_to": {"side": "own", "kind": "unit", "keyword": "bracconiere"}, "value": 1,
-        "text": "Le tue Unita con Bracconiere hanno +1 Forza."}]}
-  ],
-  "cards": [
-    {"id": "scudiera", "name": "Scudiera di Brace", "type": "unit", "cost": 1, "colors": ["R"], "power": 2,
-     "keywords": ["assalto", "infuso"],
-     "abilities": [{"trigger": "on_infuse", "if": [{"infusion_count": 1}], "do": [{"op": "temp_power", "n": 1, "target": "self"}]}],
-     "text": "Assalto. Infuso: la prima volta che infondi in lei in un turno, +1 Forza aggiuntiva fino a fine turno."},
-    {"id": "carica", "name": "Carica della Fornace", "type": "tactic", "cost": 2, "colors": ["R"],
-     "play": {"target": {"side": "own", "kind": "unit", "inf_ge": 2}, "do": [{"op": "give_renew", "target": "chosen"}]},
-     "text": "Una tua Unita con contatore di infusione >=2 ottiene Rinnovo fino a fine turno."},
-    {"id": "vesh", "name": "Vesh, Lama Rovente", "type": "unit", "cost": 4, "colors": ["R"], "power": 4,
-     "keywords": ["assalto"],
-     "abilities": [{"trigger": "on_attack", "do": [{"op": "steal_infusion"}]}],
-     "text": "Assalto. Quando attacca, puoi spostare su Vesh il contatore di infusione (e la Forza) di un'altra tua Unita."},
-    {"id": "sentinella", "name": "Sentinella del Guado", "type": "unit", "cost": 2, "colors": ["B"], "power": 3,
-     "keywords": ["scudo"],
-     "abilities": [{"trigger": "on_intercept", "do": [{"op": "gain_guard", "n": 1}]}],
-     "text": "Scudo. Quando intercetta, ottieni 1 Guardia."},
-    {"id": "muro", "name": "Muro di Scudi", "type": "reaction", "cost": 1, "colors": ["B"],
-     "react": {"do": [{"op": "def_mod", "n": "@muro_bonus"}, {"op": "after_combat_ready_interceptor"}]},
-     "text": "Il bersaglio ottiene +4 per questo combattimento. Dopo il combattimento, se e un'Unita che ha intercettato, torna Pronta."},
-    {"id": "bastione", "name": "Il Bastione Vivente", "type": "unit", "cost": 5, "colors": ["B"], "power": 6,
-     "keywords": ["scudo"],
-     "abilities": [{"trigger": "on_defeats_attacker", "do": [{"op": "draw", "n": 1}]}],
-     "text": "Scudo. Quando sconfigge in combattimento un'Unita attaccante, pesca 1 carta."},
-    {"id": "penitente", "name": "Penitente delle Mille Ferite", "type": "unit", "cost": 2, "colors": ["K"], "power": 1,
-     "keywords": ["furia"],
-     "abilities": [{"static": "power", "if": [{"furia": 2}], "value": 3}],
-     "text": "Furia 2: +3 Forza."},
-    {"id": "patto", "name": "Patto di Sangue", "type": "tactic", "cost": 1, "colors": ["K"],
-     "play": {"costs": [{"lose_life": 1, "floor": 1}], "do": [{"op": "draw", "n": 1}]},
-     "text": "Costo aggiuntivo: il tuo Leader perde 1 Vita (non sotto 1). Pesca 1 carta."},
-    {"id": "grido", "name": "Grido dalla Cicatrice", "type": "reaction", "cost": 1, "colors": ["K"],
-     "react": {"do": [{"op": "att_mod", "n": "-@grido_hand"}], "do_from_scars": [{"op": "att_mod", "n": "-@grido_scars"}]},
-     "text": "L'attaccante ha -3 Forza per questo combattimento; -5 se giocata dalle Cicatrici."},
-    {"id": "lince", "name": "Lince del Sottobosco", "type": "unit", "cost": 2, "colors": ["G"], "power": 2,
-     "keywords": ["bracconiere"], "kw_params": {"bracconiere": 2},
-     "text": "Bracconiere +2."},
-    {"id": "esca", "name": "Esca", "type": "tactic", "cost": 1, "colors": ["G"],
-     "play": {"target": {"side": "opp", "kind": "unit", "cost_le": 3, "exposed": false}, "do": [{"op": "expose", "target": "chosen"}]},
-     "text": "Un'Unita avversaria con costo <=3 diventa Esposta."},
-    {"id": "matriarca", "name": "Matriarca del Branco", "type": "unit", "cost": 5, "colors": ["G"], "power": 5,
-     "abilities": [{"trigger": "on_own_unit_defeats_exposed", "once_per_turn": true, "do": [{"op": "draw", "n": 1}]}],
-     "text": "Una volta per turno, quando una tua Unita sconfigge un'Unita Esposta, pesca 1 carta."},
-    {"id": "recluta", "name": "Recluta del Crocevia", "type": "unit", "cost": 1, "colors": [], "power": 1,
-     "keywords": ["scudo"],
-     "abilities": [{"trigger": "on_enter", "if": [{"scars_ge": 2}], "do": [{"op": "perm_power", "n": 1, "target": "self"}]}],
-     "text": "Scudo. Quando entra, se hai almeno 2 Cicatrici, +1 Forza permanente."},
-    {"id": "lanterna", "name": "Lanterna del Pellegrino", "type": "relic", "cost": 2, "colors": [],
-     "abilities": [{"static": "guard_max", "value": 1}],
-     "text": "Il tuo massimo di Guardia aumenta di 1."},
-    {"id": "colpo", "name": "Colpo Mirato", "type": "tactic", "cost": 3, "colors": [],
-     "play": {"target": {"side": "opp", "kind": "unit", "exposed": true, "power_le": 4}, "do": [{"op": "defeat", "target": "chosen"}]},
-     "text": "Sconfiggi un'Unita Esposta con Forza <=4."},
-
-    {"id": "t_r2", "name": "[test] Razziatore Rosso", "type": "unit", "cost": 2, "colors": ["R"], "power": 3, "test": true},
-    {"id": "t_r3", "name": "[test] Fabbro Rosso", "type": "unit", "cost": 3, "colors": ["R"], "power": 4, "test": true},
-    {"id": "t_r6", "name": "[test] Colosso Rosso", "type": "unit", "cost": 6, "colors": ["R"], "power": 7, "test": true},
-    {"id": "t_b3", "name": "[test] Custode Blu", "type": "unit", "cost": 3, "colors": ["B"], "power": 4, "test": true},
-    {"id": "t_b4", "name": "[test] Guardiano Blu", "type": "unit", "cost": 4, "colors": ["B"], "power": 5, "keywords": ["scudo"], "test": true},
-    {"id": "t_b6", "name": "[test] Leviatano Blu", "type": "unit", "cost": 6, "colors": ["B"], "power": 7, "test": true},
-    {"id": "t_k3", "name": "[test] Flagellante Nero", "type": "unit", "cost": 3, "colors": ["K"], "power": 3, "keywords": ["furia"],
-     "abilities": [{"static": "power", "if": [{"furia": 3}], "value": 2}], "test": true},
-    {"id": "t_k4", "name": "[test] Spettro Nero", "type": "unit", "cost": 4, "colors": ["K"], "power": 5, "test": true},
-    {"id": "t_k6", "name": "[test] Orrore Nero", "type": "unit", "cost": 6, "colors": ["K"], "power": 7, "test": true},
-    {"id": "t_g3", "name": "[test] Cacciatore Verde", "type": "unit", "cost": 3, "colors": ["G"], "power": 3,
-     "keywords": ["bracconiere"], "kw_params": {"bracconiere": 2}, "test": true},
-    {"id": "t_g4", "name": "[test] Orso Verde", "type": "unit", "cost": 4, "colors": ["G"], "power": 5, "test": true},
-    {"id": "t_g6", "name": "[test] Antico Verde", "type": "unit", "cost": 6, "colors": ["G"], "power": 7, "test": true},
-    {"id": "t_n2", "name": "[test] Mercenario", "type": "unit", "cost": 2, "colors": [], "power": 3, "test": true},
-    {"id": "t_n4", "name": "[test] Veterano", "type": "unit", "cost": 4, "colors": [], "power": 5, "test": true}
-  ]
+ "_doc": "Carte e Leader del set di prova v0. Gli effetti sono scritti nel linguaggio descritto in sim/README.md (sezione 'Linguaggio delle carte'). Le carte [test] sono riempitivi senza testo per costruire mazzi da 40.",
+ "leaders": [
+  {
+   "id": "arden",
+   "name": "Arden, Fabbro di Guerra",
+   "colors": [
+    "R",
+    "G"
+   ],
+   "base": [
+    {
+     "trigger": "on_infuse",
+     "if": [
+      {
+       "infusion_count": 2
+      }
+     ],
+     "do": [
+      {
+       "op": "temp_power",
+       "n": 1,
+       "target": "infused"
+      }
+     ],
+     "text": "La seconda volta che infondi in uno stesso personaggio in un turno, +1 Forza aggiuntiva fino a fine turno."
+    }
+   ],
+   "awakened": [
+    {
+     "static": "power",
+     "applies_to": {
+      "side": "own",
+      "kind": "unit",
+      "keyword": "assalto"
+     },
+     "value": 1,
+     "text": "Le tue Unita con Assalto hanno +1 Forza."
+    }
+   ]
+  },
+  {
+   "id": "maera",
+   "name": "Maera, Custode del Passo",
+   "colors": [
+    "B",
+    "K"
+   ],
+   "base": [
+    {
+     "reaction": true,
+     "guard_cost": 1,
+     "do": [
+      {
+       "op": "att_mod",
+       "n": -3
+      }
+     ],
+     "text": "Reazione: spendi 1 Guardia, l'attaccante ha -3 Forza per questo combattimento."
+    }
+   ],
+   "awakened": [
+    {
+     "modifier": "parry_per_guard",
+     "value": 3,
+     "text": "La tua Parata da +3 per ogni Guardia spesa invece di +2."
+    }
+   ]
+  },
+  {
+   "id": "vey",
+   "name": "Sorella Vey, la Segnata",
+   "colors": [
+    "K",
+    "R"
+   ],
+   "base": [
+    {
+     "modifier": "rim_keeps_furia",
+     "text": "Le Cicatrici che Rimargini continuano a contare per la tua Furia fino a fine turno."
+    }
+   ],
+   "awakened": [
+    {
+     "modifier": "rim_free_once",
+     "text": "Una volta per turno, Rimarginare costa 0 Brace."
+    }
+   ]
+  },
+  {
+   "id": "thorn",
+   "name": "Thorn, Voce del Branco",
+   "colors": [
+    "G",
+    "B"
+   ],
+   "base": [
+    {
+     "activated": true,
+     "exhaust": true,
+     "cost": 2,
+     "target": {
+      "side": "opp",
+      "kind": "unit",
+      "cost_le": 2,
+      "exposed": false
+     },
+     "do": [
+      {
+       "op": "expose",
+       "target": "chosen"
+      }
+     ],
+     "text": "Esaurisci (si Espone), 2 Brace: un'Unita avversaria con costo <=2 diventa Esposta."
+    }
+   ],
+   "awakened": [
+    {
+     "static": "power",
+     "applies_to": {
+      "side": "own",
+      "kind": "unit",
+      "keyword": "bracconiere"
+     },
+     "value": 1,
+     "text": "Le tue Unita con Bracconiere hanno +1 Forza."
+    }
+   ]
+  }
+ ],
+ "cards": [
+  {
+   "id": "scudiera",
+   "name": "Scudiera di Brace",
+   "type": "unit",
+   "cost": 1,
+   "colors": [
+    "R"
+   ],
+   "power": 2,
+   "keywords": [
+    "assalto",
+    "infuso"
+   ],
+   "abilities": [
+    {
+     "trigger": "on_infuse",
+     "if": [
+      {
+       "infusion_count": 1
+      }
+     ],
+     "do": [
+      {
+       "op": "temp_power",
+       "n": 1,
+       "target": "self"
+      }
+     ]
+    }
+   ],
+   "text": "Assalto. Infuso: la prima volta che infondi in lei in un turno, +1 Forza aggiuntiva fino a fine turno."
+  },
+  {
+   "id": "carica",
+   "name": "Carica della Fornace",
+   "type": "tactic",
+   "cost": 2,
+   "colors": [
+    "R"
+   ],
+   "play": {
+    "target": {
+     "side": "own",
+     "kind": "unit",
+     "inf_ge": 2
+    },
+    "do": [
+     {
+      "op": "give_renew",
+      "target": "chosen"
+     }
+    ]
+   },
+   "text": "Una tua Unita con contatore di infusione >=2 ottiene Rinnovo fino a fine turno."
+  },
+  {
+   "id": "vesh",
+   "name": "Vesh, Lama Rovente",
+   "type": "unit",
+   "cost": 4,
+   "colors": [
+    "R"
+   ],
+   "power": 4,
+   "keywords": [
+    "assalto"
+   ],
+   "abilities": [
+    {
+     "trigger": "on_attack",
+     "do": [
+      {
+       "op": "steal_infusion"
+      }
+     ]
+    }
+   ],
+   "text": "Assalto. Quando attacca, puoi spostare su Vesh il contatore di infusione (e la Forza) di un'altra tua Unita."
+  },
+  {
+   "id": "sentinella",
+   "name": "Sentinella del Guado",
+   "type": "unit",
+   "cost": 2,
+   "colors": [
+    "B"
+   ],
+   "power": 3,
+   "keywords": [
+    "scudo"
+   ],
+   "abilities": [
+    {
+     "trigger": "on_intercept",
+     "do": [
+      {
+       "op": "gain_guard",
+       "n": 1
+      }
+     ]
+    }
+   ],
+   "text": "Scudo. Quando intercetta, ottieni 1 Guardia."
+  },
+  {
+   "id": "muro",
+   "name": "Muro di Scudi",
+   "type": "reaction",
+   "cost": 1,
+   "colors": [
+    "B"
+   ],
+   "react": {
+    "do": [
+     {
+      "op": "def_mod",
+      "n": "@muro_bonus"
+     },
+     {
+      "op": "after_combat_ready_interceptor"
+     }
+    ]
+   },
+   "text": "Il bersaglio ottiene +4 per questo combattimento. Dopo il combattimento, se e un'Unita che ha intercettato, torna Pronta."
+  },
+  {
+   "id": "bastione",
+   "name": "Il Bastione Vivente",
+   "type": "unit",
+   "cost": 5,
+   "colors": [
+    "B"
+   ],
+   "power": 6,
+   "keywords": [
+    "scudo"
+   ],
+   "abilities": [
+    {
+     "trigger": "on_defeats_attacker",
+     "do": [
+      {
+       "op": "draw",
+       "n": 1
+      }
+     ]
+    }
+   ],
+   "text": "Scudo. Quando sconfigge in combattimento un'Unita attaccante, pesca 1 carta."
+  },
+  {
+   "id": "penitente",
+   "name": "Penitente delle Mille Ferite",
+   "type": "unit",
+   "cost": 2,
+   "colors": [
+    "K"
+   ],
+   "power": 1,
+   "keywords": [
+    "furia"
+   ],
+   "abilities": [
+    {
+     "static": "power",
+     "if": [
+      {
+       "furia": 2
+      }
+     ],
+     "value": 3
+    }
+   ],
+   "text": "Furia 2: +3 Forza."
+  },
+  {
+   "id": "patto",
+   "name": "Patto di Sangue",
+   "type": "tactic",
+   "cost": 1,
+   "colors": [
+    "K"
+   ],
+   "play": {
+    "costs": [
+     {
+      "lose_life": 1,
+      "floor": 1
+     }
+    ],
+    "do": [
+     {
+      "op": "draw",
+      "n": 1
+     }
+    ]
+   },
+   "text": "Costo aggiuntivo: il tuo Leader perde 1 Vita (non sotto 1). Pesca 1 carta."
+  },
+  {
+   "id": "grido",
+   "name": "Grido dalla Cicatrice",
+   "type": "reaction",
+   "cost": 1,
+   "colors": [
+    "K"
+   ],
+   "react": {
+    "do": [
+     {
+      "op": "att_mod",
+      "n": "-@grido_hand"
+     }
+    ],
+    "do_from_scars": [
+     {
+      "op": "att_mod",
+      "n": "-@grido_scars"
+     }
+    ]
+   },
+   "text": "L'attaccante ha -3 Forza per questo combattimento; -5 se giocata dalle Cicatrici."
+  },
+  {
+   "id": "lince",
+   "name": "Lince del Sottobosco",
+   "type": "unit",
+   "cost": 2,
+   "colors": [
+    "G"
+   ],
+   "power": 2,
+   "keywords": [
+    "bracconiere"
+   ],
+   "kw_params": {
+    "bracconiere": 2
+   },
+   "text": "Bracconiere +2."
+  },
+  {
+   "id": "esca",
+   "name": "Esca",
+   "type": "tactic",
+   "cost": 1,
+   "colors": [
+    "G"
+   ],
+   "play": {
+    "target": {
+     "side": "opp",
+     "kind": "unit",
+     "cost_le": 3,
+     "exposed": false
+    },
+    "do": [
+     {
+      "op": "expose",
+      "target": "chosen"
+     }
+    ]
+   },
+   "text": "Un'Unita avversaria con costo <=3 diventa Esposta."
+  },
+  {
+   "id": "matriarca",
+   "name": "Matriarca del Branco",
+   "type": "unit",
+   "cost": 5,
+   "colors": [
+    "G"
+   ],
+   "power": 5,
+   "abilities": [
+    {
+     "trigger": "on_own_unit_defeats_exposed",
+     "once_per_turn": true,
+     "do": [
+      {
+       "op": "draw",
+       "n": 1
+      }
+     ]
+    }
+   ],
+   "text": "Una volta per turno, quando una tua Unita sconfigge un'Unita Esposta, pesca 1 carta."
+  },
+  {
+   "id": "recluta",
+   "name": "Recluta del Crocevia",
+   "type": "unit",
+   "cost": 1,
+   "colors": [],
+   "power": 1,
+   "keywords": [
+    "scudo"
+   ],
+   "abilities": [
+    {
+     "trigger": "on_enter",
+     "if": [
+      {
+       "scars_ge": 2
+      }
+     ],
+     "do": [
+      {
+       "op": "perm_power",
+       "n": 1,
+       "target": "self"
+      }
+     ]
+    }
+   ],
+   "text": "Scudo. Quando entra, se hai almeno 2 Cicatrici, +1 Forza permanente."
+  },
+  {
+   "id": "lanterna",
+   "name": "Lanterna del Pellegrino",
+   "type": "relic",
+   "cost": 2,
+   "colors": [],
+   "abilities": [
+    {
+     "static": "guard_max",
+     "value": 1
+    }
+   ],
+   "text": "Il tuo massimo di Guardia aumenta di 1."
+  },
+  {
+   "id": "colpo",
+   "name": "Colpo Mirato",
+   "type": "tactic",
+   "cost": 3,
+   "colors": [],
+   "play": {
+    "target": {
+     "side": "opp",
+     "kind": "unit",
+     "exposed": true,
+     "power_le": 4
+    },
+    "do": [
+     {
+      "op": "defeat",
+      "target": "chosen"
+     }
+    ]
+   },
+   "text": "Sconfiggi un'Unita Esposta con Forza <=4."
+  },
+  {
+   "id": "t_r2",
+   "name": "[test] Razziatore Rosso",
+   "type": "unit",
+   "cost": 2,
+   "colors": [
+    "R"
+   ],
+   "power": 3,
+   "test": true
+  },
+  {
+   "id": "t_r3",
+   "name": "[test] Fabbro Rosso",
+   "type": "unit",
+   "cost": 3,
+   "colors": [
+    "R"
+   ],
+   "power": 4,
+   "test": true
+  },
+  {
+   "id": "t_r6",
+   "name": "[test] Colosso Rosso",
+   "type": "unit",
+   "cost": 6,
+   "colors": [
+    "R"
+   ],
+   "power": 7,
+   "test": true
+  },
+  {
+   "id": "t_b3",
+   "name": "[test] Custode Blu",
+   "type": "unit",
+   "cost": 3,
+   "colors": [
+    "B"
+   ],
+   "power": 4,
+   "test": true
+  },
+  {
+   "id": "t_b4",
+   "name": "[test] Guardiano Blu",
+   "type": "unit",
+   "cost": 4,
+   "colors": [
+    "B"
+   ],
+   "power": 5,
+   "keywords": [
+    "scudo"
+   ],
+   "test": true
+  },
+  {
+   "id": "t_b6",
+   "name": "[test] Leviatano Blu",
+   "type": "unit",
+   "cost": 6,
+   "colors": [
+    "B"
+   ],
+   "power": 7,
+   "test": true
+  },
+  {
+   "id": "t_k3",
+   "name": "[test] Flagellante Nero",
+   "type": "unit",
+   "cost": 3,
+   "colors": [
+    "K"
+   ],
+   "power": 3,
+   "keywords": [
+    "furia"
+   ],
+   "abilities": [
+    {
+     "static": "power",
+     "if": [
+      {
+       "furia": 3
+      }
+     ],
+     "value": 2
+    }
+   ],
+   "test": true
+  },
+  {
+   "id": "t_k4",
+   "name": "[test] Spettro Nero",
+   "type": "unit",
+   "cost": 4,
+   "colors": [
+    "K"
+   ],
+   "power": 5,
+   "test": true
+  },
+  {
+   "id": "t_k6",
+   "name": "[test] Orrore Nero",
+   "type": "unit",
+   "cost": 6,
+   "colors": [
+    "K"
+   ],
+   "power": 7,
+   "test": true
+  },
+  {
+   "id": "t_g3",
+   "name": "[test] Cacciatore Verde",
+   "type": "unit",
+   "cost": 3,
+   "colors": [
+    "G"
+   ],
+   "power": 3,
+   "keywords": [
+    "bracconiere"
+   ],
+   "kw_params": {
+    "bracconiere": 2
+   },
+   "test": true
+  },
+  {
+   "id": "t_g4",
+   "name": "[test] Orso Verde",
+   "type": "unit",
+   "cost": 4,
+   "colors": [
+    "G"
+   ],
+   "power": 5,
+   "test": true
+  },
+  {
+   "id": "t_g6",
+   "name": "[test] Antico Verde",
+   "type": "unit",
+   "cost": 6,
+   "colors": [
+    "G"
+   ],
+   "power": 7,
+   "test": true
+  },
+  {
+   "id": "t_n2",
+   "name": "[test] Mercenario",
+   "type": "unit",
+   "cost": 2,
+   "colors": [],
+   "power": 3,
+   "test": true
+  },
+  {
+   "id": "t_n4",
+   "name": "[test] Veterano",
+   "type": "unit",
+   "cost": 4,
+   "colors": [],
+   "power": 5,
+   "test": true
+  },
+  {
+   "id": "x_titano",
+   "name": "[trappola] Titano",
+   "type": "unit",
+   "cost": 1,
+   "colors": [],
+   "power": 7,
+   "keywords": [
+    "assalto",
+    "scudo"
+   ],
+   "test": true,
+   "text": "Carta volutamente rotta: serve solo a verificare che IA e motore riconoscano un mazzo troppo forte."
+  }
+ ]
 }

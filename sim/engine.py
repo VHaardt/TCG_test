@@ -125,6 +125,7 @@ def new_stats():
         "rim_used": [0, 0],
         "rim_possible": [0, 0],          # turns in which Rimarginare was legal at some point
         "guard_stored": [0, 0],
+        "guard_hist": [{}, {}],          # Guardia accantonata a fine turno -> numero di turni
         "turns_ended": [0, 0],
         "awaken_turn": [None, None],
         "life_at_round6": None,          # (Vite G1, Vite G2) at the start of G1's turn 7
@@ -392,6 +393,8 @@ class GameState:
         pl.guard = stored
         if self.stats is not None:
             self.stats["guard_stored"][a] += stored
+            gh = self.stats["guard_hist"][a]
+            gh[stored] = gh.get(stored, 0) + 1
             self.stats["turns_ended"][a] += 1
             if self._rim_flag:
                 self.stats["rim_possible"][a] += 1
@@ -505,7 +508,8 @@ class GameState:
         acts = [("no_react",)]
         if pl.reactions_used >= self.reaction_limit(d) or pl.guard < 1:
             return acts
-        for k in range(1, pl.guard + 1):
+        kmax = pl.guard if not self.r.parry_max_guard else min(pl.guard, self.r.parry_max_guard)
+        for k in range(1, kmax + 1):
             acts.append(("parry", k))
         seen = set()
         for src, pile in (("hand", pl.hand), ("scar", pl.scars)):

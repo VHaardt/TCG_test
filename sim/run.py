@@ -40,7 +40,20 @@ def load_deck(name):
 
 
 def all_decks():
-    return sorted(os.path.splitext(os.path.basename(p))[0] for p in glob.glob(os.path.join(DECK_DIR, "*.json")))
+    """Reference decks (files starting with '_' such as the trap deck are excluded)."""
+    names = (os.path.splitext(os.path.basename(p))[0] for p in glob.glob(os.path.join(DECK_DIR, "*.json")))
+    return sorted(n for n in names if not n.startswith("_"))
+
+
+def cards_version():
+    """Short hash of the card database, printed in every report."""
+    import hashlib
+    from .cards import DATA_DIR
+    h = hashlib.sha1()
+    for path in sorted(glob.glob(os.path.join(DATA_DIR, "*.json"))):
+        with open(path, "rb") as f:
+            h.update(f.read())
+    return h.hexdigest()[:10]
 
 
 # ---------------------------------------------------------------------------- games
@@ -48,7 +61,7 @@ def play_game(job):
     deck_names, agent_specs, rules, seed, keep_log = job
     (l1, d1), (l2, d2) = load_deck(deck_names[0]), load_deck(deck_names[1])
     agents = [make_agent(agent_specs[0], seed=seed * 2 + 1), make_agent(agent_specs[1], seed=seed * 2 + 2)]
-    s = new_game(l1, d1, l2, d2, rules=rules, seed=seed, log=keep_log)
+    s = new_game(l1, d1, l2, d2, rules=rules, seed=seed, log=True)
     steps = 0
     while not s.over:
         s.step(agents[s.decider()].act(s))
@@ -61,7 +74,9 @@ def play_game(job):
         "winner": s.winner, "end_reason": s.end_reason,
         "rounds": s.p[0].turn_no, "turns": [s.p[0].turn_no, s.p[1].turn_no],
         "life_end": [len(s.p[0].life), len(s.p[1].life)],
-        "stats": s.stats, "log": s.log,
+        "stats": s.stats,
+        "log": s.log if (keep_log or seed % 1000 == 0 or s.end_reason not in ("colpo_finale", "crepuscolo", "mazzo_vuoto")
+                         or not 5 <= s.p[0].turn_no <= 15) else None,
     }
 
 
@@ -154,8 +169,18 @@ def metrics(records):
     ends = {}
     for r in records:
         ends[r["end_reason"]] = ends.get(r["end_reason"], 0) + 1
+    ge13 = sum(1 for x in rounds if x >= 13)
+    clessidra = sum(1 for x in rounds if x >= DEFAULT.saldo_late_turn)
+    ghist = {}
+    for r in records:
+        for q in (0, 1):
+            for k, v in r["stats"]["guard_hist"][q].items():
+                ghist[int(k)] = ghist.get(int(k), 0) + v
     return {
         "n": n,
+        "rounds_ge13": wilson(ge13, n),
+        "clessidra_active": wilson(clessidra, n),
+        "guard_hist": dict(sorted(ghist.items())),
         "rounds_median": median_ci(rounds),
         "rounds_mean": statistics.mean(rounds) if rounds else float("nan"),
         "rounds_in_5_15": wilson(in_range, n),
@@ -186,6 +211,29 @@ def deck_winrates(records):
             w, n = out.get(d, (0, 0))
             out[d] = (w + (1 if r["winner"] == seat else 0), n + 1)
     return {d: wilson(w, n) for d, (w, n) in out.items()}
+
+
+def g1_by_deck(records):
+    """First-player win rate in mirror matches, per deck."""
+    out = {}
+    for r in records:
+        if r["decks"][0] != r["decks"][1] or r["winner"] is None:
+            continue
+        w, n = out.get(r["decks"][0], (0, 0))
+        out[r["decks"][0]] = (w + (r["winner"] == 0), n + 1)
+    return {d: wilson(w, n) for d, (w, n) in out.items()}
+
+
+def matchup_matrix(records):
+    m = {}
+    for r in records:
+        a, b = r["decks"]
+        if a == b or r["winner"] is None:
+            continue
+        for row, col, seat in ((a, b, 0), (b, a, 1)):
+            w, n = m.get((row, col), (0, 0))
+            m[(row, col)] = (w + (r["winner"] == seat), n + 1)
+    return m
 
 
 def card_stats(records):
@@ -231,6 +279,7 @@ def render(title, records, rules, extra="", agents=None, elapsed=None):
     dw = deck_winrates(records)
     lines = [f"# {title}", ""]
     lines.append(f"- Regole: `{RULES_VERSION}`; moduli attivi: {', '.join(rules.modules)}")
+    lines.append(f"- Versione carte: `{cards_version()}`; seed: {min(r['seed'] for r in records)}–{max(r['seed'] for r in records)}")
     diff = rules_digest(rules)
     lines.append(f"- Parametri diversi dal default: {json.dumps(diff, ensure_ascii=False) if diff else 'nessuno'}")
     lines.append(f"- Partite: {m['n']}; IA: {agents or '?'}" + (f"; tempo {elapsed:.0f}s" if elapsed else ""))
@@ -242,6 +291,8 @@ def render(title, records, rules, extra="", agents=None, elapsed=None):
     med = m["rounds_median"]
     lines.append(f"| Durata mediana (turni per giocatore) | {med[0]:.1f} [{med[1]:.1f}–{med[2]:.1f}] (media {m['rounds_mean']:.1f}) | 8–10 | {check(8 <= med[0] <= 10)} |")
     lines.append(f"| Partite tra 5 e 15 turni | {pct(m['rounds_in_5_15'])} | ≥90% | {check(m['rounds_in_5_15'][0] >= 0.9)} |")
+    lines.append(f"| Partite arrivate al turno 13 | {pct(m['rounds_ge13'])} | <10% | {check(m['rounds_ge13'][0] < 0.1)} |")
+    lines.append(f"| Clessidra attiva a fine partita (turno ≥{DEFAULT.saldo_late_turn}) | {pct(m['clessidra_active'])} | <15% | {check(m['clessidra_active'][0] < 0.15)} |")
     lines.append(f"| Partite oltre il turno 15 | {pct(m['rounds_over_15'])} | <2% | {check(m['rounds_over_15'][0] < 0.02)} |")
     lines.append(f"| Vittorie del primo giocatore | {pct(m['g1_win'])} | 48–52% | {check(0.48 <= m['g1_win'][0] <= 0.52)} |")
     lines.append(f"| Rimonte (sotto di ≥2 Vite al turno 6, n={m['comeback_n']}) | {pct(m['comeback'])} | 20–35% | {check(0.2 <= m['comeback'][0] <= 0.35)} |")
@@ -256,6 +307,30 @@ def render(title, records, rules, extra="", agents=None, elapsed=None):
         lines.append("|---|---|---|")
         for d, t in sorted(dw.items(), key=lambda x: -x[1][0]):
             lines.append(f"| {d} | {pct(t)} | {check(0.45 <= t[0] <= 0.55)} |")
+    g1d = g1_by_deck(records)
+    if g1d:
+        lines.append("")
+        lines.append("## Vittorie del primo giocatore nelle partite speculari")
+        lines.append("| Mazzo | G1 vince | Obiettivo 48–52% |")
+        lines.append("|---|---|---|")
+        for d, t in sorted(g1d.items()):
+            lines.append(f"| {d} | {pct(t)} | {check(0.48 <= t[0] <= 0.52)} |")
+    mm = matchup_matrix(records)
+    if mm:
+        names = sorted({k[0] for k in mm})
+        lines.append("")
+        lines.append("## Matrice degli abbinamenti (% vittorie della riga)")
+        lines.append("| | " + " | ".join(names) + " |")
+        lines.append("|---" * (len(names) + 1) + "|")
+        for a in names:
+            cells = []
+            for b in names:
+                if (a, b) in mm:
+                    w, n = mm[(a, b)]
+                    cells.append(f"{100*w/n:.0f}%")
+                else:
+                    cells.append("–")
+            lines.append(f"| {a} | " + " | ".join(cells) + " |")
     lines.append("")
     lines.append("## Dettagli")
     lines.append(f"- Fine partita: {json.dumps(m['end_reasons'])}")
@@ -264,7 +339,7 @@ def render(title, records, rules, extra="", agents=None, elapsed=None):
     lines.append(f"- Partite toccate dal Crepuscolo terminale: {pct(m['touched_by_stall'])}")
     lines.append(f"- Vite perse per fonte: " + ", ".join(f"{k} {100*v:.0f}%" for k, v in m["lives_lost_by_source"].items()))
     lines.append(f"- Reazioni usate: {json.dumps(m['reactions'], ensure_ascii=False)}")
-    lines.append(f"- Guardia accantonata in media per turno: {m['guard_per_turn']:.2f}")
+    lines.append(f"- Guardia accantonata in media per turno: {m['guard_per_turn']:.2f}; distribuzione (Guardia → turni): {json.dumps(m['guard_hist'])}")
     cs = card_stats(records)
     lines.append("")
     lines.append("## Statistiche per carta")
@@ -280,10 +355,18 @@ def render(title, records, rules, extra="", agents=None, elapsed=None):
     return "\n".join(lines) + "\n", m
 
 
-def save(name, text, records, meta):
-    os.makedirs(REPORT_DIR, exist_ok=True)
+def save(name, text, records, meta, out_dir=None):
+    out_dir = out_dir or REPORT_DIR
+    os.makedirs(out_dir, exist_ok=True)
     stamp = time.strftime("%Y%m%d-%H%M%S")
-    base = os.path.join(REPORT_DIR, f"{stamp}_{name}")
+    base = os.path.join(out_dir, f"{stamp}_{name}")
+    logs = [r for r in records if r.get("log")]
+    if logs:
+        with open(base + "_replay.txt", "w", encoding="utf-8") as f:
+            for r in logs:
+                f.write(f"===== seed {r['seed']} | {r['decks'][0]} (P1) vs {r['decks'][1]} (P2) | "
+                        f"{r['end_reason']} | turni {r['turns']}\n")
+                f.write("\n".join(r["log"]) + "\n\n")
     with open(base + ".md", "w", encoding="utf-8") as f:
         f.write(text)
     with open(base + ".json", "w", encoding="utf-8") as f:

@@ -42,6 +42,7 @@ class Rules:
     guard_max: int = 2
     guard_max_awakened: int = 3
     parry_per_guard: int = 2
+    parry_max_guard: int = 0             # 0 = Parata scalabile; 1 = Parata fissa della bozza
     infusion_cap: int = 0                # §16.4 reserve lever (0 = no cap)
 
     # reactions (§8)
@@ -111,6 +112,9 @@ VARIANTS = {
     "T3_rim_base": {"set": {"rimarginare_mode": "base"}},
     "T4_no_ultimo_respiro": {"remove": ["ultimo_respiro"]},
     "L_risveglio_turno7": {"add": ["risveglio_a_tempo"]},
+    # introduzione in sequenza (regolamento §16.3)
+    "I1_solo_tempra5": {"set": {"parry_max_guard": 1}, "remove": ["ultimo_respiro"]},
+    "I2_parata_scalabile": {"remove": ["ultimo_respiro"]},
 }
 
 
@@ -118,3 +122,24 @@ def rules_for(name, base=DEFAULT):
     v = VARIANTS[name]
     r = base.with_(**v.get("set", {}))
     return r.with_modules(add=v.get("add", ()), remove=v.get("remove", ()))
+
+
+def rules_from(spec, base=DEFAULT):
+    """A rule configuration from a preset name, a JSON file path or a dict.
+    JSON / dict format: {"base": "<preset>", "set": {param: value}, "add": [modules], "remove": [modules]}.
+    This is how the swarm proposes a variant without touching the code."""
+    import json
+    import os
+    if isinstance(spec, str) and spec in VARIANTS:
+        return rules_for(spec, base)
+    if isinstance(spec, str):
+        if not os.path.exists(spec):
+            raise ValueError(f"variante sconosciuta: {spec} (né preset né file)")
+        with open(spec, encoding="utf-8") as f:
+            spec = json.load(f)
+    r = rules_for(spec["base"], base) if spec.get("base") else base
+    unknown = set(spec.get("set", {})) - set(Rules.__dataclass_fields__)
+    if unknown:
+        raise ValueError(f"parametri sconosciuti: {sorted(unknown)}")
+    r = r.with_(**spec.get("set", {}))
+    return r.with_modules(add=spec.get("add", ()), remove=spec.get("remove", ()))

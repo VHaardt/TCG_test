@@ -291,10 +291,11 @@ def determinize(s, q, rng):
 class MCTSAgent:
     """Single-observer information-set MCTS. Each iteration samples a determinization,
     descends the shared tree with UCB over the actions legal in that sample, then plays
-    a RuleAgent rollout for at most `horizon` turns and scores it with `evaluate`."""
+    a RuleAgent rollout for at most `horizon` turns (default: to the end of the game, which
+    tested far stronger than short rollouts + `evaluate`) and scores the result."""
     name = "forte"
 
-    def __init__(self, iterations=300, horizon=2, c=0.9, seed=None, rollout_noise=0.1):
+    def __init__(self, iterations=300, horizon=100, c=0.9, seed=None, rollout_noise=0.1):
         self.iterations = iterations
         self.horizon = horizon
         self.c = c
