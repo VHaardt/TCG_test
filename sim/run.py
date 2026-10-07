@@ -446,6 +446,34 @@ def cmd_ia(args):
     print("report:", path)
 
 
+def cmd_trappola(args):
+    """Trap-deck check (strategia §6): the deck with the broken card must win > 80%
+    against every reference deck, otherwise the AI does not see what is strong."""
+    rules = rules_for(args.variant)
+    decks = args.decks or all_decks()
+    lines = [f"# Controllo mazzo trappola", "",
+             f"IA `{args.agents}` per entrambi i lati, {args.games} partite per mazzo (posti alternati).", "",
+             "| Avversario | Vittorie trappola | ≥80% | Vittorie se il Titano è stato giocato | Partite senza Titano |",
+             "|---|---|---|---|---|"]
+    t = time.time()
+    all_recs = []
+    for k, d in enumerate(decks):
+        recs = run_jobs(match_jobs("_trappola", d, args.agents, args.agents, rules, args.games,
+                                   seed0=700000 + 1000 * k), args.workers)
+        all_recs += recs
+        wins = sum(1 for r in recs if r["winner"] is not None and r["decks"][r["winner"]] == "_trappola")
+        res = wilson(wins, len(recs))
+        seat = [r["decks"].index("_trappola") for r in recs]
+        played = [r for r, q in zip(recs, seat) if r["stats"]["cards_played"][q].get("x_titano")]
+        pw = sum(1 for r in played if r["winner"] is not None and r["decks"][r["winner"]] == "_trappola") if played else 0
+        lines.append(f"| {d} | {pct(res)} | {check(res[0] > 0.80)} | {pct(wilson(pw, len(played)))} | "
+                     f"{100*(1-len(played)/len(recs)):.0f}% |")
+    text = "\n".join(lines) + f"\n\nTempo: {time.time()-t:.0f}s\n"
+    path = save(f"trappola_{args.agents.replace(':', '')}", text, all_recs, {"agents": args.agents})
+    print(text)
+    print("report:", path)
+
+
 def cmd_partita(args):
     rules = rules_for(args.variant)
     r = play_game(((args.deck1, args.deck2), (args.agent1, args.agent2), rules, args.seed, True))
@@ -474,6 +502,12 @@ def main(argv=None):
     i.add_argument("--variant", default="default", choices=sorted(VARIANTS))
     i.add_argument("--decks", nargs="*")
     i.add_argument("--workers", type=int)
+    tr = sub.add_parser("trappola")
+    tr.add_argument("--games", type=int, default=50)
+    tr.add_argument("--agents", default="semplice")
+    tr.add_argument("--variant", default="default", choices=sorted(VARIANTS))
+    tr.add_argument("--decks", nargs="*")
+    tr.add_argument("--workers", type=int)
     g = sub.add_parser("partita")
     g.add_argument("deck1")
     g.add_argument("deck2")
@@ -482,7 +516,7 @@ def main(argv=None):
     g.add_argument("--seed", type=int, default=0)
     g.add_argument("--variant", default="default", choices=sorted(VARIANTS))
     args = p.parse_args(argv)
-    {"torneo": cmd_torneo, "varianti": cmd_varianti, "ia": cmd_ia, "partita": cmd_partita}[args.cmd](args)
+    {"torneo": cmd_torneo, "varianti": cmd_varianti, "ia": cmd_ia, "trappola": cmd_trappola, "partita": cmd_partita}[args.cmd](args)
 
 
 if __name__ == "__main__":

@@ -20,8 +20,21 @@ python -m sim.run torneo --games 200                 # tutti i mazzi contro tutt
 python -m sim.run torneo --games 50 --agents forte:200
 python -m sim.run varianti --games 200 --variants default V1b_per_attack V2_g2_six
 python -m sim.run ia --games 6 --strong forte:150    # controllo: l'IA forte batte la semplice?
+python -m sim.run trappola --games 100              # controllo: il mazzo con la carta rotta vince?
 python -m sim.run partita arden_rosso_verde maera_blu_nero --seed 3   # replay leggibile
+python -m sim.esperimento --base default --variante V1b=V1b_per_attack --partite 200 --out <cartella>
 python tests/test_engine.py
+```
+
+### Giocare una partita a mano (playtester)
+
+Un lato lo gioca un agente o una persona, una decisione per comando; l'altro lo gioca l'IA.
+Si vede solo l'informazione visibile a quel giocatore e le azioni legali numerate.
+
+```bash
+python -m sim.gioca nuova --mazzo maera_blu_nero --contro arden_rosso_verde --ia semplice --seed 3 --file p.json
+python -m sim.gioca mossa --file p.json 2      # sceglie l'azione numero 2
+python -m sim.gioca stato --file p.json --log  # stato e registro completo
 ```
 
 Ogni comando scrive un report in markdown e i dati grezzi in json dentro `reports/`. Il report riporta la versione delle regole, i moduli attivi e i parametri diversi dal default, così ogni numero è tracciabile.
@@ -67,4 +80,5 @@ Se una carta nuova ha bisogno di un'operazione o di un evento che non esiste, si
 
 - Le carte `[test]` sono riempitivi senza testo, servono solo a fare mazzi da 40 finché il passo 3 non produce il set vero.
 - L'IA semplice usa priorità fisse; l'IA forte campiona le informazioni nascoste ma gioca i rollout con l'IA semplice, quindi sottovaluta combo che la semplice non conosce.
+- L'IA forte con 100 iterazioni batte la semplice solo nel 53% dei casi (obiettivo 65%) e costa circa 4 secondi a partita per core: per i tornei di massa si usa la semplice, la forte serve per i controlli a campione.
 - Mulligan e scarti per limite di mano usano una regola fissa, non una decisione dell'IA.
