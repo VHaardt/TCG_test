@@ -213,7 +213,7 @@ def cmd_ab(a):
         recs, el = arm(spec, a.ia, a.partite, a.mazzi, a.seed, a.incroci)
         m = metrics(recs)
         res[name] = (spec, m, recs)
-        save(f"{name}_{spec.replace('/', '_')}", render(f"Braccio {name}: {spec}", m, spec, a.ia, el), recs, out)
+        save(f"{name}_{os.path.splitext(os.path.basename(spec))[0]}", render(f"Braccio {name}: {spec}", m, spec, a.ia, el), recs, out)
     (sa, ma, ra), (sb, mb, rb) = res["A"], res["B"]
     rmean = lambda recs: statistics.mean(r["rounds"] for r in recs)
     import random as _r
@@ -292,7 +292,7 @@ def cmd_forte(a):
             f"- Vittorie dell'IA forte: {pct(res)}; margine {100*(res[0]-0.5):+.1f} punti "
             f"[{100*(res[1]-0.5):+.1f}, {100*(res[2]-0.5):+.1f}]\n")
     print(text)
-    print("report:", save(f"forte_{a.variante}", text, recs, a.out))
+    print("report:", save(f"forte_{os.path.splitext(os.path.basename(a.variante))[0]}", text, recs, a.out))
 
 
 def cmd_partita(a):

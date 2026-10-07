@@ -339,6 +339,8 @@ class GameState:
             self.p[q] = pl
             self.draw(q, self.r.hand)
             (mulligan or default_mulligan)(self, q)
+            if q == G2:
+                self.draw(q, self.r.g2_hand_extra)
             for _ in range(self.r.life):
                 pl.life.append(pl.deck.pop())
         self.active = G1

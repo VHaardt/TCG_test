@@ -31,6 +31,7 @@ class Rules2:
     mulligan_max: int = 3
     brace_max: int = 8                 # Brace = min(round, brace_max)
     scintilla_g2_gems: int = 1         # G2 +1 gemma nel round 1
+    g2_hand_extra: int = 0             # carte in più nella mano iniziale di G2 (dopo il mulligan)
     no_attack_round: int = 1
 
     # Vita, Saldo, Clessidra, Crepuscolo
