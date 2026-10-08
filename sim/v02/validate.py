@@ -177,7 +177,9 @@ class _V:
                 self.selector(where + ".applies_to", ab["applies_to"])
             self.conds(where + ".if", ab.get("if"))
         elif kind == "trigger":
-            self.keys(where, ab, {"trigger", "if", "target", "do"})
+            self.keys(where, ab, {"trigger", "if", "target", "do", "stack"})
+            if "stack" in ab and not isinstance(ab["stack"], bool):
+                self.err(where, "'stack' vuole true/false")
             if ab["trigger"] not in EVENTS:
                 self.err(where, f"evento sconosciuto '{ab['trigger']}'")
             self.conds(where + ".if", ab.get("if"))

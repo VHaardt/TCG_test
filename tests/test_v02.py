@@ -651,6 +651,19 @@ def test_defeat_triggers_look_back_on_mutual_defeat():
     assert len(s.p[1].hand) == n + 1
 
 
+def test_global_trigger_stack_false_fires_once_per_id():
+    """R-007: "stack": false on a global trigger = "Più copie non si sommano"."""
+    for stack, drawn in ((True, 2), (False, 1)):
+        payoff = _card(f"_payoff_{stack}", power=0, abilities=[
+            {"trigger": "on_own_unit_defeats_unit", "stack": stack, "do": [{"op": "draw", "n": 1}]}])
+        s = _arena()
+        s.p[0].units = [Unit(900, _card("_s5", power=5), True), Unit(902, payoff, False), Unit(903, payoff, False)]
+        s.p[1].units = [Unit(901, _card("_s1", power=1), True)]
+        n = len(s.p[0].hand)
+        _fight(s, ("attack", 900), oppose=901)
+        assert len(s.p[0].hand) == n + drawn, stack
+
+
 if __name__ == "__main__":
     for k, f in list(globals().items()):
         if k.startswith("test_"):

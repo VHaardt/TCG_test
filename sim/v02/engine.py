@@ -759,9 +759,15 @@ class GameState:
             pl.discard.append(cid)
 
     # ------------------------------------------------------------------ effects (small DSL)
-    def fire(self, q, abilities, event, ctx, src=None):
-        for ab in abilities:
+    def fire(self, q, abilities, event, ctx, src=None, once=None):
+        """once: set shared by one fire_global call; a trigger with "stack": false fires once
+        per card id there ("Più copie non si sommano", R-007)."""
+        for i, ab in enumerate(abilities):
             if ab.get("trigger") == event and self.cond_ok(q, ab.get("if"), ctx):
+                if ab.get("stack") is False and once is not None:
+                    if (src, i) in once:
+                        continue
+                    once.add((src, i))
                 ops = [o for o in ab["do"] if o["op"] not in ("att_mod", "def_mod")]
                 c = ctx
                 if "target" in ab:                          # N1: bersaglio scelto dal motore
@@ -782,11 +788,12 @@ class GameState:
 
     def fire_global(self, q, event, ctx, gone=()):
         """gone: Units of q defeated in this combat, whose look-back triggers still fire (§7.5)."""
+        once = set()
         for u in list(self.p[q].units) + list(gone):
-            self.fire(q, CARDS[u.cid].abilities, event, dict(ctx, self=u.uid), src=u.cid)
+            self.fire(q, CARDS[u.cid].abilities, event, dict(ctx, self=u.uid), src=u.cid, once=once)
         self.fire(q, self.leader_abilities(q), event, dict(ctx, self="L"), src=self.p[q].leader)
         for rid in list(self.p[q].relics):                  # N3: anche le Reliquie
-            self.fire(q, CARDS[rid].abilities, event, dict(ctx, self=rid), src=rid)
+            self.fire(q, CARDS[rid].abilities, event, dict(ctx, self=rid), src=rid, once=once)
 
     def op_target(self, q, op, ctx):
         """(owner, Unit) named by op["target"]: "chosen" (default), "self", "opposer", "attacker";
