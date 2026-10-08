@@ -82,9 +82,10 @@ def regret_matching(M, iters=300):
 class PugnoGame:
     """Builds the payoff matrix for the current combat from attacker a's point of view."""
 
-    def __init__(self, s, lam=LAMBDA, defender_hand=None, opposer="current"):
+    def __init__(self, s, lam=LAMBDA, defender_hand=None, opposer="current", lam_cap=False):
         self.s = s
         self.lam = lam
+        self.lam_cap = lam_cap      # R-011: the attacker's unspent gems are worth lam only up to its Guardia cap
         self.a, self.d = s.active, 1 - s.active
         self.cache = {}
         self.base = s
@@ -121,7 +122,10 @@ class PugnoGame:
 
     def cell(self, a_gems, col, opposer_mode):
         _, d_gems, react = col
-        gems = self.lam * (self.B - a_gems) - self.lam * (self.G - d_gems)
+        kept = self.B - a_gems
+        if self.lam_cap:
+            kept = min(kept, self.base.guard_max(self.a))
+        gems = self.lam * kept - self.lam * (self.G - d_gems)
         if opposer_mode == "after":
             best = None
             for o in self.opp_choices:
@@ -176,7 +180,8 @@ def determinize(s, q, rng):
 class RuleAgent2:
     name = "semplice"
 
-    def __init__(self, seed=None, lam=LAMBDA, iters=300, k_det=4, det=False, pay_life=False):
+    def __init__(self, seed=None, lam=LAMBDA, iters=300, k_det=4, det=False, pay_life=False, lam_cap=False):
+        self.lam_cap = lam_cap
         self.rng = random.Random((seed or 0) * 7919 + 17)     # separate from the game seed
         self.lam = lam
         self.iters = iters
@@ -190,7 +195,7 @@ class RuleAgent2:
         mode = _opposer_mode(s)
         acc = None
         for _ in range(max(1, self.k_det)):
-            g = PugnoGame(s, self.lam, defender_hand=sample_hand(s, s.active, self.rng))
+            g = PugnoGame(s, self.lam, lam_cap=self.lam_cap, defender_hand=sample_hand(s, s.active, self.rng))
             M = g.matrix(mode)
             if self.det or s.r.pugno != "simultaneo":
                 x = np.zeros(M.shape[0]); x[int(np.argmax(M.min(axis=1)))] = 1
@@ -201,7 +206,7 @@ class RuleAgent2:
 
     def defender_strategy(self, s, a_seen=None):
         mode = _opposer_mode(s)
-        g = PugnoGame(s, self.lam)
+        g = PugnoGame(s, self.lam, lam_cap=self.lam_cap)
         M = g.matrix(mode)
         if a_seen is not None:
             y = np.zeros(M.shape[1]); y[int(np.argmin(M[a_seen]))] = 1
@@ -223,7 +228,7 @@ class RuleAgent2:
 
     def game_value(self, s, opposer):
         """Attacker's value of the pugno game if `opposer` is chosen now (defender's view)."""
-        g = PugnoGame(s, self.lam, opposer=opposer)
+        g = PugnoGame(s, self.lam, lam_cap=self.lam_cap, opposer=opposer)
         M = g.matrix("fixed")
         if s.r.pugno == "simultaneo" and not self.det:
             x, y = regret_matching(M, max(100, self.iters // 3))
@@ -251,7 +256,7 @@ class RuleAgent2:
                     best, best_v = act, v
             return best
         if ph == "oppose_after":
-            g = PugnoGame(s, self.lam, opposer=None)
+            g = PugnoGame(s, self.lam, lam_cap=self.lam_cap, opposer=None)
             cb = s.combat
             best, best_v = ("no_oppose",), g._value_outcome(cb.a, cb.d, cb.react, None)
             for act in acts[1:]:
@@ -268,7 +273,7 @@ class RuleAgent2:
     # ------------------------------------------------ V2 control: face-up single answer
     def _risposta_values(self, s, a_gems):
         out = []
-        g = PugnoGame(s, self.lam, opposer=None)
+        g = PugnoGame(s, self.lam, lam_cap=self.lam_cap, opposer=None)
         for act in s.legal_actions() if s.phase == "risposta" else [("parry", 0, None)] + \
                 [("oppose", uid) for uid in s.opposer_options()] + s._parry_options(1 - s.active)[1:]:
             if act[0] == "oppose":
@@ -402,7 +407,7 @@ class BestResponseAgent(RuleAgent2):
 
     def act(self, s):
         if s.phase == "pugno_att" and s.r.pugno == "simultaneo":
-            g = PugnoGame(s, self.lam)
+            g = PugnoGame(s, self.lam, lam_cap=self.lam_cap)
             M = g.matrix(_opposer_mode(s))
             if self.opponent == "det":
                 y = np.zeros(M.shape[1]); y[int(np.argmin(M.max(axis=0)))] = 1
@@ -410,7 +415,7 @@ class BestResponseAgent(RuleAgent2):
                 _, y = regret_matching(M, self.iters)
             return ("gems", int(np.argmax(M @ y)))
         if s.phase == "pugno_def" and s.r.pugno == "simultaneo":
-            g = PugnoGame(s, self.lam)
+            g = PugnoGame(s, self.lam, lam_cap=self.lam_cap)
             M = g.matrix(_opposer_mode(s))
             if self.opponent == "det":
                 x = np.zeros(M.shape[0]); x[int(np.argmax(M.min(axis=1)))] = 1
@@ -425,12 +430,27 @@ class MCTSAgent2:
     played with the equilibrium strategy (never by peeking at the hidden pugno)."""
     name = "forte"
 
-    def __init__(self, iterations=100, c=0.9, seed=None, lam=LAMBDA):
+    def __init__(self, iterations=100, c=0.9, seed=None, lam=LAMBDA, v2=True, margin=0.04):
         self.iterations = iterations
         self.c = c
         self.rng = random.Random((seed or 0) * 104729 + 3)
-        self.base = RuleAgent2(seed=seed, lam=lam)
-        self.fast = RuleAgent2(seed=(seed or 0) + 99991, lam=lam, iters=150, k_det=1)
+        self.v2 = v2                # R-011: lam cap, no null attacks, default to the simple AI's move
+        self.margin = margin
+        self.base = RuleAgent2(seed=seed, lam=lam, lam_cap=v2)
+        self.fast = RuleAgent2(seed=(seed or 0) + 99991, lam=lam, iters=150, k_det=1, lam_cap=v2)
+
+    def _null_attack(self, s, act):
+        """An attack on the Leader that cannot hit even with all the Brace against no defence, from
+        a character with no "quando attacca" trigger: the defender never needs to oppose it."""
+        if act[0] != "attack" or len(act) != 2:
+            return False
+        a = s.active
+        if act[1] != "L":
+            u = s.unit(a, act[1])
+            if u is None or any(ab.get("trigger") == "on_attack" for ab in CARDS[u.cid].abilities) \
+                    or CARDS[u.cid].has("caccia"):
+                return False
+        return not s.preview(act[1], None, s.p[a].brace, 0)[2][0]
 
     def act(self, s):
         acts = s.legal_actions()
@@ -439,6 +459,15 @@ class MCTSAgent2:
         if s.phase not in ("main", "oppose", "oppose_after"):
             return self.base.act(s)
         me = s.decider()
+        default = None
+        if self.v2:
+            pruned = [a for a in acts if not (s.phase == "main" and self._null_attack(s, a))]
+            acts = pruned or acts
+            if len(acts) == 1:
+                return acts[0]
+            default = self.base.act(s)
+            if default not in acts:
+                default = None
         stats = {a: [0, 0.0] for a in acts}
         for it in range(self.iterations):
             total = sum(n for n, _ in stats.values()) + 1
@@ -453,7 +482,12 @@ class MCTSAgent2:
             v = evaluate(c, me)
             stats[act][0] += 1
             stats[act][1] += v
-        return max(acts, key=lambda a: stats[a][0])
+        best = max(acts, key=lambda a: stats[a][0])
+        if default is not None and stats[default][0] and best != default:
+            mean = lambda a: stats[a][1] / stats[a][0]
+            if mean(best) - mean(default) < self.margin:
+                return default
+        return best
 
 
 def make_agent(spec, seed=None):
@@ -469,6 +503,8 @@ def make_agent(spec, seed=None):
         return RuleAgent2(seed=seed, lam=lam, det=True)
     if name == "br":
         return BestResponseAgent(seed=seed, lam=lam, opponent=rest or "eq")
-    if name == "forte":
+    if name == "forte":                                 # R-011: forte v2 (default)
         return MCTSAgent2(iterations=int(rest) if rest else 100, seed=seed, lam=lam)
+    if name == "forte1":                                # forte di E-000 v0.2, per confronto
+        return MCTSAgent2(iterations=int(rest) if rest else 100, seed=seed, lam=lam, v2=False)
     raise ValueError(spec)
