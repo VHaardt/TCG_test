@@ -329,7 +329,7 @@ class RuleAgent2:
         for act in units:
             # attack only with a credible threat: an attacker that cannot reach Tempra stays home to oppose
             pw = s.unit_power(a, s.unit(a, act[1]))
-            if pw + pl.brace >= s.r.tempra + 2 * min(op.guard, 1) or (s.alle_corde(1 - a) and pw + pl.brace >= s.r.tempra):
+            if pw + pl.brace >= s.tempra(1 - a) + 2 * min(op.guard, 1) or (s.alle_corde(1 - a) and pw + pl.brace >= s.tempra(1 - a)):
                 return act
         if hunt:
             return hunt
@@ -342,7 +342,7 @@ class RuleAgent2:
         rim = by_kind.get("rim", [])
         lead = [act for act in attacks if act[1] == "L"]
         if lead:
-            threat = s.leader_power(a) + pl.brace >= s.r.tempra + 2 * op.guard - 1
+            threat = s.leader_power(a) + pl.brace >= s.tempra(1 - a) + 2 * op.guard - 1
             if threat or s.alle_corde(1 - a) or not rim or len(pl.life) >= 4:
                 return lead[0]
         if rim and len(pl.life) >= 1:

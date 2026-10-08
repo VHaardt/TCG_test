@@ -759,6 +759,10 @@ class GameState:
             pl.discard.append(cid)
 
     # ------------------------------------------------------------------ effects (small DSL)
+    def tempra(self, q):
+        """Tempra of q's Leader (tempra_awakened when set and q is Awakened)."""
+        return self.r.tempra_awakened if self.p[q].awakened and self.r.tempra_awakened else self.r.tempra
+
     def fire(self, q, abilities, event, ctx, src=None, once=None):
         """once: set shared by one fire_global call; a trigger with "stack": false fires once
         per card id there ("Più copie non si sommano", R-007)."""
@@ -972,7 +976,7 @@ class GameState:
                     src.append((d, cid))
         ctx_d = dict(self.combat_ctx(cb, opposer, pugno=parry, react_src=rs), role="defense")   # Q-015 S-2: solo Parata
         if tgt is None:
-            db = self.r.tempra
+            db = self.tempra(d)
         else:
             tu = self.unit(d, tgt)
             if tu is None:                                  # il bersaglio ha lasciato il gioco

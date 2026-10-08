@@ -20,6 +20,7 @@ class Rules2:
     leader_power: int = 3
     leader_power_awakened: int = 4
     tempra: int = 5
+    tempra_awakened: int = 0           # Tempra del Leader Risvegliato; 0 = uguale a tempra
     life: int = 5
     awaken_at_life: int = 2
     guard_max: int = 2
