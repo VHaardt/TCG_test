@@ -31,7 +31,8 @@ class Rules2:
     mulligan_max: int = 3
     brace_max: int = 8                 # Brace = min(round, brace_max)
     scintilla_g2_gems: int = 1         # G2 +1 gemma nel round 1
-    scintilla_g2_round2: int = 0       # gemme in più per G2 nel round 2 (Scintilla divisa)
+    scintilla_extra_gems: int = 0      # Scintilla divisa: gemme in più per G2 ...
+    scintilla_extra_round: int = 2     # ... in questo round
     scintilla_guardia_g2: int = 0      # gemme di Guardia in più per G2 nella Fine del round 1
     g2_hand_extra: int = 0             # carte in più nella mano iniziale di G2 (dopo il mulligan)
     no_attack_round: int = 1

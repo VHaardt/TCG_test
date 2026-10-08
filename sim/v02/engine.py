@@ -371,8 +371,8 @@ class GameState:
         pl.brace = min(self.round, self.r.brace_max)        # 7e
         if a == G2 and self.round == 1:
             pl.brace += self.r.scintilla_g2_gems
-        if a == G2 and self.round == 2:
-            pl.brace += self.r.scintilla_g2_round2
+        if a == G2 and self.round == self.r.scintilla_extra_round:
+            pl.brace += self.r.scintilla_extra_gems
         self.state_checks()
         if not (a == G1 and self.round == 1):               # 8
             self.draw(a)
