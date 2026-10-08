@@ -174,7 +174,7 @@ Ripeti "scegli un'azione legale, risolvila per intero, controlli di stato" finch
 | Giocare una Reliquia | gemme di Brace | Massimo 2 Reliquie |
 | Giocare una Tattica | gemme di Brace | Si risolve e va negli Scarti |
 | Usare un'abilità ⟳ | ruotare la carta + quanto stampato | Legale solo se la carta è Pronta |
-| **Rimarginare** | ⟳ del Leader + 1 gemma | Prendi in mano una tua Cicatrice **dritta** (§10.2) |
+| **Rimarginare** | ⟳ del Leader + 1 Brace | Prendi in mano una tua Cicatrice **dritta** (§10.2) |
 | Dichiarare un attacco | — | §8. **Nessuno attacca nel round 1** [`no_attack_round` 1] |
 | Terminare la fase | — | — |
 
@@ -357,7 +357,7 @@ Il Leader attacca come un personaggio (§8) con la sua Forza: 3, Risvegliato 4. 
 *Questo punto è in attesa di Vittorio:* il pilastro 2 di v0.1 ("il Leader non colpisce gratis") non vale più sul lato Risvegliato. Vedi `pilastri_design_v0.2.md`, pilastro 2.
 
 ### 10.2 Rimarginare (abilità ⟳ di ogni Leader)
-> **⟳, 1 gemma**: prendi in mano una tua Cicatrice **dritta**.
+> **⟳, 1 Brace**: prendi in mano una tua Cicatrice **dritta**.
 
 - È un'abilità ⟳ stampata (implicitamente) su ogni Leader: il Leader deve essere **Pronto** e si ruota.
 - Conseguenza: in un turno il Leader **o attacca o Rimargina** (o usa un'altra ⟳), salvo effetti che lo raddrizzano.
@@ -395,7 +395,7 @@ Le abilità che in v0.1 erano Reazioni del Leader sono **statiche**: si leggono 
 ### 12.2 Parole chiave (ognuna compare in almeno due colori)
 - **Assalto**: questa Unità entra **Pronta**, quindi può attaccare nel turno in cui entra (mai nel round 1).
 - **Scudo**: quando questa Unità si oppone, vince i pareggi nel Confronto: contro un'Unità a pari è sconfitto solo l'attaccante; contro un Leader è sconfitta solo se Db < Fa. Si ruota come le altre Unità **[default, aperto: P7]**.
-- **Impeto N: +X** *(se nell'impegno hai almeno N gemme, +X in questo scontro, anche quando è il bersaglio)*: si legge in C4 (d), è pubblica. Il difensore conta solo la Parata (C4 b). Sostituisce Infuso N (Q-014, forma Q-015 M2).
+- **Impeto N: +X** *(se nell'impegno hai almeno N gemme, +X in questo scontro, anche quando è il bersaglio, contando solo le gemme di Parata)*: si legge in C4 (d), è pubblica. Il difensore conta solo la Parata (C4 b). Sostituisce Infuso N (Q-014, forma Q-015 M2).
 - **Caccia** *(quando attacca, puoi scegliere come bersaglio un'Unità avversaria invece del Leader; l'avversario può ancora opporsi con un'altra Unità, che diventa il bersaglio)*: il bersaglio cacciato può essere Pronto o Ruotato e si difende con la sua Forza, la Parata, la Reazione e lo Scudo; non "si oppone", quindi i suoi "quando si oppone" non scattano (Q-014).
 - **Furia N: +X**: +X al Confronto se hai almeno N Cicatrici, contando **tutte** le Cicatrici (dritte e fresche). Si legge solo in C5: non è mai un'aura.
 - **Bracconiere X** *(quando attacca e il suo bersaglio è un'Unità, +X in questo scontro)*: vale se il bersaglio è un'Unità che si oppone o un'Unità cacciata; mai quando è l'Unità con Bracconiere a opporsi (Q-014).
@@ -426,11 +426,11 @@ Le abilità che in v0.1 erano Reazioni del Leader sono **statiche**: si leggono 
 
 ## 13. Carte d'esempio convertite
 
-Sono le carte di v0.1 convertite con la tabella del §12.3, così come le usa il simulatore (`sim/v02/cards_v02.json`). Le conversioni dei Leader sono provvisorie e i valori vanno al thread carte. Formato: **Nome** — costo · tipo · Forza · testo. Il costo è in gemme.
+Sono le carte di v0.1 convertite con la tabella del §12.3, così come le usa il simulatore (`sim/v02/cards_v02.json`) per le misure del nucleo. **Non sono il set**: le carte e i Leader del primo set (LDR-01…06, con i testi approvati, es. Thorn = LDR-04 "⟳, 1 Brace: Stanca … costo ≤3") sono in `tcg/set/finale/set_v02.json`. Le conversioni dei Leader sono provvisorie e i valori vanno al thread carte. Formato: **Nome** — costo · tipo · Forza · testo. Il costo è in gemme.
 
 **Leader** (tutti F3 / Tempra 4 / Vita 5; Risvegliati F4 / Tempra 4)
 - **Arden, Fabbro di Guerra** (Rosso/Verde). Base: se un tuo attaccante ha almeno 2 gemme impegnate, ha +1 Forza in questo scontro. Risvegliato: le tue Unità con Assalto hanno +1 Forza.
-- **Maera, Custode del Passo** (Blu/Nero). Base, statica: quando difendi e hai impegnato almeno 1 gemma, l'attaccante ha −2 Forza in questo scontro. Risvegliato, statica: le tue gemme di Parata valgono +3 invece di +2.
+- **Maera, Custode del Passo** (Blu/Nero). Base, statica: quando difendi, se nell'impegno hai almeno 1 gemma di Parata, l'attaccante ha −2 in questo scontro. Risvegliato, statica: le tue gemme di Parata valgono +3 invece di +2.
 - **Sorella Vey, la Segnata** (Nero/Rosso). Base: la tua Furia conta 1 Cicatrice in più. Risvegliato: Rimarginare non costa gemme (resta ⟳).
 - **Thorn, Voce del Branco** (Verde/Blu). Base: ⟳, 2 gemme: Stanca un'Unità avversaria Pronta con costo ≤ 2. Risvegliato: le tue Unità con Bracconiere hanno +1 Forza.
 
@@ -519,7 +519,7 @@ Il costo di una Reazione si paga con le gemme di Guardia impegnate in C4. Le car
 | **Pronto** | Carta dritta: può attaccare, opporsi e usare ⟳. |
 | **Raddrizzare** | Riportare dritta una carta Ruotata o una Cicatrice fresca. |
 | **Reazione** | Carta giocata dal difensore in C4, dalla mano o da una Cicatrice dritta, pagata con le gemme impegnate; al massimo una per scontro. |
-| **Rimarginare** | ⟳ del Leader + 1 gemma: prendi in mano una Cicatrice dritta. |
+| **Rimarginare** | ⟳ del Leader + 1 Brace: prendi in mano una Cicatrice dritta. |
 | **Rinnovo** | Quando l'Unità attacca e sconfigge un'Unità, si raddrizza. |
 | **Risveglio** | Il Leader si gira sul lato Risvegliato quando ha Vita ≤ 2; una volta per partita. |
 | **Round** | Un turno di G1 più un turno di G2; avanza nel Ripristino di G1. |
@@ -571,7 +571,7 @@ Nomi dei parametri da `sim/v02/config.py`; preset del simulatore: `V02`.
 | Limite tecnico | round 17 | `max_rounds` 17 | Oltre: "non conclusa" |
 | Muro di Scudi | 1 gemma, +4 | `muro_bonus` 4 | Provvisorio |
 | Grido dalla Cicatrice | 1 gemma; −3 dalla mano, −5 dalle Cicatrici | `grido_hand` 3, `grido_scars` 5 | Provvisorio |
-| Rimarginare | ⟳ del Leader + 1 gemma | — | Niente limite "1 volta per turno" |
+| Rimarginare | ⟳ del Leader + 1 Brace | — | Niente limite "1 volta per turno" |
 
 ### 16.1 Numeri misurati (E-014, base finale: Tempra 4, impegno sequenziale)
 Mazzi convertiti da v0.1, mirror, IA semplice, 10.000 partite salvo dove indicato.
@@ -682,3 +682,4 @@ I moduli di v0.1 §17 (campo di battaglia, zone contese, round condiviso, Fulcro
 | v0.1 | 2026-10-07 | Prima stesura consolidata e ratificata (vedi `regolamento_v0.1.md`). |
 | v0.2 | 2026-10-08 | Nucleo v0.2 da Q-013 (8 APPROVO su 8), specifica della sezione A dell'esito. Tempra 4; gemme e tracciato del round; Pronto/Ruotato; combattimento C1–C6 con impegno sequenziale e opposizione prima dell'impegno; raddrizzo nel Ripristino; Cicatrici fresche e Saldo senza contatori; +1 Guardia Alle Corde; Reazioni dei Leader statiche. Default aperti: P6 (G2 +1 gemma nei round 1 e 3), P7 (Scudo vince i pareggi), P9b (costo delle Reazioni). Regola C4 (a) scritta nella forma "una Reazione si gioca solo se le gemme impegnate ne pagano il costo" (esiti invariati). |
 | v0.2.1 | 2026-10-08 | Chiarimenti per il set (R-007), nessuna regola del nucleo nuova. Stanca solo nel tuo turno, anche nei trigger (Q-016; tolta la riga del §6.3). Impegno e Parata del difensore: le condizioni sulle gemme del difensore contano solo la Parata (C4 b, Q-015 S-2). Trigger di C6 (e) anche nella sconfitta reciproca, con esempio Rinnovo/BLU-025 (§7.5, Q-015 S-9). Limite di copie per ID (§2.3). Massimo di Guardia: "+1 per Lanterna" → aumenti stampati sulle carte (§5.3). Costi ⟳ con la Brace (§5.2). Testi di Impeto, Caccia, Bracconiere, Rinnovo da Q-014/Q-015 (§12). Glossario: Bonus al bersaglio, Caccia, Difendi, Forza attuale, Impeto. |
+| v0.2.2 | 2026-10-08 | Refusi da R-009: Rimarginare "⟳, 1 Brace" (§6.3, §10.2, glossario, §16); richiamo di Impeto "contando solo le gemme di Parata"; Maera del §13 con "gemma di Parata"; nota al §13 che le carte d'esempio sono quelle del simulatore del nucleo, non il set. |
