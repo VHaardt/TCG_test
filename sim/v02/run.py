@@ -123,6 +123,12 @@ def metrics(recs):
     lh = [sum(r["stats"].get("leader_hits", [[0] * 4] * 2)[q][i] for r in recs for q in (0, 1)) for i in range(4)]
     m["leader_free"] = (wilson(lh[1], lh[0]), lh[0], wilson(lh[3], lh[2]), lh[2])     # Q-017
     m["leader_drain"] = wilson(lh[3], sum(sum(r["stats"]["attacks_leader_hit"]) for r in recs))   # Q-017 (Cr)
+    fr = {}
+    for r in recs:
+        for q in (0, 1):
+            for k, v in r["stats"].get("leader_free_rim", [{}, {}])[q].items():
+                fr[k] = fr.get(k, 0) + v
+    m["leader_free_rim"] = {k[:-4]: (wilson(fr.get(k[:-4] + "|rim", 0), v), v) for k, v in sorted(fr.items()) if k.endswith("|tot")}
     both = [r for r in recs if all(x is not None for x in r["stats"]["awaken_round"])]
     m["r13_both_awak"] = (wilson(sum(r["rounds"] >= 13 for r in both), len(both)), len(both))    # Q-017 (Ne)
     m["attacks_per_game"] = att / max(n, 1)
@@ -297,6 +303,8 @@ def render(title, m, spec, agents, elapsed):
          f"| Attacchi a segno sul Leader | {pct(m['leader_hit'])} | | |",
          f"| Colpi del Leader a segno senza gemme: Base / Risvegliato (Q-017) | {pct(m['leader_free'][0])} (n={m['leader_free'][1]}) / {pct(m['leader_free'][2])} (n={m['leader_free'][3]}) | | |",
          f"| Colpi a segno sui Leader dati dal Risvegliato senza gemme (drain, Q-017) | {pct(m['leader_drain'])} | <35% (Cr) | |",
+         f"| Colpi del Leader senza gemme con Rimarginare legale, per Leader e lato (Q-017) | "
+         + (", ".join(f"{k.replace('|', ' ')} {pct(v)} (n={n})" for k, (v, n) in m["leader_free_rim"].items()) or "—") + " | | |",
          f"| Round 13+ nelle partite con entrambi Risvegliati (Q-017) | {pct(m['r13_both_awak'][0])} (n={m['r13_both_awak'][1]}) | | |",
          f"| Attacchi per partita | {m['attacks_per_game']:.1f} | | |",
          f"| Pugno attaccante vuoto / pieno | {pct(m['pugno_att_empty'])} / {pct(m['pugno_att_full'])} (gemme medie {m['pugno_att_gems']:.2f}) | non >90% | |",

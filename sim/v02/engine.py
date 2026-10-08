@@ -110,7 +110,7 @@ COMBAT_CONDS = {"attacking", "opposing", "pugno_ge", "target_is_unit", "attacker
 
 class Combat:
     __slots__ = ("att", "opposer", "hunted", "hunted_ready", "a", "d", "react", "a_visible", "att_mod", "def_mod",
-                 "opened")
+                 "opened", "rim_legal")
 
     def __init__(self, att, hunted=None, hunted_ready=None):
         self.att = att              # "L" or uid of the attacking unit
@@ -121,6 +121,7 @@ class Combat:
         self.d = None               # defender's gems in the pugno (Reaction cost included)
         self.react = None           # (cid, "hand"|"scar")
         self.a_visible = False
+        self.rim_legal = False
         self.att_mod = 0            # from triggers resolved in this combat
         self.def_mod = 0
         self.opened = False
@@ -147,7 +148,7 @@ def new_stats():
         "reactions": [0, 0], "mods": {}, "legal_actions": [0, 0], "decisions": [0, 0],
         "idle_turns": [0, 0], "idle3_turns": [0, 0], "turns": [0, 0],
         "lives_lost": [{}, {}], "life_at_round6": None, "awaken_round": [None, None],
-        "rim_used": [0, 0], "cards_played": [{}, {}], "drawn": [{}, {}], "guard_stored": [0, 0],
+        "rim_used": [0, 0], "cards_played": [{}, {}], "drawn": [{}, {}], "leader_free_rim": [{}, {}], "guard_stored": [0, 0],
         # R-005, metriche M1-M14 (indice = giocatore che difende per M1-M3, che attacca per M4-M5)
         "react_avail": [0, 0], "react_decisive": [0, 0],                 # M1, M2
         "react_scar": [0, 0], "react_scar_life": [0, 0],                 # M3
@@ -881,6 +882,8 @@ class GameState:
         d = 1 - a
         self.combat = Combat(att, hunted, self.unit(d, hunted).ready if hunted is not None else None)
         if att == "L":
+            # Q-017 (Ne, An): attaccando, il Leader rinuncia a un Rimarginare legale?
+            self.combat.rim_legal = pl.brace >= self.modifier(a, "rim_cost", 1) and any(not sc[1] for sc in pl.scars)
             pl.l_ready = False
         else:
             u = self.unit(a, att)
@@ -1143,6 +1146,11 @@ class GameState:
                 k = 2 if pa.awakened else 0
                 lh[k] += 1
                 lh[k + 1] += not cb.a
+                if not cb.a:
+                    side = "Risvegliato" if pa.awakened else "Base"
+                    self.stat_add("leader_free_rim", a, f"{pa.leader}|{side}|tot")
+                    if getattr(cb, "rim_legal", False):
+                        self.stat_add("leader_free_rim", a, f"{pa.leader}|{side}|rim")
             if self.alle_corde(d) and pd.fresh() == 0:
                 self.lose(d, "colpo_finale")
             else:
