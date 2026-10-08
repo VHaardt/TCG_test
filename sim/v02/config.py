@@ -72,6 +72,9 @@ PRESETS = {
     "V3B_opposizione_dopo": {"opposizione": "dopo"},
     "V4B_raddrizzo_fine": {"raddrizzo": "fine"},
     "S_scudo_pareggi": {"scudo": "vince_pareggi"},
+    # nucleo v0.2 ratificato (Q-013 esito.md, 2026-10-08); G1 e Scudo sono default di punti aperti
+    "V02": {"tempra": 4, "pugno": "sequenziale", "scudo": "vince_pareggi",
+            "scintilla_extra_gems": 1, "scintilla_extra_round": 3},
 }
 
 

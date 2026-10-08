@@ -306,7 +306,7 @@ def main(argv=None):
     sub = p.add_subparsers(dest="cmd", required=True)
 
     def common(x, partite=100):
-        x.add_argument("--variante", default="B0")
+        x.add_argument("--variante", default="V02")
         x.add_argument("--ia", default="semplice")
         x.add_argument("--partite", type=int, default=partite)
         x.add_argument("--mazzi", nargs="*")
@@ -314,7 +314,7 @@ def main(argv=None):
         x.add_argument("--seed", type=int, default=1)
         x.add_argument("--out")
     t = sub.add_parser("torneo"); common(t)
-    ab = sub.add_parser("ab"); common(ab); ab.add_argument("--base", default="B0")
+    ab = sub.add_parser("ab"); common(ab); ab.add_argument("--base", default="V02")
     lm = sub.add_parser("lambda"); common(lm, 200)
     co = sub.add_parser("collaudo"); common(co, 250)
     fo = sub.add_parser("forte"); common(fo, 25); fo.add_argument("--forte", default="forte:60")

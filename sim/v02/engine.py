@@ -27,7 +27,7 @@ from ..cards import load as load_db
 from .config import B0
 
 G1, G2 = 0, 1
-RULES_VERSION = "v0.2-B0"
+RULES_VERSION = "v0.2"
 DATA = os.path.join(os.path.dirname(__file__), "cards_v02.json")
 CARDS, LEADERS = load_db(DATA)
 
