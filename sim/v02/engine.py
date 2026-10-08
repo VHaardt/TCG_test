@@ -1007,12 +1007,17 @@ class GameState:
         db += r_def + cb.def_mod
         return fa, db, mods
 
-    def outcome(self, fa, db, opposer, cb=None):
-        """(leader_hit, attacker_unit_defeated, target_unit_defeated)."""
+    def outcome(self, fa, db, opposer, cb=None, a_gems=None):
+        """(leader_hit, attacker_unit_defeated, target_unit_defeated). a_gems: attacker's gems
+        (default cb.a), read only by leader_min_gems (Q-017 B3)."""
         a, d = self.active, 1 - self.active
         cb = cb or self.combat
         tgt = cb.target(opposer)
         if tgt is None:
+            if cb.att == "L" and self.r.leader_min_gems:
+                g = cb.a if a_gems is None else a_gems
+                if (g or 0) < self.r.leader_min_gems:
+                    return False, False, False
             return fa >= db, False, False
         tu = self.unit(d, tgt)
         if tu is None:
@@ -1030,7 +1035,7 @@ class GameState:
         """Pure: (Fa, Db, outcome) of an attack not yet declared (AI heuristics)."""
         cb = Combat(att, hunted, self.unit(1 - self.active, hunted).ready if hunted is not None else None)
         fa, db, _ = self.compute(a_gems, d_gems, react, opposer, cb=cb)
-        return fa, db, self.outcome(fa, db, opposer, cb=cb)
+        return fa, db, self.outcome(fa, db, opposer, cb=cb, a_gems=a_gems)
 
     def decided_before_commit(self):
         """M4: no legal commitment of either player changes the outcome. Fa grows with the
@@ -1041,7 +1046,7 @@ class GameState:
         for _, d_gems, react in self._parry_options(1 - self.active):
             for a_gems in (0, B):
                 fa, db, _ = self.compute(a_gems, d_gems, react, cb.opposer)
-                o = self.outcome(fa, db, cb.opposer)
+                o = self.outcome(fa, db, cb.opposer, a_gems=a_gems)
                 if first is None:
                     first = o
                 elif o != first:

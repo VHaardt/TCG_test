@@ -664,6 +664,21 @@ def test_global_trigger_stack_false_fires_once_per_id():
         assert len(s.p[0].hand) == n + drawn, stack
 
 
+def test_q017_levers_tempra_awakened_and_leader_min_gems():
+    """Q-017: tempra_awakened is the Db of an Awakened Leader; leader_min_gems stops a Leader
+    hit with fewer gems than N."""
+    s = _arena()
+    s.r = s.r.with_(tempra_awakened=5)
+    s.p[1].awakened = True
+    assert s.tempra(1) == 5 and s.tempra(0) == 4
+    s = _arena()
+    s.p[0].awakened = True                                  # Risvegliato F4 contro Tempra 4
+    assert s.preview("L", None, 0, 0)[2][0] is True
+    s.r = s.r.with_(leader_min_gems=1)
+    assert s.preview("L", None, 0, 0)[2][0] is False
+    assert s.preview("L", None, 1, 0)[2][0] is True
+
+
 if __name__ == "__main__":
     for k, f in list(globals().items()):
         if k.startswith("test_"):

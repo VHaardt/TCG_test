@@ -122,6 +122,9 @@ def metrics(recs):
     m["leader_hit"] = wilson(sum(sum(r["stats"]["attacks_leader_hit"]) for r in recs), att)
     lh = [sum(r["stats"].get("leader_hits", [[0] * 4] * 2)[q][i] for r in recs for q in (0, 1)) for i in range(4)]
     m["leader_free"] = (wilson(lh[1], lh[0]), lh[0], wilson(lh[3], lh[2]), lh[2])     # Q-017
+    m["leader_drain"] = wilson(lh[3], sum(sum(r["stats"]["attacks_leader_hit"]) for r in recs))   # Q-017 (Cr)
+    both = [r for r in recs if all(x is not None for x in r["stats"]["awaken_round"])]
+    m["r13_both_awak"] = (wilson(sum(r["rounds"] >= 13 for r in both), len(both)), len(both))    # Q-017 (Ne)
     m["attacks_per_game"] = att / max(n, 1)
     cb = [r for r in recs if r["stats"]["life_at_round6"]]
     behind = [(r, 0 if r["stats"]["life_at_round6"][0] < r["stats"]["life_at_round6"][1] else 1)
@@ -293,6 +296,8 @@ def render(title, m, spec, agents, elapsed):
          f"| Turni con Unità Pronte ferme | {pct(m['idle'])} (con ≥3: {pct(m['idle3'])}) | ≤35% (V4) | |",
          f"| Attacchi a segno sul Leader | {pct(m['leader_hit'])} | | |",
          f"| Colpi del Leader a segno senza gemme: Base / Risvegliato (Q-017) | {pct(m['leader_free'][0])} (n={m['leader_free'][1]}) / {pct(m['leader_free'][2])} (n={m['leader_free'][3]}) | | |",
+         f"| Colpi a segno sui Leader dati dal Risvegliato senza gemme (drain, Q-017) | {pct(m['leader_drain'])} | <35% (Cr) | |",
+         f"| Round 13+ nelle partite con entrambi Risvegliati (Q-017) | {pct(m['r13_both_awak'][0])} (n={m['r13_both_awak'][1]}) | | |",
          f"| Attacchi per partita | {m['attacks_per_game']:.1f} | | |",
          f"| Pugno attaccante vuoto / pieno | {pct(m['pugno_att_empty'])} / {pct(m['pugno_att_full'])} (gemme medie {m['pugno_att_gems']:.2f}) | non >90% | |",
          f"| Pugno difensore vuoto / pieno | {pct(m['pugno_def_empty'])} / {pct(m['pugno_def_full'])} (gemme medie {m['pugno_def_gems']:.2f}) | non >90% | |",
@@ -446,7 +451,7 @@ def cmd_collaudo(a):
 
 
 def cmd_forte(a):
-    res, recs = head_to_head(a.variante, a.forte, a.ia, a.partite)
+    res, recs = head_to_head(a.variante, a.forte, a.ia, a.partite, a.mazzi)
     text = (f"# IA forte contro semplice ({a.variante})\n\n`{a.forte}` contro `{a.ia}`, mirror, {len(recs)} partite.\n\n"
             f"- Vittorie dell'IA forte: {pct(res)}; margine {100*(res[0]-0.5):+.1f} punti "
             f"[{100*(res[1]-0.5):+.1f}, {100*(res[2]-0.5):+.1f}]\n")

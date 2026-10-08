@@ -21,6 +21,7 @@ class Rules2:
     leader_power_awakened: int = 4
     tempra: int = 5
     tempra_awakened: int = 0           # Tempra del Leader Risvegliato; 0 = uguale a tempra
+    leader_min_gems: int = 0           # Q-017 B3: il Leader va a segno solo con almeno N gemme impegnate
     life: int = 5
     awaken_at_life: int = 2
     guard_max: int = 2

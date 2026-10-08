@@ -102,7 +102,7 @@ class PugnoGame:
     def _value_outcome(self, a_gems, d_gems, react, opposer):
         st = self.base
         fa, db, _ = st.compute(a_gems, d_gems, react, opposer)
-        hit, ad, od = st.outcome(fa, db, opposer)
+        hit, ad, od = st.outcome(fa, db, opposer, a_gems=a_gems)
         used = react if (react is not None and d_gems >= max(CARDS[react[0]].cost, 1)) else None
         key = (hit, ad, od, used, opposer)
         v = self.cache.get(key)
@@ -342,7 +342,7 @@ class RuleAgent2:
         rim = by_kind.get("rim", [])
         lead = [act for act in attacks if act[1] == "L"]
         if lead:
-            threat = s.leader_power(a) + pl.brace >= s.tempra(1 - a) + 2 * op.guard - 1
+            threat = s.leader_power(a) + pl.brace >= s.tempra(1 - a) + 2 * op.guard - 1 and pl.brace >= s.r.leader_min_gems
             if threat or s.alle_corde(1 - a) or not rim or len(pl.life) >= 4:
                 return lead[0]
         if rim and len(pl.life) >= 1:
