@@ -1,25 +1,17 @@
 # CICATRICI — Pilastri di design e obiettivi misurabili (v0.2)
 
 > Copia di `pilastri_design.md` (v0.1) aggiornata all'esito ratificato di Q-013 (`swarm/questioni/Q-013_rework_nucleo_v0.2/esito.md`, 8 APPROVO su 8, 2026-10-08). Le regole sono in `regolamento_v0.2.md`.
-> **Stato:** i pilastri 3, 4 e 6 sono riscritti come previsto dall'esito; il pilastro 2 è riscritto nella parte su Esposto, ma la frase "il Leader non colpisce gratis" è **in attesa di Vittorio** (riquadro sotto). Il pilastro 9 è confermato. Gli altri pilastri non cambiano nel merito. Cambiare un pilastro richiede l'ok di Vittorio (esito, sezione B).
+> **Stato:** i pilastri 3, 4 e 6 sono riscritti come previsto dall'esito; il pilastro 2 è riscritto (Esposto in Q-013; "il Leader non colpisce gratis" in Q-017, ratificata 8/8). Il pilastro 9 è confermato. Gli altri pilastri non cambiano nel merito. Cambiare un pilastro richiede l'ok di Vittorio (esito, sezione B).
 
 ## 1. Ogni colpo racconta una storia
 Il danno subito non sparisce: diventa Cicatrici pubbliche che danno carte, Reazioni e Furia. Dopo **3 Vite perse** il Leader si Risveglia (Forza +1, Guardia +1), indipendentemente da quante Cicatrici hai recuperato. Chi è sotto ha sempre una risorsa nuova, ma deve guadagnarsela: recuperare una Cicatrice costa un'azione del Leader e abbassa la Furia.
 
-## 2. Agire costa la difesa *(riscritto in v0.2; ultima frase in attesa di Vittorio)*
+## 2. Agire costa la difesa *(riscritto in v0.2; ultima frase da Q-017)*
 Ogni carta in campo è Pronta o Ruotata. Attaccare, opporsi, usare abilità ⟳ e **Rimarginare** ruotano il personaggio, che si raddrizza solo nel Ripristino del suo controllore: chi ha agito nel proprio turno non può opporsi nel turno avversario. Ruotata vuol dire solo "ha agito": non rende mai bersaglio, perché il bersaglio di un attacco è sempre il Leader avversario, salvo opposizione. Ogni turno il Leader sceglie tra attaccare e curarsi.
 
-*Testo di v0.1, sospeso:* "Il Leader non colpisce gratis: con Forza 3 contro Tempra 5 deve investire Brace per ferire, e ogni turno sceglie tra attaccare e curarsi."
+**Il Leader non colpisce gratis: attaccare lo ruota, quindi nel turno in cui colpisce non Rimargina. Con Forza 3 contro Tempra 4 il Leader Base di norma deve anche impegnare Brace; il Risveglio toglie questo secondo costo.** *(Q-017, livello 3, ratificata 8/8 il 2026-10-08, con l'ok di Vittorio "va bene che il leader colpisca gratis ma lo devono valutare gli agenti". Nessuna regola cambia. Dati in `swarm/esperimenti/E-017/esito.md`: nessuna leva alternativa rispetta le fasce; il costo della rotazione è reale, Rimarginare era legale nel 62–100% dei colpi a vuoto del Risvegliato. Variante di minoranza e condizioni di revisione nell'esito.)*
 
-> **In attesa di Vittorio — "il Leader non colpisce gratis"**
->
-> **Il conflitto.** Q-013 ha deciso 8/8 la Tempra 4 su entrambi i lati del Leader. Sul lato Base (Forza 3) la frase regge ancora: per andare a segno su un Leader che non si difende serve almeno 1 gemma impegnata. Sul lato Risvegliato (Forza 4) no: il Leader va a segno **a pugno vuoto** contro un Leader che non para e non oppone. Nessun votante ha trattato il punto; l'ha segnalato l'editor (esito P1 e sezione B.1) e l'architetto ha ritirato in ratifica la sua lettura "Tempra 4 è livello 1, il testo non cambia".
->
-> **Le due strade.**
-> 1. **Accettare l'eccezione sul Risvegliato.** Il pilastro diventa "il Leader Base non colpisce gratis; il Risveglio è un premio offensivo che toglie questo costo". Non cambia nessuna regola; cambia solo il testo del pilastro.
-> 2. **Chiedere allo swarm una leva che ripari il pilastro.** Si apre una questione per trovare la leva; il pilastro resta com'è finché la leva non è misurata e votata. Candidata già nell'esito: Tempra 4 sul Base e 5 sul Risvegliato (ripiego del critico, oggi legato all'innesco "rimonte < 12% dopo la compensazione", non scattato: 12.8%).
->
-> **Dati utili.** Base finale (Tempra 4, impegno sequenziale): mediana 8 round, round 13+ 1.5%, rimonte 14.3% (fascia 20–35); con Tempra 5 mediana 11 e round 13+ 13.2%. Sei pre-mortem su otto indicano Tempra 4 come la regola che rischia di essere tolta.
+*Testo di v0.1, superato:* "Il Leader non colpisce gratis: con Forza 3 contro Tempra 5 deve investire Brace per ferire, e ogni turno sceglie tra attaccare e curarsi."
 
 ## 3. Una risorsa, tre scelte *(riscritto in v0.2)*
 Nessuna carta-risorsa, quindi niente screw o flood: ogni turno prendi gemme dal tracciato del round. Ogni gemma di Brace si **spende** per giocare carte, si **impegna** in un attacco (+1 Forza) oppure, a fine turno, diventa **Guardia** sul Leader. Nel turno avversario ogni gemma di Guardia impegnata dà +2 alla difesa (Parata) o paga una Reazione: la difesa è una scelta graduata (0, 1, 2…) e pubblica. L'attaccante impegna per primo e a vista; il difensore risponde dopo averlo visto.
