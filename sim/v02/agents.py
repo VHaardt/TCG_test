@@ -31,7 +31,7 @@ def raw_eval(s, q):
         if not p.life:
             v -= 2.5
         v += 0.25 * min(len(p.hand), 7)
-        v += 0.12 * sum(1 for _, f in p.scars if not f) + 0.04 * len(p.scars)
+        v += 0.12 * sum(1 for sc in p.scars if not sc[1]) + 0.04 * len(p.scars)
         for u in p.units:
             v += 0.35 + 0.18 * s.unit_power(who, u)
             if u.ready or not late:
@@ -97,7 +97,7 @@ class PugnoGame:
         self.G = st.p[self.d].guard
         self.rows = list(range(self.B + 1))
         self.cols = [act for act in st._parry_options(self.d)]   # ("parry", k, react)
-        self.opp_choices = [None] + [u.uid for u in st.p[self.d].units if u.ready]
+        self.opp_choices = [None] + st.opposer_options()
 
     def _value_outcome(self, a_gems, d_gems, react, opposer):
         st = self.base
@@ -176,12 +176,13 @@ def determinize(s, q, rng):
 class RuleAgent2:
     name = "semplice"
 
-    def __init__(self, seed=None, lam=LAMBDA, iters=300, k_det=4, det=False):
+    def __init__(self, seed=None, lam=LAMBDA, iters=300, k_det=4, det=False, pay_life=False):
         self.rng = random.Random((seed or 0) * 7919 + 17)     # separate from the game seed
         self.lam = lam
         self.iters = iters
         self.k_det = k_det
         self.det = det
+        self.pay_life = pay_life                               # M14: paga sempre i costi in Vita
 
     # ------------------------------------------------ pugno decisions
     def attacker_strategy(self, s):
@@ -269,7 +270,7 @@ class RuleAgent2:
         out = []
         g = PugnoGame(s, self.lam, opposer=None)
         for act in s.legal_actions() if s.phase == "risposta" else [("parry", 0, None)] + \
-                [("oppose", u.uid) for u in s.p[1 - s.active].units if u.ready] + s._parry_options(1 - s.active)[1:]:
+                [("oppose", uid) for uid in s.opposer_options()] + s._parry_options(1 - s.active)[1:]:
             if act[0] == "oppose":
                 v = g._value_outcome(a_gems, 0, None, act[1]) + g.lam * (g.B - a_gems) - g.lam * g.G + 0.01
             else:
@@ -299,9 +300,9 @@ class RuleAgent2:
         for act in acts:
             by_kind.setdefault(act[0], []).append(act)
         reserve = 0 if s.round <= 2 else 1
-        # 1. leader / unit abilities with a target
+        # 1. leader / unit abilities with a target (a cost in Vita only with a margin, or always with pay_life)
         for act in by_kind.get("ability", []):
-            if act[3] is not None:
+            if act[3] is not None and (self.pay_life or not self._ability_life_cost(s, act) or len(pl.life) >= 4):
                 return act
         # 2. cards: most expensive first, keeping a small reserve for the pugno
         plays = []
@@ -318,13 +319,18 @@ class RuleAgent2:
             return plays[0][2]
         # 3. attacks: units first, then the Leader
         attacks = by_kind.get("attack", [])
-        units = [act for act in attacks if act[1] != "L"]
+        hunt = self._hunt(s, [act for act in attacks if len(act) > 2])
+        if hunt and not s.alle_corde(1 - a):
+            return hunt
+        units = [act for act in attacks if act[1] != "L" and len(act) == 2]
         units.sort(key=lambda act: -s.unit_power(a, s.unit(a, act[1])))
         for act in units:
             # attack only with a credible threat: an attacker that cannot reach Tempra stays home to oppose
             pw = s.unit_power(a, s.unit(a, act[1]))
             if pw + pl.brace >= s.r.tempra + 2 * min(op.guard, 1) or (s.alle_corde(1 - a) and pw + pl.brace >= s.r.tempra):
                 return act
+        if hunt:
+            return hunt
         rim = by_kind.get("rim", [])
         lead = [act for act in attacks if act[1] == "L"]
         if lead:
@@ -336,10 +342,31 @@ class RuleAgent2:
             return rim[0]
         return ("end",)
 
+    def _ability_life_cost(self, s, act):
+        src, i = act[1], act[2]
+        ab = s.leader_abilities(s.active)[i] if src == "L" else CARDS[s.unit(s.active, src).cid].abilities[i]
+        return any("lose_life" in x for x in ab.get("costs", ()) or ())
+
+    def _hunt(self, s, hunts):
+        """Caccia (R-005 #1): hunt when the attack defeats the target with the expected gems
+        (all of the attacker's Brace against all of the defender's Guardia as Parata) and the
+        hunter survives; the most expensive target first."""
+        a, d = s.active, 1 - s.active
+        best = None
+        for act in hunts:
+            _, _, (_, att_dead, tgt_dead) = s.preview(act[1], act[2], s.p[a].brace, s.p[d].guard)
+            if tgt_dead and not att_dead:
+                key = (CARDS[s.unit(d, act[2]).cid].cost, s.unit_power(d, s.unit(d, act[2])))
+                if best is None or key > best[0]:
+                    best = (key, act)
+        return best[1] if best else None
+
     def _tactic_ok(self, s, act):
         c = CARDS[act[1]]
         a = s.active
-        if any("lose_life" in x for x in (c.play or {}).get("costs", []) or ()):
+        if any("lose_life" in x for x in tuple((c.play or {}).get("costs") or ()) + tuple(c.costs)):
+            if self.pay_life:
+                return True
             return len(s.p[a].hand) <= 3 and len(s.p[a].life) >= 3
         if act[2] is None:
             return True
@@ -422,12 +449,14 @@ class MCTSAgent2:
 
 
 def make_agent(spec, seed=None):
-    """'semplice', 'semplice@0.08' (lam), 'det', 'br', 'br:det', 'forte', 'forte:200'."""
+    """'semplice', 'semplice@0.08' (lam), 'vita', 'det', 'br', 'br:det', 'forte', 'forte:200'."""
     name, _, rest = spec.partition(":")
     name, _, lam = name.partition("@")
     lam = float(lam) if lam else LAMBDA
     if name == "semplice":
         return RuleAgent2(seed=seed, lam=lam)
+    if name == "vita":                                  # M14: semplice, ma paga sempre i costi in Vita
+        return RuleAgent2(seed=seed, lam=lam, pay_life=True)
     if name == "det":
         return RuleAgent2(seed=seed, lam=lam, det=True)
     if name == "br":

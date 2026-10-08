@@ -19,6 +19,7 @@ Decision points (`state.phase`):
   oppose_after  defender may oppose after the opening (opposizione = "dopo")
 With pugno = "simultaneo" the defender's agent must not read `combat.a`; with
 "sequenziale" it may (`combat.a_visible`)."""
+import dataclasses
 import json
 import os
 import random
@@ -29,7 +30,26 @@ from .config import B0
 G1, G2 = 0, 1
 RULES_VERSION = "v0.2"
 DATA = os.path.join(os.path.dirname(__file__), "cards_v02.json")
-CARDS, LEADERS = load_db(DATA)
+KW_ALIAS = {"infuso": "impeto"}     # nome di v0.1/Q-013, accettato nei file vecchi
+CARDS, LEADERS = {}, {}
+META = {}                           # campi di carta non letti dal motore (slot, rarity): metriche M15
+
+
+def load_cards(path=DATA):
+    """Fills CARDS, LEADERS, META in place from a v0.2 card file."""
+    cards, leaders = load_db(path)
+    for cid, c in cards.items():
+        if c.keywords & set(KW_ALIAS):
+            cards[cid] = dataclasses.replace(c, keywords=frozenset(KW_ALIAS.get(k, k) for k in c.keywords))
+    with open(path, encoding="utf-8") as f:
+        raw = json.load(f)
+    CARDS.clear(); CARDS.update(cards)
+    LEADERS.clear(); LEADERS.update(leaders)
+    META.clear()
+    META.update({c["id"]: {k: c[k] for k in ("slot", "rarity") if k in c} for c in raw["cards"]})
+
+
+load_cards()
 
 
 class Unit:
@@ -51,7 +71,7 @@ class Player:
         self.awakened = False
         self.l_ready = True
         self.life = []
-        self.scars = []             # [cid, fresh]
+        self.scars = []             # [cid, fresh, origine della perdita di Vita]
         self.hand = []
         self.deck = []              # top = end of list
         self.discard = []
@@ -71,15 +91,16 @@ class Player:
         return p
 
     def fresh(self):
-        return sum(1 for _, f in self.scars if f)
+        return sum(1 for sc in self.scars if sc[1])
 
 
 class Combat:
-    __slots__ = ("att", "opposer", "a", "d", "react", "a_visible", "att_mod", "def_mod", "opened")
+    __slots__ = ("att", "opposer", "hunted", "a", "d", "react", "a_visible", "att_mod", "def_mod", "opened")
 
-    def __init__(self, att):
+    def __init__(self, att, hunted=None):
         self.att = att              # "L" or uid of the attacking unit
-        self.opposer = None         # uid of the defender's opposing unit, or None (target = Leader)
+        self.opposer = None         # uid of the defender's opposing unit, or None
+        self.hunted = hunted        # uid of the Unit chosen with Caccia (C1), or None
         self.a = None               # attacker's gems in the pugno
         self.d = None               # defender's gems in the pugno (Reaction cost included)
         self.react = None           # (cid, "hand"|"scar")
@@ -94,6 +115,11 @@ class Combat:
             setattr(c, k, getattr(self, k))
         return c
 
+    def target(self, opposer="current"):
+        """uid of the target Unit (opposer, else the hunted Unit), or None = the Leader."""
+        o = self.opposer if opposer == "current" else opposer
+        return o if o is not None else self.hunted
+
 
 def new_stats():
     return {
@@ -105,6 +131,19 @@ def new_stats():
         "idle_turns": [0, 0], "idle3_turns": [0, 0], "turns": [0, 0],
         "lives_lost": [{}, {}], "life_at_round6": None, "awaken_round": [None, None],
         "rim_used": [0, 0], "cards_played": [{}, {}], "guard_stored": [0, 0],
+        # R-005, metriche M1-M14 (indice = giocatore che difende per M1-M3, che attacca per M4-M5)
+        "react_avail": [0, 0], "react_decisive": [0, 0],                 # M1, M2
+        "react_scar": [0, 0], "react_scar_life": [0, 0],                 # M3
+        "decided_pre": [0, 0],                                           # M4
+        "hunt": [0, 0], "hunt_ready": [0, 0], "hunt_rotated": [0, 0],    # M5
+        "target_leader": [0, 0],
+        "unit_turns": [0, 0], "unit_idle": [0, 0],                       # M6
+        "opp_repeat": [0, 0],                                            # M7
+        "double_gems": [0, 0],                                           # M8
+        "opp_elig": [0, 0], "opp_elig_impeto": [0, 0], "opp_impeto": [0, 0],   # M9
+        "activations": [{}, {}],                                         # M11
+        "removals": [0, 0],                                              # M12
+        "life_costs": [0, 0],                                            # M14
     }
 
 
@@ -122,6 +161,7 @@ class GameState:
         self.rng = random.Random()
         self.stats = new_stats()
         self.log = None
+        self.track = None           # stato delle metriche M6/M7 (solo la partita vera, non i cloni)
 
     # ------------------------------------------------------------------ basics
     def clone(self):
@@ -134,6 +174,7 @@ class GameState:
         s.rng = random.Random(self.rng.random())
         s.stats = None
         s.log = None
+        s.track = None
         return s
 
     @property
@@ -216,6 +257,10 @@ class GameState:
         g += self.static_sum(q, "guard_max")
         if self.alle_corde(q):
             g += self.r.guard_alle_corde_bonus
+        sources = self.static_sources(q) + [ab for u in self.p[q].units for ab in CARDS[u.cid].abilities]
+        for ab in sources:                                  # tetto ("cap"), applicato per ultimo
+            if ab.get("static") == "guard_max" and "cap" in ab and self.cond_ok(q, ab.get("if"), {}):
+                g = min(g, ab["cap"])
         return g
 
     def furia(self, q):
@@ -228,6 +273,12 @@ class GameState:
         return self.r.parata_per_gemma
 
     def num(self, v, q=None):
+        if isinstance(v, dict):                             # valore dinamico: {"scars": "own"|"opp"}
+            (k, side), = v.items()
+            who = q if side == "own" else 1 - q
+            if k == "scars":
+                return len(self.p[who].scars)
+            raise ValueError(f"valore dinamico sconosciuto: {v}")
         if isinstance(v, str):
             neg = v.startswith("-")
             name = v.lstrip("-@")
@@ -248,39 +299,66 @@ class GameState:
                 return False
             if k == "pugno_ge" and ctx.get("pugno", -1) < v:
                 return False
+            if k == "deck_nonempty" and bool(self.p[q].deck) != v:
+                return False
+            if k == "target_is_unit" and (ctx.get("target_uid") is not None) != v:
+                return False
+            if k == "opposing" and (ctx.get("opposer_uid") is not None
+                                    and ctx.get("opposer_uid") == ctx.get("self")) != v:
+                return False
+            if k == "attacker_has":
+                cid = ctx.get("attacker_cid")
+                if cid is None or not CARDS[cid].has(KW_ALIAS.get(v, v)):
+                    return False
             if k == "infusion_count":       # v0.1 condition: never true in v0.2
                 return False
         return True
 
-    def matches(self, q_unit, u, sel, ctx=None):
+    def matches(self, q_unit, u, sel, ctx=None, chooser=None):
+        """chooser: who reads the selector (dynamic values, "if"); default the Unit's owner."""
+        ch = q_unit if chooser is None else chooser
+        if "any" in sel:                                    # unione di selettori, dopo le chiavi comuni
+            rest = {k: v for k, v in sel.items() if k != "any"}
+            return self.matches(q_unit, u, rest, ctx, chooser) and \
+                any(self.matches(q_unit, u, s2, ctx, chooser) for s2 in sel["any"])
+        if "if" in sel and not self.cond_ok(ch, sel["if"], ctx or {}):
+            return False
         c = CARDS[u.cid]
-        if "cost_le" in sel and c.cost > sel["cost_le"]:
+        if "cost_le" in sel and c.cost > self.num(sel["cost_le"], ch):
             return False
         if "ready" in sel and u.ready != sel["ready"]:
             return False
-        if "power_le" in sel and self.unit_power(q_unit, u) > sel["power_le"]:
+        if "power_le" in sel and self.unit_power(q_unit, u) > self.num(sel["power_le"], ch):
             return False
-        if "keyword" in sel and not c.has(sel["keyword"]):
+        if "keyword" in sel and not c.has(KW_ALIAS.get(sel["keyword"], sel["keyword"])):
             return False
         if sel.get("attacker") and (ctx or {}).get("attacker_uid") != u.uid:
             return False
         return True
 
-    def unit_power(self, q, u, ctx=None):
-        """Printed Forza + static bonuses. ctx (during a combat): attacker_uid, pugno."""
+    def unit_power(self, q, u, ctx=None, trace=None):
+        """Printed Forza + static bonuses. ctx (during a combat): see combat_ctx; "pugno" = gems
+        committed by the Unit's side (Parata only for the defender). trace: list of (q, source)
+        of conditional bonuses that applied (metrica M11)."""
         ctx = dict(ctx or {}, self=u.uid)
         c = CARDS[u.cid]
         p = c.power
         for ab in c.abilities:
             if ab.get("static") == "power" and "applies_to" not in ab and self.cond_ok(q, ab.get("if"), ctx):
                 p += self.num(ab["value"], q)
-        sources = self.static_sources(q) + [ab for v in self.p[q].units for ab in CARDS[v.cid].abilities
-                                            if "applies_to" in ab]
-        for ab in sources:
+                if trace is not None and ab.get("if"):
+                    trace.append((q, u.cid))
+        pl = self.p[q]
+        sources = ([(pl.leader, ab) for ab in self.leader_abilities(q)]
+                   + [(r, ab) for r in pl.relics for ab in CARDS[r].abilities]
+                   + [(v.cid, ab) for v in pl.units for ab in CARDS[v.cid].abilities if "applies_to" in ab])
+        for sid, ab in sources:
             if ab.get("static") == "power" and "applies_to" in ab:
                 sel = ab["applies_to"]
                 if sel.get("side", "own") == "own" and self.matches(q, u, sel, ctx) and self.cond_ok(q, ab.get("if"), ctx):
                     p += self.num(ab["value"], q)
+                    if trace is not None and (ab.get("if") or sel.get("attacker")):
+                        trace.append((q, sid))
         return p
 
     def leader_power(self, q, ctx=None):
@@ -300,7 +378,7 @@ class GameState:
             return False
         if not ignore_saldo and pl.fresh() >= self.saldo_cap():
             return False
-        pl.scars.append([pl.life.pop(), not ignore_saldo])
+        pl.scars.append([pl.life.pop(), not ignore_saldo, source])
         self.stat_add("lives_lost", q, source)
         self.say(f"    P{q+1} perde 1 Vita ({source}): restano {len(pl.life)}")
         return True
@@ -344,6 +422,8 @@ class GameState:
             for _ in range(self.r.life):
                 pl.life.append(pl.deck.pop())
         self.active = G1
+        if self.stats is not None:
+            self.track = {"seen": set(), "attacked": set(), "opposed": set(), "cand": [set(), set()]}
         self.begin_turn()
         return self
 
@@ -397,6 +477,14 @@ class GameState:
                 self.stats["idle_turns"][a] += 1
             if idle >= 3:
                 self.stats["idle3_turns"][a] += 1
+        if self.track is not None:                          # M6: ferma = Pronta, non attacca e non si oppone
+            tr = self.track
+            self.stats["unit_idle"][1 - a] += len(tr["cand"][1 - a] - tr["opposed"])
+            tr["cand"][1 - a] = set()
+            if self.round > self.r.no_attack_round:
+                self.stats["unit_turns"][a] += len(tr["seen"])
+                tr["cand"][a] = {u.uid for u in pl.units if u.ready and u.uid in tr["seen"]} - tr["attacked"]
+            tr["seen"], tr["attacked"], tr["opposed"] = set(), set(), set()
         stored = min(pl.brace, self.guard_max(a))           # 10b
         pl.guard = stored
         if a == G2 and self.round == 1:
@@ -428,17 +516,22 @@ class GameState:
         if ph in ("impeto", "pugno_att"):
             return [("gems", k) for k in range(self.p[a].brace + 1)]
         if ph in ("oppose", "oppose_after"):
-            return [("no_oppose",)] + [("oppose", u.uid) for u in self.p[d].units if u.ready]
+            return [("no_oppose",)] + [("oppose", uid) for uid in self.opposer_options()]
         if ph == "pugno_def":
             return self._parry_options(d)
         if ph == "risposta":
-            return ([("oppose", u.uid) for u in self.p[d].units if u.ready] + self._parry_options(d))
+            return ([("oppose", uid) for uid in self.opposer_options()] + self._parry_options(d))
         return []
+
+    def opposer_options(self):
+        """C2: ready Units of the defender, except the Unit hunted with Caccia."""
+        hunted = self.combat.hunted if self.combat else None
+        return [u.uid for u in self.p[1 - self.active].units if u.ready and u.uid != hunted]
 
     def reaction_options(self, d):
         pl = self.p[d]
         out, seen = [], set()
-        for src, pile in (("hand", pl.hand), ("scar", [c for c, f in pl.scars if not f])):
+        for src, pile in (("hand", pl.hand), ("scar", [sc[0] for sc in pl.scars if not sc[1]])):
             for cid in pile:
                 if CARDS[cid].type == "reaction" and (cid, src) not in seen:
                     seen.add((cid, src))
@@ -482,32 +575,35 @@ class GameState:
                         acts.append(("play", cid, t))
         rim_cost = self.modifier(a, "rim_cost", 1)
         if pl.l_ready and pl.brace >= rim_cost:
-            for cid in sorted({c for c, f in pl.scars if not f}):
+            for cid in sorted({sc[0] for sc in pl.scars if not sc[1]}):
                 acts.append(("rim", cid))
         if pl.l_ready:
             for i, ab in enumerate(self.leader_abilities(a)):
-                if ab.get("activated") and pl.brace >= ab.get("cost", 0):
+                if ab.get("activated") and pl.brace >= ab.get("cost", 0) and self.pay_costs(a, ab.get("costs"), True):
                     for t in self._targets(a, ab.get("target")):
                         acts.append(("ability", "L", i, t))
         for u in pl.units:
             if u.ready:
                 for i, ab in enumerate(CARDS[u.cid].abilities):
-                    if ab.get("activated") and pl.brace >= ab.get("cost", 0):
+                    if ab.get("activated") and pl.brace >= ab.get("cost", 0) and self.pay_costs(a, ab.get("costs"), True):
                         for t in self._targets(a, ab.get("target")):
                             acts.append(("ability", u.uid, i, t))
         if self.can_attack(a):
             if pl.l_ready:
                 acts.append(("attack", "L"))
+            foes = [v.uid for v in self.p[1 - a].units]
             for u in pl.units:
                 if u.ready:
                     acts.append(("attack", u.uid))
+                    if CARDS[u.cid].has("caccia"):          # Caccia: bersaglio un'Unità, Pronta o Ruotata
+                        acts += [("attack", u.uid, t) for t in foes]
         return acts
 
     def _targets(self, a, sel):
         if sel is None:
             return [None]
         side = a if sel.get("side", "own") == "own" else 1 - a
-        return [u.uid for u in self.p[side].units if self.matches(side, u, sel)]
+        return [u.uid for u in self.p[side].units if self.matches(side, u, sel, chooser=a)]
 
     def pay_costs(self, q, costs, check_only=False):
         for c in costs or ():
@@ -517,6 +613,7 @@ class GameState:
             for c in costs or ():
                 for _ in range(c.get("lose_life", 0)):
                     self.lose_life(q, "costo")
+                    self.stat_add("life_costs", q)
         return True
 
     # ------------------------------------------------------------------ step
@@ -525,6 +622,8 @@ class GameState:
             q = self.decider()
             self.stats["decisions"][q] += 1
             self.stats["legal_actions"][q] += len(self.legal_actions())
+            if self.phase == "main" and self.track is not None and self.can_attack(q):
+                self.track["seen"].update(u.uid for u in self.p[q].units if u.ready)
         ph = self.phase
         if ph == "main":
             self._main_step(act)
@@ -589,9 +688,11 @@ class GameState:
                 ab = CARDS[u.cid].abilities[i]
                 u.ready = False
             pl.brace -= ab.get("cost", 0)
-            self.run_ops(a, ab["do"], self._chosen(a, ab.get("target"), t))
+            self.pay_costs(a, ab.get("costs"))              # Cicatrici contate prima (bersaglio già scelto)
+            self.stat_add("activations", a, LEADERS[pl.leader].id if src == "L" else u.cid)
+            self.run_ops(a, ab["do"], dict(self._chosen(a, ab.get("target"), t), self=src))
         elif k == "attack":
-            self._declare(a, act[1])
+            self._declare(a, act[1], act[2] if len(act) > 2 else None)
         else:
             raise ValueError(f"azione sconosciuta: {act}")
 
@@ -621,26 +722,41 @@ class GameState:
             pl.discard.append(cid)
 
     # ------------------------------------------------------------------ effects (small DSL)
-    def fire(self, q, abilities, event, ctx):
+    def fire(self, q, abilities, event, ctx, src=None):
         for ab in abilities:
             if ab.get("trigger") == event and self.cond_ok(q, ab.get("if"), ctx):
-                self.run_ops(q, [o for o in ab["do"] if o["op"] not in ("att_mod", "def_mod")], ctx)
+                ops = [o for o in ab["do"] if o["op"] not in ("att_mod", "def_mod")]
+                if ops and src is not None:
+                    self.stat_add("activations", q, src)
+                self.run_ops(q, ops, ctx)
 
     def fire_global(self, q, event, ctx):
         for u in list(self.p[q].units):
-            self.fire(q, CARDS[u.cid].abilities, event, dict(ctx, self=u.uid))
-        self.fire(q, self.leader_abilities(q), event, dict(ctx, self="L"))
+            self.fire(q, CARDS[u.cid].abilities, event, dict(ctx, self=u.uid), src=u.cid)
+        self.fire(q, self.leader_abilities(q), event, dict(ctx, self="L"), src=self.p[q].leader)
+
+    def op_target(self, q, op, ctx):
+        """(owner, Unit) named by op["target"]: "chosen" (default), "self", "opposer"."""
+        t = op.get("target", "chosen")
+        if t == "self":
+            return q, self.unit(q, ctx.get("self"))
+        if t == "opposer":
+            return q, self.unit(q, ctx.get("opposer_uid"))
+        owner = ctx.get("chosen_owner")
+        return owner, (self.unit(owner, ctx.get("chosen")) if owner is not None else None)
 
     def run_ops(self, q, ops, ctx):
         for op in ops:
             if self.over:
                 return
+            if not self.cond_ok(q, op.get("if"), ctx):      # condizione sulla singola op
+                continue
             k = op["op"]
             n = self.num(op.get("n", 0), q)
             if k == "draw":
                 self.draw(q, n)
             elif k in ("stanca", "defeat", "raddrizza"):
-                u = self.unit(ctx["chosen_owner"], ctx["chosen"])
+                owner, u = self.op_target(q, op, ctx)
                 if u is None:
                     continue
                 if k == "stanca":
@@ -648,8 +764,10 @@ class GameState:
                 elif k == "raddrizza":
                     u.ready = True
                 else:
-                    self.p[ctx["chosen_owner"]].units.remove(u)
-                    self.p[ctx["chosen_owner"]].discard.append(u.cid)
+                    self.p[owner].units.remove(u)
+                    self.p[owner].discard.append(u.cid)
+                    if owner != q:
+                        self.stat_add("removals", q)
             elif k == "att_mod" and self.combat:
                 self.combat.att_mod += n
             elif k == "def_mod" and self.combat:
@@ -663,32 +781,45 @@ class GameState:
         for ab in abilities:
             if ab.get("trigger") == event and self.cond_ok(q, ab.get("if"), ctx):
                 for o in ab["do"]:
-                    if o["op"] == "att_mod":
-                        am += self.num(o.get("n", 0), q)
-                    elif o["op"] == "def_mod":
-                        dm += self.num(o.get("n", 0), q)
+                    if o["op"] in ("att_mod", "def_mod") and self.cond_ok(q, o.get("if"), ctx):
+                        if o["op"] == "att_mod":
+                            am += self.num(o.get("n", 0), q)
+                        else:
+                            dm += self.num(o.get("n", 0), q)
         return am, dm
 
     # ------------------------------------------------------------------ combat
-    def _declare(self, a, att):
+    def _declare(self, a, att, hunted=None):
         pl = self.p[a]
         d = 1 - a
+        self.combat = Combat(att, hunted)
         if att == "L":
             pl.l_ready = False
         else:
-            self.unit(a, att).ready = False
-            self.fire(a, CARDS[self.unit(a, att).cid].abilities, "on_attack", {"self": att})
-        self.combat = Combat(att)
+            u = self.unit(a, att)
+            u.ready = False
+            self.fire(a, CARDS[u.cid].abilities, "on_attack", dict(self.combat_ctx(self.combat), self=att), src=u.cid)
         self.stat_add("attacks", a)
-        self.say(f"  P{a+1} attacca con {self.describe(a, att)}")
+        if self.track is not None:
+            self.track["attacked"].add(att)
+        if hunted is not None:
+            self.stat_add("hunt", a)
+            self.stat_add("hunt_ready" if self.unit(d, hunted).ready else "hunt_rotated", a)
+            self.stat_add("activations", a, self.unit(a, att).cid)
+        self.say(f"  P{a+1} attacca con {self.describe(a, att)}"
+                 + (f" (Caccia: {self.describe(d, hunted)})" if hunted is not None else ""))
         if self.over:
             return
         if self.r.pugno == "nessuno":
             self.phase = "impeto"
-        elif self.r.opposizione == "prima" and any(u.ready for u in self.p[d].units):
+        elif self.r.opposizione == "prima" and self.opposer_options():
             self.phase = "oppose"
         else:
             self.phase = "pugno_att"
+        if self.stats is not None and (self.phase in ("oppose", "impeto") or self.r.opposizione == "dopo"):
+            opts = self.opposer_options()                   # M9: Unità che potrebbero opporsi
+            self.stats["opp_elig"][d] += len(opts)
+            self.stats["opp_elig_impeto"][d] += sum(CARDS[self.unit(d, x).cid].has("impeto") for x in opts)
 
     def _oppose(self, uid):
         a, d = self.active, 1 - self.active
@@ -697,26 +828,49 @@ class GameState:
         if not (CARDS[u.cid].has("scudo") and self.r.scudo == "oppone_senza_ruotarsi"):
             u.ready = False
         self.stat_add("opposed", a)
+        if self.stats is not None:
+            self.stats["opp_impeto"][d] += CARDS[u.cid].has("impeto")
+            if self.track is not None:
+                self.stats["opp_repeat"][d] += uid in self.track["opposed"]     # M7
+                self.track["opposed"].add(uid)
         self.say(f"    P{d+1} oppone {CARDS[u.cid].name}")
-        self.fire(d, CARDS[u.cid].abilities, "on_oppose", {"self": uid})
+        self.fire(d, CARDS[u.cid].abilities, "on_oppose", dict(self.combat_ctx(self.combat), self=uid), src=u.cid)
 
-    def compute(self, a_gems, d_gems, react, opposer, count_mods=False):
-        """(Fa, Db, modifiers) for given pugno contents. Pure: used by the engine and by the AI."""
+    def combat_ctx(self, cb, opposer="current", pugno=None):
+        """Condition context of a combat: attacker, opposer, target (Unit uid or None = Leader)."""
+        att = None if cb.att == "L" else self.unit(self.active, cb.att)
+        opp = cb.opposer if opposer == "current" else opposer
+        ctx = {"attacker_uid": cb.att, "attacker_cid": att.cid if att else None,
+               "opposer_uid": opp, "target_uid": opp if opp is not None else cb.hunted}
+        if pugno is not None:
+            ctx["pugno"] = pugno
+        return ctx
+
+    def compute(self, a_gems, d_gems, react, opposer, count_mods=False, cb=None, trace=None):
+        """(Fa, Db, modifiers) for given pugno contents. Pure: used by the engine and by the AI.
+        opposer: the opposing Unit (None = nobody opposes: target = hunted Unit or Leader).
+        cb: a Combat other than the current one (AI previews). trace: dict filled for the metrics."""
         a, d = self.active, 1 - self.active
-        cb = self.combat
+        cb = cb or self.combat
+        tgt = cb.target(opposer)
+        src = trace["src"] if trace is not None else None
         mods = 0
-        ctx_a = {"attacker_uid": cb.att, "pugno": a_gems}
+        ctx_a = self.combat_ctx(cb, opposer, pugno=a_gems)
         if cb.att == "L":
             base_a = self.r.leader_power_awakened if self.p[a].awakened else self.r.leader_power
             fa = self.leader_power(a, ctx_a)
             mods += fa != base_a
+            if src is not None and fa != base_a:
+                src.append((a, self.p[a].leader))
         else:
             u = self.unit(a, cb.att)
-            fa = self.unit_power(a, u, ctx_a)
+            fa = self.unit_power(a, u, ctx_a, src)
             mods += fa != CARDS[u.cid].power
-            if opposer is not None and CARDS[u.cid].has("bracconiere"):
+            if tgt is not None and CARDS[u.cid].has("bracconiere"):     # attacca un'Unità
                 fa += CARDS[u.cid].kw("bracconiere")
                 mods += 1
+                if src is not None:
+                    src.append((a, u.cid))
             am, _ = self.trigger_mods(a, CARDS[u.cid].abilities, "on_attack", dict(ctx_a, self=cb.att))
             fa += am
             mods += am != 0
@@ -725,28 +879,40 @@ class GameState:
         parry = d_gems
         r_att = r_def = 0
         if react is not None:
-            cid, src = react
+            cid, rsrc = react
             c = CARDS[cid]
             cost = max(c.cost, 1)
             if d_gems >= cost:
                 parry -= cost
-                ops = c.react.get("do_from_scars", c.react["do"]) if src == "scar" else c.react["do"]
+                ops = c.react.get("do_from_scars", c.react["do"]) if rsrc == "scar" else c.react["do"]
+                rctx = self.combat_ctx(cb, opposer, pugno=parry)
                 for o in ops:
-                    if o["op"] == "att_mod":
-                        r_att += self.num(o["n"], d)
-                    elif o["op"] == "def_mod":
-                        r_def += self.num(o["n"], d)
+                    if o["op"] in ("att_mod", "def_mod") and self.cond_ok(d, o.get("if"), rctx):
+                        if o["op"] == "att_mod":
+                            r_att += self.num(o["n"], d)
+                        else:
+                            r_def += self.num(o["n"], d)
                 mods += 1
-        ctx_d = {"pugno": d_gems, "attacker_uid": cb.att}
-        if opposer is None:
+                if src is not None:
+                    src.append((d, cid))
+        ctx_d = self.combat_ctx(cb, opposer, pugno=d_gems)
+        if tgt is None:
             db = self.r.tempra
         else:
-            ou = self.unit(d, opposer)
-            db = self.unit_power(d, ou)
-            mods += db != CARDS[ou.cid].power
-            _, dm = self.trigger_mods(d, CARDS[ou.cid].abilities, "on_oppose", {"self": opposer})
-            db += dm
-            mods += dm != 0
+            tu = self.unit(d, tgt)
+            if tu is None:                                  # il bersaglio ha lasciato il gioco
+                return fa, 0, mods
+            ctx_t = self.combat_ctx(cb, opposer, pugno=parry)    # Impeto in difesa: solo la Parata
+            db = self.unit_power(d, tu, ctx_t, src)
+            mods += db != CARDS[tu.cid].power
+            if trace is not None:
+                trace["pugno_target"] = parry
+            if opposer is not None:
+                _, dm = self.trigger_mods(d, CARDS[tu.cid].abilities, "on_oppose", dict(ctx_t, self=opposer))
+                db += dm
+                mods += dm != 0
+                if src is not None and dm:
+                    src.append((d, tu.cid))
         db += parry * self.parata_per_gemma(d)
         mods += parry > 0
         for ab in self.static_sources(d):
@@ -754,17 +920,24 @@ class GameState:
                 fa += ab.get("att_mod", 0)
                 db += ab.get("def_mod", 0)
                 mods += 1
+                if src is not None:
+                    src.append((d, self.p[d].leader))
         fa += r_att + cb.att_mod
         db += r_def + cb.def_mod
         return fa, db, mods
 
-    def outcome(self, fa, db, opposer):
-        """(leader_hit, attacker_unit_defeated, opposer_defeated)."""
+    def outcome(self, fa, db, opposer, cb=None):
+        """(leader_hit, attacker_unit_defeated, target_unit_defeated)."""
         a, d = self.active, 1 - self.active
-        if opposer is None:
+        cb = cb or self.combat
+        tgt = cb.target(opposer)
+        if tgt is None:
             return fa >= db, False, False
-        pareggi = self.r.scudo == "vince_pareggi" and CARDS[self.unit(d, opposer).cid].has("scudo")
-        if self.combat.att == "L":
+        tu = self.unit(d, tgt)
+        if tu is None:
+            return False, False, False
+        pareggi = self.r.scudo == "vince_pareggi" and CARDS[tu.cid].has("scudo")    # "quando è il bersaglio"
+        if cb.att == "L":
             return False, False, (fa > db) if pareggi else (db <= fa)
         if fa > db:
             return False, False, True
@@ -772,45 +945,97 @@ class GameState:
             return False, True, False
         return False, True, not pareggi
 
+    def preview(self, att, hunted, a_gems, d_gems, react=None, opposer=None):
+        """Pure: (Fa, Db, outcome) of an attack not yet declared (AI heuristics)."""
+        cb = Combat(att, hunted)
+        fa, db, _ = self.compute(a_gems, d_gems, react, opposer, cb=cb)
+        return fa, db, self.outcome(fa, db, opposer, cb=cb)
+
+    def decided_before_commit(self):
+        """M4: no legal commitment of either player changes the outcome. Fa grows with the
+        attacker's gems, so for each answer of the defender 0 and all gems bound the outcomes."""
+        cb = self.combat
+        B = self.p[self.active].brace
+        first = None
+        for _, d_gems, react in self._parry_options(1 - self.active):
+            for a_gems in (0, B):
+                fa, db, _ = self.compute(a_gems, d_gems, react, cb.opposer)
+                o = self.outcome(fa, db, cb.opposer)
+                if first is None:
+                    first = o
+                elif o != first:
+                    return False
+        return True
+
     def _open_and_resolve(self):
         a, d = self.active, 1 - self.active
         cb = self.combat
         pa, pd = self.p[a], self.p[d]
         cb.opened = True
-        fa, db, mods = self.compute(cb.a, cb.d, cb.react, cb.opposer)
-        hit, att_dead, opp_dead = self.outcome(fa, db, cb.opposer)
+        trace = {"src": [], "pugno_target": None} if self.stats is not None else None
+        fa, db, mods = self.compute(cb.a, cb.d, cb.react, cb.opposer, trace=trace)
+        hit, att_dead, tgt_dead = self.outcome(fa, db, cb.opposer)
+        tgt = cb.target()
+        r_cost = max(CARDS[cb.react[0]].cost, 1) if cb.react else 0
+        paid = cb.react is not None and cb.d >= r_cost
         if self.stats is not None:
+            st_all = self.stats
             for side, key, gems, avail in ((a, "pugno_att", cb.a, pa.brace), (d, "pugno_def", cb.d, pd.guard)):
-                st = self.stats[key][side]
+                st = st_all[key][side]
                 if avail > 0:
                     st[0] += 1
                     st[1] += gems == 0
                     st[2] += gems == avail
                 st[3] += gems
-            self.stats["mods"][mods] = self.stats["mods"].get(mods, 0) + 1
+            st_all["mods"][mods] = st_all["mods"].get(mods, 0) + 1
             if cb.react:
-                self.stats["reactions"][d] += 1
+                st_all["reactions"][d] += 1
+            if any(max(CARDS[c].cost, 1) <= pd.guard for c, _ in self.reaction_options(d)):
+                st_all["react_avail"][d] += 1                          # M1
+            if paid:                                                    # M2: stesse gemme di Parata, senza Reazione
+                fa2, db2, _ = self.compute(cb.a, cb.d - r_cost, None, cb.opposer)
+                st_all["react_decisive"][d] += self.outcome(fa2, db2, cb.opposer) != (hit, att_dead, tgt_dead)
+                if cb.react[1] == "scar":                               # M3
+                    st_all["react_scar"][d] += 1
+                    sc = next((x for x in pd.scars if x[0] == cb.react[0] and not x[1]), None)
+                    st_all["react_scar_life"][d] += sc is not None and sc[2] == "costo"
+            st_all["decided_pre"][a] += self.decided_before_commit()   # M4
+            st_all["target_leader"][a] += tgt is None                   # M5
+            if trace["pugno_target"] is not None and paid:              # M8: gemme contate due volte
+                st_all["double_gems"][d] += max(0, min(r_cost, trace["pugno_target"] - (cb.d - r_cost)))
+            for q, sid in trace["src"]:                                 # M11
+                self.stat_add("activations", q, sid)
         self.say(f"    pugni: attaccante {cb.a}, difensore {cb.d}" + (f" + {CARDS[cb.react[0]].name}" if cb.react else "")
                  + f" -> {fa} contro {db}")
         pa.brace -= cb.a
         pd.guard -= cb.d
-        if cb.react:
-            cid, src = cb.react
-            if cb.d >= max(CARDS[cid].cost, 1):
-                if src == "hand":
-                    pd.hand.remove(cid)
-                else:
-                    for sc in pd.scars:
-                        if sc[0] == cid and not sc[1]:
-                            pd.scars.remove(sc)
-                            break
-                pd.discard.append(cid)
+        rctx = self.combat_ctx(cb)
+        late_ops = []
+        if paid:
+            cid, rsrc = cb.react
+            if rsrc == "hand":
+                pd.hand.remove(cid)
+            else:
+                for sc in pd.scars:
+                    if sc[0] == cid and not sc[1]:
+                        pd.scars.remove(sc)
+                        break
+            pd.discard.append(cid)
+            c = CARDS[cid]
+            ops = c.react.get("do_from_scars", c.react["do"]) if rsrc == "scar" else c.react["do"]
+            ops = [o for o in ops if o["op"] not in ("att_mod", "def_mod")]
+            late_ops = [o for o in ops if "target" in o]                # sulle Unità: dopo lo scontro (C6e)
+            self.run_ops(d, [o for o in ops if "target" not in o], rctx)     # C4 (d): pesca
+            if self.over:
+                return
         att_unit = self.unit(a, cb.att) if cb.att != "L" else None
-        opp_unit = self.unit(d, cb.opposer) if cb.opposer is not None else None
-        if opp_dead:
-            pd.units.remove(opp_unit)
-            pd.discard.append(opp_unit.cid)
+        tgt_unit = self.unit(d, tgt) if tgt is not None else None
+        if tgt_dead:
+            pd.units.remove(tgt_unit)
+            pd.discard.append(tgt_unit.cid)
             self.stat_add("units_defeated_in_combat", a)
+            if cb.opposer is None:
+                self.stat_add("removals", a)                             # M12: sconfitta da Caccia
         if att_dead:
             pa.units.remove(att_unit)
             pa.discard.append(att_unit.cid)
@@ -820,18 +1045,24 @@ class GameState:
                 self.lose(d, "colpo_finale")
             else:
                 self.lose_life(d, "attacco_leader" if cb.att == "L" else "attacco")
-        elif not opp_dead:
+        elif not tgt_dead:
             self.stat_add("stopped", a)
         self.combat = None
         self.phase = "main"
         if self.over:
             return
         self.state_checks()
-        if att_dead and opp_unit is not None and not opp_dead:
-            self.fire(d, CARDS[opp_unit.cid].abilities, "on_defeats_attacker", {"self": opp_unit.uid})
+        # C6 (e): prima i trigger del giocatore attivo, poi quelli del difensore
+        if tgt_dead:
+            abil, sid = (CARDS[att_unit.cid].abilities, att_unit.cid) if att_unit else (self.leader_abilities(a), pa.leader)
+            self.fire(a, abil, "on_attack_defeats_unit", dict(rctx, self=cb.att), src=sid)    # Rinnovo
+            if att_unit is not None and not att_dead:
+                self.fire_global(a, "on_own_unit_defeats_unit", {})
+        if att_dead and tgt_unit is not None and not tgt_dead:
+            self.fire(d, CARDS[tgt_unit.cid].abilities, "on_defeats_attacker", {"self": tgt_unit.uid}, src=tgt_unit.cid)
             self.fire_global(d, "on_own_unit_defeats_unit", {})
-        if opp_dead and att_unit is not None and not att_dead:
-            self.fire_global(a, "on_own_unit_defeats_unit", {})
+        if late_ops and not self.over:
+            self.run_ops(d, late_ops, rctx)                             # es. raddrizza l'Unità che si opponeva
 
 
 def default_mulligan(s, q):

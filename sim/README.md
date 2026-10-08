@@ -98,7 +98,17 @@ python3 -m sim.v02.run ab --base V02 --variante mia.json --partite 2500   # A/B 
 python3 -m sim.v02.run collaudo --variante V02          # sfruttabilità dell'IA del pugno
 python3 -m sim.v02.run forte --forte forte:30 --partite 75               # IA forte contro semplice
 python3 -m sim.v02.run partita arden_rosso_verde maera_blu_nero          # una partita con log
+python3 -m sim.v02.run vita --partite 200               # M14: IA che paga sempre i costi in Vita
 python3 tests/test_v02.py
 ```
 
-IA: `semplice` (euristiche + equilibrio del pugno con regret matching, prezzo-ombra λ=0.03 per gemma), `det` (pugno deterministico), `br` (miglior risposta, per il collaudo), `forte:N` (MCTS con rollout semplici, ~1–2 s a partita con Tempra 4). Carte convertite da v0.1 in `sim/v02/cards_v02.json`. Esperimenti in `/mnt/project-files/tcg/swarm/esperimenti/E-014/`.
+IA: `semplice` (euristiche + equilibrio del pugno con regret matching, prezzo-ombra λ=0.03 per gemma), `vita` (semplice, ma paga sempre i costi in Vita), `det` (pugno deterministico), `br` (miglior risposta, per il collaudo), `forte:N` (MCTS con rollout semplici, ~1–2 s a partita con Tempra 4). Carte convertite da v0.1 in `sim/v02/cards_v02.json`. Esperimenti in `/mnt/project-files/tcg/swarm/esperimenti/E-014/`.
+
+**Primitive R-005** (set v0.2, forme esatte in `/mnt/project-files/tcg/set/richieste/R-005_risposta.md`):
+- parole chiave lette dal motore: `assalto`, `scudo` (vince i pareggi quando è il bersaglio, anche cacciato), `bracconiere` (+X quando attacca un'Unità), `caccia` (azione `("attack", uid, bersaglio)` su qualsiasi Unità avversaria; si oppone solo un'altra Unità). `impeto` è descrittiva (`infuso` è accettato come alias nei file vecchi);
+- trigger `on_attack_defeats_unit` (Rinnovo) e op con `"target": "self" | "opposer" | "chosen"`;
+- `costs` (Vita) dentro le abilità ⟳; valori dinamici `{"scars": "own"}` nei selettori; selettori con `"if"` e `"any"`;
+- `"if"` su una singola op; condizioni `deck_nonempty`, `target_is_unit`, `opposing`, `attacker_has`; `pugno_ge` sul bersaglio legge solo la Parata (gemme dopo il costo della Reazione);
+- Reazioni: `draw` (in C4) e op su Unità (`raddrizza` l'Unità che si opponeva, dopo lo scontro); `guard_max` con `"cap"` applicato per ultimo.
+
+Il report di `torneo` ha una tabella **M1–M15** (Reazioni disponibili/giocate/decisive, scontri decisi prima dell'impegno, Caccia, Unità ferme, colore minore e presenza degli slot nei mazzi vincenti, attivazioni per carta...). M4 usa la monotonia di Fa nelle gemme: 2 calcoli puri per ogni risposta del difensore (+~18% di tempo sul torneo). M10/M15 leggono i file dei mazzi; M15 usa il campo facoltativo `"slot"` delle carte.

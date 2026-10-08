@@ -6,6 +6,7 @@
   python -m sim.v02.run lambda --partite 400            # taratura del prezzo-ombra
   python -m sim.v02.run collaudo --partite 1000         # sfruttabilita del pugno
   python -m sim.v02.run forte --variante B0 --partite 100 --forte forte:60
+  python -m sim.v02.run vita --partite 200              # M14: IA che paga sempre i costi in Vita
 
 Every arm plays the same jobs (decks, seats, seeds): differences come from the rules."""
 import argparse
@@ -15,10 +16,10 @@ import statistics
 import time
 from multiprocessing import Pool
 
-from ..run import load_deck, all_decks, wilson, median_ci, pct, check
+from ..run import load_deck, all_decks, wilson, median_ci, pct, check, DECK_DIR
 from .agents import make_agent
 from .config import rules_from, B0
-from .engine import new_game, RULES_VERSION
+from .engine import new_game, RULES_VERSION, CARDS, LEADERS, META
 
 ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 REPORT_DIR = os.path.join(ROOT, "reports", "v02")
@@ -133,7 +134,111 @@ def metrics(recs):
             w[1] += 1
             w[0] += r["winner"] == q
     m["deck_win"] = {d: wilson(w, n_) for d, (w, n_) in dw.items()}
+    m.update(r005_metrics(recs, att))
     return m
+
+
+# ---------------------------------------------------------------------------- R-005, M1-M15
+def deck_list(name):
+    """(leader, {cid: copies}) read from the deck file, without the legality check."""
+    with open(os.path.join(DECK_DIR, name + ".json"), encoding="utf-8") as f:
+        d = json.load(f)
+    return d["leader"], d["cards"]
+
+
+def minor_colour(name):
+    """(colour, cards of that colour, coloured cards): the Leader's colour with fewer cards in the deck."""
+    lid, cards = deck_list(name)
+    cols = LEADERS[lid].colors
+    count = {c: sum(n for cid, n in cards.items() if c in CARDS[cid].colors) for c in cols}
+    tot = sum(n for cid, n in cards.items() if set(CARDS[cid].colors) & set(cols))
+    minor = min(cols, key=lambda c: count[c])
+    return minor, count[minor], tot
+
+
+def slots_of(cid):
+    """Slot labels of a card for M15: the card id, plus "slot" from the card file, plus "caccia"."""
+    tags = META.get(cid, {}).get("slot") or []
+    tags = [tags] if isinstance(tags, str) else list(tags)
+    if cid in CARDS and CARDS[cid].has("caccia"):
+        tags.append("caccia")
+    return tags
+
+
+def r005_metrics(recs, att):
+    m = {}
+    tot = lambda key: sum(sum(r["stats"][key]) for r in recs)
+    per_deck = lambda key: _per_deck(recs, key)
+    att = max(att, 1)
+    m["react_avail"] = tot("react_avail") / att                               # M1
+    m["react_decisive"] = tot("react_decisive") / att                         # M2
+    m["react_scar"] = per_deck("react_scar")                                  # M3 (per partita)
+    m["react_scar_life"] = per_deck("react_scar_life")
+    m["decided_pre"] = wilson(tot("decided_pre"), att)                        # M4
+    hunt = tot("hunt")                                                        # M5
+    m["hunt"] = (hunt / max(len(recs), 1), tot("hunt_ready"), tot("hunt_rotated"))
+    m["target_leader"] = wilson(tot("target_leader"), att)
+    idle = {}                                                                 # M6
+    for r in recs:
+        for q in (0, 1):
+            x = idle.setdefault(r["decks"][q], [0, 0])
+            x[0] += r["stats"]["unit_idle"][q]
+            x[1] += r["stats"]["unit_turns"][q]
+    m["unit_idle"] = wilson(sum(x[0] for x in idle.values()), sum(x[1] for x in idle.values()))
+    m["unit_idle_deck"] = {d: wilson(*x) for d, x in idle.items()}
+    m["opp_repeat"] = wilson(tot("opp_repeat"), max(tot("opposed"), 1))     # M7
+    m["double_gems"] = tot("double_gems")                                     # M8
+    m["opp_rate"] = tot("opposed") / max(tot("opp_elig"), 1)                  # M9
+    m["opp_rate_impeto"] = tot("opp_impeto") / max(tot("opp_elig_impeto"), 1)
+    m["opp_impeto"] = tot("opp_impeto")
+    minor = {}                                                                # M10, per Leader
+    for r in recs:
+        if r["winner"] is None:
+            continue
+        name = r["decks"][r["winner"]]
+        col, k, n_col = minor_colour(name)
+        x = minor.setdefault(deck_list(name)[0], [0, 0, 0, col])
+        x[0] += k; x[1] += n_col; x[2] += 1
+    m["minor"] = {lid: (x[3], x[0] / max(x[2], 1), x[0] / max(x[1], 1), x[2]) for lid, x in minor.items()}
+    acts, seats = {}, {}                                                      # M11: per partita giocata dal mazzo
+    for r in recs:
+        for q in (0, 1):
+            lid, cards = deck_list(r["decks"][q])
+            for cid in list(cards) + [lid]:
+                seats[cid] = seats.get(cid, 0) + 1
+            for cid, k in r["stats"]["activations"][q].items():
+                acts[cid] = acts.get(cid, 0) + k
+    per_game = {cid: k / max(seats.get(cid, 1), 1) for cid, k in acts.items()}
+    m["activations"] = dict(sorted(per_game.items(), key=lambda t: -t[1]))
+    m["removals"] = per_deck("removals")                                      # M12
+    m["life_costs"] = per_deck("life_costs")                                  # M14 (costi pagati)
+    wins = [r for r in recs if r["winner"] is not None]                       # M15
+    pres = {}
+    for r in wins:
+        _, cards = deck_list(r["decks"][r["winner"]])
+        for tag in {t for cid in cards for t in [cid] + slots_of(cid)}:
+            pres[tag] = pres.get(tag, 0) + 1
+    m["slot_presence"] = {t: k / max(len(wins), 1) for t, k in sorted(pres.items(), key=lambda t: -t[1])}
+    m["slot_alarm"] = sorted(cid for cid in pres if cid in CARDS and ("caccia" in slots_of(cid) or "11.1" in slots_of(cid))
+                             and m["slot_presence"][cid] > 0.60)
+    by_agent = {}                                                             # M14: vittorie per IA (partite miste)
+    for r in recs:
+        if r["agents"][0] != r["agents"][1]:
+            for q in (0, 1):
+                x = by_agent.setdefault(r["agents"][q], [0, 0])
+                x[0] += r["winner"] == q; x[1] += 1
+    m["agent_win"] = {k: wilson(*x) for k, x in by_agent.items()}
+    return m
+
+
+def _per_deck(recs, key):
+    """{deck: per-game average of stats[key] for the side that played the deck}."""
+    out = {}
+    for r in recs:
+        for q in (0, 1):
+            x = out.setdefault(r["decks"][q], [0, 0])
+            x[0] += r["stats"][key][q]; x[1] += 1
+    return {d: k / max(n_, 1) for d, (k, n_) in sorted(out.items())}
 
 
 BANDS = {"stopped": (0.30, 0.45), "rounds_median": (8, 11), "rounds_ge13": (0, 0.12), "early_win": (0, 0)}
@@ -172,7 +277,36 @@ def render(title, m, spec, agents, elapsed):
          f"| Fine partita | {m['end_reasons']} | | |",
          f"| Nelle fasce comuni | {'sì' if in_bands(m) else 'no'} | | |", "",
          "Vittorie per mazzo: " + ", ".join(f"{d} {pct(w)}" for d, w in sorted(m["deck_win"].items())), ""]
+    L += render_r005(m)
     return "\n".join(L) + "\n"
+
+
+def render_r005(m):
+    fmt = lambda d, f="{:.2f}": ", ".join(f"{k} " + f.format(v) for k, v in d.items()) or "—"
+    top = list(m["activations"].items())[:12]
+    pres = [(t, v) for t, v in m["slot_presence"].items() if t not in CARDS or "caccia" in slots_of(t) or META.get(t, {}).get("slot")]
+    return [
+        "## Metriche diagnostiche R-005 (M1–M15)", "",
+        "| # | Metrica | Valore | Obiettivo |", "|---|---|---|---|",
+        f"| M1 | Reazioni disponibili / giocate per scontro | {m['react_avail']:.3f} / {m['reactions_per_combat']:.3f} | giocate ≥0.10 |",
+        f"| M2 | Reazioni decisive per scontro | {m['react_decisive']:.3f} | ≥0.05 |",
+        f"| M3 | Reazioni da Cicatrici dritte per partita (di cui nate da un costo in Vita) | "
+        + ", ".join(f"{d} {v:.2f} ({m['react_scar_life'][d]:.2f})" for d, v in m["react_scar"].items()) + " | |",
+        f"| M4 | Scontri decisi prima dell'impegno | {pct(m['decided_pre'])} | |",
+        f"| M5 | Attacchi con Caccia per partita (su Pronte / Ruotate); attacchi sul Leader | {m['hunt'][0]:.2f} ({m['hunt'][1]} / {m['hunt'][2]}); {pct(m['target_leader'])} | |",
+        f"| M6 | Unità ferme (né attaccano né si oppongono) | {pct(m['unit_idle'])}; " + fmt({d: v[0] for d, v in m['unit_idle_deck'].items()}, "{:.1%}") + " | ≤38%, verdi ≤35% |",
+        f"| M7 | Opposizioni ripetute della stessa Unità nel turno | {pct(m['opp_repeat'])} | ≤3% |",
+        f"| M8 | Gemme contate sia per la Reazione sia per Impeto | {m['double_gems']} | 0 |",
+        f"| M9 | Opposizioni per Unità che può opporsi: con Impeto / tutte | {m['opp_rate_impeto']:.3f} ({m['opp_impeto']}) / {m['opp_rate']:.3f} | |",
+        f"| M10 | Colore minore nei mazzi vincenti, per Leader (carte, quota) | "
+        + ", ".join(f"{l} {c}: {k:.1f} ({100*q:.0f}%, {n} vittorie)" for l, (c, k, q, n) in sorted(m["minor"].items())) + " | ≥35% |",
+        f"| M11 | Attivazioni per partita (prime 12) | " + fmt(dict(top)) + " | |",
+        f"| M12 | Rimozioni per partita (effetti e Caccia) | " + fmt(m["removals"]) + " | |",
+        f"| M13 | Pugno d'attacco pieno | {pct(m['pugno_att_full'])} | |",
+        f"| M14 | Costi in Vita pagati per partita; vittorie per IA (partite miste) | " + fmt(m["life_costs"])
+        + "; " + (", ".join(f"{k} {pct(v)}" for k, v in m["agent_win"].items()) or "nessuna partita mista (comando `vita`)") + " | |",
+        f"| M15 | Presenza nei mazzi vincenti (slot e Caccia) | " + (fmt(dict(pres[:12]), "{:.0%}") if pres else "nessuno slot nei file")
+        + f"; oltre il 60%: {', '.join(m['slot_alarm']) or 'nessuno'} | nessuno slot di Caccia o 11.1 >60% |", ""]
 
 
 def save(name, text, recs, out_dir=None):
@@ -295,6 +429,17 @@ def cmd_forte(a):
     print("report:", save(f"forte_{os.path.splitext(os.path.basename(a.variante))[0]}", text, recs, a.out))
 
 
+def cmd_vita(a):
+    """M14: an AI that always pays its costs in Vita against the plain AI, mirror."""
+    res, recs = head_to_head(a.variante, "vita", a.ia, a.partite, a.mazzi)
+    m = metrics(recs)
+    text = (f"# M14: IA che paga sempre i costi in Vita ({a.variante})\n\n`vita` contro `{a.ia}`, mirror, {len(recs)} partite.\n\n"
+            f"- Vittorie dell'IA `vita`: {pct(res)}\n- Costi in Vita pagati per partita: "
+            + ", ".join(f"{d} {v:.2f}" for d, v in m["life_costs"].items()) + "\n")
+    print(text)
+    print("report:", save(f"vita_{os.path.splitext(os.path.basename(a.variante))[0]}", text, recs, a.out))
+
+
 def cmd_partita(a):
     r = play_game(((a.mazzo1, a.mazzo2), (a.ia, a.ia), a.variante, a.seed, True))
     print("\n".join(r["log"]))
@@ -318,10 +463,11 @@ def main(argv=None):
     lm = sub.add_parser("lambda"); common(lm, 200)
     co = sub.add_parser("collaudo"); common(co, 250)
     fo = sub.add_parser("forte"); common(fo, 25); fo.add_argument("--forte", default="forte:60")
+    vi = sub.add_parser("vita"); common(vi, 100)
     pa = sub.add_parser("partita"); common(pa); pa.add_argument("mazzo1"); pa.add_argument("mazzo2")
     a = p.parse_args(argv)
     {"torneo": cmd_torneo, "ab": cmd_ab, "lambda": cmd_lambda, "collaudo": cmd_collaudo,
-     "forte": cmd_forte, "partita": cmd_partita}[a.cmd](a)
+     "forte": cmd_forte, "vita": cmd_vita, "partita": cmd_partita}[a.cmd](a)
 
 
 if __name__ == "__main__":

@@ -13,7 +13,7 @@
    "power": 2,
    "keywords": [
     "assalto",
-    "infuso"
+    "impeto"
    ],
    "abilities": [
     {
@@ -29,7 +29,7 @@
      "value": 1
     }
    ],
-   "text": "Assalto. Infuso 1: se il tuo pugno aperto ha almeno 1 gemma, +1 Forza in questo scontro."
+   "text": "Assalto. Impeto 1: se il tuo pugno aperto ha almeno 1 gemma, +1 Forza in questo scontro."
   },
   {
    "id": "carica",
@@ -64,7 +64,7 @@
    "power": 4,
    "keywords": [
     "assalto",
-    "infuso"
+    "impeto"
    ],
    "abilities": [
     {
@@ -80,7 +80,7 @@
      "value": 2
     }
    ],
-   "text": "Assalto. Infuso 2: se il tuo pugno aperto ha almeno 2 gemme, +2 Forza in questo scontro."
+   "text": "Assalto. Impeto 2: se il tuo pugno aperto ha almeno 2 gemme, +2 Forza in questo scontro."
   },
   {
    "id": "sentinella",
@@ -552,7 +552,7 @@
       }
      ],
      "value": 1,
-     "text": "Infuso 2 (Leader): se il pugno aperto di un tuo attaccante ha almeno 2 gemme, +1 Forza."
+     "text": "Impeto 2 (Leader): se il pugno aperto di un tuo attaccante ha almeno 2 gemme, +1 Forza."
     }
    ],
    "awakened": [
