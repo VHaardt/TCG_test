@@ -120,6 +120,8 @@ def metrics(recs):
     m["stopped"] = wilson(stopped, att)
     m["opposed"] = wilson(sum(sum(r["stats"]["opposed"]) for r in recs), att)
     m["leader_hit"] = wilson(sum(sum(r["stats"]["attacks_leader_hit"]) for r in recs), att)
+    lh = [sum(r["stats"].get("leader_hits", [[0] * 4] * 2)[q][i] for r in recs for q in (0, 1)) for i in range(4)]
+    m["leader_free"] = (wilson(lh[1], lh[0]), lh[0], wilson(lh[3], lh[2]), lh[2])     # Q-017
     m["attacks_per_game"] = att / max(n, 1)
     cb = [r for r in recs if r["stats"]["life_at_round6"]]
     behind = [(r, 0 if r["stats"]["life_at_round6"][0] < r["stats"]["life_at_round6"][1] else 1)
@@ -290,6 +292,7 @@ def render(title, m, spec, agents, elapsed):
          f"| Attacchi con opposizione | {pct(m['opposed'])} | 15–35% (V4) | |",
          f"| Turni con Unità Pronte ferme | {pct(m['idle'])} (con ≥3: {pct(m['idle3'])}) | ≤35% (V4) | |",
          f"| Attacchi a segno sul Leader | {pct(m['leader_hit'])} | | |",
+         f"| Colpi del Leader a segno senza gemme: Base / Risvegliato (Q-017) | {pct(m['leader_free'][0])} (n={m['leader_free'][1]}) / {pct(m['leader_free'][2])} (n={m['leader_free'][3]}) | | |",
          f"| Attacchi per partita | {m['attacks_per_game']:.1f} | | |",
          f"| Pugno attaccante vuoto / pieno | {pct(m['pugno_att_empty'])} / {pct(m['pugno_att_full'])} (gemme medie {m['pugno_att_gems']:.2f}) | non >90% | |",
          f"| Pugno difensore vuoto / pieno | {pct(m['pugno_def_empty'])} / {pct(m['pugno_def_full'])} (gemme medie {m['pugno_def_gems']:.2f}) | non >90% | |",

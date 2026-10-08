@@ -136,6 +136,7 @@ class Combat:
 def new_stats():
     return {
         "attacks": [0, 0], "attacks_leader_hit": [0, 0], "stopped": [0, 0],
+        "leader_hits": [[0, 0, 0, 0], [0, 0, 0, 0]],   # Q-017: colpi del Leader [Base, Base senza gemme, Risv., Risv. senza gemme]
         "opposed": [0, 0], "units_defeated_in_combat": [0, 0],
         "pugno_att": [[0, 0, 0, 0], [0, 0, 0, 0]],   # [combats with gems available, empty, full, gems]
         "pugno_def": [[0, 0, 0, 0], [0, 0, 0, 0]],
@@ -1121,6 +1122,11 @@ class GameState:
             pa.discard.append(att_unit.cid)
         if hit:
             self.stat_add("attacks_leader_hit", a)
+            if cb.att == "L" and self.stats is not None:
+                lh = self.stats["leader_hits"][a]
+                k = 2 if pa.awakened else 0
+                lh[k] += 1
+                lh[k + 1] += not cb.a
             if self.alle_corde(d) and pd.fresh() == 0:
                 self.lose(d, "colpo_finale")
             else:
