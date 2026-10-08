@@ -147,7 +147,7 @@ def new_stats():
         "reactions": [0, 0], "mods": {}, "legal_actions": [0, 0], "decisions": [0, 0],
         "idle_turns": [0, 0], "idle3_turns": [0, 0], "turns": [0, 0],
         "lives_lost": [{}, {}], "life_at_round6": None, "awaken_round": [None, None],
-        "rim_used": [0, 0], "cards_played": [{}, {}], "guard_stored": [0, 0],
+        "rim_used": [0, 0], "cards_played": [{}, {}], "drawn": [{}, {}], "guard_stored": [0, 0],
         # R-005, metriche M1-M14 (indice = giocatore che difende per M1-M3, che attacca per M4-M5)
         "react_avail": [0, 0], "react_decisive": [0, 0],                 # M1, M2
         "react_scar": [0, 0], "react_scar_life": [0, 0],                 # M3
@@ -440,6 +440,7 @@ class GameState:
         for _ in range(n):
             if pl.deck:
                 pl.hand.append(pl.deck.pop())
+                self.stat_add("drawn", q, pl.hand[-1])          # E-000: carte viste
             elif not pl.life:
                 self.lose(q, "mazzo_vuoto")
                 return
