@@ -311,6 +311,8 @@ class RuleAgent2:
             if c.type == "tactic":
                 if not self._tactic_ok(s, act):
                     continue
+            elif any("lose_life" in x for x in c.costs) and not self.pay_life and len(pl.life) < 4:
+                continue                                       # costo in Vita su Unità/Reliquie: stesso freno delle ⟳
             if pl.brace - c.cost < reserve and c.cost > 1:
                 continue
             plays.append((c.cost, self._target_score(s, act), act))
@@ -331,6 +333,12 @@ class RuleAgent2:
                 return act
         if hunt:
             return hunt
+        # ⟳ without a target (e.g. draw) on Units that did not attack, keeping the reserve
+        for act in by_kind.get("ability", []):
+            if act[3] is None and act[1] != "L":
+                ab = CARDS[s.unit(a, act[1]).cid].abilities[act[2]]
+                if pl.brace - ab.get("cost", 0) >= reserve and (self.pay_life or not self._ability_life_cost(s, act)):
+                    return act
         rim = by_kind.get("rim", [])
         lead = [act for act in attacks if act[1] == "L"]
         if lead:

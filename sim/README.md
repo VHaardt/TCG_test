@@ -111,4 +111,12 @@ IA: `semplice` (euristiche + equilibrio del pugno con regret matching, prezzo-om
 - `"if"` su una singola op; condizioni `deck_nonempty`, `target_is_unit`, `opposing`, `attacker_has`; `pugno_ge` sul bersaglio legge solo la Parata (gemme dopo il costo della Reazione);
 - Reazioni: `draw` (in C4) e op su Unità (`raddrizza` l'Unità che si opponeva, dopo lo scontro); `guard_max` con `"cap"` applicato per ultimo.
 
+**R-006**: il caricamento delle carte è **stretto** (`sim/v02/validate.py`): chiave, condizione, evento, op o campo di selettore sconosciuti danno `ValueError` con l'id della carta (liberi i campi che iniziano con `_` e quelli descrittivi: `text`, `name`, `rarity`, `slot`, `tags`, `intent`, ...). Primitive in più: `"target"` nei trigger (bersaglio scelto dal motore: Forza più alta, poi costo), `"stack": false`, trigger delle Reliquie in `fire_global`, eventi `on_own_reaction` e `on_own_unit_attack_defeats_unit`, valore `{"n": 2, "plus": 1, "if": [...]}`, op con `"target": "attacker"` e `"sel"`, condizioni `react_from_scars` e `hunted_ready`, `opposing` nelle statiche `combat`, selettore `"kind": "unit"`.
+
+```bash
+python3 -m sim.v02.run valida set.json --mazzi mazzi.json       # tutti gli errori di carte e mazzi
+python3 -m sim.v02.run torneo --carte set.json --mazzi mazzi.json --incroci 20
+```
+`--mazzi` accetta nomi di `sim/decks`, file `.json` con un mazzo (`cards` come `{id: copie}` o lista di id) o con più mazzi (`{"mazzi": [...]}`, anche `file.json#nome`); i mazzi si controllano sul database v0.2 caricato.
+
 Il report di `torneo` ha una tabella **M1–M15** (Reazioni disponibili/giocate/decisive, scontri decisi prima dell'impegno, Caccia, Unità ferme, colore minore e presenza degli slot nei mazzi vincenti, attivazioni per carta...). M4 usa la monotonia di Fa nelle gemme: 2 calcoli puri per ogni risposta del difensore (+~18% di tempo sul torneo). M10/M15 leggono i file dei mazzi; M15 usa il campo facoltativo `"slot"` delle carte.

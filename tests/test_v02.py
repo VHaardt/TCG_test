@@ -407,6 +407,225 @@ def test_report_has_r005_metrics_and_slot_presence():
         E.META["lince"] = {}
 
 
+# ---------------------------------------------------------------------------- R-006
+def test_validator_names_card_and_unknown_fields():
+    from sim.v02.validate import validate
+    raw = {"cards": [
+        {"id": "A", "type": "unit", "cost": 1, "power": 1, "colors": [], "_pending": "x", "intent": "ok", "tags": ["11.1"],
+         "abilities": [{"static": "power", "if": [{"opposed": True}], "value": 1}]},
+        {"id": "B", "type": "tactic", "cost": 1, "colors": [], "play": {"target": {"side": "opp", "type": "unit"},
+                                                                      "do": [{"op": "zap", "target": "chosen"}]}},
+        {"id": "C", "type": "unit", "cost": 1, "power": 1, "colors": [], "abilities": [
+            {"trigger": "on_fly", "do": [{"op": "stanca", "target": "chosen"}]},
+            {"static": "power", "value": 1, "unique": True}]},
+        {"id": "D", "type": "reaction", "cost": 1, "colors": [], "react": {"do": [{"op": "defeat", "target": "attacker",
+                                                                                  "sel": {"cost_le": 4}}]}}],
+        "leaders": [{"id": "L", "colors": ["R"], "base": [{"static": "power", "applies_to": {"side": "own", "kind": "unit"}, "value": 1}]}]}
+    errs = validate(raw)
+    want = ["A.abilities[0].if: condizione sconosciuta 'opposed'", "B.play.target: chiave sconosciuta 'type'",
+            "B.play.do[0]: op sconosciuta 'zap'", "C.abilities[0]: evento sconosciuto 'on_fly'",
+            "C.abilities[0].do[0]: target 'chosen' senza un selettore 'target' nell'abilità",
+            "C.abilities[1]: chiave sconosciuta 'unique'"]
+    assert sorted(errs) == sorted(want), errs
+    s = _arena()
+    try:
+        s.cond_ok(0, [{"opposed": True}], {})
+        assert False
+    except ValueError:
+        pass
+    try:
+        s.matches(0, Unit(1, "recluta", True), {"type": "unit"})
+        assert False
+    except ValueError:
+        pass
+
+
+def test_load_cards_rejects_invalid_file():
+    import json
+    import tempfile
+    raw = {"cards": [{"id": "X1", "type": "unit", "cost": 1, "colors": [], "power": 1,
+                      "abilities": [{"trigger": "on_enter", "do": [{"op": "draw", "n": 1, "if": [{"nope": 1}]}]}]}],
+           "leaders": []}
+    with tempfile.NamedTemporaryFile("w", suffix=".json", delete=False) as f:
+        json.dump(raw, f)
+    try:
+        E.load_cards(f.name)
+        assert False
+    except ValueError as e:
+        assert "X1.abilities[0].do[0].if: condizione sconosciuta 'nope'" in str(e)
+    finally:
+        os.unlink(f.name)
+    assert "recluta" in E.CARDS                                          # the old database is untouched
+
+
+def test_trigger_target_chosen_by_engine():
+    tirer = _card("_ver009", abilities=[{"trigger": "on_enter", "target": {"side": "opp", "ready": True, "cost_le": 3},
+                                         "do": [{"op": "stanca", "target": "chosen"}]}])
+    s = _arena()
+    s.p[0].brace = 2
+    s.p[0].hand.append(tirer)
+    s.p[1].units = [Unit(901, _card("_s2", power=2, cost=2), True), Unit(902, _card("_s4", power=4, cost=3), True),
+                    Unit(903, _card("_s9", power=9, cost=6), True)]
+    s.step(("play", tirer, None))
+    assert [u.ready for u in s.p[1].units] == [True, False, True]       # highest Forza among cost <= 3
+    s = _arena()                                                         # no legal target: nothing happens
+    s.p[0].brace = 2
+    s.p[0].hand.append(tirer)
+    s.step(("play", tirer, None))
+    assert len(s.p[0].units) == 1
+    raider = _card("_neu018", power=5, abilities=[{"trigger": "on_attack", "target": {"side": "opp", "ready": True},
+                                                   "do": [{"op": "stanca", "target": "chosen"}]}])
+    s = _arena()
+    s.p[0].units = [Unit(900, raider, True)]
+    s.p[1].units = [Unit(901, _card("_s2", power=2), True)]
+    s.step(("attack", 900))
+    assert not s.unit(1, 901).ready and s.phase == "pugno_att"           # nobody left to oppose
+
+
+def test_stack_false_and_kind_unit():
+    aura = _card("_ner016", type="relic", cost=3, power=0, colors=("K",), abilities=[
+        {"static": "power", "applies_to": {"side": "own", "attacker": True}, "value": 1, "stack": False}])
+    unit_only = _card("_ver018", type="relic", cost=3, power=0, colors=("G",), abilities=[
+        {"static": "power", "applies_to": {"side": "own", "attacker": True, "kind": "unit"}, "value": 1}])
+    s = _arena()
+    s.p[0].units = [Unit(900, _card("_a3", power=3), True)]
+    s.p[0].relics = [aura, aura]
+    s.step(("attack", 900))
+    assert s.compute(0, 0, None, None)[0] == 4                           # two copies: +1 once
+    s = _arena()
+    s.p[0].relics = [unit_only]
+    s.step(("attack", "L"))
+    assert s.compute(0, 0, None, None)[0] == 3                           # "kind": "unit": not the Leader
+    s = _arena()
+    s.p[0].relics = [aura]
+    s.step(("attack", "L"))
+    assert s.compute(0, 0, None, None)[0] == 4
+
+
+def test_relic_triggers_on_own_reaction_and_attack_defeats_unit():
+    blu018 = _card("_blu018", type="relic", cost=4, power=0, colors=("B",), abilities=[
+        {"trigger": "on_own_reaction", "do": [{"op": "draw", "n": 1, "if": [{"deck_nonempty": True}]}]}])
+    r = _card("_r3", type="reaction", cost=1, power=0, react={"do": [{"op": "def_mod", "n": 3}]})
+    s = _arena()
+    s.p[0].units = [Unit(900, _card("_a4", power=4), True)]
+    s.p[1].relics = [blu018]
+    s.p[1].guard = 1
+    s.p[1].hand.append(r)
+    n = len(s.p[1].hand)
+    _fight(s, ("attack", 900), parry=("parry", 1, (r, "hand")))
+    assert len(s.p[1].hand) == n                                         # -1 Reaction, +1 drawn after the combat
+    ver022 = _card("_ver022", type="relic", cost=5, power=0, abilities=[
+        {"trigger": "on_own_unit_attack_defeats_unit", "target": {"side": "opp", "ready": True, "cost_le": 4},
+         "do": [{"op": "stanca", "target": "chosen"}]}])
+    s = _arena()
+    s.p[0].relics = [ver022]
+    s.p[0].units = [Unit(900, _card("_hunter5", power=5, keywords=["caccia"]), True)]
+    s.p[1].units = [Unit(901, _card("_s2", power=2), False), Unit(902, _card("_s1", power=1, cost=1), True)]
+    _fight(s, ("attack", 900, 901), oppose=None)
+    assert s.unit(1, 901) is None and not s.unit(1, 902).ready
+    s = _arena()                                                         # opposing and defeating: no trigger
+    s.active = 1
+    s.p[0].relics = [ver022]
+    s.p[0].units = [Unit(904, _card("_s9", power=9), True), Unit(906, _card("_s1", power=1, cost=1), True)]
+    s.p[1].units = [Unit(905, _card("_a4", power=4), True)]
+    _fight(s, ("attack", 905), oppose=904)
+    assert s.unit(1, 905) is None and s.unit(1, 905) is None and s.unit(0, 906).ready
+
+
+def test_dynamic_value_n_plus_if():
+    s = _arena()
+    sel = {"side": "opp", "ready": False, "power_le": {"n": 2, "plus": 1, "if": [{"scars_ge": 1}]}}
+    s.p[1].units = [Unit(901, _card("_p3", power=3), False)]
+    assert s._targets(0, sel) == []
+    s.p[0].scars.append([s.p[0].life.pop(), False, "attacco"])
+    assert s._targets(0, sel) == [901]
+
+
+def test_reaction_defeats_attacker_with_sel():
+    blu025 = _card("_blu025", type="reaction", cost=2, power=0, react={"do": [
+        {"op": "att_mod", "n": -5}, {"op": "defeat", "target": "attacker", "sel": {"cost_le": 4}}]})
+    for cost, gone in ((4, True), (5, False)):
+        s = _arena()
+        s.p[0].units = [Unit(900, _card(f"_a{cost}", power=6, cost=cost), True)]
+        s.p[1].guard = 2
+        s.p[1].hand.append(blu025)
+        _fight(s, ("attack", 900), parry=("parry", 2, (blu025, "hand")))
+        assert (s.unit(0, 900) is None) == gone
+        assert s.stats["removals"][1] == (1 if gone else 0)
+
+
+def test_combat_conditions_opposing_relic_react_from_scars_hunted_ready():
+    neu014 = _card("_neu014", type="relic", cost=3, power=0, colors=(), abilities=[
+        {"static": "combat", "role": "defense", "if": [{"opposing": True}], "def_mod": 1}])
+    ner021 = _card("_ner021", type="relic", cost=5, power=0, colors=("K",), abilities=[
+        {"static": "combat", "role": "defense", "if": [{"react_from_scars": True}], "att_mod": -2}])
+    ver008 = _card("_ver008", power=1, keywords=["caccia"],
+                   abilities=[{"static": "power", "if": [{"attacking": True}, {"hunted_ready": False}], "value": 2}])
+    r = _card("_r0b", type="reaction", cost=1, power=0, react={"do": [{"op": "def_mod", "n": 0}]})
+    E.LEADERS["_blank"] = LeaderCard(id="_blank", name="blank", colors=("R",), base=(), awakened=())
+    s = _arena()
+    s.p[1].leader = "_blank"
+    s.p[0].units = [Unit(900, ver008, True)]
+    s.p[1].relics = [neu014, ner021]
+    s.p[1].units = [Unit(901, _card("_s2", power=2), False), Unit(902, _card("_s2", power=2), True)]
+    s.step(("attack", 900, 901))
+    assert s.compute(0, 0, None, None)[:2] == (1 + 2, 2)                 # hunted Rotated: +2; not opposing: no +1
+    assert s.compute(0, 0, None, 902)[:2] == (1, 2 + 1)                  # replaced by an opposer: no +2; +1
+    assert s.compute(0, 1, (r, "scar"), None)[0] == 3 - 2                # Reaction from a Scar: -2
+    assert s.compute(0, 1, (r, "hand"), None)[0] == 3
+    s = _arena()
+    s.p[0].units = [Unit(900, ver008, True)]
+    s.p[1].relics = [neu014]
+    s.step(("attack", 900))
+    assert s.compute(0, 0, None, None)[:2] == (1, 4)                     # Leader target: no +1, no +2
+
+
+def test_hunted_target_fires_on_defeats_attacker():
+    wall = _card("_blu003", power=5, keywords=["scudo"], abilities=[
+        {"trigger": "on_defeats_attacker", "do": [{"op": "draw", "n": 1, "if": [{"deck_nonempty": True}]}]}])
+    s = _arena()
+    s.p[0].units = [Unit(900, _card("_hunter3", power=3, keywords=["caccia"]), True)]
+    s.p[1].units = [Unit(901, wall, False)]
+    n = len(s.p[1].hand)
+    _fight(s, ("attack", 900, 901))
+    assert s.unit(0, 900) is None and len(s.p[1].hand) == n + 1
+
+
+def test_v02_decks_checked_against_v02_database():
+    import json
+    import tempfile
+    from sim.v02 import decks as D
+    leader, cards = D.load("arden_rosso_verde")
+    assert leader == "arden" and len(cards) == 40
+    multi = {"mazzi": [{"name": "ok", "leader": "arden", "cards": ["scudiera"] * 3 + ["t_r2"] * 3 + ["vesh"] * 3 + ["lince"] * 3
+                        + ["esca"] * 3 + ["t_r3"] * 3 + ["t_g3"] * 3 + ["t_g4"] * 3 + ["t_n2"] * 3 + ["t_n4"] * 3
+                        + ["carica"] * 2 + ["matriarca"] * 2 + ["colpo"] * 2 + ["recluta"] * 2 + ["t_r6"] * 2},
+                       {"name": "bad", "leader": "arden", "cards": ["ROS-999"] * 40}]}
+    with tempfile.NamedTemporaryFile("w", suffix=".json", delete=False) as f:
+        json.dump(multi, f)
+    try:
+        assert D.expand([f.name]) == [f.name + "#ok", f.name + "#bad"]
+        assert len(D.load(f.name + "#ok")[1]) == 40
+        try:
+            D.load(f.name + "#bad")
+            assert False
+        except ValueError as e:
+            assert "id sconosciuti: ROS-999" in str(e)
+    finally:
+        os.unlink(f.name)
+
+
+def test_ai_uses_targetless_activated_ability():
+    drawer = _card("_blu016", power=4, abilities=[{"activated": True, "cost": 1, "do": [{"op": "draw", "n": 1}]}])
+    s = _arena()
+    s.round = 2
+    s.p[0].units = [Unit(900, drawer, True)]
+    s.p[0].brace = 1
+    s.p[0].hand = []
+    s.p[1].guard = 3                                                     # 4 + 1 < 4 + 2: no credible attack
+    assert RuleAgent2(0).act(s) == ("ability", 900, 0, None)
+
+
 if __name__ == "__main__":
     for k, f in list(globals().items()):
         if k.startswith("test_"):

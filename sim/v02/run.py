@@ -7,6 +7,8 @@
   python -m sim.v02.run collaudo --partite 1000         # sfruttabilita del pugno
   python -m sim.v02.run forte --variante B0 --partite 100 --forte forte:60
   python -m sim.v02.run vita --partite 200              # M14: IA che paga sempre i costi in Vita
+  python -m sim.v02.run valida set.json --mazzi mazzi.json   # controllo stretto di carte e mazzi
+  python -m sim.v02.run torneo --carte set.json --mazzi mazzi.json   # un altro file di carte
 
 Every arm plays the same jobs (decks, seats, seeds): differences come from the rules."""
 import argparse
@@ -16,19 +18,32 @@ import statistics
 import time
 from multiprocessing import Pool
 
-from ..run import load_deck, all_decks, wilson, median_ci, pct, check, DECK_DIR
+from ..run import wilson, median_ci, pct, check
+from . import decks as D
+from . import engine
 from .agents import make_agent
 from .config import rules_from, B0
 from .engine import new_game, RULES_VERSION, CARDS, LEADERS, META
+from .validate import validate
+
+CARTE = [None]                      # --carte: file di carte usato da questo processo e dai worker
 
 ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 REPORT_DIR = os.path.join(ROOT, "reports", "v02")
 
 
+def use_cards(path):
+    """Loads a card file (validated) in this process if it is not the current one."""
+    path = os.path.abspath(path or engine.DATA)
+    if engine.LOADED[0] != path:
+        engine.load_cards(path)
+
+
 def play_game(job):
-    decks, agents_spec, spec, seed, keep_log = job
+    decks, agents_spec, spec, seed, keep_log = job[:5]
+    use_cards(job[5] if len(job) > 5 else CARTE[0])
     rules = rules_from(spec)
-    (l1, d1), (l2, d2) = load_deck(decks[0]), load_deck(decks[1])
+    (l1, d1), (l2, d2) = D.load(decks[0]), D.load(decks[1])
     agents = [make_agent(agents_spec[0], seed=seed * 2 + 1), make_agent(agents_spec[1], seed=seed * 2 + 2)]
     s = new_game(l1, d1, l2, d2, rules=rules, seed=seed, log=keep_log)
     steps = 0
@@ -42,7 +57,14 @@ def play_game(job):
             "stats": s.stats, "log": s.log}
 
 
+def all_decks():
+    return D.reference_decks()
+
+
 def run_jobs(jobs, workers=None):
+    jobs = [j[:5] + (CARTE[0],) for j in jobs]
+    for ref in {d for j in jobs for d in j[0]}:          # errori chiari prima di partire
+        D.load(ref)
     workers = workers or os.cpu_count() or 2
     if workers == 1 or len(jobs) < 8:
         return [play_game(j) for j in jobs]
@@ -141,9 +163,7 @@ def metrics(recs):
 # ---------------------------------------------------------------------------- R-005, M1-M15
 def deck_list(name):
     """(leader, {cid: copies}) read from the deck file, without the legality check."""
-    with open(os.path.join(DECK_DIR, name + ".json"), encoding="utf-8") as f:
-        d = json.load(f)
-    return d["leader"], d["cards"]
+    return D.raw_deck(name)
 
 
 def minor_colour(name):
@@ -158,8 +178,10 @@ def minor_colour(name):
 
 def slots_of(cid):
     """Slot labels of a card for M15: the card id, plus "slot" from the card file, plus "caccia"."""
-    tags = META.get(cid, {}).get("slot") or []
-    tags = [tags] if isinstance(tags, str) else list(tags)
+    tags = []
+    for k in ("slot", "tags"):
+        v = META.get(cid, {}).get(k) or []
+        tags += [v] if isinstance(v, str) else list(v)
     if cid in CARDS and CARDS[cid].has("caccia"):
         tags.append("caccia")
     return tags
@@ -276,22 +298,22 @@ def render(title, m, spec, agents, elapsed):
          f"| Azioni legali per decisione | {m['legal_per_decision']:.1f} | <60 | {check(m['legal_per_decision'] < 60)} |",
          f"| Fine partita | {m['end_reasons']} | | |",
          f"| Nelle fasce comuni | {'sì' if in_bands(m) else 'no'} | | |", "",
-         "Vittorie per mazzo: " + ", ".join(f"{d} {pct(w)}" for d, w in sorted(m["deck_win"].items())), ""]
+         "Vittorie per mazzo: " + ", ".join(f"{D.label(d)} {pct(w)}" for d, w in sorted(m["deck_win"].items())), ""]
     L += render_r005(m)
     return "\n".join(L) + "\n"
 
 
 def render_r005(m):
-    fmt = lambda d, f="{:.2f}": ", ".join(f"{k} " + f.format(v) for k, v in d.items()) or "—"
+    fmt = lambda d, f="{:.2f}": ", ".join(f"{D.label(k)} " + f.format(v) for k, v in d.items()) or "—"
     top = list(m["activations"].items())[:12]
-    pres = [(t, v) for t, v in m["slot_presence"].items() if t not in CARDS or "caccia" in slots_of(t) or META.get(t, {}).get("slot")]
+    pres = [(t, v) for t, v in m["slot_presence"].items() if t not in CARDS or "caccia" in slots_of(t) or slots_of(t)]
     return [
         "## Metriche diagnostiche R-005 (M1–M15)", "",
         "| # | Metrica | Valore | Obiettivo |", "|---|---|---|---|",
         f"| M1 | Reazioni disponibili / giocate per scontro | {m['react_avail']:.3f} / {m['reactions_per_combat']:.3f} | giocate ≥0.10 |",
         f"| M2 | Reazioni decisive per scontro | {m['react_decisive']:.3f} | ≥0.05 |",
         f"| M3 | Reazioni da Cicatrici dritte per partita (di cui nate da un costo in Vita) | "
-        + ", ".join(f"{d} {v:.2f} ({m['react_scar_life'][d]:.2f})" for d, v in m["react_scar"].items()) + " | |",
+        + ", ".join(f"{D.label(d)} {v:.2f} ({m['react_scar_life'][d]:.2f})" for d, v in m["react_scar"].items()) + " | |",
         f"| M4 | Scontri decisi prima dell'impegno | {pct(m['decided_pre'])} | |",
         f"| M5 | Attacchi con Caccia per partita (su Pronte / Ruotate); attacchi sul Leader | {m['hunt'][0]:.2f} ({m['hunt'][1]} / {m['hunt'][2]}); {pct(m['target_leader'])} | |",
         f"| M6 | Unità ferme (né attaccano né si oppongono) | {pct(m['unit_idle'])}; " + fmt({d: v[0] for d, v in m['unit_idle_deck'].items()}, "{:.1%}") + " | ≤38%, verdi ≤35% |",
@@ -440,6 +462,25 @@ def cmd_vita(a):
     print("report:", save(f"vita_{os.path.splitext(os.path.basename(a.variante))[0]}", text, recs, a.out))
 
 
+def cmd_valida(a):
+    """Strict check of a card file and, optionally, of decks against it. Exit code 1 on errors."""
+    import sys
+    with open(a.file, encoding="utf-8") as f:
+        raw = json.load(f)
+    errors = validate(raw)
+    colors = {c["id"]: tuple(c.get("colors") or ()) for c in raw.get("cards", [])}
+    lcolors = {l["id"]: tuple(l.get("colors") or ()) for l in raw.get("leaders", [])}
+    for ref in D.expand(a.mazzi or []):
+        try:
+            leader, cards = D.raw_deck(ref)
+            errors += [f"mazzo {ref}: {p}" for p in D.problems(leader, cards, colors, lcolors)]
+        except (ValueError, KeyError) as e:
+            errors.append(f"mazzo {ref}: {e}")
+    print("\n".join(errors) if errors else "nessun errore")
+    print(f"{a.file}: {len(raw.get('cards', []))} carte, {len(raw.get('leaders', []))} Leader, {len(errors)} errori")
+    sys.exit(1 if errors else 0)
+
+
 def cmd_partita(a):
     r = play_game(((a.mazzo1, a.mazzo2), (a.ia, a.ia), a.variante, a.seed, True))
     print("\n".join(r["log"]))
@@ -454,7 +495,8 @@ def main(argv=None):
         x.add_argument("--variante", default="V02")
         x.add_argument("--ia", default="semplice")
         x.add_argument("--partite", type=int, default=partite)
-        x.add_argument("--mazzi", nargs="*")
+        x.add_argument("--mazzi", nargs="*", help="nomi in sim/decks, file .json o file.json#nome")
+        x.add_argument("--carte", help="file di carte v0.2 (default sim/v02/cards_v02.json)")
         x.add_argument("--incroci", type=int, default=0)
         x.add_argument("--seed", type=int, default=1)
         x.add_argument("--out")
@@ -465,9 +507,21 @@ def main(argv=None):
     fo = sub.add_parser("forte"); common(fo, 25); fo.add_argument("--forte", default="forte:60")
     vi = sub.add_parser("vita"); common(vi, 100)
     pa = sub.add_parser("partita"); common(pa); pa.add_argument("mazzo1"); pa.add_argument("mazzo2")
+    va = sub.add_parser("valida"); va.add_argument("file"); va.add_argument("--mazzi", nargs="*")
     a = p.parse_args(argv)
+    if a.cmd == "valida":
+        return cmd_valida(a)
+    CARTE[0] = os.path.abspath(a.carte) if a.carte else None
+    try:
+        use_cards(CARTE[0])
+        if a.mazzi:
+            a.mazzi = D.expand(a.mazzi)
+        for ref in a.mazzi or [] if a.cmd != "partita" else (a.mazzo1, a.mazzo2):
+            D.load(ref)
+    except ValueError as e:                             # carte o mazzi non validi: messaggio, niente traceback
+        raise SystemExit(f"errore: {e}")
     {"torneo": cmd_torneo, "ab": cmd_ab, "lambda": cmd_lambda, "collaudo": cmd_collaudo,
-     "forte": cmd_forte, "vita": cmd_vita, "partita": cmd_partita}[a.cmd](a)
+     "forte": cmd_forte, "vita": cmd_vita, "partita": cmd_partita, "valida": cmd_valida}[a.cmd](a)
 
 
 if __name__ == "__main__":
