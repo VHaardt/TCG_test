@@ -86,3 +86,19 @@ Se una carta nuova ha bisogno di un'operazione o di un evento che non esiste, si
 - L'IA semplice usa priorità fisse; l'IA forte campiona le informazioni nascoste ma gioca i rollout con l'IA semplice, quindi sottovaluta combo che la semplice non conosce.
 - L'IA forte con 100 iterazioni batte la semplice solo nel 53% dei casi (obiettivo 65%) e costa circa 4 secondi a partita per core: per i tornei di massa si usa la semplice, la forte serve per i controlli a campione.
 - Mulligan e scarti per limite di mano usano una regola fissa, non una decisione dell'IA.
+
+## Nucleo v0.2 (`sim/v02/`)
+
+Motore, IA e runner del nucleo v0.2 ratificato (Q-013, `docs/regolamento_v0.2.md`). Le regole sono un dataclass (`sim/v02/config.py`): ogni scelta aperta è un parametro, ogni variante un preset o un file JSON `{"base": preset, "set": {...}}`. Preset `V02` (default) = nucleo ratificato; `B0` = base dell'esperimento; `V1B_sequenziale`, `V2B_scoperto`, `V3B_opposizione_dopo`, `V4B_raddrizzo_fine`, `S_scudo_pareggi`.
+
+```bash
+python3 -m sim.v02.run torneo --partite 500            # metriche e fasce dei pilastri, mirror su tutti i mazzi
+python3 -m sim.v02.run torneo --partite 0 --incroci 400 # incroci fra mazzi diversi
+python3 -m sim.v02.run ab --base V02 --variante mia.json --partite 2500   # A/B appaiato
+python3 -m sim.v02.run collaudo --variante V02          # sfruttabilità dell'IA del pugno
+python3 -m sim.v02.run forte --forte forte:30 --partite 75               # IA forte contro semplice
+python3 -m sim.v02.run partita arden_rosso_verde maera_blu_nero          # una partita con log
+python3 tests/test_v02.py
+```
+
+IA: `semplice` (euristiche + equilibrio del pugno con regret matching, prezzo-ombra λ=0.03 per gemma), `det` (pugno deterministico), `br` (miglior risposta, per il collaudo), `forte:N` (MCTS con rollout semplici, ~1–2 s a partita con Tempra 4). Carte convertite da v0.1 in `sim/v02/cards_v02.json`. Esperimenti in `/mnt/project-files/tcg/swarm/esperimenti/E-014/`.
