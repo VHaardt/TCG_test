@@ -148,7 +148,7 @@ def new_stats():
         "reactions": [0, 0], "mods": {}, "legal_actions": [0, 0], "decisions": [0, 0],
         "idle_turns": [0, 0], "idle3_turns": [0, 0], "turns": [0, 0],
         "lives_lost": [{}, {}], "life_at_round6": None, "awaken_round": [None, None],
-        "rim_used": [0, 0], "cards_played": [{}, {}], "drawn": [{}, {}], "leader_free_rim": [{}, {}], "guard_stored": [0, 0],
+        "rim_used": [0, 0], "cards_played": [{}, {}], "drawn": [{}, {}], "leader_free_rim": [{}, {}], "stanca_removed": [0, 0], "turns_both022": [0, 0], "atk_leader_both022": [0, 0], "guard_stored": [0, 0],
         # R-005, metriche M1-M14 (indice = giocatore che difende per M1-M3, che attacca per M4-M5)
         "react_avail": [0, 0], "react_decisive": [0, 0],                 # M1, M2
         "react_scar": [0, 0], "react_scar_life": [0, 0],                 # M3
@@ -473,7 +473,7 @@ class GameState:
                 pl.life.append(pl.deck.pop())
         self.active = G1
         if self.stats is not None:
-            self.track = {"seen": set(), "attacked": set(), "opposed": set(), "cand": [set(), set()]}
+            self.track = {"seen": set(), "attacked": set(), "opposed": set(), "cand": [set(), set()], "stancate": set()}
         self.begin_turn()
         return self
 
@@ -534,7 +534,9 @@ class GameState:
             if self.round > self.r.no_attack_round:
                 self.stats["unit_turns"][a] += len(tr["seen"])
                 tr["cand"][a] = {u.uid for u in pl.units if u.ready and u.uid in tr["seen"]} - tr["attacked"]
-            tr["seen"], tr["attacked"], tr["opposed"] = set(), set(), set()
+            tr["seen"], tr["attacked"], tr["opposed"], tr["stancate"] = set(), set(), set(), set()
+            if self.both_022(a):
+                self.stat_add("turns_both022", a)              # R-009 #6
         stored = min(pl.brace, self.guard_max(a))           # 10b
         pl.guard = stored
         if a == G2 and self.round == 1:
@@ -772,6 +774,15 @@ class GameState:
             pl.discard.append(cid)
 
     # ------------------------------------------------------------------ effects (small DSL)
+    def _stancata_rimossa(self, q, owner, u):
+        """R-009 #5: q removes an opposing Unit it made Stanca (from Ready) in this same turn."""
+        if self.track is not None and (owner, u.uid) in self.track["stancate"]:
+            self.stat_add("stanca_removed", q)
+
+    def both_022(self, q):
+        ids = {u.cid for u in self.p[q].units}
+        return "ROS-022" in ids and "VER-022" in ids
+
     def tempra(self, q):
         """Tempra of q's Leader (tempra_awakened when set and q is Awakened)."""
         return self.r.tempra_awakened if self.p[q].awakened and self.r.tempra_awakened else self.r.tempra
@@ -848,6 +859,8 @@ class GameState:
                 if u is None:
                     continue
                 if k == "stanca":
+                    if self.track is not None and u.ready:
+                        self.track["stancate"].add((owner, u.uid))  # R-009 #5
                     u.ready = False
                 elif k == "raddrizza":
                     u.ready = True
@@ -856,6 +869,7 @@ class GameState:
                     self.p[owner].discard.append(u.cid)
                     if owner != q:
                         self.stat_add("removals", q)
+                        self._stancata_rimossa(q, owner, u)
             elif k == "att_mod" and self.combat:
                 self.combat.att_mod += n
             elif k == "def_mod" and self.combat:
@@ -892,6 +906,8 @@ class GameState:
         self.stat_add("attacks", a)
         if self.track is not None:
             self.track["attacked"].add(att)
+            if hunted is None and self.both_022(a):
+                self.stat_add("atk_leader_both022", a)         # R-009 #6 (bersaglio dichiarato: il Leader)
         if hunted is not None:
             self.stat_add("hunt", a)
             self.stat_add("hunt_ready" if self.unit(d, hunted).ready else "hunt_rotated", a)
@@ -1134,6 +1150,7 @@ class GameState:
             pd.units.remove(tgt_unit)
             pd.discard.append(tgt_unit.cid)
             self.stat_add("units_defeated_in_combat", a)
+            self._stancata_rimossa(a, d, tgt_unit)
             if cb.opposer is None:
                 self.stat_add("removals", a)                             # M12: sconfitta da Caccia
         if att_dead:

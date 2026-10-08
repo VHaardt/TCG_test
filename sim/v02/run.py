@@ -244,6 +244,18 @@ def r005_metrics(recs, att):
     per_game = {cid: k / max(seats.get(cid, 1), 1) for cid, k in acts.items()}
     m["activations"] = dict(sorted(per_game.items(), key=lambda t: -t[1]))
     m["removals"] = per_deck("removals")                                      # M12
+    m["stanca_removed"] = per_deck("stanca_removed")                          # R-009 #5
+    tb = per_deck("turns_both022")
+    ab = per_deck("atk_leader_both022")
+    m["both022"] = {d: ab[d] / tb[d] for d in tb if tb[d] > 0}               # R-009 #6
+    cb = {}                                                                   # R-009 #8: rimonte per mazzo
+    for r in recs:
+        lr = r["stats"]["life_at_round6"]
+        if lr and abs(lr[0] - lr[1]) >= 2:
+            q = 0 if lr[0] < lr[1] else 1
+            x = cb.setdefault(r["decks"][q], [0, 0])
+            x[0] += r["winner"] == q; x[1] += 1
+    m["comeback_deck"] = {d: (k / n_, n_) for d, (k, n_) in sorted(cb.items())}
     m["life_costs"] = per_deck("life_costs")                                  # M14 (costi pagati)
     wins = [r for r in recs if r["winner"] is not None]                       # M15
     pres = {}
@@ -340,6 +352,9 @@ def render_r005(m):
         + ", ".join(f"{l} {c}: {k:.1f} ({100*q:.0f}%, {n} vittorie)" for l, (c, k, q, n) in sorted(m["minor"].items())) + " | ≥35% |",
         f"| M11 | Attivazioni per partita (prime 12) | " + fmt(dict(top)) + " | |",
         f"| M12 | Rimozioni per partita (effetti e Caccia) | " + fmt(m["removals"]) + " | |",
+        f"| R9-5 | Unità Stancate da Pronte e rimosse nello stesso turno, per partita | " + fmt(m["stanca_removed"]) + " | allarme >1 con LDR-04/LDR-06 |",
+        f"| R9-6 | Attacchi dichiarati al Leader per turno con ROS-022 e VER-022 in gioco | " + (fmt(m["both022"]) if m["both022"] else "mai insieme") + " | |",
+        f"| R9-8 | Rimonte per mazzo (chi era indietro di ≥2 Vite al round 6) | " + ", ".join(f"{D.label(d)} {100*v:.0f}% (n={n})" for d, (v, n) in m["comeback_deck"].items()) + " | 20–35% |",
         f"| M13 | Pugno d'attacco pieno | {pct(m['pugno_att_full'])} | |",
         f"| M14 | Costi in Vita pagati per partita; vittorie per IA (partite miste) | " + fmt(m["life_costs"])
         + "; " + (", ".join(f"{k} {pct(v)}" for k, v in m["agent_win"].items()) or "nessuna partita mista (comando `vita`)") + " | |",
