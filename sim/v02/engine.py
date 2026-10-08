@@ -341,6 +341,8 @@ class GameState:
                 return False
             if k == "hunted_ready" and ctx.get("hunted_ready") != v:
                 return False
+            if k == "survived" and ctx.get("survived", True) != v:   # chi ha sconfitto è ancora in gioco
+                return False
             if k == "attacker_has":
                 cid = ctx.get("attacker_cid")
                 if cid is None or not CARDS[cid].has(KW_ALIAS.get(v, v)):
@@ -778,8 +780,9 @@ class GameState:
         return max(cands, key=lambda uid: (self.unit_power(side, self.unit(side, uid)),
                                            CARDS[self.unit(side, uid).cid].cost, -uid))
 
-    def fire_global(self, q, event, ctx):
-        for u in list(self.p[q].units):
+    def fire_global(self, q, event, ctx, gone=()):
+        """gone: Units of q defeated in this combat, whose look-back triggers still fire (§7.5)."""
+        for u in list(self.p[q].units) + list(gone):
             self.fire(q, CARDS[u.cid].abilities, event, dict(ctx, self=u.uid), src=u.cid)
         self.fire(q, self.leader_abilities(q), event, dict(ctx, self="L"), src=self.p[q].leader)
         for rid in list(self.p[q].relics):                  # N3: anche le Reliquie
@@ -958,7 +961,7 @@ class GameState:
                 mods += 1
                 if src is not None:
                     src.append((d, cid))
-        ctx_d = dict(self.combat_ctx(cb, opposer, pugno=d_gems, react_src=rs), role="defense")
+        ctx_d = dict(self.combat_ctx(cb, opposer, pugno=parry, react_src=rs), role="defense")   # Q-015 S-2: solo Parata
         if tgt is None:
             db = self.r.tempra
         else:
@@ -1117,15 +1120,19 @@ class GameState:
             return
         self.state_checks()
         # C6 (e): prima i trigger del giocatore attivo, poi quelli del difensore
+        # §7.5 (R-007 T-8): i trigger "quando sconfigge" guardano indietro e scattano anche se la loro
+        # fonte è stata sconfitta nello stesso scontro; {"survived": true} li limita a chi è ancora in gioco
         if tgt_dead:
             abil, sid = (CARDS[att_unit.cid].abilities, att_unit.cid) if att_unit else (self.leader_abilities(a), pa.leader)
-            self.fire(a, abil, "on_attack_defeats_unit", dict(rctx, self=cb.att), src=sid)    # Rinnovo
-            if att_unit is not None and not att_dead:
-                self.fire_global(a, "on_own_unit_defeats_unit", {})
-                self.fire_global(a, "on_own_unit_attack_defeats_unit", {})       # N4
-        if att_dead and tgt_unit is not None and not tgt_dead:
-            self.fire(d, CARDS[tgt_unit.cid].abilities, "on_defeats_attacker", {"self": tgt_unit.uid}, src=tgt_unit.cid)
-            self.fire_global(d, "on_own_unit_defeats_unit", {})
+            self.fire(a, abil, "on_attack_defeats_unit", dict(rctx, self=cb.att, survived=not att_dead), src=sid)    # Rinnovo
+            if att_unit is not None:
+                gone = [att_unit] if att_dead else []
+                self.fire_global(a, "on_own_unit_defeats_unit", {"survived": not att_dead}, gone)
+                self.fire_global(a, "on_own_unit_attack_defeats_unit", {"survived": not att_dead}, gone)   # N4
+        if att_dead and tgt_unit is not None:
+            self.fire(d, CARDS[tgt_unit.cid].abilities, "on_defeats_attacker",
+                      {"self": tgt_unit.uid, "survived": not tgt_dead}, src=tgt_unit.cid)
+            self.fire_global(d, "on_own_unit_defeats_unit", {"survived": not tgt_dead}, [tgt_unit] if tgt_dead else [])
         if late_ops and not self.over:
             self.run_ops(d, late_ops, rctx)                             # es. raddrizza l'Unità che si opponeva
         if paid and not self.over:

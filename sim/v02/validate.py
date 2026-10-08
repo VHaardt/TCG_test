@@ -23,7 +23,7 @@ MODIFIERS = {"rim_cost"}
 # condition -> type of its value
 CONDITIONS = {"furia": int, "scars_ge": int, "awakened": bool, "attacking": bool, "pugno_ge": int,
               "deck_nonempty": bool, "target_is_unit": bool, "opposing": bool, "attacker_has": str,
-              "react_from_scars": bool, "hunted_ready": bool}
+              "react_from_scars": bool, "hunted_ready": bool, "survived": bool}
 SELECTOR = {"side", "cost_le", "ready", "power_le", "keyword", "attacker", "kind", "any", "if"}
 OPS = {"draw": {"n"}, "att_mod": {"n"}, "def_mod": {"n"},
        "stanca": {"target", "sel"}, "defeat": {"target", "sel"}, "raddrizza": {"target", "sel"}}

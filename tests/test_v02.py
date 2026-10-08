@@ -378,7 +378,7 @@ def test_games_with_caccia_cards_terminate():
     E.CARDS["t_g3"] = dataclasses.replace(old, keywords=old.keywords | {"caccia"})
     try:
         hunts = 0
-        for seed in range(4):
+        for seed in range(12):                                          # hunting depends on the draw
             s = _play(_game(rules_from("V02"), seed), [RuleAgent2(seed), RuleAgent2(seed + 1)])
             assert s.end_reason in ("colpo_finale", "crepuscolo", "mazzo_vuoto")
             hunts += sum(s.stats["hunt"])
@@ -624,6 +624,31 @@ def test_ai_uses_targetless_activated_ability():
     s.p[0].hand = []
     s.p[1].guard = 3                                                     # 4 + 1 < 4 + 2: no credible attack
     assert RuleAgent2(0).act(s) == ("ability", 900, 0, None)
+
+
+def test_defeat_triggers_look_back_on_mutual_defeat():
+    """§7.5 (R-007 T-8): "quando sconfigge" fires even if its source died in the same combat;
+    {"survived": true} restricts it to a source still in play."""
+    drawer = _card("_drawer", power=3, abilities=[
+        {"trigger": "on_own_unit_defeats_unit", "do": [{"op": "draw", "n": 1}]}])
+    picky = _card("_picky", power=3, abilities=[
+        {"trigger": "on_own_unit_defeats_unit", "if": [{"survived": True}], "do": [{"op": "draw", "n": 1}]}])
+    for cid, drawn in ((drawer, 1), (picky, 0)):
+        s = _arena()
+        s.p[0].units = [Unit(900, cid, True)]
+        s.p[1].units = [Unit(901, _card("_s3", power=3), True)]
+        n = len(s.p[0].hand)
+        _fight(s, ("attack", 900), oppose=901)
+        assert s.unit(0, 900) is None and s.unit(1, 901) is None          # 3 contro 3: sconfitte entrambe
+        assert len(s.p[0].hand) == n + drawn, cid
+    guard = _card("_guard", power=3, abilities=[
+        {"trigger": "on_defeats_attacker", "do": [{"op": "draw", "n": 1}]}])
+    s = _arena()
+    s.p[0].units = [Unit(900, _card("_s3", power=3), True)]
+    s.p[1].units = [Unit(901, guard, True)]
+    n = len(s.p[1].hand)
+    _fight(s, ("attack", 900), oppose=901)
+    assert len(s.p[1].hand) == n + 1
 
 
 if __name__ == "__main__":
