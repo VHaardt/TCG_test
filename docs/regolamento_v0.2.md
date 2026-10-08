@@ -71,7 +71,7 @@ Valori standard per tutti i Leader del set base [`leader_power`, `leader_power_a
 - Il Risveglio dà +1 Forza e +1 al massimo di Guardia; la Tempra resta 4.
 
 ### 2.3 Regole di costruzione (invariate da v0.1)
-- Esattamente 40 carte, al massimo **3 copie per nome**.
+- Esattamente 40 carte, al massimo **3 copie per nome**. Le carte del primo set non hanno nome: il limite vale per **ID** (es. ROS-007). Due ID con lo stesso testo sono carte diverse, ognuna con le sue 3 copie; se differenziarle lo decide chi scrive le carte (R-007 T-3).
 - Ogni carta deve condividere almeno un colore col Leader oppure essere **Neutrale**.
 - Colori del set base: Rosso, Blu, Nero, Verde (§12). Leader bicolori consigliati.
 - Il mazzo non contiene carte-risorsa: la risorsa sono le gemme.
@@ -137,14 +137,15 @@ In quest'ordine:
 - Nel tuo turno la Brace si usa in due modi:
   1. **spenderla** per pagare carte e abilità (le gemme tornano nella scorta);
   2. **impegnarla** in un tuo attacco (§8, C3): ogni gemma impegnata dà +1 alla Forza dell'attaccante, poi torna nella scorta.
+- I costi in gemme di carte e abilità ⟳ si pagano **sempre con la Brace**: la Guardia si usa solo nell'impegno, nel turno avversario (§5.3) (R-007 T-5).
 - Nella Fine la Brace non spesa diventa Guardia fino al massimo; il resto torna nella scorta (§5.3).
 
 ### 5.3 Guardia e massimo di Guardia
 - **Formare la Guardia**: nella Fine del tuo turno sposti sulla carta Leader le gemme di Brace non spese, fino al **massimo di Guardia**; le altre tornano nella scorta.
-- **Massimo di Guardia** = 2 sul lato Base, 3 sul lato Risvegliato, **+1 per ogni Lanterna del Pellegrino** che controlli, **+1 se il tuo Leader è Alle Corde** [`guard_max`, `guard_max_awakened`, `guard_alle_corde_bonus` 1].
+- **Massimo di Guardia** = 2 sul lato Base, 3 sul lato Risvegliato, **più gli aumenti stampati sulle carte** (es. NEU-002; la carta dice il proprio tetto e se più copie si sommano), **+1 se il tuo Leader è Alle Corde** [`guard_max`, `guard_max_awakened`, `guard_alle_corde_bonus` 1].
 - La Guardia si usa **solo nel turno avversario**, impegnandola in uno scontro (§8, C4): ogni gemma paga il costo di una Reazione oppure dà **+2** al valore di difesa del bersaglio (**Parata**) [`parata_per_gemma` 2].
 - All'inizio del tuo Ripristino rimetti nella scorta la Guardia rimasta.
-- Il massimo vale sempre. Se scende (per esempio una Lanterna lascia il gioco), la Guardia in eccesso torna nella scorta al controllo di stato successivo. Se sale nel turno avversario (per esempio col Risveglio), si alza solo il tetto: non ricevi gemme.
+- Il massimo vale sempre. Se scende (per esempio lascia il gioco la carta che lo aumentava), la Guardia in eccesso torna nella scorta al controllo di stato successivo. Se sale nel turno avversario (per esempio col Risveglio), si alza solo il tetto: non ricevi gemme.
 
 ---
 
@@ -174,7 +175,6 @@ Ripeti "scegli un'azione legale, risolvila per intero, controlli di stato" finch
 | Giocare una Tattica | gemme di Brace | Si risolve e va negli Scarti |
 | Usare un'abilità ⟳ | ruotare la carta + quanto stampato | Legale solo se la carta è Pronta |
 | **Rimarginare** | ⟳ del Leader + 1 gemma | Prendi in mano una tua Cicatrice **dritta** (§10.2) |
-| Usare un effetto **Stanca** | come stampato | Solo nella tua fase principale (§12.2) |
 | Dichiarare un attacco | — | §8. **Nessuno attacca nel round 1** [`no_attack_round` 1] |
 | Terminare la fase | — | — |
 
@@ -226,7 +226,9 @@ Lo stato **Alle Corde** (§9.1) si legge sempre dallo stato corrente: Vita e rou
 ### 7.5 Trigger
 Le abilità che iniziano con "quando…" o "a fine turno" sono trigger. Non c'è pila: si risolvono nel punto fisso indicato dalla sequenza (§8) o dalla fase (§6). Se più trigger scattano nello stesso punto, si risolvono prima quelli del giocatore attivo, nell'ordine che sceglie, poi quelli del difensore. Un trigger "puoi…" è facoltativo.
 
-I trigger di C6 (e) ("quando sconfigge", "dopo lo scontro") guardano indietro: scattano anche se la loro fonte è stata sconfitta in quello stesso scontro.
+I trigger di C6 (e) ("quando sconfigge", "dopo lo scontro") guardano indietro: scattano anche se la loro fonte è stata sconfitta in quello stesso scontro (anche nella sconfitta reciproca, Q-015 S-9). Una carta che vuole scattare solo se la fonte resta in gioco lo dice.
+
+*Esempio (R-007 T-6).* Un'Unità con Rinnovo, costo 3, attacca; il difensore si oppone e gioca BLU-025 ("L'attaccante ha −5 in questo scontro. Dopo lo scontro, se l'attaccante è un'Unità con costo ≤4, sconfiggila"). L'attaccante vince lo stesso e sconfigge l'Unità che si oppone. In C6 (e) si risolve prima il trigger del giocatore attivo (Rinnovo: l'attaccante si raddrizza), poi quello del difensore (BLU-025 lo sconfigge). L'Unità va negli Scarti: il Rinnovo si è risolto ma non le serve. Nessun ciclo.
 
 ---
 
@@ -249,9 +251,9 @@ L'attaccante sposta nell'impegno da 0 a tutte le sue gemme di Brace, **scoperte*
 ### C4. Risposta del difensore
 Dopo aver visto l'impegno dell'attaccante, il difensore sposta nell'impegno da 0 a tutte le sue gemme di Guardia, e può giocare **al massimo una** carta Reazione presa dalla mano o da una sua Cicatrice **dritta**.
 - **(a)** Le gemme del difensore pagano prima il costo della Reazione. Una Reazione si gioca solo se le gemme impegnate ne pagano il costo.
-- **(b)** Ogni gemma restante del difensore dà **+2** al valore di difesa del bersaglio (**Parata**).
+- **(b)** Ogni gemma restante del difensore dà **+2** al valore di difesa del bersaglio (**Parata**). L'**impegno** del difensore sono tutte le gemme che sposta in C4, compresa quella che paga la Reazione; la **Parata** sono quelle che restano dopo il costo. Le condizioni sulle gemme del difensore (Impeto da bersaglio, statiche dei Leader e delle carte) contano **solo la Parata** (Q-015 S-2). Per l'attaccante contano tutte le gemme impegnate.
 - **(c)** Ogni gemma dell'attaccante dà **+1** alla sua Forza [`forza_per_gemma` 1].
-- **(d)** Si risolve la Reazione. Si leggono le condizioni **"se hai impegnato almeno N gemme"** e le abilità di Reazione dei Leader, che sono **statiche** (testi sempre attivi, che non ruotano il Leader e non si pagano).
+- **(d)** Si risolve la Reazione. Si leggono le condizioni sulle gemme (**Impeto**, §12.2; per il difensore solo la Parata) e le abilità di Reazione dei Leader, che sono **statiche** (testi sempre attivi, che non ruotano il Leader e non si pagano).
 
 *Nota di redazione.* La specifica (regola 16a) dice: "Le gemme del difensore pagano prima il costo della Reazione. Se non bastano, la Reazione torna dov'era senza effetto e tutte le gemme restano Parata". Con l'impegno a vista il difensore conosce tutto quando sceglie, quindi la forma scritta sopra dà gli stessi esiti e applica il pilastro 9 ("ogni costo non pagabile rende l'azione illegale"). È la riformulazione proposta dall'editor e sostenuta dall'architetto in ratifica; la scelta della forma è stata affidata a questo regolamento.
 
@@ -384,7 +386,7 @@ Le abilità che in v0.1 erano Reazioni del Leader sono **statiche**: si leggono 
 
 | Colore | Filosofia | Parole chiave principali | Combo previste |
 |---|---|---|---|
-| **Rosso** | Pressione, tutta la Brace in Forza | Assalto, "se hai impegnato almeno N gemme", Rinnovo | + Verde (gemme impegnate + Bracconiere), + Nero (Furia = Forza senza gemme) |
+| **Rosso** | Pressione, tutta la Brace in Forza | Assalto, Impeto, Rinnovo | + Verde (gemme impegnate + Bracconiere), + Nero (Furia = Forza senza gemme) |
 | **Blu** | Difesa, Guardia, contrattacco | Scudo, Reazioni | + Nero (Reazioni dalle Cicatrici). + Verde: da rivedere al thread carte (in v0.1 si basava su Esposto) |
 | **Nero** | Ferite come potere | Furia, Cicatrici, costi in Vita | + Rosso (picchi di Forza), + Blu (sopravvivere Alle Corde) |
 | **Verde** | Caccia alle Unità | Bracconiere, Stanca, ⟳ | + Blu, + Rosso |
@@ -393,23 +395,24 @@ Le abilità che in v0.1 erano Reazioni del Leader sono **statiche**: si leggono 
 ### 12.2 Parole chiave (ognuna compare in almeno due colori)
 - **Assalto**: questa Unità entra **Pronta**, quindi può attaccare nel turno in cui entra (mai nel round 1).
 - **Scudo**: quando questa Unità si oppone, vince i pareggi nel Confronto: contro un'Unità a pari è sconfitto solo l'attaccante; contro un Leader è sconfitta solo se Db < Fa. Si ruota come le altre Unità **[default, aperto: P7]**.
-- **"Se hai impegnato almeno N gemme: [effetto] per questo scontro"**: la condizione si legge in C4 (d) sulle gemme che hai impegnato in questo scontro, ed è pubblica. Sostituisce Infuso N. Il nome della parola chiave è affidato al thread carte (candidati: Impeto, Infuso, Ardente); finché non è scelto, le carte la scrivono per esteso.
+- **Impeto N: +X** *(se nell'impegno hai almeno N gemme, +X in questo scontro, anche quando è il bersaglio)*: si legge in C4 (d), è pubblica. Il difensore conta solo la Parata (C4 b). Sostituisce Infuso N (Q-014, forma Q-015 M2).
+- **Caccia** *(quando attacca, puoi scegliere come bersaglio un'Unità avversaria invece del Leader; l'avversario può ancora opporsi con un'altra Unità, che diventa il bersaglio)*: il bersaglio cacciato può essere Pronto o Ruotato e si difende con la sua Forza, la Parata, la Reazione e lo Scudo; non "si oppone", quindi i suoi "quando si oppone" non scattano (Q-014).
 - **Furia N: +X**: +X al Confronto se hai almeno N Cicatrici, contando **tutte** le Cicatrici (dritte e fresche). Si legge solo in C5: non è mai un'aura.
-- **Bracconiere +X**: +X al Confronto se il bersaglio è un'Unità che si oppone.
-- **Rinnovo**: quando questa Unità sconfigge un'Unità, si raddrizza. (Testo affidato al thread carte; nessuna carta d'esempio lo usa.)
-- **Stanca**: ruota un'Unità avversaria Pronta. Si usa solo nella tua fase principale e mai sul Leader.
-- **⟳** (simbolo di costo): ruota la carta; legale solo se è Pronta.
+- **Bracconiere X** *(quando attacca e il suo bersaglio è un'Unità, +X in questo scontro)*: vale se il bersaglio è un'Unità che si oppone o un'Unità cacciata; mai quando è l'Unità con Bracconiere a opporsi (Q-014).
+- **Rinnovo** *(quando attacca e sconfigge un'Unità, si raddrizza)*: mai in opposizione (Q-014).
+- **Stanca**: ruota un'Unità avversaria Pronta. Si usa solo nel tuo turno e mai sul Leader. Un effetto Stanca che si risolverebbe nel turno avversario non ha effetto (Q-016).
+- **⟳** (simbolo di costo): ruota la carta; legale solo se è Pronta. I costi in gemme si pagano con la Brace (§5.2).
 
 ### 12.3 Conversione da v0.1
 
 | v0.1 | v0.2 |
 |---|---|
-| Infuso N: [effetto] | "se hai impegnato almeno N gemme: [effetto] per questo scontro" (nome al thread carte) |
-| Esponi | **Stanca**: ruota un'Unità avversaria Pronta; solo nella tua fase principale, mai il Leader |
-| Bracconiere +X | +X se il bersaglio è un'Unità che si oppone |
+| Infuso N: [effetto] | **Impeto N: +X** (§12.2) |
+| Esponi | **Stanca**: ruota un'Unità avversaria Pronta; solo nel tuo turno, mai il Leader |
+| Bracconiere +X | Bracconiere X: +X quando attacca e il suo bersaglio è un'Unità |
 | Furia N | +X al Confronto se hai almeno N Cicatrici, contando tutte le Cicatrici; mai come aura |
 | Scudo (può intercettare) | vince i pareggi quando si oppone (C5) **[aperto: P7]** |
-| Rinnovo | quando sconfigge un'Unità, si raddrizza (thread carte) |
+| Rinnovo | quando attacca e sconfigge un'Unità, si raddrizza |
 | "fino a fine turno" | "per questo scontro", oppure effetto permanente |
 | Rimozione economica (legge 7) | solo su Unità Ruotate; legge 8: gli effetti che stancano hanno per bersaglio solo Unità |
 | Abilità di Reazione dei Leader | testi statici letti in C4 (es. Maera Risvegliata: le tue gemme di Parata valgono +3) |
@@ -488,7 +491,9 @@ Il costo di una Reazione si paga con le gemme di Guardia impegnate in C4. Le car
 | **Attaccante legale** | Un tuo personaggio Pronto (§8). |
 | **Bersaglio** | Sempre il Leader avversario, salvo opposizione o parola chiave. |
 | **Brace** | Gemme che prendi nel tuo Ripristino: min(round, 8); si spendono o si impegnano nel tuo turno. |
-| **Bracconiere +X** | +X al Confronto se il bersaglio è un'Unità che si oppone. |
+| **Bonus al bersaglio** | "Il bersaglio ha +N": si somma al suo valore di difesa (Forza dell'Unità o Tempra del Leader). |
+| **Bracconiere X** | +X in questo scontro quando attacca e il suo bersaglio è un'Unità. |
+| **Caccia** | Attaccando, sceglie come bersaglio un'Unità avversaria invece del Leader (§12.2). |
 | **Cicatrice** | Carta Vita persa, a faccia in su, pubblica. È **dritta** oppure **fresca**. |
 | **Cicatrice fresca** | Cicatrice nata in questo turno, tenuta ruotata. Non si gioca come Reazione, non si Rimargina, conta per il Saldo e impedisce il colpo finale. Si raddrizza nella Fine. |
 | **Colpo finale** | Attacco a segno su un Leader Alle Corde senza Cicatrici fresche: vittoria. |
@@ -496,15 +501,18 @@ Il costo di una Reazione si paga con le gemme di Guardia impegnate in C4. Le car
 | **Controlli di stato** | Verifiche automatiche del §7.4. |
 | **Crepuscolo** | Dal round 15, nel tuo Ripristino: se il tuo Leader è Alle Corde perdi, altrimenti perde 2 Vite che entrano dritte e non contano per il Saldo. |
 | **Db** | Valore di difesa del bersaglio nel Confronto. |
+| **Difendi** | Sei il difensore di uno scontro, qualunque sia il bersaglio. |
 | **Difensore** | Il giocatore non attivo. |
 | **Fa** | Forza dell'attaccante nel Confronto. |
 | **Forza** | Valore di attacco di un personaggio e valore di difesa di un'Unità. |
+| **Forza attuale** (fuori dallo scontro) | Forza stampata + bonus sempre attivi (aure); è quella che leggono i filtri "con Forza ≤N" (Q-015 S-4). |
 | **Furia N** | +X al Confronto con almeno N Cicatrici, contandole tutte. |
 | **Gemma** | L'unico segnalino del gioco. Sta nella scorta, in Brace, in Guardia o nell'impegno. |
 | **Giocatore attivo** | Il giocatore di cui è il turno. |
 | **Guardia** | Gemme sul Leader, formate nella tua Fine; si impegnano solo nel turno avversario. |
-| **Impegno** ("pugno") | Gemme messe scoperte in uno scontro: dall'attaccante in C3, dal difensore in C4. |
-| **Massimo di Guardia** | 2, 3 da Risvegliato, +1 per Lanterna, +1 se il tuo Leader è Alle Corde. |
+| **Impegno** ("pugno") | Gemme messe scoperte in uno scontro: dall'attaccante in C3, dal difensore in C4 (anche quella che paga la Reazione). |
+| **Impeto N: +X** | Se nell'impegno hai almeno N gemme, +X in questo scontro, anche da bersaglio; il difensore conta solo la Parata. |
+| **Massimo di Guardia** | 2, 3 da Risvegliato, +1 se il tuo Leader è Alle Corde, più gli aumenti stampati sulle carte (NEU-002). |
 | **Opposizione** | In C2 il difensore ruota una sua Unità Pronta, che diventa il bersaglio. |
 | **Parata** | Ogni gemma di Guardia impegnata che non paga una Reazione: +2 al valore di difesa. |
 | **Personaggio** | Unità o Leader. |
@@ -512,7 +520,7 @@ Il costo di una Reazione si paga con le gemme di Guardia impegnate in C4. Le car
 | **Raddrizzare** | Riportare dritta una carta Ruotata o una Cicatrice fresca. |
 | **Reazione** | Carta giocata dal difensore in C4, dalla mano o da una Cicatrice dritta, pagata con le gemme impegnate; al massimo una per scontro. |
 | **Rimarginare** | ⟳ del Leader + 1 gemma: prendi in mano una Cicatrice dritta. |
-| **Rinnovo** | Quando l'Unità sconfigge un'Unità, si raddrizza. |
+| **Rinnovo** | Quando l'Unità attacca e sconfigge un'Unità, si raddrizza. |
 | **Risveglio** | Il Leader si gira sul lato Risvegliato quando ha Vita ≤ 2; una volta per partita. |
 | **Round** | Un turno di G1 più un turno di G2; avanza nel Ripristino di G1. |
 | **Ruotato** | Carta che ha agito. Non può attaccare, opporsi né usare ⟳; non è mai bersaglio per questo. |
@@ -521,7 +529,7 @@ Il costo di una Reazione si paga con le gemme di Guardia impegnate in C4. Le car
 | **Sconfiggere** | Mandare un'Unità negli Scarti per esito di scontro o per effetto. |
 | **Scorta** | Riserva comune delle gemme. Spendere = rimettere nella scorta. |
 | **Scudo** | L'Unità che si oppone vince i pareggi [aperto: P7]. |
-| **Stanca** | Ruota un'Unità avversaria Pronta; solo nella tua fase principale, mai il Leader. |
+| **Stanca** | Ruota un'Unità avversaria Pronta; solo nel tuo turno, mai il Leader. |
 | **Tempra** | Valore di difesa del Leader: 4. |
 | **Tracciato del round** | Carta con il segnalino del round e le soglie stampate. |
 | **Trigger** | Abilità "quando…" o "a fine turno"; ordine del §7.5. |
@@ -538,7 +546,7 @@ Nomi dei parametri da `sim/v02/config.py`; preset del simulatore: `V02`.
 
 | Regola | Valore | Parametro del simulatore | Note |
 |---|---|---|---|
-| Carte nel mazzo | 40, max 3 copie | — | |
+| Carte nel mazzo | 40, max 3 copie per ID | — | |
 | Mano iniziale | 5 / 5 | `hand` 5, `g2_hand_extra` 0 | G2 a 6 carte non sposta G1 (55.9%) |
 | Mulligan | fino a 3 carte | `mulligan_max` 3 | |
 | Vita iniziale | 5 | `life` 5 | |
@@ -547,7 +555,7 @@ Nomi dei parametri da `sim/v02/config.py`; preset del simulatore: `V02`.
 | Risveglio | Vita ≤ 2 | `awaken_at_life` 2 | |
 | Brace | min(round, 8) | `brace_max` 8 | |
 | Compensazione di G2 | +1 gemma nei round 1 e 3 | `scintilla_g2_gems` 1, `scintilla_extra_gems` 1, `scintilla_extra_round` 3, `scintilla_guardia_g2` 0 | **[aperto: P6]**; G1 50.8% |
-| Massimo di Guardia | 2 / Risvegliato 3; +1 Lanterna; +1 Alle Corde | `guard_max` 2, `guard_max_awakened` 3, `guard_alle_corde_bonus` 1 | |
+| Massimo di Guardia | 2 / Risvegliato 3; +1 Alle Corde; + carte (NEU-002) | `guard_max` 2, `guard_max_awakened` 3, `guard_alle_corde_bonus` 1 | |
 | Gemma d'attacco | +1 Forza | `forza_per_gemma` 1 | |
 | Gemma di Parata | +2 difesa | `parata_per_gemma` 2 | Maera Risvegliata +3 |
 | Impegno | sequenziale, a vista | `pugno` sequenziale | Deciso 8/8 |
@@ -644,7 +652,7 @@ Le regole qui sotto sono già nel testo come default. Ogni variante si misura **
 - Tempi delle fresche "solo nel turno avversario" (Ar, Cr).
 - Incassa sì/no (Po, Bl).
 - Bersaglio scelto dall'attaccante e "preda" (Ve; serve prima Caccia dal thread carte).
-- Nome e valori di "se hai impegnato almeno N gemme" (thread carte): N ∈ {1, 2} sulle comuni, N = 3 solo su rare.
+- ~~Nome e valori di "se hai impegnato almeno N gemme"~~: deciso in Q-014 e Q-015, **Impeto N: +X** (§12.2).
 
 ### 17.8 Moduli futuri
 I moduli di v0.1 §17 (campo di battaglia, zone contese, round condiviso, Fulcro) restano fuori dal nucleo e non sono stati toccati da Q-013. Quelli che citano Esposto o l'Esposizione vanno riscritti prima di un test.
@@ -673,3 +681,4 @@ I moduli di v0.1 §17 (campo di battaglia, zone contese, round condiviso, Fulcro
 |---|---|---|
 | v0.1 | 2026-10-07 | Prima stesura consolidata e ratificata (vedi `regolamento_v0.1.md`). |
 | v0.2 | 2026-10-08 | Nucleo v0.2 da Q-013 (8 APPROVO su 8), specifica della sezione A dell'esito. Tempra 4; gemme e tracciato del round; Pronto/Ruotato; combattimento C1–C6 con impegno sequenziale e opposizione prima dell'impegno; raddrizzo nel Ripristino; Cicatrici fresche e Saldo senza contatori; +1 Guardia Alle Corde; Reazioni dei Leader statiche. Default aperti: P6 (G2 +1 gemma nei round 1 e 3), P7 (Scudo vince i pareggi), P9b (costo delle Reazioni). Regola C4 (a) scritta nella forma "una Reazione si gioca solo se le gemme impegnate ne pagano il costo" (esiti invariati). |
+| v0.2.1 | 2026-10-08 | Chiarimenti per il set (R-007), nessuna regola del nucleo nuova. Stanca solo nel tuo turno, anche nei trigger (Q-016; tolta la riga del §6.3). Impegno e Parata del difensore: le condizioni sulle gemme del difensore contano solo la Parata (C4 b, Q-015 S-2). Trigger di C6 (e) anche nella sconfitta reciproca, con esempio Rinnovo/BLU-025 (§7.5, Q-015 S-9). Limite di copie per ID (§2.3). Massimo di Guardia: "+1 per Lanterna" → aumenti stampati sulle carte (§5.3). Costi ⟳ con la Brace (§5.2). Testi di Impeto, Caccia, Bracconiere, Rinnovo da Q-014/Q-015 (§12). Glossario: Bonus al bersaglio, Caccia, Difendi, Forza attuale, Impeto. |

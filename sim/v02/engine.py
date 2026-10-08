@@ -825,6 +825,8 @@ class GameState:
             if k == "draw":
                 self.draw(q, n)
             elif k in ("stanca", "defeat", "raddrizza"):
+                if k == "stanca" and q != self.active:      # Q-016: Stanca solo nel tuo turno
+                    continue
                 owner, u = self.op_target(q, op, ctx)
                 if u is None:
                     continue
