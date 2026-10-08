@@ -371,6 +371,8 @@ class GameState:
         pl.brace = min(self.round, self.r.brace_max)        # 7e
         if a == G2 and self.round == 1:
             pl.brace += self.r.scintilla_g2_gems
+        if a == G2 and self.round == 2:
+            pl.brace += self.r.scintilla_g2_round2
         self.state_checks()
         if not (a == G1 and self.round == 1):               # 8
             self.draw(a)
@@ -397,6 +399,8 @@ class GameState:
                 self.stats["idle3_turns"][a] += 1
         stored = min(pl.brace, self.guard_max(a))           # 10b
         pl.guard = stored
+        if a == G2 and self.round == 1:
+            pl.guard += self.r.scintilla_guardia_g2          # oltre il massimo, per gli attacchi di G1 nel round 2
         pl.brace = 0
         self.stat_add("guard_stored", a, n=stored)
         if self.r.raddrizzo == "fine":                      # 10c
