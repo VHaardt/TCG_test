@@ -679,6 +679,18 @@ def test_q017_levers_tempra_awakened_and_leader_min_gems():
     assert s.preview("L", None, 1, 0)[2][0] is True
 
 
+def test_filters_read_forza_attuale_without_combat_bonuses():
+    """R-009 T-9: "Forza ≤N" filters read printed Forza + auras; Furia and other conditional
+    bonuses of the Unit itself are combat bonuses."""
+    furioso = _card("_furioso", power=1, keywords=("furia",), abilities=[{"static": "power", "if": [{"furia": 1}], "value": 1}])
+    s = _arena()
+    s.p[1].units = [Unit(901, furioso, True)]
+    s.p[1].scars = [("x", False), ("y", False)]
+    u = s.unit(1, 901)
+    assert s.unit_power(1, u) == 2                       # in uno scontro conta
+    assert s.matches(1, u, {"side": "own", "power_le": 1}, {}, 1)
+
+
 if __name__ == "__main__":
     for k, f in list(globals().items()):
         if k.startswith("test_"):

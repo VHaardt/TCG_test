@@ -104,6 +104,10 @@ class Player:
         return sum(1 for sc in self.scars if sc[1])
 
 
+# conditions that exist only inside a combat (R-009 T-9: not read by the "Forza attuale" filters)
+COMBAT_CONDS = {"attacking", "opposing", "pugno_ge", "target_is_unit", "attacker_has", "react_from_scars",
+                "hunted_ready", "survived"}
+
 class Combat:
     __slots__ = ("att", "opposer", "hunted", "hunted_ready", "a", "d", "react", "a_visible", "att_mod", "def_mod",
                  "opened")
@@ -369,7 +373,7 @@ class GameState:
             return False
         if "ready" in sel and u.ready != sel["ready"]:
             return False
-        if "power_le" in sel and self.unit_power(q_unit, u) > self.num(sel["power_le"], ch):
+        if "power_le" in sel and self.unit_power(q_unit, u, outside=True) > self.num(sel["power_le"], ch):
             return False
         if "keyword" in sel and not c.has(KW_ALIAS.get(sel["keyword"], sel["keyword"])):
             return False
@@ -377,14 +381,18 @@ class GameState:
             return False
         return True
 
-    def unit_power(self, q, u, ctx=None, trace=None):
+    def unit_power(self, q, u, ctx=None, trace=None, outside=False):
         """Printed Forza + static bonuses. ctx (during a combat): see combat_ctx; "pugno" = gems
         committed by the Unit's side (Parata only for the defender). trace: list of (q, source)
-        of conditional bonuses that applied (metrica M11)."""
+        of conditional bonuses that applied (metrica M11). outside: "Forza attuale" of the
+        filters (Q-015 S-4, R-009 T-9) = printed + auras without combat conditions; the Unit's
+        own conditional bonuses (Furia, "in questo scontro") are combat bonuses and don't count."""
         ctx = dict(ctx or {}, self=u.uid)
         c = CARDS[u.cid]
         p = c.power
         for ab in c.abilities:
+            if outside and ab.get("if"):
+                continue
             if ab.get("static") == "power" and "applies_to" not in ab and self.cond_ok(q, ab.get("if"), ctx):
                 p += self.num(ab["value"], q)
                 if trace is not None and ab.get("if"):
@@ -392,6 +400,8 @@ class GameState:
         for sid, ab in self.sources(q, "aura"):
             if ab.get("static") == "power" and "applies_to" in ab:
                 sel = ab["applies_to"]
+                if outside and (sel.get("attacker") or any(set(c2) & COMBAT_CONDS for c2 in ab.get("if") or [])):
+                    continue
                 if sel.get("side", "own") == "own" and self.matches(q, u, sel, ctx) and self.cond_ok(q, ab.get("if"), ctx):
                     p += self.num(ab["value"], q)
                     if trace is not None and (ab.get("if") or sel.get("attacker")):
