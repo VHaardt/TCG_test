@@ -204,7 +204,7 @@ In quest'ordine:
 ### 7.2 Stati: Pronto e Ruotato
 - Ogni carta in campo è **Pronta** (dritta) o **Ruotata**.
 - Una carta si ruota quando **attacca**, quando **si oppone**, quando usa un'abilità **⟳** (incluso Rimarginare), oppure per un effetto **Stanca**.
-- **Ruotata vuol dire solo "ha agito".** Non rende mai bersaglio di un attacco.
+- **Ruotata vuol dire solo "ha agito".** Essere Ruotata non rende bersaglio di un attacco e non protegge dalla Caccia (Q-018).
 - Un personaggio Ruotato non può attaccare, opporsi né usare abilità ⟳.
 - I tuoi personaggi si raddrizzano nel tuo Ripristino (§6.1 d), oppure prima se un effetto lo dice (per esempio Rinnovo).
 - Ruotare una carta già Ruotata non ha effetto.
@@ -395,8 +395,8 @@ Le abilità che in v0.1 erano Reazioni del Leader sono **statiche**: si leggono 
 ### 12.2 Parole chiave (ognuna compare in almeno due colori)
 - **Assalto**: questa Unità entra **Pronta**, quindi può attaccare nel turno in cui entra (mai nel round 1).
 - **Scudo**: quando questa Unità si oppone, vince i pareggi nel Confronto: contro un'Unità a pari è sconfitto solo l'attaccante; contro un Leader è sconfitta solo se Db < Fa. Si ruota come le altre Unità **[default, aperto: P7]**.
-- **Impeto N: +X** *(se nell'impegno hai almeno N gemme, +X in questo scontro, anche quando è il bersaglio, contando solo le gemme di Parata)*: si legge in C4 (d), è pubblica. Il difensore conta solo la Parata (C4 b). Sostituisce Infuso N (Q-014, forma Q-015 M2).
-- **Caccia** *(quando attacca, puoi scegliere come bersaglio un'Unità avversaria invece del Leader; l'avversario può ancora opporsi con un'altra Unità, che diventa il bersaglio)*: il bersaglio cacciato può essere Pronto o Ruotato e si difende con la sua Forza, la Parata, la Reazione e lo Scudo; non "si oppone", quindi i suoi "quando si oppone" non scattano (Q-014).
+- **Impeto N: +X** *(se nell'impegno hai almeno N gemme, +X in questo scontro; quando è il bersaglio contano solo le gemme di Parata)*: si legge in C4 (d), è pubblica. Il difensore conta solo la Parata (C4 b). Sostituisce Infuso N (Q-014, forma Q-015 M2).
+- **Caccia** *(quando attacca, puoi scegliere come bersaglio un'Unità avversaria, anche Ruotata, invece del Leader; l'avversario può ancora opporsi con un'altra Unità, che diventa il bersaglio)*: il bersaglio cacciato può essere Pronto o Ruotato e si difende con la sua Forza, la Parata, la Reazione e lo Scudo; non "si oppone", quindi i suoi "quando si oppone" non scattano (Q-014).
 - **Furia N: +X**: +X al Confronto se hai almeno N Cicatrici, contando **tutte** le Cicatrici (dritte e fresche). Si legge solo in C5: non è mai un'aura.
 - **Bracconiere X** *(quando attacca e il suo bersaglio è un'Unità, +X in questo scontro)*: vale se il bersaglio è un'Unità che si oppone o un'Unità cacciata; mai quando è l'Unità con Bracconiere a opporsi (Q-014).
 - **Rinnovo** *(quando attacca e sconfigge un'Unità, si raddrizza)*: mai in opposizione (Q-014).
@@ -493,7 +493,7 @@ Il costo di una Reazione si paga con le gemme di Guardia impegnate in C4. Le car
 | **Brace** | Gemme che prendi nel tuo Ripristino: min(round, 8); si spendono o si impegnano nel tuo turno. |
 | **Bonus al bersaglio** | "Il bersaglio ha +N": si somma al suo valore di difesa (Forza dell'Unità o Tempra del Leader). |
 | **Bracconiere X** | +X in questo scontro quando attacca e il suo bersaglio è un'Unità. |
-| **Caccia** | Attaccando, sceglie come bersaglio un'Unità avversaria invece del Leader (§12.2). |
+| **Caccia** | Attaccando, sceglie come bersaglio un'Unità avversaria, anche Ruotata, invece del Leader (§12.2). |
 | **Cicatrice** | Carta Vita persa, a faccia in su, pubblica. È **dritta** oppure **fresca**. |
 | **Cicatrice fresca** | Cicatrice nata in questo turno, tenuta ruotata. Non si gioca come Reazione, non si Rimargina, conta per il Saldo e impedisce il colpo finale. Si raddrizza nella Fine. |
 | **Colpo finale** | Attacco a segno su un Leader Alle Corde senza Cicatrici fresche: vittoria. |
@@ -511,7 +511,7 @@ Il costo di una Reazione si paga con le gemme di Guardia impegnate in C4. Le car
 | **Giocatore attivo** | Il giocatore di cui è il turno. |
 | **Guardia** | Gemme sul Leader, formate nella tua Fine; si impegnano solo nel turno avversario. |
 | **Impegno** ("pugno") | Gemme messe scoperte in uno scontro: dall'attaccante in C3, dal difensore in C4 (anche quella che paga la Reazione). |
-| **Impeto N: +X** | Se nell'impegno hai almeno N gemme, +X in questo scontro, anche da bersaglio; il difensore conta solo la Parata. |
+| **Impeto N: +X** | Se nell'impegno hai almeno N gemme, +X in questo scontro; quando è il bersaglio contano solo le gemme di Parata. |
 | **Massimo di Guardia** | 2, 3 da Risvegliato, +1 se il tuo Leader è Alle Corde, più gli aumenti stampati sulle carte (NEU-002). |
 | **Opposizione** | In C2 il difensore ruota una sua Unità Pronta, che diventa il bersaglio. |
 | **Parata** | Ogni gemma di Guardia impegnata che non paga una Reazione: +2 al valore di difesa. |
@@ -683,3 +683,4 @@ I moduli di v0.1 §17 (campo di battaglia, zone contese, round condiviso, Fulcro
 | v0.2 | 2026-10-08 | Nucleo v0.2 da Q-013 (8 APPROVO su 8), specifica della sezione A dell'esito. Tempra 4; gemme e tracciato del round; Pronto/Ruotato; combattimento C1–C6 con impegno sequenziale e opposizione prima dell'impegno; raddrizzo nel Ripristino; Cicatrici fresche e Saldo senza contatori; +1 Guardia Alle Corde; Reazioni dei Leader statiche. Default aperti: P6 (G2 +1 gemma nei round 1 e 3), P7 (Scudo vince i pareggi), P9b (costo delle Reazioni). Regola C4 (a) scritta nella forma "una Reazione si gioca solo se le gemme impegnate ne pagano il costo" (esiti invariati). |
 | v0.2.1 | 2026-10-08 | Chiarimenti per il set (R-007), nessuna regola del nucleo nuova. Stanca solo nel tuo turno, anche nei trigger (Q-016; tolta la riga del §6.3). Impegno e Parata del difensore: le condizioni sulle gemme del difensore contano solo la Parata (C4 b, Q-015 S-2). Trigger di C6 (e) anche nella sconfitta reciproca, con esempio Rinnovo/BLU-025 (§7.5, Q-015 S-9). Limite di copie per ID (§2.3). Massimo di Guardia: "+1 per Lanterna" → aumenti stampati sulle carte (§5.3). Costi ⟳ con la Brace (§5.2). Testi di Impeto, Caccia, Bracconiere, Rinnovo da Q-014/Q-015 (§12). Glossario: Bonus al bersaglio, Caccia, Difendi, Forza attuale, Impeto. |
 | v0.2.2 | 2026-10-08 | Refusi da R-009: Rimarginare "⟳, 1 Brace" (§6.3, §10.2, glossario, §16); richiamo di Impeto "contando solo le gemme di Parata"; Maera del §13 con "gemma di Parata"; nota al §13 che le carte d'esempio sono quelle del simulatore del nucleo, non il set. |
+| v0.2.3 | 2026-10-08 | Testi di Q-018 (livello 1, R-011 §4): richiami di Impeto e Caccia (§12.2, glossario); al §7.2 "Essere Ruotata non rende bersaglio di un attacco e non protegge dalla Caccia". Nessuna regola nuova. |

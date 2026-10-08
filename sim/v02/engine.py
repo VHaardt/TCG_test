@@ -742,6 +742,10 @@ class GameState:
             pl.brace -= ab.get("cost", 0)
             self.pay_costs(a, ab.get("costs"))              # Cicatrici contate prima (bersaglio già scelto)
             self.stat_add("activations", a, LEADERS[pl.leader].id if src == "L" else u.cid)
+            if self.log is not None:
+                who = "del Leader" if src == "L" else f"di {CARDS[u.cid].name}"
+                tgt = f" su {self.describe(self._chosen(a, ab.get('target'), t)['chosen_owner'], t)}" if t is not None else ""
+                self.say(f"  P{a+1} usa ⟳ {who}{tgt}")
             self.run_ops(a, ab["do"], dict(self._chosen(a, ab.get("target"), t), self=src))
         elif k == "attack":
             self._declare(a, act[1], act[2] if len(act) > 2 else None)
@@ -858,6 +862,7 @@ class GameState:
                 owner, u = self.op_target(q, op, ctx)
                 if u is None:
                     continue
+                self.say(f"    {CARDS[u.cid].name} di P{owner+1}: " + {"stanca": "Stancata", "raddrizza": "raddrizzata", "defeat": "sconfitta da un effetto"}[k])
                 if k == "stanca":
                     if self.track is not None and u.ready:
                         self.track["stancate"].add((owner, u.uid))  # R-009 #5
@@ -1149,6 +1154,7 @@ class GameState:
         if tgt_dead:
             pd.units.remove(tgt_unit)
             pd.discard.append(tgt_unit.cid)
+            self.say(f"    {CARDS[tgt_unit.cid].name} di P{d+1} è sconfitta")
             self.stat_add("units_defeated_in_combat", a)
             self._stancata_rimossa(a, d, tgt_unit)
             if cb.opposer is None:
@@ -1156,6 +1162,7 @@ class GameState:
         if att_dead:
             pa.units.remove(att_unit)
             pa.discard.append(att_unit.cid)
+            self.say(f"    {CARDS[att_unit.cid].name} di P{a+1} è sconfitta")
         if hit:
             self.stat_add("attacks_leader_hit", a)
             if cb.att == "L" and self.stats is not None:
