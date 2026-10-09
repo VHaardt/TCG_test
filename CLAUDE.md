@@ -1,6 +1,7 @@
 # CICATRICI — note per le sessioni Claude
 
-- Regolamento e pilastri: `docs/` (copia di `/mnt/project-files/tcg/regolamento_v0.1.md` e `pilastri_design.md`).
+- Regolamento e pilastri: `docs/regolamento_v0.2.md` e `docs/pilastri_design_v0.2.md` (copie di `/mnt/project-files/tcg/`; v0.1 resta per storia). Esito del rework: `docs/discussione/Q-013_esito.md`.
+- Simulatore v0.2: `sim/v02/` (preset `V02` = nucleo ratificato); `sim/` principale = v0.1.
 - Simulatore: `sim/` (istruzioni in `sim/README.md`). Regole e carte sono dati modificabili: niente regole scritte nel codice del motore.
 
 ## Standard di progetto: lo swarm di agenti

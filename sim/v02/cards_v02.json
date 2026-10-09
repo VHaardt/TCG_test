@@ -1,0 +1,658 @@
+{
+ "version": "v0.2-B0",
+ "note": "Carte di v0.1 convertite con la tabella §1.F di tcg/swarm/questioni/Q-013_rework_nucleo_v0.2/esperimento.md. Conversioni dei Leader provvisorie.",
+ "cards": [
+  {
+   "id": "scudiera",
+   "name": "Scudiera di Brace",
+   "type": "unit",
+   "cost": 1,
+   "colors": [
+    "R"
+   ],
+   "power": 2,
+   "keywords": [
+    "assalto",
+    "impeto"
+   ],
+   "abilities": [
+    {
+     "static": "power",
+     "if": [
+      {
+       "attacking": true
+      },
+      {
+       "pugno_ge": 1
+      }
+     ],
+     "value": 1
+    }
+   ],
+   "text": "Assalto. Impeto 1: se il tuo pugno aperto ha almeno 1 gemma, +1 Forza in questo scontro."
+  },
+  {
+   "id": "carica",
+   "name": "Carica della Fornace",
+   "type": "tactic",
+   "cost": 2,
+   "colors": [
+    "R"
+   ],
+   "play": {
+    "target": {
+     "side": "own",
+     "ready": false
+    },
+    "do": [
+     {
+      "op": "raddrizza",
+      "target": "chosen"
+     }
+    ]
+   },
+   "text": "Raddrizza una tua Unità ruotata."
+  },
+  {
+   "id": "vesh",
+   "name": "Vesh, Lama Rovente",
+   "type": "unit",
+   "cost": 4,
+   "colors": [
+    "R"
+   ],
+   "power": 4,
+   "keywords": [
+    "assalto",
+    "impeto"
+   ],
+   "abilities": [
+    {
+     "static": "power",
+     "if": [
+      {
+       "attacking": true
+      },
+      {
+       "pugno_ge": 2
+      }
+     ],
+     "value": 2
+    }
+   ],
+   "text": "Assalto. Impeto 2: se il tuo pugno aperto ha almeno 2 gemme, +2 Forza in questo scontro."
+  },
+  {
+   "id": "sentinella",
+   "name": "Sentinella del Guado",
+   "type": "unit",
+   "cost": 2,
+   "colors": [
+    "B"
+   ],
+   "power": 3,
+   "keywords": [
+    "scudo"
+   ],
+   "abilities": [
+    {
+     "trigger": "on_oppose",
+     "do": [
+      {
+       "op": "def_mod",
+       "n": 2
+      }
+     ]
+    }
+   ],
+   "text": "Scudo. Quando si oppone, +2 difesa in questo scontro."
+  },
+  {
+   "id": "muro",
+   "name": "Muro di Scudi",
+   "type": "reaction",
+   "cost": 1,
+   "colors": [
+    "B"
+   ],
+   "react": {
+    "do": [
+     {
+      "op": "def_mod",
+      "n": "@muro_bonus"
+     }
+    ]
+   },
+   "text": "Reazione: +4 difesa in questo scontro."
+  },
+  {
+   "id": "bastione",
+   "name": "Il Bastione Vivente",
+   "type": "unit",
+   "cost": 5,
+   "colors": [
+    "B"
+   ],
+   "power": 6,
+   "keywords": [
+    "scudo"
+   ],
+   "abilities": [
+    {
+     "trigger": "on_defeats_attacker",
+     "do": [
+      {
+       "op": "draw",
+       "n": 1
+      }
+     ]
+    }
+   ],
+   "text": "Scudo. Quando sconfigge un attaccante, peschi 1 carta."
+  },
+  {
+   "id": "penitente",
+   "name": "Penitente delle Mille Ferite",
+   "type": "unit",
+   "cost": 2,
+   "colors": [
+    "K"
+   ],
+   "power": 1,
+   "keywords": [
+    "furia"
+   ],
+   "abilities": [
+    {
+     "static": "power",
+     "if": [
+      {
+       "furia": 2
+      }
+     ],
+     "value": 3
+    }
+   ],
+   "text": "Furia 2: +3 Forza."
+  },
+  {
+   "id": "patto",
+   "name": "Patto di Sangue",
+   "type": "tactic",
+   "cost": 1,
+   "colors": [
+    "K"
+   ],
+   "play": {
+    "costs": [
+     {
+      "lose_life": 1,
+      "floor": 1
+     }
+    ],
+    "do": [
+     {
+      "op": "draw",
+      "n": 1
+     }
+    ]
+   },
+   "text": "Costo aggiuntivo: perdi 1 Vita (non puoi scendere sotto 1). Peschi 1 carta."
+  },
+  {
+   "id": "grido",
+   "name": "Grido dalla Cicatrice",
+   "type": "reaction",
+   "cost": 1,
+   "colors": [
+    "K"
+   ],
+   "react": {
+    "do": [
+     {
+      "op": "att_mod",
+      "n": "-@grido_hand"
+     }
+    ],
+    "do_from_scars": [
+     {
+      "op": "att_mod",
+      "n": "-@grido_scars"
+     }
+    ]
+   },
+   "text": "Reazione: l'attaccante ha -3 Forza (dalle Cicatrici: -5)."
+  },
+  {
+   "id": "lince",
+   "name": "Lince del Sottobosco",
+   "type": "unit",
+   "cost": 2,
+   "colors": [
+    "G"
+   ],
+   "power": 2,
+   "keywords": [
+    "bracconiere"
+   ],
+   "kw_params": {
+    "bracconiere": 2
+   },
+   "text": "Bracconiere 2: +2 Forza se il bersaglio è un'Unità che si oppone."
+  },
+  {
+   "id": "esca",
+   "name": "Esca",
+   "type": "tactic",
+   "cost": 1,
+   "colors": [
+    "G"
+   ],
+   "play": {
+    "target": {
+     "side": "opp",
+     "cost_le": 3,
+     "ready": true
+    },
+    "do": [
+     {
+      "op": "stanca",
+      "target": "chosen"
+     }
+    ]
+   },
+   "text": "Stanca: ruota un'Unità avversaria Pronta con costo ≤3."
+  },
+  {
+   "id": "matriarca",
+   "name": "Matriarca del Branco",
+   "type": "unit",
+   "cost": 5,
+   "colors": [
+    "G"
+   ],
+   "power": 5,
+   "abilities": [
+    {
+     "trigger": "on_own_unit_defeats_unit",
+     "do": [
+      {
+       "op": "draw",
+       "n": 1
+      }
+     ]
+    }
+   ],
+   "text": "Quando una tua Unità sconfigge un'Unità, peschi 1 carta."
+  },
+  {
+   "id": "recluta",
+   "name": "Recluta del Crocevia",
+   "type": "unit",
+   "cost": 1,
+   "colors": [],
+   "power": 1,
+   "keywords": [
+    "scudo"
+   ],
+   "abilities": [
+    {
+     "static": "power",
+     "if": [
+      {
+       "scars_ge": 2
+      }
+     ],
+     "value": 1
+    }
+   ],
+   "text": "Scudo. Se hai almeno 2 Cicatrici, +1 Forza."
+  },
+  {
+   "id": "lanterna",
+   "name": "Lanterna del Pellegrino",
+   "type": "relic",
+   "cost": 2,
+   "colors": [],
+   "abilities": [
+    {
+     "static": "guard_max",
+     "value": 1
+    }
+   ],
+   "text": "Il tuo massimo di Guardia è +1."
+  },
+  {
+   "id": "colpo",
+   "name": "Colpo Mirato",
+   "type": "tactic",
+   "cost": 3,
+   "colors": [],
+   "play": {
+    "target": {
+     "side": "opp",
+     "ready": false,
+     "power_le": 4
+    },
+    "do": [
+     {
+      "op": "defeat",
+      "target": "chosen"
+     }
+    ]
+   },
+   "text": "Sconfiggi un'Unità avversaria ruotata con Forza ≤4."
+  },
+  {
+   "id": "t_r2",
+   "name": "[test] Razziatore Rosso",
+   "type": "unit",
+   "cost": 2,
+   "colors": [
+    "R"
+   ],
+   "power": 3,
+   "test": true
+  },
+  {
+   "id": "t_r3",
+   "name": "[test] Fabbro Rosso",
+   "type": "unit",
+   "cost": 3,
+   "colors": [
+    "R"
+   ],
+   "power": 4,
+   "test": true
+  },
+  {
+   "id": "t_r6",
+   "name": "[test] Colosso Rosso",
+   "type": "unit",
+   "cost": 6,
+   "colors": [
+    "R"
+   ],
+   "power": 7,
+   "test": true
+  },
+  {
+   "id": "t_b3",
+   "name": "[test] Custode Blu",
+   "type": "unit",
+   "cost": 3,
+   "colors": [
+    "B"
+   ],
+   "power": 4,
+   "test": true
+  },
+  {
+   "id": "t_b4",
+   "name": "[test] Guardiano Blu",
+   "type": "unit",
+   "cost": 4,
+   "colors": [
+    "B"
+   ],
+   "power": 5,
+   "keywords": [
+    "scudo"
+   ],
+   "test": true
+  },
+  {
+   "id": "t_b6",
+   "name": "[test] Leviatano Blu",
+   "type": "unit",
+   "cost": 6,
+   "colors": [
+    "B"
+   ],
+   "power": 7,
+   "test": true
+  },
+  {
+   "id": "t_k3",
+   "name": "[test] Flagellante Nero",
+   "type": "unit",
+   "cost": 3,
+   "colors": [
+    "K"
+   ],
+   "power": 3,
+   "keywords": [
+    "furia"
+   ],
+   "abilities": [
+    {
+     "static": "power",
+     "if": [
+      {
+       "furia": 3
+      }
+     ],
+     "value": 2
+    }
+   ],
+   "test": true
+  },
+  {
+   "id": "t_k4",
+   "name": "[test] Spettro Nero",
+   "type": "unit",
+   "cost": 4,
+   "colors": [
+    "K"
+   ],
+   "power": 5,
+   "test": true
+  },
+  {
+   "id": "t_k6",
+   "name": "[test] Orrore Nero",
+   "type": "unit",
+   "cost": 6,
+   "colors": [
+    "K"
+   ],
+   "power": 7,
+   "test": true
+  },
+  {
+   "id": "t_g3",
+   "name": "[test] Cacciatore Verde",
+   "type": "unit",
+   "cost": 3,
+   "colors": [
+    "G"
+   ],
+   "power": 3,
+   "keywords": [
+    "bracconiere"
+   ],
+   "kw_params": {
+    "bracconiere": 2
+   },
+   "test": true
+  },
+  {
+   "id": "t_g4",
+   "name": "[test] Orso Verde",
+   "type": "unit",
+   "cost": 4,
+   "colors": [
+    "G"
+   ],
+   "power": 5,
+   "test": true
+  },
+  {
+   "id": "t_g6",
+   "name": "[test] Antico Verde",
+   "type": "unit",
+   "cost": 6,
+   "colors": [
+    "G"
+   ],
+   "power": 7,
+   "test": true
+  },
+  {
+   "id": "t_n2",
+   "name": "[test] Mercenario",
+   "type": "unit",
+   "cost": 2,
+   "colors": [],
+   "power": 3,
+   "test": true
+  },
+  {
+   "id": "t_n4",
+   "name": "[test] Veterano",
+   "type": "unit",
+   "cost": 4,
+   "colors": [],
+   "power": 5,
+   "test": true
+  },
+  {
+   "id": "x_titano",
+   "name": "[trappola] Titano",
+   "type": "unit",
+   "cost": 1,
+   "colors": [],
+   "power": 7,
+   "keywords": [
+    "assalto",
+    "scudo"
+   ],
+   "test": true,
+   "text": "Carta volutamente rotta: serve solo a verificare che IA e motore riconoscano un mazzo troppo forte."
+  }
+ ],
+ "leaders": [
+  {
+   "id": "arden",
+   "name": "Arden, Fabbro di Guerra",
+   "colors": [
+    "R",
+    "G"
+   ],
+   "base": [
+    {
+     "static": "power",
+     "applies_to": {
+      "side": "own",
+      "attacker": true
+     },
+     "if": [
+      {
+       "pugno_ge": 2
+      }
+     ],
+     "value": 1,
+     "text": "Impeto 2 (Leader): se il pugno aperto di un tuo attaccante ha almeno 2 gemme, +1 Forza."
+    }
+   ],
+   "awakened": [
+    {
+     "static": "power",
+     "applies_to": {
+      "side": "own",
+      "keyword": "assalto"
+     },
+     "value": 1,
+     "text": "Le tue Unità con Assalto hanno +1 Forza."
+    }
+   ]
+  },
+  {
+   "id": "maera",
+   "name": "Maera, Custode del Passo",
+   "colors": [
+    "B",
+    "K"
+   ],
+   "base": [
+    {
+     "static": "combat",
+     "role": "defense",
+     "if": [
+      {
+       "pugno_ge": 1
+      }
+     ],
+     "att_mod": -2,
+     "text": "Quando difendi con almeno 1 gemma nel pugno, l'attaccante ha -2 Forza (era la Reazione del Leader, resa statica)."
+    }
+   ],
+   "awakened": [
+    {
+     "static": "parata_per_gemma",
+     "value": 3,
+     "text": "Le tue gemme di Parata valgono +3 invece di +2."
+    }
+   ]
+  },
+  {
+   "id": "vey",
+   "name": "Sorella Vey, la Segnata",
+   "colors": [
+    "K",
+    "R"
+   ],
+   "base": [
+    {
+     "static": "furia_bonus",
+     "value": 1,
+     "text": "La tua Furia conta 1 Cicatrice in più."
+    }
+   ],
+   "awakened": [
+    {
+     "modifier": "rim_cost",
+     "value": 0,
+     "text": "Rimarginare non costa gemme."
+    }
+   ]
+  },
+  {
+   "id": "thorn",
+   "name": "Thorn, Voce del Branco",
+   "colors": [
+    "G",
+    "B"
+   ],
+   "base": [
+    {
+     "activated": true,
+     "cost": 2,
+     "target": {
+      "side": "opp",
+      "cost_le": 2,
+      "ready": true
+     },
+     "do": [
+      {
+       "op": "stanca",
+       "target": "chosen"
+      }
+     ],
+     "text": "⟳, 2 gemme: Stanca un'Unità avversaria Pronta con costo ≤2."
+    }
+   ],
+   "awakened": [
+    {
+     "static": "power",
+     "applies_to": {
+      "side": "own",
+      "keyword": "bracconiere"
+     },
+     "value": 1,
+     "text": "Le tue Unità con Bracconiere hanno +1 Forza."
+    }
+   ]
+  }
+ ]
+}

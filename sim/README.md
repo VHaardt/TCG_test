@@ -86,3 +86,37 @@ Se una carta nuova ha bisogno di un'operazione o di un evento che non esiste, si
 - L'IA semplice usa priorità fisse; l'IA forte campiona le informazioni nascoste ma gioca i rollout con l'IA semplice, quindi sottovaluta combo che la semplice non conosce.
 - L'IA forte con 100 iterazioni batte la semplice solo nel 53% dei casi (obiettivo 65%) e costa circa 4 secondi a partita per core: per i tornei di massa si usa la semplice, la forte serve per i controlli a campione.
 - Mulligan e scarti per limite di mano usano una regola fissa, non una decisione dell'IA.
+
+## Nucleo v0.2 (`sim/v02/`)
+
+Motore, IA e runner del nucleo v0.2 ratificato (Q-013, `docs/regolamento_v0.2.md`). Le regole sono un dataclass (`sim/v02/config.py`): ogni scelta aperta è un parametro, ogni variante un preset o un file JSON `{"base": preset, "set": {...}}`. Preset `V02` (default) = nucleo ratificato; `B0` = base dell'esperimento; `V1B_sequenziale`, `V2B_scoperto`, `V3B_opposizione_dopo`, `V4B_raddrizzo_fine`, `S_scudo_pareggi`.
+
+```bash
+python3 -m sim.v02.run torneo --partite 500            # metriche e fasce dei pilastri, mirror su tutti i mazzi
+python3 -m sim.v02.run torneo --partite 0 --incroci 400 # incroci fra mazzi diversi
+python3 -m sim.v02.run ab --base V02 --variante mia.json --partite 2500   # A/B appaiato
+python3 -m sim.v02.run collaudo --variante V02          # sfruttabilità dell'IA del pugno
+python3 -m sim.v02.run forte --forte forte:30 --partite 75               # IA forte contro semplice
+python3 -m sim.v02.run partita arden_rosso_verde maera_blu_nero          # una partita con log
+python3 -m sim.v02.run vita --partite 200               # M14: IA che paga sempre i costi in Vita
+python3 tests/test_v02.py
+```
+
+IA: `semplice` (euristiche + equilibrio del pugno con regret matching, prezzo-ombra λ=0.03 per gemma), `vita` (semplice, ma paga sempre i costi in Vita), `det` (pugno deterministico), `br` (miglior risposta, per il collaudo), `forte:N` (MCTS con rollout semplici, ~1–2 s a partita con Tempra 4). Carte convertite da v0.1 in `sim/v02/cards_v02.json`. Esperimenti in `/mnt/project-files/tcg/swarm/esperimenti/E-014/`.
+
+**Primitive R-005** (set v0.2, forme esatte in `/mnt/project-files/tcg/set/richieste/R-005_risposta.md`):
+- parole chiave lette dal motore: `assalto`, `scudo` (vince i pareggi quando è il bersaglio, anche cacciato), `bracconiere` (+X quando attacca un'Unità), `caccia` (azione `("attack", uid, bersaglio)` su qualsiasi Unità avversaria; si oppone solo un'altra Unità). `impeto` è descrittiva (`infuso` è accettato come alias nei file vecchi);
+- trigger `on_attack_defeats_unit` (Rinnovo) e op con `"target": "self" | "opposer" | "chosen"`;
+- `costs` (Vita) dentro le abilità ⟳; valori dinamici `{"scars": "own"}` nei selettori; selettori con `"if"` e `"any"`;
+- `"if"` su una singola op; condizioni `deck_nonempty`, `target_is_unit`, `opposing`, `attacker_has`; `pugno_ge` sul bersaglio legge solo la Parata (gemme dopo il costo della Reazione);
+- Reazioni: `draw` (in C4) e op su Unità (`raddrizza` l'Unità che si opponeva, dopo lo scontro); `guard_max` con `"cap"` applicato per ultimo.
+
+**R-006**: il caricamento delle carte è **stretto** (`sim/v02/validate.py`): chiave, condizione, evento, op o campo di selettore sconosciuti danno `ValueError` con l'id della carta (liberi i campi che iniziano con `_` e quelli descrittivi: `text`, `name`, `rarity`, `slot`, `tags`, `intent`, ...). Primitive in più: `"target"` nei trigger (bersaglio scelto dal motore: Forza più alta, poi costo), `"stack": false`, trigger delle Reliquie in `fire_global`, eventi `on_own_reaction` e `on_own_unit_attack_defeats_unit`, valore `{"n": 2, "plus": 1, "if": [...]}`, op con `"target": "attacker"` e `"sel"`, condizioni `react_from_scars` e `hunted_ready`, `opposing` nelle statiche `combat`, selettore `"kind": "unit"`.
+
+```bash
+python3 -m sim.v02.run valida set.json --mazzi mazzi.json       # tutti gli errori di carte e mazzi
+python3 -m sim.v02.run torneo --carte set.json --mazzi mazzi.json --incroci 20
+```
+`--mazzi` accetta nomi di `sim/decks`, file `.json` con un mazzo (`cards` come `{id: copie}` o lista di id) o con più mazzi (`{"mazzi": [...]}`, anche `file.json#nome`); i mazzi si controllano sul database v0.2 caricato.
+
+Il report di `torneo` ha una tabella **M1–M15** (Reazioni disponibili/giocate/decisive, scontri decisi prima dell'impegno, Caccia, Unità ferme, colore minore e presenza degli slot nei mazzi vincenti, attivazioni per carta...). M4 usa la monotonia di Fa nelle gemme: 2 calcoli puri per ogni risposta del difensore (+~18% di tempo sul torneo). M10/M15 leggono i file dei mazzi; M15 usa il campo facoltativo `"slot"` delle carte.
