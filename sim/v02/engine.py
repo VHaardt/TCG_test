@@ -490,11 +490,17 @@ class GameState:
                 self.stats["life_at_round6"] = (len(self.p[0].life), len(self.p[1].life))
         self.say(f"--- Round {self.round}, P{a+1} | Vite {len(self.p[0].life)}-{len(self.p[1].life)}")
         if self.round >= self.r.crepuscolo_round:          # 7b
-            if self.alle_corde(a):
-                self.lose(a, "crepuscolo")
-                return
-            for _ in range(self.r.crepuscolo_loss):
-                self.lose_life(a, "crepuscolo", ignore_saldo=True)
+            if self.r.crepuscolo_simultaneo:                # Q-019 B: nel Ripristino di G1, per entrambi
+                if a == G1:
+                    self._crepuscolo_both()
+                    if self.over:
+                        return
+            else:
+                if self.alle_corde(a):
+                    self.lose(a, "crepuscolo")
+                    return
+                for _ in range(self.r.crepuscolo_loss):
+                    self.lose_life(a, "crepuscolo", ignore_saldo=True)
         pl.guard = 0                                        # 7c
         if self.r.raddrizzo == "ripristino":                # 7d
             self._straighten(a)
@@ -510,6 +516,22 @@ class GameState:
         self.phase = "main"
         if self.stats is not None:
             self.stats["turns"][a] += 1
+
+    def _crepuscolo_both(self):
+        """Q-019 B: one Crepuscolo check for both players. Whoever is Alle Corde loses; if both are,
+        nobody loses here and the next hit on a Leader ends the game (both have no fresh Scars)."""
+        corde = [q for q in (G1, G2) if self.alle_corde(q)]
+        if len(corde) == 1:
+            self.lose(corde[0], "crepuscolo")
+            return
+        if len(corde) == 2:
+            self.say("    Crepuscolo: entrambi Alle Corde, decide il primo colpo")
+            return
+        for q in (G1, G2):
+            for _ in range(self.r.crepuscolo_loss):
+                self.lose_life(q, "crepuscolo", ignore_saldo=True)
+                if self.over:
+                    return
 
     def _straighten(self, q):
         pl = self.p[q]
@@ -538,6 +560,8 @@ class GameState:
             if self.both_022(a):
                 self.stat_add("turns_both022", a)              # R-009 #6
         stored = min(pl.brace, self.guard_max(a))           # 10b
+        if self.r.guardia_stop_round and self.round >= self.r.guardia_stop_round:
+            stored = 0                                      # Q-019 C
         pl.guard = stored
         if a == G2 and self.round == 1:
             pl.guard += self.r.scintilla_guardia_g2          # oltre il massimo, per gli attacchi di G1 nel round 2

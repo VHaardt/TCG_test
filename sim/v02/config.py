@@ -46,6 +46,8 @@ class Rules2:
     corde_one_life_round: int = 13
     crepuscolo_round: int = 15
     crepuscolo_loss: int = 2
+    crepuscolo_simultaneo: bool = False   # Q-019 B: un solo controllo, nel Ripristino di G1, per entrambi
+    guardia_stop_round: int = 0           # Q-019 C: da questo round non si forma la Guardia (0 = mai)
 
     # limits
     max_units: int = 5

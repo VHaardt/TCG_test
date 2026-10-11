@@ -691,6 +691,23 @@ def test_filters_read_forza_attuale_without_combat_bonuses():
     assert s.matches(1, u, {"side": "own", "power_le": 1}, {}, 1)
 
 
+
+def test_q019_crepuscolo_simultaneo():
+    """Q-019 B: one Crepuscolo check in G1's Ripristino for both players; only the one Alle Corde loses,
+    with both Alle Corde nobody loses there."""
+    s = _arena()
+    s.r = s.r.with_(crepuscolo_simultaneo=True)
+    s.round = 15
+    n0, n1 = len(s.p[0].life), len(s.p[1].life)
+    s._crepuscolo_both()
+    assert len(s.p[0].life) == n0 - 2 and len(s.p[1].life) == n1 - 2 and not s.over
+    s = _arena()
+    s.r = s.r.with_(crepuscolo_simultaneo=True)
+    s.round = 15
+    s.p[1].life = s.p[1].life[:1]
+    s._crepuscolo_both()
+    assert s.over and s.winner == 0
+
 if __name__ == "__main__":
     for k, f in list(globals().items()):
         if k.startswith("test_"):
