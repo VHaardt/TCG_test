@@ -162,6 +162,8 @@ def metrics(recs):
         m["end_reasons"][r["end_reason"]] = m["end_reasons"].get(r["end_reason"], 0) + 1
     cr = [r for r in recs if r["end_reason"] == "crepuscolo"]
     m["g1_win_crep"] = wilson(sum(r["winner"] == 0 for r in cr), len(cr))     # R-011 #2
+    r15 = [r for r in recs if r["rounds"] >= 15]
+    m["g1_win_r15"] = wilson(sum(r["winner"] == 0 for r in r15), len(r15))    # Q-019
     dw = {}
     for r in recs:
         for q in (0, 1):
@@ -328,6 +330,7 @@ def render(title, m, spec, agents, elapsed):
          f"| Azioni legali per decisione | {m['legal_per_decision']:.1f} | <60 | {check(m['legal_per_decision'] < 60)} |",
          f"| Fine partita | {m['end_reasons']} | | |",
          f"| G1 vince fra le partite finite al Crepuscolo | {pct(m['g1_win_crep'])} | | |",
+         f"| G1 vince fra le partite arrivate al round 15 | {pct(m['g1_win_r15'])} | | |",
          f"| Nelle fasce comuni | {'sì' if in_bands(m) else 'no'} | | |", "",
          "Vittorie per mazzo: " + ", ".join(f"{D.label(d)} {pct(w)}" for d, w in sorted(m["deck_win"].items())), ""]
     L += render_r005(m)

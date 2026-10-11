@@ -507,7 +507,7 @@ class GameState:
         pl.brace = min(self.round, self.r.brace_max)        # 7e
         if a == G2 and self.round == 1:
             pl.brace += self.r.scintilla_g2_gems
-        if a == G2 and self.round == self.r.scintilla_extra_round:
+        if a == G2 and (self.round == self.r.scintilla_extra_round or self.round in self.r.scintilla_extra_rounds):
             pl.brace += self.r.scintilla_extra_gems
         self.state_checks()
         if not (a == G1 and self.round == 1):               # 8
@@ -525,7 +525,21 @@ class GameState:
             self.lose(corde[0], "crepuscolo")
             return
         if len(corde) == 2:
-            self.say("    Crepuscolo: entrambi Alle Corde, decide il primo colpo")
+            sp = self.r.crepuscolo_spareggio
+            if sp == "primo_colpo":
+                self.say("    Crepuscolo: entrambi Alle Corde, decide il primo colpo")
+                return
+            if sp == "attivo":                              # §7.4: perde il giocatore attivo
+                loser = self.active
+            elif sp == "mazzo":                             # meno carte nel mazzo, a parità l'attivo
+                d0, d1 = len(self.p[G1].deck), len(self.p[G2].deck)
+                loser = G1 if d0 < d1 else G2 if d1 < d0 else self.active
+            elif sp == "cicatrici":                         # più Cicatrici, a parità l'attivo
+                c0, c1 = len(self.p[G1].scars), len(self.p[G2].scars)
+                loser = G1 if c0 > c1 else G2 if c1 > c0 else self.active
+            else:
+                raise ValueError(f"crepuscolo_spareggio sconosciuto: {sp}")
+            self.lose(loser, "crepuscolo")
             return
         for q in (G1, G2):
             for _ in range(self.r.crepuscolo_loss):

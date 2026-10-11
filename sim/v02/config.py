@@ -35,6 +35,7 @@ class Rules2:
     scintilla_g2_gems: int = 1         # G2 +1 gemma nel round 1
     scintilla_extra_gems: int = 0      # Scintilla divisa: gemme in più per G2 ...
     scintilla_extra_round: int = 2     # ... in questo round
+    scintilla_extra_rounds: tuple = ()  # ... e in questi round (Q-019: P6 ritarata, es. (3, 5))
     scintilla_guardia_g2: int = 0      # gemme di Guardia in più per G2 nella Fine del round 1
     g2_hand_extra: int = 0             # carte in più nella mano iniziale di G2 (dopo il mulligan)
     no_attack_round: int = 1
@@ -47,6 +48,7 @@ class Rules2:
     crepuscolo_round: int = 15
     crepuscolo_loss: int = 2
     crepuscolo_simultaneo: bool = False   # Q-019 B: un solo controllo, nel Ripristino di G1, per entrambi
+    crepuscolo_spareggio: str = "primo_colpo"  # Q-019 B con entrambi Alle Corde: primo_colpo, attivo, mazzo, cicatrici
     guardia_stop_round: int = 0           # Q-019 C: da questo round non si forma la Guardia (0 = mai)
 
     # limits
