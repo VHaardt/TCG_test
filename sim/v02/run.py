@@ -54,7 +54,7 @@ def play_game(job):
         s.end_reason = "loop"
     return {"decks": list(decks), "agents": list(agents_spec), "seed": seed, "winner": s.winner,
             "end_reason": s.end_reason, "rounds": s.round, "life_end": [len(s.p[0].life), len(s.p[1].life)],
-            "stats": s.stats, "log": s.log}
+            "stats": s.stats, "log": s.log, "crep": dict(s.crep)}
 
 
 def all_decks():
@@ -164,6 +164,17 @@ def metrics(recs):
     m["g1_win_crep"] = wilson(sum(r["winner"] == 0 for r in cr), len(cr))     # R-011 #2
     r15 = [r for r in recs if r["rounds"] >= 15]
     m["g1_win_r15"] = wilson(sum(r["winner"] == 0 for r in r15), len(r15))    # Q-019
+    c15 = [r for r in recs if r.get("crep", {}).get("r15_lives")]
+    par = [r for r in c15 if r["crep"]["pareggio"]]
+    m["crep_pareggi"] = wilson(len(par), len(c15))
+    m["crep_pari"] = wilson(sum(r["crep"]["r15_lives"][0] == r["crep"]["r15_lives"][1] for r in par), len(par))
+    m["crep_vivi_r16"] = wilson(sum(bool(r["crep"].get("vivo_r16")) for r in c15), len(c15))
+    m["crep_g1_pareggi"] = wilson(sum(r["winner"] == 0 for r in par), len(par))
+    lp = {}
+    for r in c15:
+        k = "%d-%d" % tuple(r["crep"]["r15_lives"])
+        lp[k] = lp.get(k, 0) + 1
+    m["crep_vite"] = dict(sorted(lp.items(), key=lambda x: -x[1])[:8])
     dw = {}
     for r in recs:
         for q in (0, 1):
@@ -331,6 +342,9 @@ def render(title, m, spec, agents, elapsed):
          f"| Fine partita | {m['end_reasons']} | | |",
          f"| G1 vince fra le partite finite al Crepuscolo | {pct(m['g1_win_crep'])} | | |",
          f"| G1 vince fra le partite arrivate al round 15 | {pct(m['g1_win_r15'])} | | |",
+         f"| Q-019: pareggi al primo Crepuscolo (entrambi Alle Corde) / Vite pari fra i pareggi | {pct(m['crep_pareggi'])} / {pct(m['crep_pari'])} | | |",
+         f"| Q-019: G1 vince fra i pareggi; partite vive al round 16 | {pct(m['crep_g1_pareggi'])}; {pct(m['crep_vivi_r16'])} | | |",
+         f"| Q-019: Vite G1-G2 al primo Crepuscolo (più frequenti) | {m['crep_vite']} | | |",
          f"| Nelle fasce comuni | {'sì' if in_bands(m) else 'no'} | | |", "",
          "Vittorie per mazzo: " + ", ".join(f"{D.label(d)} {pct(w)}" for d, w in sorted(m["deck_win"].items())), ""]
     L += render_r005(m)

@@ -179,6 +179,7 @@ class GameState:
         self.rng = random.Random()
         self.stats = new_stats()
         self.log = None
+        self.crep = {}
         self.track = None           # stato delle metriche M6/M7 (solo la partita vera, non i cloni)
 
     # ------------------------------------------------------------------ basics
@@ -193,6 +194,7 @@ class GameState:
         s.stats = None
         s.log = None
         s.track = None
+        s.crep = {}
         return s
 
     @property
@@ -489,6 +491,11 @@ class GameState:
             if self.round == 7 and self.stats is not None:
                 self.stats["life_at_round6"] = (len(self.p[0].life), len(self.p[1].life))
         self.say(f"--- Round {self.round}, P{a+1} | Vite {len(self.p[0].life)}-{len(self.p[1].life)}")
+        if a == G1 and self.round == self.r.crepuscolo_round:   # Q-019: diagnostica al primo controllo
+            lv = (len(self.p[G1].life), len(self.p[G2].life))
+            self.crep = {"r15_lives": lv, "pareggio": self.alle_corde(G1) and self.alle_corde(G2)}
+        if a == G1 and self.round == self.r.crepuscolo_round + 1:
+            self.crep["vivo_r16"] = True
         if self.round >= self.r.crepuscolo_round:          # 7b
             if self.r.crepuscolo_simultaneo:                # Q-019 B: nel Ripristino di G1, per entrambi
                 if a == G1:
@@ -531,6 +538,10 @@ class GameState:
                 return
             if sp == "attivo":                              # §7.4: perde il giocatore attivo
                 loser = self.active
+            elif sp in ("vite_attivo", "vite_difensore"):  # meno Vite; a parità l'attivo o il difensore
+                l0, l1 = len(self.p[G1].life), len(self.p[G2].life)
+                tie = self.active if sp == "vite_attivo" else 1 - self.active
+                loser = G1 if l0 < l1 else G2 if l1 < l0 else tie
             elif sp == "mazzo":                             # meno carte nel mazzo, a parità l'attivo
                 d0, d1 = len(self.p[G1].deck), len(self.p[G2].deck)
                 loser = G1 if d0 < d1 else G2 if d1 < d0 else self.active
