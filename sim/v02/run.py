@@ -374,7 +374,7 @@ def render_r012(recs, traccia=()):
         for q in (0, 1):
             x = per[r["decks"][q]]
             x["n"] += 1
-            for k in ("leader_attacks", "leader_on_attack", "furia_bonus_combats", "scudo_atk2"):
+            for k in ("leader_attacks", "leader_on_attack", "furia_bonus_combats", "scudo_atk2", "solo_unit_turns", "caccia_leader_atk"):
                 x[k] = x.get(k, 0) + st[k][q]
             x["act_then_hit"] = x.get("act_then_hit", 0) + sum(st["act_then_hit"][q].values())
             x["lead_act"] = x.get("lead_act", 0) + sum(v for c, v in st["activations"][q].items() if c in LEADERS or c.startswith("LDR"))
@@ -392,8 +392,8 @@ def render_r012(recs, traccia=()):
                         t = x.setdefault("tr", {}).setdefault(cid, {})
                         t[lab] = t.get(lab, 0) + v
     L += ["", "## R-012: contatori per mazzo (per partita)", "",
-          "| Mazzo | Attacchi del Leader | on_attack del Leader eseguiti | Attivazioni del Leader (⟳ e trigger) / ⟳ seguite da un colpo a segno | Scontri con furia_bonus | Scudo a ≥2 gemme | Round del primo colpo al Leader (media, n) | Forza max a 2 gemme | Carte giocate per colore |",
-          "|---|---|---|---|---|---|---|---|---|"]
+          "| Mazzo | Attacchi del Leader | on_attack del Leader eseguiti | Attivazioni del Leader (⟳ e trigger) / ⟳ seguite da un colpo a segno | Scontri con furia_bonus | Scudo a ≥2 gemme | Round del primo colpo al Leader (media, n) | Forza max a 2 gemme | Carte giocate per colore | Turni con una sola Unità in campo | Attacchi al Leader di Unità con Caccia |",
+          "|---|---|---|---|---|---|---|---|---|---|---|"]
     for d in decks:
         x = per[d]; n = max(x["n"], 1)
         fh = x.get("fh", [])
@@ -401,7 +401,8 @@ def render_r012(recs, traccia=()):
         L.append(f"| {D.label(d)} | {x.get('leader_attacks', 0)/n:.2f} | {x.get('leader_on_attack', 0)/n:.2f} | "
                  f"{x.get('lead_act', 0)/n:.2f} / {x.get('act_then_hit', 0)/n:.2f} | {x.get('furia_bonus_combats', 0)/n:.2f} | "
                  f"{x.get('scudo_atk2', 0)/n:.2f} | {(sum(fh)/len(fh)) if fh else float('nan'):.1f} ({len(fh)}) | {x.get('peak2', 0)} | "
-                 + ", ".join(f"{c} {100*v/ct:.0f}%" for c, v in sorted(col.items())) + " |")
+                 + ", ".join(f"{c} {100*v/ct:.0f}%" for c, v in sorted(col.items()))
+                 + f" | {x.get('solo_unit_turns', 0)/n:.2f} | {x.get('caccia_leader_atk', 0)/n:.2f} |")
     if traccia:
         L += ["", "## R-012: carte tracciate (per partita del mazzo: giocate / attivazioni / colpi a segno sul Leader / Unità sconfitte)", "",
               "| Mazzo | " + " | ".join(traccia) + " |", "|---|" + "---|" * len(traccia)]

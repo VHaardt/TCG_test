@@ -168,6 +168,7 @@ def new_stats():
         "furia_bonus_combats": [0, 0], "scudo_atk2": [0, 0],
         "act_then_hit": [{}, {}],                                        # ⟳ del Leader seguita da un colpo a segno nello stesso turno
         "first_hit_round": [None, None], "peak2": [0, 0],                # M13 picco: Forza massima a 2 gemme
+        "solo_unit_turns": [0, 0], "caccia_leader_atk": [0, 0],          # R-013
     }
 
 
@@ -529,6 +530,8 @@ class GameState:
         self.phase = "main"
         if self.stats is not None:
             self.stats["turns"][a] += 1
+            if len(pl.units) == 1:
+                self.stats["solo_unit_turns"][a] += 1          # R-013: una sola Unità in campo a inizio fase principale
 
     def _crepuscolo_both(self):
         """Q-019 B: one Crepuscolo check for both players. Whoever is Alle Corde loses; if both are,
@@ -976,6 +979,8 @@ class GameState:
             self.track["attacked"].add(att)
             if hunted is None and self.both_022(a):
                 self.stat_add("atk_leader_both022", a)         # R-009 #6 (bersaglio dichiarato: il Leader)
+        if hunted is None and att != "L" and CARDS[self.unit(a, att).cid].has("caccia"):
+            self.stat_add("caccia_leader_atk", a)               # R-013: Unità con Caccia che attacca il Leader
         if hunted is not None:
             self.stat_add("hunt", a)
             self.stat_add("hunt_ready" if self.unit(d, hunted).ready else "hunt_rotated", a)
