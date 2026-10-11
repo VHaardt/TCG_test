@@ -351,6 +351,67 @@ def render(title, m, spec, agents, elapsed):
     return "\n".join(L) + "\n"
 
 
+def render_r012(recs, traccia=()):
+    """R-012: matrice degli incroci, contatori per mazzo e uso delle carte tracciate."""
+    decks = sorted({d for r in recs for d in r["decks"]})
+    if not recs or "leader_attacks" not in recs[0]["stats"]:
+        return []
+    L = ["## R-012: matrice degli incroci (vittorie della riga contro la colonna, n)", "",
+         "| | " + " | ".join(D.label(d) for d in decks) + " |", "|---|" + "---|" * len(decks)]
+    for x in decks:
+        row = []
+        for y in decks:
+            g = [r for r in recs if set(r["decks"]) == {x, y} and x != y]
+            if not g:
+                row.append("—")
+                continue
+            w = wilson(sum(r["winner"] is not None and r["decks"][r["winner"]] == x for r in g), len(g))
+            row.append(f"{100*w[0]:.1f} [{100*w[1]:.0f}–{100*w[2]:.0f}] ({len(g)})")
+        L.append(f"| {D.label(x)} | " + " | ".join(row) + " |")
+    per = {d: {"n": 0} for d in decks}
+    for r in recs:
+        st = r["stats"]
+        for q in (0, 1):
+            x = per[r["decks"][q]]
+            x["n"] += 1
+            for k in ("leader_attacks", "leader_on_attack", "furia_bonus_combats", "scudo_atk2"):
+                x[k] = x.get(k, 0) + st[k][q]
+            x["act_then_hit"] = x.get("act_then_hit", 0) + sum(st["act_then_hit"][q].values())
+            x["lead_act"] = x.get("lead_act", 0) + sum(v for c, v in st["activations"][q].items() if c in LEADERS or c.startswith("LDR"))
+            fh = st["first_hit_round"][q]
+            if fh is not None:
+                x.setdefault("fh", []).append(fh)
+            x["peak2"] = max(x.get("peak2", 0), st["peak2"][q])
+            for cid, v in st["cards_played"][q].items():
+                for c in CARDS[cid].colors if cid in CARDS else ():
+                    col = x.setdefault("col", {})
+                    col[c] = col.get(c, 0) + v
+            for key, lab in (("cards_played", "g"), ("activations", "a"), ("hits_by", "h"), ("kills_by", "k")):
+                for cid, v in st[key][q].items():
+                    if cid in traccia:
+                        t = x.setdefault("tr", {}).setdefault(cid, {})
+                        t[lab] = t.get(lab, 0) + v
+    L += ["", "## R-012: contatori per mazzo (per partita)", "",
+          "| Mazzo | Attacchi del Leader | on_attack del Leader eseguiti | Attivazioni del Leader (⟳ e trigger) / ⟳ seguite da un colpo a segno | Scontri con furia_bonus | Scudo a ≥2 gemme | Round del primo colpo al Leader (media, n) | Forza max a 2 gemme | Carte giocate per colore |",
+          "|---|---|---|---|---|---|---|---|---|"]
+    for d in decks:
+        x = per[d]; n = max(x["n"], 1)
+        fh = x.get("fh", [])
+        col = x.get("col", {}); ct = max(sum(col.values()), 1)
+        L.append(f"| {D.label(d)} | {x.get('leader_attacks', 0)/n:.2f} | {x.get('leader_on_attack', 0)/n:.2f} | "
+                 f"{x.get('lead_act', 0)/n:.2f} / {x.get('act_then_hit', 0)/n:.2f} | {x.get('furia_bonus_combats', 0)/n:.2f} | "
+                 f"{x.get('scudo_atk2', 0)/n:.2f} | {(sum(fh)/len(fh)) if fh else float('nan'):.1f} ({len(fh)}) | {x.get('peak2', 0)} | "
+                 + ", ".join(f"{c} {100*v/ct:.0f}%" for c, v in sorted(col.items())) + " |")
+    if traccia:
+        L += ["", "## R-012: carte tracciate (per partita del mazzo: giocate / attivazioni / colpi a segno sul Leader / Unità sconfitte)", "",
+              "| Mazzo | " + " | ".join(traccia) + " |", "|---|" + "---|" * len(traccia)]
+        for d in decks:
+            x = per[d]; n = max(x["n"], 1); tr = x.get("tr", {})
+            L.append(f"| {D.label(d)} | " + " | ".join(
+                "/".join(f"{tr.get(c, {}).get(k, 0)/n:.2f}" for k in "gahk") for c in traccia) + " |")
+    return L + [""]
+
+
 def render_r005(m):
     fmt = lambda d, f="{:.2f}": ", ".join(f"{D.label(k)} " + f.format(v) for k, v in d.items()) or "—"
     top = list(m["activations"].items())[:12]
@@ -450,6 +511,7 @@ def cmd_torneo(a):
     recs, el = arm(a.variante, a.ia, a.partite, a.mazzi, a.seed, a.incroci)
     m = metrics(recs)
     text = render(f"Torneo v0.2 — {a.variante}", m, a.variante, a.ia, el)
+    text += "\n".join(render_r012(recs, tuple(t for t in (a.traccia or "").split(",") if t))) + "\n"
     print(text)
     print("report:", save(f"torneo_{os.path.splitext(os.path.basename(a.variante))[0]}", text, recs, a.out))
 
@@ -552,6 +614,7 @@ def main(argv=None):
         x.add_argument("--seed", type=int, default=1)
         x.add_argument("--out")
     t = sub.add_parser("torneo"); common(t)
+    t.add_argument("--traccia", help="R-012: ID di carte e Leader da tracciare, separati da virgola")
     ab = sub.add_parser("ab"); common(ab); ab.add_argument("--base", default="V02")
     lm = sub.add_parser("lambda"); common(lm, 200)
     co = sub.add_parser("collaudo"); common(co, 250)

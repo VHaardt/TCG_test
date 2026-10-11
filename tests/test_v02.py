@@ -708,6 +708,23 @@ def test_q019_crepuscolo_simultaneo():
     s._crepuscolo_both()
     assert s.over and s.winner == 0
 
+
+def test_r012_leader_on_attack_trigger_and_att_mod():
+    """R-012 primitiva 1: "quando il tuo Leader attacca" fires like a Unit's on_attack; an att_mod
+    on the Leader counts in the combat."""
+    E.LEADERS["_v2"] = LeaderCard(id="_v2", name="v2", colors=("G", "B"), base=(
+        {"trigger": "on_attack", "target": {"side": "opp", "ready": True, "cost_le": 3},
+         "do": [{"op": "stanca", "target": "chosen"}]},
+        {"trigger": "on_attack", "do": [{"op": "att_mod", "n": 1}]}), awakened=())
+    small = _card("_small2", power=2, cost=2)
+    s = _arena()
+    s.p[0].leader = "_v2"
+    s.p[1].units = [Unit(901, small, True)]
+    s.step(("attack", "L"))
+    assert not s.unit(1, 901).ready                                      # Stancata quando il Leader attacca
+    fa, _, _ = s.compute(0, 0, None, None)
+    assert fa == s.r.leader_power + 1
+
 if __name__ == "__main__":
     for k, f in list(globals().items()):
         if k.startswith("test_"):

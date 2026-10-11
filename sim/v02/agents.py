@@ -445,7 +445,10 @@ class MCTSAgent2:
         if act[0] != "attack" or len(act) != 2:
             return False
         a = s.active
-        if act[1] != "L":
+        if act[1] == "L":
+            if any(ab.get("trigger") == "on_attack" for ab in s.leader_abilities(a)):
+                return False                                    # R-012: il trigger del Leader conta anche senza colpo
+        else:
             u = s.unit(a, act[1])
             if u is None or any(ab.get("trigger") == "on_attack" for ab in CARDS[u.cid].abilities) \
                     or CARDS[u.cid].has("caccia"):

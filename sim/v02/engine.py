@@ -162,6 +162,12 @@ def new_stats():
         "activations": [{}, {}],                                         # M11
         "removals": [0, 0],                                              # M12
         "life_costs": [0, 0],                                            # M14
+        # R-012 (E-020): uso delle carte e contatori
+        "leader_attacks": [0, 0], "leader_on_attack": [0, 0],
+        "hits_by": [{}, {}], "kills_by": [{}, {}],                       # colpi a segno sul Leader / Unità sconfitte, per attaccante
+        "furia_bonus_combats": [0, 0], "scudo_atk2": [0, 0],
+        "act_then_hit": [{}, {}],                                        # ⟳ del Leader seguita da un colpo a segno nello stesso turno
+        "first_hit_round": [None, None], "peak2": [0, 0],                # M13 picco: Forza massima a 2 gemme
     }
 
 
@@ -582,6 +588,7 @@ class GameState:
                 self.stats["unit_turns"][a] += len(tr["seen"])
                 tr["cand"][a] = {u.uid for u in pl.units if u.ready and u.uid in tr["seen"]} - tr["attacked"]
             tr["seen"], tr["attacked"], tr["opposed"], tr["stancate"] = set(), set(), set(), set()
+            tr.pop("lead_act", None)
             if self.both_022(a):
                 self.stat_add("turns_both022", a)              # R-009 #6
         stored = min(pl.brace, self.guard_max(a))           # 10b
@@ -791,6 +798,8 @@ class GameState:
             pl.brace -= ab.get("cost", 0)
             self.pay_costs(a, ab.get("costs"))              # Cicatrici contate prima (bersaglio già scelto)
             self.stat_add("activations", a, LEADERS[pl.leader].id if src == "L" else u.cid)
+            if src == "L" and self.track is not None:
+                self.track.setdefault("lead_act", []).append(LEADERS[pl.leader].id)
             if self.log is not None:
                 who = "del Leader" if src == "L" else f"di {CARDS[u.cid].name}"
                 tgt = f" su {self.describe(self._chosen(a, ab.get('target'), t)['chosen_owner'], t)}" if t is not None else ""
@@ -953,6 +962,11 @@ class GameState:
             # Q-017 (Ne, An): attaccando, il Leader rinuncia a un Rimarginare legale?
             self.combat.rim_legal = pl.brace >= self.modifier(a, "rim_cost", 1) and any(not sc[1] for sc in pl.scars)
             pl.l_ready = False
+            self.stat_add("leader_attacks", a)
+            before = self.stats["activations"][a].get(pl.leader, 0) if self.stats is not None else 0
+            self.fire(a, self.leader_abilities(a), "on_attack", dict(self.combat_ctx(self.combat), self="L"), src=pl.leader)
+            if self.stats is not None:                      # R-012 primitiva 1: on_attack del Leader eseguiti
+                self.stats["leader_on_attack"][a] += self.stats["activations"][a].get(pl.leader, 0) - before
         else:
             u = self.unit(a, att)
             u.ready = False
@@ -1026,6 +1040,9 @@ class GameState:
             mods += fa != base_a
             if src is not None and fa != base_a:
                 src.append((a, self.p[a].leader))
+            am, _ = self.trigger_mods(a, self.leader_abilities(a), "on_attack", dict(ctx_a, self="L"))
+            fa += am
+            mods += am != 0
         else:
             u = self.unit(a, cb.att)
             fa = self.unit_power(a, u, ctx_a, src)
@@ -1158,6 +1175,23 @@ class GameState:
                     st[2] += gems == avail
                 st[3] += gems
             st_all["mods"][mods] = st_all["mods"].get(mods, 0) + 1
+            acid = LEADERS[pa.leader].id if cb.att == "L" else self.unit(a, cb.att).cid
+            if cb.att != "L":
+                if self.static_sum(a, "furia_bonus") > 0:
+                    st_all["furia_bonus_combats"][a] += 1
+                if CARDS[acid].has("scudo") and cb.a >= 2:
+                    st_all["scudo_atk2"][a] += 1
+            if cb.a == 2:
+                st_all["peak2"][a] = max(st_all["peak2"][a], fa)
+            if hit:
+                self.stat_add("hits_by", a, acid)
+                if st_all["first_hit_round"][a] is None:
+                    st_all["first_hit_round"][a] = self.round
+                if self.track is not None and self.track.get("lead_act"):
+                    for lid in self.track.pop("lead_act"):
+                        self.stat_add("act_then_hit", a, lid)
+            if tgt_dead:
+                self.stat_add("kills_by", a, acid)
             if cb.react:
                 st_all["reactions"][d] += 1
             if any(max(CARDS[c].cost, 1) <= pd.guard for c, _ in self.reaction_options(d)):
