@@ -48,7 +48,7 @@ class Rules2:
     crepuscolo_round: int = 15
     crepuscolo_loss: int = 2
     crepuscolo_simultaneo: bool = False   # Q-019 B: un solo controllo, nel Ripristino di G1, per entrambi
-    crepuscolo_spareggio: str = "primo_colpo"  # Q-019 B con entrambi Alle Corde: primo_colpo, attivo, mazzo, cicatrici
+    crepuscolo_spareggio: str = "primo_colpo"  # Q-019 B con entrambi Alle Corde: primo_colpo, attivo, vite_attivo, vite_difensore, mazzo, cicatrici
     guardia_stop_round: int = 0           # Q-019 C: da questo round non si forma la Guardia (0 = mai)
 
     # limits
@@ -81,6 +81,10 @@ PRESETS = {
     # nucleo v0.2 ratificato (Q-013 esito.md, 2026-10-08); G1 e Scudo sono default di punti aperti
     "V02": {"tempra": 4, "pugno": "sequenziale", "scudo": "vince_pareggi",
             "scintilla_extra_gems": 1, "scintilla_extra_round": 3},
+    # v0.2.4: V02 + Q-019 ratificata (2026-10-12): Crepuscolo di round, spareggio vite → attivo, G2 +1 gemma anche nel round 5
+    "V024": {"tempra": 4, "pugno": "sequenziale", "scudo": "vince_pareggi",
+             "scintilla_extra_gems": 1, "scintilla_extra_round": 3, "scintilla_extra_rounds": (5,),
+             "crepuscolo_simultaneo": True, "crepuscolo_spareggio": "vite_attivo"},
 }
 
 

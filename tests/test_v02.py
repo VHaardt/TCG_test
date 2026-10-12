@@ -725,6 +725,22 @@ def test_r012_leader_on_attack_trigger_and_att_mod():
     fa, _, _ = s.compute(0, 0, None, None)
     assert fa == s.r.leader_power + 1
 
+
+def test_q019_v024_spareggio_vite_attivo():
+    """Q-019 (V024): both Alle Corde in G1's Ripristino of round 15 -> fewer Lives loses, then the active player (G1)."""
+    s = _arena()
+    s.r = rules_from("V024")
+    s.round, s.active = 15, 0
+    s.p[0].life, s.p[1].life = s.p[0].life[:1], []
+    s._crepuscolo_both()
+    assert s.over and s.winner == 0                     # G2 a 0 Vite perde
+    s = _arena()
+    s.r = rules_from("V024")
+    s.round, s.active = 15, 0
+    s.p[0].life, s.p[1].life = s.p[0].life[:1], s.p[1].life[:1]
+    s._crepuscolo_both()
+    assert s.over and s.winner == 1                     # a Vite pari perde l'attivo (G1)
+
 if __name__ == "__main__":
     for k, f in list(globals().items()):
         if k.startswith("test_"):

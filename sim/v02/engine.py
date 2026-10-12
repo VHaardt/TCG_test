@@ -534,8 +534,9 @@ class GameState:
                 self.stats["solo_unit_turns"][a] += 1          # R-013: una sola Unità in campo a inizio fase principale
 
     def _crepuscolo_both(self):
-        """Q-019 B: one Crepuscolo check for both players. Whoever is Alle Corde loses; if both are,
-        nobody loses here and the next hit on a Leader ends the game (both have no fresh Scars)."""
+        """Q-019 B: one Crepuscolo check for both players, in G1's Ripristino. Whoever is Alle Corde loses;
+        if both are, crepuscolo_spareggio decides (V024: fewer Lives loses, then the active player, G1;
+        "primo_colpo": nobody loses here and the next hit on a Leader ends the game)."""
         corde = [q for q in (G1, G2) if self.alle_corde(q)]
         if len(corde) == 1:
             self.lose(corde[0], "crepuscolo")
@@ -559,6 +560,9 @@ class GameState:
                 loser = G1 if c0 > c1 else G2 if c1 > c0 else self.active
             else:
                 raise ValueError(f"crepuscolo_spareggio sconosciuto: {sp}")
+            if self.stats is not None:                      # Q-019: pari esatti a ogni controllo
+                self.crep["spareggio"] = {"round": self.round, "vite": [len(self.p[G1].life), len(self.p[G2].life)],
+                                          "perde": loser}
             self.lose(loser, "crepuscolo")
             return
         for q in (G1, G2):
@@ -602,6 +606,8 @@ class GameState:
             pl.guard += self.r.scintilla_guardia_g2          # oltre il massimo, per gli attacchi di G1 nel round 2
         pl.brace = 0
         self.stat_add("guard_stored", a, n=stored)
+        if self.round >= 13 and self.stats is not None:     # Q-019: Guardia formata nei round finali
+            self.crep.setdefault("guard", {})[f"{self.round}-{a}"] = pl.guard
         if self.r.raddrizzo == "fine":                      # 10c
             self._straighten(a)
         for q in (G1, G2):                                  # 10d
@@ -975,6 +981,8 @@ class GameState:
             u.ready = False
             self.fire(a, CARDS[u.cid].abilities, "on_attack", dict(self.combat_ctx(self.combat), self=att), src=u.cid)
         self.stat_add("attacks", a)
+        if self.round >= 13 and self.stats is not None:     # Q-019 R-1: attacchi dichiarati nei round finali
+            self.crep.setdefault("atk", []).append((self.round, a))
         if self.track is not None:
             self.track["attacked"].add(att)
             if hunted is None and self.both_022(a):
@@ -1190,6 +1198,8 @@ class GameState:
                 st_all["peak2"][a] = max(st_all["peak2"][a], fa)
             if hit:
                 self.stat_add("hits_by", a, acid)
+                if self.round >= 13:                            # Q-019: colpi a segno sul Leader nei round finali
+                    self.crep.setdefault("hits", []).append((self.round, a))
                 if st_all["first_hit_round"][a] is None:
                     st_all["first_hit_round"][a] = self.round
                 if self.track is not None and self.track.get("lead_act"):

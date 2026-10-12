@@ -89,7 +89,7 @@ Se una carta nuova ha bisogno di un'operazione o di un evento che non esiste, si
 
 ## Nucleo v0.2 (`sim/v02/`)
 
-Motore, IA e runner del nucleo v0.2 ratificato (Q-013, `docs/regolamento_v0.2.md`). Le regole sono un dataclass (`sim/v02/config.py`): ogni scelta aperta è un parametro, ogni variante un preset o un file JSON `{"base": preset, "set": {...}}`. Preset `V02` (default) = nucleo ratificato; `B0` = base dell'esperimento; `V1B_sequenziale`, `V2B_scoperto`, `V3B_opposizione_dopo`, `V4B_raddrizzo_fine`, `S_scudo_pareggi`.
+Motore, IA e runner del nucleo v0.2 ratificato (Q-013, `docs/regolamento_v0.2.md`). Le regole sono un dataclass (`sim/v02/config.py`): ogni scelta aperta è un parametro, ogni variante un preset o un file JSON `{"base": preset, "set": {...}}`. Preset `V024` (default) = nucleo ratificato v0.2.4 (V02 + Q-019: Crepuscolo di round nel Ripristino di G1 per entrambi, spareggio meno Vite poi G1, G2 +1 gemma nei round 1, 3 e 5); `V02` = nucleo di Q-013, riferimento del ciclo carte 01 (E-020); `B0` = base dell'esperimento; `V1B_sequenziale`, `V2B_scoperto`, `V3B_opposizione_dopo`, `V4B_raddrizzo_fine`, `S_scudo_pareggi`.
 
 ```bash
 python3 -m sim.v02.run torneo --partite 500            # metriche e fasce dei pilastri, mirror su tutti i mazzi

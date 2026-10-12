@@ -175,6 +175,33 @@ def metrics(recs):
         k = "%d-%d" % tuple(r["crep"]["r15_lives"])
         lp[k] = lp.get(k, 0) + 1
     m["crep_vite"] = dict(sorted(lp.items(), key=lambda x: -x[1])[:8])
+    sp = [r for r in recs if r.get("crep", {}).get("spareggio")]          # Q-019 esito §6: spareggi a ogni controllo
+    m["sp_n"], m["sp_rate"] = len(sp), wilson(len(sp), len(c15))
+    m["sp_pari"] = wilson(sum(r["crep"]["spareggio"]["vite"][0] == r["crep"]["spareggio"]["vite"][1] for r in sp), len(sp))
+    m["sp_round"] = {}
+    for r in sp:
+        k = r["crep"]["spareggio"]["round"]; m["sp_round"][k] = m["sp_round"].get(k, 0) + 1
+    m["sp_g2"] = wilson(sum(r["winner"] == 1 for r in sp), len(sp))
+    def no_hit(r, rounds):
+        return not any(rd in rounds and q == r["winner"] for rd, q in r["crep"].get("hits", []))
+    m["sp_stallo"] = wilson(sum(no_hit(r, {r["crep"]["spareggio"]["round"] - 1}) for r in sp), len(sp))
+    m["sp_noatk"] = wilson(sum(not any(rd == r["crep"]["spareggio"]["round"] - 1 and q == r["winner"]
+                                       for rd, q in r["crep"].get("atk", [])) for r in sp), len(sp))
+    gw = [r["crep"].get("guard", {}).get(f"{r['crep']['spareggio']['round'] - 1}-{r['winner']}") for r in sp]
+    gw = [g for g in gw if g is not None]
+    m["sp_guard"] = (sum(gw) / len(gw)) if gw else float("nan")
+    fin = [r for r in c15 if r["winner"] is not None and r["rounds"] >= 15]
+    m["stallo_r15"] = wilson(sum(no_hit(r, {14, 15}) for r in fin), len(fin))
+    m["stallo_r15_g2"] = wilson(sum(no_hit(r, {14, 15}) and r["winner"] == 1 for r in fin), len(fin))
+    spd = {}
+    for r in sp:
+        d = D.label(r["decks"][r["winner"]]); spd[d] = spd.get(d, 0) + 1
+    m["sp_deck"] = dict(sorted(spd.items(), key=lambda x: -x[1]))
+    pair = {}
+    for r in c15:
+        k = " vs ".join(sorted(D.label(d) for d in r["decks"]))
+        x = pair.setdefault(k, [0, 0]); x[0] += r["winner"] == 0; x[1] += 1
+    m["g1_r15_pair"] = {k: (wilson(*v), v[1]) for k, v in sorted(pair.items())}
     dw = {}
     for r in recs:
         for q in (0, 1):
@@ -345,6 +372,12 @@ def render(title, m, spec, agents, elapsed):
          f"| Q-019: pareggi al primo Crepuscolo (entrambi Alle Corde) / Vite pari fra i pareggi | {pct(m['crep_pareggi'])} / {pct(m['crep_pari'])} | | |",
          f"| Q-019: G1 vince fra i pareggi; partite vive al round 16 | {pct(m['crep_g1_pareggi'])}; {pct(m['crep_vivi_r16'])} | | |",
          f"| Q-019: Vite G1-G2 al primo Crepuscolo (più frequenti) | {m['crep_vite']} | | |",
+         f"| Q-019: spareggi (entrambi Alle Corde) a qualunque controllo, fra le arrivate al R15 / Vite pari fra gli spareggi (n={m['sp_n']}) | {pct(m['sp_rate'])} / {pct(m['sp_pari'])} | | |",
+         f"| Q-019: spareggi per round; G2 vince lo spareggio | {m['sp_round']}; {pct(m['sp_g2'])} | | |",
+         f"| Q-019 R-1: stallo fra gli spareggi: il vincitore non va a segno / non attacca nel suo ultimo turno; Guardia media del vincitore nella sua ultima Fine | {pct(m['sp_stallo'])} / {pct(m['sp_noatk'])}; {m['sp_guard']:.2f} | ≤50% (Cr) | |",
+         f"| Q-019: partite finite dal R15 vinte senza colpi a segno del vincitore nei R14–15 (di cui vinte da G2) | {pct(m['stallo_r15'])} ({pct(m['stallo_r15_g2'])}) | | |",
+         f"| Q-019: vincitori degli spareggi per mazzo | {m['sp_deck']} | | |",
+         f"| Q-019: G1 fra le arrivate al R15 per coppia di mazzi | " + ", ".join(f"{k} {100*w[0]:.0f}% (n={n})" for k, (w, n) in m["g1_r15_pair"].items()) + " | | |",
          f"| Nelle fasce comuni | {'sì' if in_bands(m) else 'no'} | | |", "",
          "Vittorie per mazzo: " + ", ".join(f"{D.label(d)} {pct(w)}" for d, w in sorted(m["deck_win"].items())), ""]
     L += render_r005(m)
@@ -606,7 +639,7 @@ def main(argv=None):
     sub = p.add_subparsers(dest="cmd", required=True)
 
     def common(x, partite=100):
-        x.add_argument("--variante", default="V02")
+        x.add_argument("--variante", default="V024")
         x.add_argument("--ia", default="semplice")
         x.add_argument("--partite", type=int, default=partite)
         x.add_argument("--mazzi", nargs="*", help="nomi in sim/decks, file .json o file.json#nome")
@@ -616,7 +649,7 @@ def main(argv=None):
         x.add_argument("--out")
     t = sub.add_parser("torneo"); common(t)
     t.add_argument("--traccia", help="R-012: ID di carte e Leader da tracciare, separati da virgola")
-    ab = sub.add_parser("ab"); common(ab); ab.add_argument("--base", default="V02")
+    ab = sub.add_parser("ab"); common(ab); ab.add_argument("--base", default="V024")
     lm = sub.add_parser("lambda"); common(lm, 200)
     co = sub.add_parser("collaudo"); common(co, 250)
     fo = sub.add_parser("forte"); common(fo, 25); fo.add_argument("--forte", default="forte:60")
