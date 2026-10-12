@@ -2,8 +2,8 @@
 
 | Campo | Valore |
 |---|---|
-| Versione | v0.2 (nucleo) |
-| Data | 2026-10-08 |
+| Versione | v0.2.4 (nucleo; ultima modifica Q-019) |
+| Data | 2026-10-12 |
 | Stato | **ratificato dallo swarm (Q-013, 8/8 APPROVO); pilastri 2–3–4–6 in revisione, vedi pilastri** (`pilastri_design_v0.2.md`) |
 | Fonte normativa | `swarm/questioni/Q-013_rework_nucleo_v0.2/esito.md`, sezione A "Specifica consolidata". Dati: `swarm/esperimenti/E-014/sintesi_r3.md` |
 | Sostituisce | `regolamento_v0.1.md`. Le parti di v0.1 non toccate da Q-013 restano valide e sono riportate qui |
@@ -20,7 +20,8 @@
 > 7. Ultimo respiro diventa +1 Guardia Alle Corde; spariscono finestra e limite di reazioni.
 > 8. Infondere sparisce ("se hai impegnato almeno N gemme"); le abilità di Reazione dei Leader sono statiche.
 > 9. Esponi diventa Stanca, Intercetto diventa opposizione; lo Scudo vince i pareggi [aperto: P7].
-> 10. G2 prende 1 gemma in più nei round 1 e 3 [aperto: P6].
+> 10. G2 prende 1 gemma in più nei round 1, 3 e 5 [aperto: P6; ritarata da Q-019].
+> 11. Crepuscolo di round (Q-019): un solo controllo nel Ripristino di G1, per entrambi i Leader.
 
 ---
 
@@ -51,7 +52,7 @@ Non servono altri segnalini, contatori o dadi. Gli stati si mostrano ruotando le
 
 **La carta-tracciato del round** ha le caselle da 1 a 15 e riporta stampati:
 - per ogni round, la Brace del round: min(round, 8);
-- "round 1 e 3: G2 +1 gemma" **[default, aperto: P6]**;
+- "round 1, 3 e 5: G2 +1 gemma" **[default, aperto: P6]**;
 - "10: Saldo 3";
 - "13: Alle Corde a 1 Vita";
 - "15: Crepuscolo".
@@ -133,7 +134,7 @@ In quest'ordine:
 
 ### 5.2 Brace
 - Nel tuo Ripristino prendi dalla scorta **min(round, 8)** gemme: è la tua Brace [`brace_max` 8].
-- Se sei G2, nel **round 1** e nel **round 3** ne prendi **1 in più** **[default, aperto: P6; `scintilla_g2_gems` 1, `scintilla_extra_gems` 1, `scintilla_extra_round` 3]**.
+- Se sei G2, nei **round 1, 3 e 5** ne prendi **1 in più** **[default, aperto: P6; `scintilla_g2_gems` 1, `scintilla_extra_gems` 1, `scintilla_extra_round` 3, `scintilla_extra_rounds` (5,)]**.
 - Nel tuo turno la Brace si usa in due modi:
   1. **spenderla** per pagare carte e abilità (le gemme tornano nella scorta);
   2. **impegnarla** in un tuo attacco (§8, C3): ogni gemma impegnata dà +1 alla Forza dell'attaccante, poi torna nella scorta.
@@ -156,10 +157,10 @@ Il **giocatore attivo** è quello di cui è il turno; l'altro è il **difensore*
 ### 6.1 Ripristino
 In quest'ordine:
 - **(a)** Se sei G1, avanzi il segnalino del round di 1.
-- **(b) Crepuscolo** (dal round 15): se il tuo Leader è Alle Corde, **perdi la partita**. Altrimenti il tuo Leader perde 2 Vite: le carte vanno tra le Cicatrici **dritte** e non contano per il Saldo (§9.3) [`crepuscolo_round` 15, `crepuscolo_loss` 2].
+- **(b) Crepuscolo** (dal round 15). Dal round 15, nel passo b del Ripristino di G1, il controllo vale per entrambi i Leader nello stesso momento. Se un solo Leader è Alle Corde, il suo giocatore perde la partita. Se lo sono entrambi, perde chi ha meno Vite; a Vite pari perde il giocatore attivo (G1) (§9.7). Se nessuno dei due è Alle Corde, ognuno perde 2 Vite (Cicatrici dritte, fuori dal Saldo, §9.3). Nel Ripristino di G2 il passo b non fa nulla. [`crepuscolo_round` 15, `crepuscolo_loss` 2, `crepuscolo_simultaneo` sì, `crepuscolo_spareggio` vite_attivo]
 - **(c)** Rimetti nella scorta le tue gemme di Guardia.
 - **(d)** **Raddrizzi i tuoi personaggi** (il Leader e le tue Unità).
-- **(e)** Prendi dalla scorta la tua Brace: min(round, 8) gemme; se sei G2, nel round 1 e nel round 3 ne prendi 1 in più **[default, aperto: P6]**.
+- **(e)** Prendi dalla scorta la tua Brace: min(round, 8) gemme; se sei G2, nei round 1, 3 e 5 ne prendi 1 in più **[default, aperto: P6]**.
 - **(f)** Controlli di stato (§7.4).
 
 ### 6.2 Pesca
@@ -320,7 +321,7 @@ Se devi pescare e il mazzo è vuoto, invece di pescare perdi 1 Vita, soggetta al
 Si vince **solo** così:
 1. col **colpo finale** (§9.5);
 2. quando l'avversario deve pescare da un mazzo vuoto con 0 Vite (§9.6);
-3. col **Crepuscolo**: dal round 15, se nel suo Ripristino il Leader avversario è Alle Corde, l'avversario perde (§6.1 b).
+3. col **Crepuscolo**: dal round 15, nel Ripristino di G1, se un Leader è Alle Corde il suo giocatore perde (§6.1 b, con lo spareggio scritto lì).
 
 Se due condizioni si verificano nello stesso momento, **perde il giocatore attivo**. Non esistono patte, vittorie ai punti o vittorie alternative.
 
@@ -338,12 +339,12 @@ Se due condizioni si verificano nello stesso momento, **perde il giocatore attiv
 - **Furia** conta **tutte** le Cicatrici, dritte e fresche (§12.2).
 
 ### 9.10 Fine garantita
-Dal round 13 un Leader con 1 Vita è Alle Corde, e dal round 15 il Crepuscolo toglie 2 Vite a ogni Ripristino o fa perdere chi è Alle Corde. Quindi ogni giocatore perde al più tardi:
-- al suo turno del round **15** se a quel Ripristino ha ≤ 1 Vita;
+Dal round 13 un Leader con 1 Vita è Alle Corde. Dal round 15, nel Ripristino di G1, il Crepuscolo toglie 2 Vite a ciascun Leader o fa perdere chi è Alle Corde (§6.1 b). Quindi ogni giocatore, G1 o G2, perde al più tardi nel Ripristino di G1:
+- del round **15** se in quel momento ha ≤ 1 Vita;
 - del round **16** se ne ha 2 o 3;
 - del round **17** se ne ha 4 o 5.
 
-Il simulatore interrompe e registra come "non conclusa" una partita che superi il round 17 [`max_rounds` 17]: sarebbe un errore di implementazione, non una patta. Misurato: 0.2% di partite oltre il round 15; 99.3% chiuse dal colpo finale e 0.7% dal Crepuscolo.
+Il simulatore interrompe e registra come "non conclusa" una partita che superi il round 17 [`max_rounds` 17]: sarebbe un errore di implementazione, non una patta. Misurato (E-019, set v0.2, IA semplice): 4.6% di partite oltre il round 15; 84.4% chiuse dal colpo finale e 15.6% dal Crepuscolo.
 
 ---
 
@@ -374,9 +375,10 @@ Le abilità che in v0.1 erano Reazioni del Leader sono **statiche**: si leggono 
 - **Nessuno attacca nel round 1** (né con Unità, né con il Leader, né con Assalto).
 - **G1 non pesca nel round 1.**
 - Mano iniziale: 5 carte per entrambi [`g2_hand_extra` 0].
-- **G2 prende 1 gemma di Brace in più nel round 1 e 1 in più nel round 3** **[default, aperto: P6]**. La regola è stampata sul tracciato: non serve un segnalino Scintilla.
+- **G2 prende 1 gemma di Brace in più nei round 1, 3 e 5** **[default, aperto: P6; ritarata da Q-019]**. La regola è stampata sul tracciato: non serve un segnalino Scintilla.
 - Obiettivo di taratura: G1 vince il 48–52% delle partite (pilastri).
-- Misurato (2.000 partite, mazzi convertiti, mirror): senza compensazione G1 vince il 55.7%; con +1 gemma nei round 1 e 3 vince il **50.8%** [48.7–53.0]. La variante che decide è nel §17.1.
+- Misurato (2.000 partite, mazzi convertiti, mirror, E-014, prima di Q-019): senza compensazione G1 vince il 55.7%; con la vecchia compensazione (+1 gemma nei soli round 1 e 3) vince il 50.8% [48.7–53.0].
+- Misurato (E-019, set v0.2, IA semplice, 10.080 partite): con il Crepuscolo di round e +1 gemma nei round 1, 3 e 5 G1 vince il **48.9%** [47.0–50.7] nei mirror. La gemma del round 5 vale circa 5.5 punti di G1. La variante che decide è nel §17.1.
 
 ---
 
@@ -420,7 +422,7 @@ Le abilità che in v0.1 erano Reazioni del Leader sono **statiche**: si leggono 
 | Esposto, "Unità Esposta" | Ruotata; ma una carta Ruotata non è mai bersaglio |
 | Fornace, "Brace pari alla Fornace" | Brace = min(round, 8) dal tracciato |
 | Guardia "accantonata" | gemme di Brace spostate sul Leader nella Fine |
-| Scintilla | +1 gemma a G2 nei round 1 e 3, stampata sul tracciato **[aperto: P6]** |
+| Scintilla | +1 gemma a G2 nei round 1, 3 e 5, stampata sul tracciato **[aperto: P6]** |
 
 ---
 
@@ -499,7 +501,7 @@ Il costo di una Reazione si paga con le gemme di Guardia impegnate in C4. Le car
 | **Colpo finale** | Attacco a segno su un Leader Alle Corde senza Cicatrici fresche: vittoria. |
 | **Confronto** | Passo C5: si confrontano Fa e Db. |
 | **Controlli di stato** | Verifiche automatiche del §7.4. |
-| **Crepuscolo** | Dal round 15, nel tuo Ripristino: se il tuo Leader è Alle Corde perdi, altrimenti perde 2 Vite che entrano dritte e non contano per il Saldo. |
+| **Crepuscolo** | Dal round 15, nel Ripristino di G1, per entrambi i Leader: chi è Alle Corde perde (se lo sono entrambi, perde chi ha meno Vite, a parità il giocatore attivo); altrimenti ognuno perde 2 Vite dritte, fuori Saldo. |
 | **Db** | Valore di difesa del bersaglio nel Confronto. |
 | **Difendi** | Sei il difensore di uno scontro, qualunque sia il bersaglio. |
 | **Difensore** | Il giocatore non attivo. |
@@ -542,7 +544,7 @@ Il costo di una Reazione si paga con le gemme di Guardia impegnate in C4. Le car
 
 ## 16. Parametri numerici v0.2
 
-Nomi dei parametri da `sim/v02/config.py`; preset del simulatore: `V02`.
+Nomi dei parametri da `sim/v02/config.py`; preset del simulatore: `V02` (nucleo ratificato), `V024` (con Q-019).
 
 | Regola | Valore | Parametro del simulatore | Note |
 |---|---|---|---|
@@ -554,7 +556,7 @@ Nomi dei parametri da `sim/v02/config.py`; preset del simulatore: `V02`.
 | Tempra del Leader | **4** (entrambi i lati) | `tempra` 4 | Deciso 8/8; con 5: mediana 11, round 13+ 13.2% |
 | Risveglio | Vita ≤ 2 | `awaken_at_life` 2 | |
 | Brace | min(round, 8) | `brace_max` 8 | |
-| Compensazione di G2 | +1 gemma nei round 1 e 3 | `scintilla_g2_gems` 1, `scintilla_extra_gems` 1, `scintilla_extra_round` 3, `scintilla_guardia_g2` 0 | **[aperto: P6]**; G1 50.8% |
+| Compensazione di G2 | +1 gemma nei round 1, 3 e 5 | `scintilla_g2_gems` 1, `scintilla_extra_gems` 1, `scintilla_extra_round` 3, `scintilla_extra_rounds` (5,), `scintilla_guardia_g2` 0 | **[aperto: P6]**; Q-019; G1 48.9% nei mirror (E-019) |
 | Massimo di Guardia | 2 / Risvegliato 3; +1 Alle Corde; + carte (NEU-002) | `guard_max` 2, `guard_max_awakened` 3, `guard_alle_corde_bonus` 1 | |
 | Gemma d'attacco | +1 Forza | `forza_per_gemma` 1 | |
 | Gemma di Parata | +2 difesa | `parata_per_gemma` 2 | Maera Risvegliata +3 |
@@ -565,6 +567,8 @@ Nomi dei parametri da `sim/v02/config.py`; preset del simulatore: `V02`.
 | Saldo | 2 fresche; 3 dal round 10 | `saldo` 2, `saldo_late` 3, `saldo_late_round` 10 | |
 | Alle Corde a 1 Vita | dal round 13 | `corde_one_life_round` 13 | |
 | Crepuscolo | dal round 15, −2 Vite dritte | `crepuscolo_round` 15, `crepuscolo_loss` 2 | |
+| Crepuscolo di round | un solo controllo nel Ripristino di G1, per entrambi i Leader | `crepuscolo_simultaneo` sì | Q-019, ratificata 8/8 |
+| Spareggio del Crepuscolo | meno Vite, poi giocatore attivo (G1) | `crepuscolo_spareggio` vite_attivo | Q-019, ratificata 8/8 |
 | Nessun attacco | round 1 | `no_attack_round` 1 | |
 | Unità / Reliquie | max 5 / max 2 | `max_units` 5, `max_relics` 2 | |
 | Limite di mano | 8 a fine turno | `hand_limit` 8 | |
@@ -581,10 +585,12 @@ Mazzi convertiti da v0.1, mirror, IA semplice, 10.000 partite salvo dove indicat
 | Attacchi fermati | 42.0% | 30–45% |
 | Durata | mediana 8 round, media 8.38 | mediana 8–10 |
 | Partite al round 13+ | 1.5% | <10% |
-| Oltre il round 15 | 0.2% | <2% |
+| Oltre il round 15 | 0.2% (E-014); con set v0.2: 5.3% → **4.6%** con Q-019 (E-019, IA semplice) | <2% |
 | Vittorie prima del round 5 | 0.0% | 0 |
 | G1 vince, senza compensazione | 55.7% | 48–52% |
-| G1 vince, con +1 gemma nei round 1 e 3 (2.000 partite) | 50.8% [48.7–53.0] | 48–52% |
+| G1 vince, con la vecchia compensazione nei soli round 1 e 3 (2.000 partite, E-014) | 50.8% [48.7–53.0] | 48–52% |
+| G1 vince nei mirror, Crepuscolo di round e +1 gemma nei round 1, 3 e 5 (E-019, set v0.2, IA semplice, 10.080 partite) | **48.9%** [47.0–50.7] (A, V02: 51.5%) | 48–52% |
+| Durata e rimonte con Q-019 (E-019, set v0.2, IA semplice) | mediana 10 round (invariata da A); rimonte 19.6% [18.1–21.1] (A: 20.6%) | mediana 8–10; rimonte 20–35% |
 | Rimonte (senza / con compensazione) | 14.3% / 12.8% | **20–35% (fuori fascia)** |
 | Rimonte negli incroci fra mazzi diversi | 6.7% | 20–35% |
 | Margine IA forte (300 partite) | +28.7 (78.7% di vittorie) | ≥65% di vittorie |
@@ -594,7 +600,7 @@ Mazzi convertiti da v0.1, mirror, IA semplice, 10.000 partite salvo dove indicat
 | Impegno vuoto / pieno | attaccante 70% / 17%; difensore 59% / 22% | nessuna degenerazione oltre il 90% |
 | Modificatori per scontro | massimo 5; 0 o 1 nel 91% degli scontri | leggibilità |
 | Attacchi a segno sul Leader | 44.5%; 29 attacchi per partita | — |
-| Fine della partita | colpo finale 99.3%, Crepuscolo 0.7% | — |
+| Fine della partita | colpo finale 99.3%, Crepuscolo 0.7% (E-014); con set v0.2 e Q-019: colpo finale 84.4%, Crepuscolo **15.6%** (E-019, IA semplice) | — |
 | Vittorie per mazzo negli incroci | Arden 53.3, Maera 63.7, Thorn 10.0, Vey 72.9 | 45–55% (squilibrio dei mazzi convertiti) |
 
 ---
@@ -603,7 +609,8 @@ Mazzi convertiti da v0.1, mirror, IA semplice, 10.000 partite salvo dove indicat
 
 Le regole qui sotto sono già nel testo come default. Ogni variante si misura **una alla volta**, contro la base vigente, con seed appaiati.
 
-### 17.1 P6 — Compensazione di G1 **[default: G2 +1 gemma nei round 1 e 3]**
+### 17.1 P6 — Compensazione di G1 **[default: G2 +1 gemma nei round 1, 3 e 5]**
+- **Q-019 (2026-10-12):** il default passa da {1,3} a {1,3,5} insieme al Crepuscolo di round; P6 resta **[aperto]**. Tarato solo con l'IA semplice (E-019: G1 nei mirror 48.9 [47.0–50.7]); con la forte v2 va rimisurato (R-3, condizione di revisione 2 di Q-019).
 - **Voti:** {1,3}: 2; {1,2}: 2; {1,4}: 1; Scintilla 1: 1; 2 gemme di Guardia: 1; non assegnabile: 1. Default per spareggio sulla fascia dei pilastri 48–52.
 - **Bracci:** `scintilla_extra_round` ∈ {2, 3, 4}, più la Guardia di Ar (`scintilla_guardia_g2` 2).
 - **Misura:** 10.000 partite appaiate per braccio sulla base finale.
@@ -684,3 +691,4 @@ I moduli di v0.1 §17 (campo di battaglia, zone contese, round condiviso, Fulcro
 | v0.2.1 | 2026-10-08 | Chiarimenti per il set (R-007), nessuna regola del nucleo nuova. Stanca solo nel tuo turno, anche nei trigger (Q-016; tolta la riga del §6.3). Impegno e Parata del difensore: le condizioni sulle gemme del difensore contano solo la Parata (C4 b, Q-015 S-2). Trigger di C6 (e) anche nella sconfitta reciproca, con esempio Rinnovo/BLU-025 (§7.5, Q-015 S-9). Limite di copie per ID (§2.3). Massimo di Guardia: "+1 per Lanterna" → aumenti stampati sulle carte (§5.3). Costi ⟳ con la Brace (§5.2). Testi di Impeto, Caccia, Bracconiere, Rinnovo da Q-014/Q-015 (§12). Glossario: Bonus al bersaglio, Caccia, Difendi, Forza attuale, Impeto. |
 | v0.2.2 | 2026-10-08 | Refusi da R-009: Rimarginare "⟳, 1 Brace" (§6.3, §10.2, glossario, §16); richiamo di Impeto "contando solo le gemme di Parata"; Maera del §13 con "gemma di Parata"; nota al §13 che le carte d'esempio sono quelle del simulatore del nucleo, non il set. |
 | v0.2.3 | 2026-10-08 | Testi di Q-018 (livello 1, R-011 §4): richiami di Impeto e Caccia (§12.2, glossario); al §7.2 "Essere Ruotata non rende bersaglio di un attacco e non protegge dalla Caccia". Nessuna regola nuova. |
+| v0.2.4 | 2026-10-12 | Q-019 (livello 3, ratificata 8/8): Crepuscolo di round, un solo controllo nel Ripristino di G1 per entrambi i Leader, spareggio meno Vite poi giocatore attivo (G1); compensazione di G2 nei round 1, 3 e 5. Preset del simulatore V024. |
