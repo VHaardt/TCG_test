@@ -3,6 +3,18 @@ import glob, math, os, re, sys
 
 ROOT = os.environ.get("E020_ROOT", "/mnt/project-files/tcg/swarm/esperimenti/E-020")
 COMMIT = sys.argv[1] if len(sys.argv) > 1 else "feabc5c"
+
+
+def _preset():
+    """Reads the preset from the first cell report under ROOT, so the header matches the data."""
+    for f in sorted(glob.glob(f"{ROOT}/*/*/*/*_torneo_*.md")):
+        m = re.search(r"configurazione `([^`]+)`", open(f, encoding="utf-8").read())
+        if m:
+            return m.group(1)
+    return "?"
+
+
+PRESET = _preset()
 LAB = lambda d: re.sub(r"rif_LDR0(\d)_\w+", r"L\1", d).replace("mix_M3_thorn_lucchetto", "M3")
 ORDER = ["L1", "L2", "L3", "L4", "L5", "L6", "M3"]
 
@@ -85,7 +97,7 @@ def render(name, ia, cells, base, ref="00_B0"):
     mix = {k: c for k, c in cells.items() if k.startswith("M3")}
     ngames = sum(c["n"] for c in cells.values())
     L = [f"# E-020 / {name} — dati con IA {'semplice' if ia == 'S' else 'forte:30 (v2)'}", "",
-         f"Motore commit {COMMIT} (branch `claude/regolamento-v0.1`), preset V02, un torneo per incrocio (`lancia_e020.sh`), "
+         f"Motore commit {COMMIT} (branch `claude/regolamento-v0.1`), preset {PRESET}, un torneo per incrocio (`lancia_e020.sh`), "
          f"partite appaiate per seme con B0. Incroci: {len(rif)} rif" + (f" + {len(mix)} mix_M3" if mix else "")
          + f"; partite: {ngames} ({next(iter(cells.values()))['n']} per incrocio). Solo dati: le regole d'uscita sono nel piano e nel LEGGIMI.", ""]
     tot = leader_totals(rif)
