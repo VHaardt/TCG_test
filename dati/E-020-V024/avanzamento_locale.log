@@ -25,3 +25,11 @@
 09_T1_PB forte:30 L4-L5 seed 3013 fatto
 09_T1_PB forte:30 L4-L6 seed 3014 fatto
 2026-10-12T17:19:01Z fine 09_T1_PB forte:30 100 3000 4
+2026-10-12T17:19:04Z push 09_T1_PB 100 4  ok
+2026-10-12T17:19:04Z inizio 11_T1_V2 forte:30 100 3000 4 (traccia LDR-03,LDR-04,LDR-05,ROS-001,ROS-010,ROS-018,BLU-015)
+11_T1_V2 forte:30 L1-L4 seed 3003 fatto
+11_T1_V2 forte:30 L2-L4 seed 3007 fatto
+11_T1_V2 forte:30 L3-L4 seed 3010 fatto
+11_T1_V2 forte:30 L4-L5 seed 3013 fatto
+11_T1_V2 forte:30 L4-L6 seed 3014 fatto
+2026-10-12T19:51:03Z fine 11_T1_V2 forte:30 100 3000 4
