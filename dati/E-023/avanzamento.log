@@ -16,3 +16,22 @@
 00_B0 semplice L4-L6 seed 2014 fatto
 00_B0 semplice L5-L6 seed 2015 fatto
 2026-10-13T14:58:03Z fine 00_B0 semplice 400 2000 tutti
+2026-10-13T14:58:06Z push 00_B0 semplice 400 2000 ok
+2026-10-13T14:58:06Z Coda riordinata (coordinatore 14:56Z): dopo le corse con l'IA semplice gira Q-022 mirror_P137, poi la forte di E-023
+2026-10-13T14:58:06Z inizio D06_vuoto semplice 400 2000 tutti (src /home/claude/e023_in/dati/E-023-input, traccia LDR-06,NER-002,NER-003,NER-009,NER-011,N…)
+D06_vuoto semplice L1-L2 seed 2001 fatto
+D06_vuoto semplice L1-L3 seed 2002 fatto
+D06_vuoto semplice L1-L4 seed 2003 fatto
+D06_vuoto semplice L1-L5 seed 2004 fatto
+D06_vuoto semplice L1-L6 seed 2005 fatto
+D06_vuoto semplice L2-L3 seed 2006 fatto
+D06_vuoto semplice L2-L4 seed 2007 fatto
+D06_vuoto semplice L2-L5 seed 2008 fatto
+D06_vuoto semplice L2-L6 seed 2009 fatto
+D06_vuoto semplice L3-L4 seed 2010 fatto
+D06_vuoto semplice L3-L5 seed 2011 fatto
+D06_vuoto semplice L3-L6 seed 2012 fatto
+D06_vuoto semplice L4-L5 seed 2013 fatto
+D06_vuoto semplice L4-L6 seed 2014 fatto
+D06_vuoto semplice L5-L6 seed 2015 fatto
+2026-10-13T15:02:43Z fine D06_vuoto semplice 400 2000 tutti
