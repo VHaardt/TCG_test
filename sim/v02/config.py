@@ -48,7 +48,7 @@ class Rules2:
     crepuscolo_round: int = 15
     crepuscolo_loss: int = 2
     crepuscolo_simultaneo: bool = False   # Q-019 B: un solo controllo, nel Ripristino di G1, per entrambi
-    crepuscolo_spareggio: str = "primo_colpo"  # Q-019 B con entrambi Alle Corde: primo_colpo, attivo, vite_attivo, vite_difensore, mazzo, cicatrici
+    crepuscolo_spareggio: str = "primo_colpo"  # Q-019 B con entrambi Alle Corde: primo_colpo, attivo, vite_attivo, vite_difensore, mazzo, cicatrici; Q-022: vite_leader, vite_ruotato, vite_guardia
     guardia_stop_round: int = 0           # Q-019 C: da questo round non si forma la Guardia (0 = mai)
 
     # limits

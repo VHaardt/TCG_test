@@ -54,7 +54,8 @@ def play_game(job):
         s.end_reason = "loop"
     return {"decks": list(decks), "agents": list(agents_spec), "seed": seed, "winner": s.winner,
             "end_reason": s.end_reason, "rounds": s.round, "life_end": [len(s.p[0].life), len(s.p[1].life)],
-            "stats": s.stats, "log": s.log, "crep": dict(s.crep)}
+            "stats": s.stats, "log": s.log, "crep": dict(s.crep),
+            "spareggio_word": s.r.crepuscolo_spareggio}
 
 
 def all_decks():
@@ -190,6 +191,53 @@ def metrics(recs):
     gw = [r["crep"].get("guard", {}).get(f"{r['crep']['spareggio']['round'] - 1}-{r['winner']}") for r in sp]
     gw = [g for g in gw if g is not None]
     m["sp_guard"] = (sum(gw) / len(gw)) if gw else float("nan")
+    # Q-022: righe di stallo proposte nel round 1 (blu, architetto, critico, verde, ponti, analista, rosso, nero)
+    def atk_in(r, q):
+        return any(rd == r["crep"]["spareggio"]["round"] - 1 and qq == q for rd, qq in r["crep"].get("atk", []))
+    loser = lambda r: r["crep"]["spareggio"]["perde"]
+    pari = [r for r in sp if r["crep"]["spareggio"]["vite"][0] == r["crep"]["spareggio"]["vite"][1]]
+    dis = [r for r in sp if r not in pari]
+    m["sp_noatk_both"] = wilson(sum(not atk_in(r, 0) and not atk_in(r, 1) for r in sp), len(sp))
+    m["sp_loser_atk"] = wilson(sum(atk_in(r, loser(r)) for r in sp), len(sp))
+    m["sp_noatk_pari"] = wilson(sum(not atk_in(r, r["winner"]) for r in pari), len(pari))
+    m["sp_noatk_dis"] = wilson(sum(not atk_in(r, r["winner"]) for r in dis), len(dis))
+    m["sp_noatk_both_pari"] = wilson(sum(not atk_in(r, 0) and not atk_in(r, 1) for r in pari), len(pari))
+    def ultima(r):                                       # spareggio chiuso dall'ultima clausola (il posto)
+        c = r["crep"]["spareggio"]; pr = c.get("pronto"); gu = c.get("guardia")
+        if c["vite"][0] != c["vite"][1]:
+            return False
+        if spec_sp in ("vite_leader", "vite_ruotato") and pr is not None:
+            return pr[0] == pr[1]
+        if spec_sp == "vite_guardia" and gu is not None:
+            return gu[0] == gu[1]
+        return True
+    spec_sp = recs[0].get("spareggio_word") if recs else None
+    m["posto_tutte"] = wilson(sum(ultima(r) for r in sp), n)
+    m["posto_r15"] = wilson(sum(ultima(r) for r in sp), len(c15))
+    m["sp_g2_pari"] = wilson(sum(r["winner"] == 1 for r in pari), len(pari))
+    rot = {}
+    for r in pari:
+        for side, q in (("vinc", r["winner"]), ("perd", loser(r))):
+            hs = r["crep"].get("lrot", {}).get(f"{r['crep']['spareggio']['round'] - 1}-{q}", [])
+            k = side + ":" + (hs[0] if hs else "pronto")
+            rot[k] = rot.get(k, 0) + 1
+    m["sp_rot_pari"] = dict(sorted(rot.items()))
+    tp = {0: [0, 0], 1: [0, 0]}                         # Q-022 riga del critico: turni iniziati con entrambi Alle Corde a Vite pari
+    for r in recs:
+        atk = set(r.get("crep", {}).get("atk", []))
+        for rd, q in r.get("crep", {}).get("pari_inizio", []):
+            tp[q][0] += 1; tp[q][1] += (rd, q) not in atk
+    m["pari_noatk_g1"] = wilson(tp[0][1], tp[0][0]); m["pari_noatk_g2"] = wilson(tp[1][1], tp[1][0])
+    m["pari_turni"] = (tp[0][0], tp[1][0])
+    nb = [0, 0]                                          # Q-022 (blu, critico): nessuno dei due attacca nel round, popolazione fissata all'inizio del turno di G1
+    for r in recs:
+        atk = set(r.get("crep", {}).get("atk", []))
+        for rd, q in r.get("crep", {}).get("pari_inizio", []):
+            if q == 0:
+                nb[0] += 1; nb[1] += (rd, 0) not in atk and (rd, 1) not in atk
+    m["pari_noatk_both"] = wilson(nb[1], nb[0])
+    pre = [r for r in mir if r["rounds"] < 15]
+    m["g1_win_pre15"] = wilson(sum(r["winner"] == 0 for r in pre), len(pre))
     fin = [r for r in c15 if r["winner"] is not None and r["rounds"] >= 15]
     m["stallo_r15"] = wilson(sum(no_hit(r, {14, 15}) for r in fin), len(fin))
     m["stallo_r15_g2"] = wilson(sum(no_hit(r, {14, 15}) and r["winner"] == 1 for r in fin), len(fin))
@@ -375,6 +423,13 @@ def render(title, m, spec, agents, elapsed):
          f"| Q-019: spareggi (entrambi Alle Corde) a qualunque controllo, fra le arrivate al R15 / Vite pari fra gli spareggi (n={m['sp_n']}) | {pct(m['sp_rate'])} / {pct(m['sp_pari'])} | | |",
          f"| Q-019: spareggi per round; G2 vince lo spareggio | {m['sp_round']}; {pct(m['sp_g2'])} | | |",
          f"| Q-019 R-1: stallo fra gli spareggi: il vincitore non va a segno / non attacca nel suo ultimo turno; Guardia media del vincitore nella sua ultima Fine | {pct(m['sp_stallo'])} / {pct(m['sp_noatk'])}; {m['sp_guard']:.2f} | ≤50% (Cr) | |",
+         f"| Q-022: fra gli spareggi, nessuno dei due attacca nel suo ultimo turno / il perdente attacca | {pct(m['sp_noatk_both'])} / {pct(m['sp_loser_atk'])} | | |",
+         f"| Q-022: il vincitore non attacca, spareggi a Vite pari (n={m['sp_pari'][0]*m['sp_n']:.0f}) / a Vite diverse; nessuno attacca a Vite pari | {pct(m['sp_noatk_pari'])} / {pct(m['sp_noatk_dis'])}; {pct(m['sp_noatk_both_pari'])} | | |",
+         f"| Q-022: partite decise dal posto (ultima clausola dello spareggio), su tutte / fra le arrivate al R15; G2 vince gli spareggi a Vite pari | {pct(m['posto_tutte'])} / {pct(m['posto_r15'])}; {pct(m['sp_g2_pari'])} | | |",
+         f"| Q-022: come si è ruotato il Leader nell'ultimo turno, spareggi a Vite pari (vincitore/perdente: atk, abil, rim, pronto) | {m['sp_rot_pari']} | | |",
+         f"| Q-022 (critico): turni iniziati con entrambi i Leader Alle Corde a Vite pari dal R14, il giocatore di turno non attacca: turno di G1 (n={m['pari_turni'][0]}) / turno di G2 (n={m['pari_turni'][1]}) | {pct(m['pari_noatk_g1'])} / {pct(m['pari_noatk_g2'])} | ≤30% per chi perde la parità | |",
+         f"| Q-022 (blu, critico): stessi round iniziati da G1 con entrambi Alle Corde a Vite pari, nessuno dei due attacca nel round (n={m['pari_turni'][0]}) | {pct(m['pari_noatk_both'])} | ≤25–30% | |",
+         f"| Q-022: G1 nei mirror fra le partite finite prima del R15 | {pct(m['g1_win_pre15'])} | | |",
          f"| Q-019: partite finite dal R15 vinte senza colpi a segno del vincitore nei R14–15 (di cui vinte da G2) | {pct(m['stallo_r15'])} ({pct(m['stallo_r15_g2'])}) | | |",
          f"| Q-019: vincitori degli spareggi per mazzo | {m['sp_deck']} | | |",
          f"| Q-019: G1 fra le arrivate al R15 per coppia di mazzi | " + ", ".join(f"{k} {100*w[0]:.0f}% (n={n})" for k, (w, n) in m["g1_r15_pair"].items()) + " | | |",

@@ -500,7 +500,8 @@ class GameState:
         self.say(f"--- Round {self.round}, P{a+1} | Vite {len(self.p[0].life)}-{len(self.p[1].life)}")
         if a == G1 and self.round == self.r.crepuscolo_round:   # Q-019: diagnostica al primo controllo
             lv = (len(self.p[G1].life), len(self.p[G2].life))
-            self.crep = {"r15_lives": lv, "pareggio": self.alle_corde(G1) and self.alle_corde(G2)}
+            # Q-022: update, non riassegnazione: prima i dati dei R13–14 (atk, hits, guard) si perdevano qui
+            self.crep.update({"r15_lives": lv, "pareggio": self.alle_corde(G1) and self.alle_corde(G2)})
         if a == G1 and self.round == self.r.crepuscolo_round + 1:
             self.crep["vivo_r16"] = True
         if self.round >= self.r.crepuscolo_round:          # 7b
@@ -528,6 +529,9 @@ class GameState:
             self.draw(a)
         self.state_checks()
         self.phase = "main"
+        if self.stats is not None and self.round >= self.r.crepuscolo_round - 1:   # Q-022 (critico): stato a inizio turno
+            if self.alle_corde(G1) and self.alle_corde(G2) and len(self.p[G1].life) == len(self.p[G2].life):
+                self.crep.setdefault("pari_inizio", []).append((self.round, a))
         if self.stats is not None:
             self.stats["turns"][a] += 1
             if len(pl.units) == 1:
@@ -552,6 +556,17 @@ class GameState:
                 l0, l1 = len(self.p[G1].life), len(self.p[G2].life)
                 tie = self.active if sp == "vite_attivo" else 1 - self.active
                 loser = G1 if l0 < l1 else G2 if l1 < l0 else tie
+            elif sp in ("vite_leader", "vite_ruotato"):   # Q-022 (nero, rosso): a Vite pari perde chi ha il Leader Pronto
+                l0, l1 = len(self.p[G1].life), len(self.p[G2].life)
+                r0, r1 = self.p[G1].l_ready, self.p[G2].l_ready
+                tie = self.active if sp == "vite_leader" else 1 - self.active
+                loser = (G1 if l0 < l1 else G2 if l1 < l0 else
+                         G1 if (r0 and not r1) else G2 if (r1 and not r0) else tie)
+            elif sp == "vite_guardia":                      # Q-022 (ponti): a Vite pari perde chi ha più Guardia, poi l'attivo
+                l0, l1 = len(self.p[G1].life), len(self.p[G2].life)
+                g0, g1 = self.p[G1].guard, self.p[G2].guard
+                loser = (G1 if l0 < l1 else G2 if l1 < l0 else
+                         G1 if g0 > g1 else G2 if g1 > g0 else self.active)
             elif sp == "mazzo":                             # meno carte nel mazzo, a parità l'attivo
                 d0, d1 = len(self.p[G1].deck), len(self.p[G2].deck)
                 loser = G1 if d0 < d1 else G2 if d1 < d0 else self.active
@@ -562,7 +577,9 @@ class GameState:
                 raise ValueError(f"crepuscolo_spareggio sconosciuto: {sp}")
             if self.stats is not None:                      # Q-019: pari esatti a ogni controllo
                 self.crep["spareggio"] = {"round": self.round, "vite": [len(self.p[G1].life), len(self.p[G2].life)],
-                                          "perde": loser}
+                                          "perde": loser,
+                                          "pronto": [self.p[G1].l_ready, self.p[G2].l_ready],     # Q-022
+                                          "guardia": [self.p[G1].guard, self.p[G2].guard]}
             self.lose(loser, "crepuscolo")
             return
         for q in (G1, G2):
@@ -570,6 +587,11 @@ class GameState:
                 self.lose_life(q, "crepuscolo", ignore_saldo=True)
                 if self.over:
                     return
+
+    def _lrot(self, q, how):
+        """Q-022: come si è ruotato il Leader nei round finali (atk, abil, rim), per la diagnostica dello spareggio."""
+        if self.round >= 13 and self.stats is not None:
+            self.crep.setdefault("lrot", {}).setdefault(f"{self.round}-{q}", []).append(how)
 
     def _straighten(self, q):
         pl = self.p[q]
@@ -787,6 +809,7 @@ class GameState:
             self._play(a, act[1], act[2])
         elif k == "rim":
             pl.l_ready = False
+            self._lrot(a, "rim")
             pl.brace -= self.modifier(a, "rim_cost", 1)
             for sc in pl.scars:
                 if sc[0] == act[1] and not sc[1]:
@@ -800,6 +823,7 @@ class GameState:
             if src == "L":
                 ab = self.leader_abilities(a)[i]
                 pl.l_ready = False
+                self._lrot(a, "abil")
             else:
                 u = self.unit(a, src)
                 ab = CARDS[u.cid].abilities[i]
@@ -971,6 +995,7 @@ class GameState:
             # Q-017 (Ne, An): attaccando, il Leader rinuncia a un Rimarginare legale?
             self.combat.rim_legal = pl.brace >= self.modifier(a, "rim_cost", 1) and any(not sc[1] for sc in pl.scars)
             pl.l_ready = False
+            self._lrot(a, "atk")
             self.stat_add("leader_attacks", a)
             before = self.stats["activations"][a].get(pl.leader, 0) if self.stats is not None else 0
             self.fire(a, self.leader_abilities(a), "on_attack", dict(self.combat_ctx(self.combat), self="L"), src=pl.leader)
