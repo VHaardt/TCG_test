@@ -1,3 +1,6 @@
 2026-10-13T03:03:16Z Verifiche Q-019 (esito §8), commit motore 19c11bc, input af95deb/bd92257
 2026-10-13T03:03:16Z inizio R1_vite_attivo (V024, cambio:14:forte:30, 480/480, seed 19)
 2026-10-13T03:42:44Z fine R1_vite_attivo
+2026-10-13T03:42:46Z push R1_vite_attivo ok
+2026-10-13T03:42:46Z inizio R1_vite_difensore (/home/claude/e020_in/dati/Q-019-input/spec/B_vite_difensore_P6_135.json, cambio:14:forte:30, 480/480, seed 19)
+2026-10-13T04:22:32Z fine R1_vite_difensore
