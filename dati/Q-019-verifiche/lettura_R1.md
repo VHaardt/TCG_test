@@ -1,5 +1,7 @@
 # Q-019, condizione di revisione R-1 (esito §8.1): lettura del thread principale
 
+> **NON VALIDA per le righe di stallo (correzione 2026-10-13).** Un bug della diagnostica (motore 19c11bc: al primo Crepuscolo `self.crep` veniva riassegnato e cancellava attacchi, colpi e Guardia dei R13–14) fa contare ogni spareggio deciso al R15 come "il vincitore non ha attaccato / non è andato a segno". Le righe di stallo e la Guardia media del vincitore qui sotto sono gonfiate; le altre righe (spareggi, chi li vince, G1, rimonte, mazzi) non dipendono dal bug. Correzione nel commit b977e9b (934a469 su claude/regolamento-v0.1); R-1 è rimisurato dal thread di Q-022.
+
 Dati: `R1_vite_attivo/` e `R1_vite_difensore/`, 10 080 partite per parola, IA `cambio:14:forte:30` (semplice fino al R13, forte v2 dal R14), seed 19 (come la diagnostica V024), motore 19c11bc, set v0.2 (bd92257). Nessuna regola cambia: è solo una misura.
 
 | Riga | vite_attivo (regola in vigore) | vite_difensore (braccio pronto) |

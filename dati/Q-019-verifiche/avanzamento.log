@@ -9,3 +9,6 @@
 2026-10-13T06:29:28Z fine R3_V024_forte
 2026-10-13T06:29:31Z push R3_V024_forte ok
 2026-10-13T06:29:33Z push FINE ok
+2026-10-13T06:30:16Z Conferma R-3: solo mirror con la forte, 100 per mazzo, P6 [1,3,5] contro [1,3] (entrambi vite_attivo)
+2026-10-13T06:30:16Z inizio R3m_V024_P6_135 (V024, forte:30, 100/0, seed 23)
+2026-10-13T06:52:44Z STOP conferma R3m (set vecchio, seed 23): sostituita dalla richiesta Q-022 (set in vigore, seed 22)
