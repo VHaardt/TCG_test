@@ -49,3 +49,11 @@
 01_VI forte:30 L3-L5 seed 3011 fatto
 01_VI forte:30 L3-L6 seed 3012 fatto
 2026-10-12T22:57:42Z fine 01_VI forte:30 100 3000 3
+2026-10-12T22:57:44Z push 01_VI 100 3  ok
+2026-10-12T22:57:44Z inizio 08_T1 forte:30 100 3000 4 (traccia LDR-03,LDR-04,LDR-05,ROS-001,ROS-010,ROS-018,BLU-015)
+08_T1 forte:30 L1-L4 seed 3003 fatto
+08_T1 forte:30 L2-L4 seed 3007 fatto
+08_T1 forte:30 L3-L4 seed 3010 fatto
+08_T1 forte:30 L4-L5 seed 3013 fatto
+08_T1 forte:30 L4-L6 seed 3014 fatto
+2026-10-13T01:22:39Z fine 08_T1 forte:30 100 3000 4
