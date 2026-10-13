@@ -24,6 +24,8 @@ Saldo (massimo 2 Vite perse per turno) e colpo finale solo su un Leader già All
 
 *Nota di allineamento (v0.2, non cambia il pilastro):* in v0.2 le soglie si leggono sul **round** del tracciato, comune ai due giocatori, e il Saldo e il colpo finale si leggono dalle **Cicatrici fresche** (al massimo 2, 3 dal round 10; colpo finale su un Leader Alle Corde senza fresche) invece che dall'istantanea e dal contatore. Gli effetti sono quelli descritti sopra.
 
+*Nota di allineamento (Q-019, non cambia il pilastro):* "nel proprio Ripristino" si legge **nel Ripristino di G1**: dal round 15 il Crepuscolo si controlla una volta per round, in quel momento, per entrambi i Leader. Se entrambi sono Alle Corde perde chi ha meno Vite; a Vite pari perde il giocatore attivo (G1) (regolamento v0.2 §6.1 b, §9.10). Il limite duro, la fine entro il round 17 e l'assenza di patte sono invariati.
+
 ## 6. Interazione che modifica, mai che annulla *(riscritto in v0.2)*
 - Nessuna carta annulla un'altra carta o vieta di giocare; l'attaccante non risponde mai alla risposta del difensore.
 - Niente scarto forzato dalla mano avversaria.

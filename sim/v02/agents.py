@@ -445,7 +445,10 @@ class MCTSAgent2:
         if act[0] != "attack" or len(act) != 2:
             return False
         a = s.active
-        if act[1] != "L":
+        if act[1] == "L":
+            if any(ab.get("trigger") == "on_attack" for ab in s.leader_abilities(a)):
+                return False                                    # R-012: il trigger del Leader conta anche senza colpo
+        else:
             u = s.unit(a, act[1])
             if u is None or any(ab.get("trigger") == "on_attack" for ab in CARDS[u.cid].abilities) \
                     or CARDS[u.cid].has("caccia"):
@@ -490,8 +493,22 @@ class MCTSAgent2:
         return best
 
 
+class SwitchAgent:
+    """Q-019 R-1: one agent until round N, another from round N on (e.g. the strong AI only in the endgame)."""
+
+    def __init__(self, early, late, from_round):
+        self.early, self.late, self.from_round = early, late, from_round
+
+    def act(self, s):
+        return (self.late if s.round >= self.from_round else self.early).act(s)
+
+
 def make_agent(spec, seed=None):
-    """'semplice', 'semplice@0.08' (lam), 'vita', 'det', 'br', 'br:det', 'forte', 'forte:200'."""
+    """'semplice', 'semplice@0.08' (lam), 'vita', 'det', 'br', 'br:det', 'forte', 'forte:200',
+    'cambio:14:forte:30' (semplice fino al round 13, poi forte:30)."""
+    if spec.startswith("cambio:"):
+        _, n, late = spec.split(":", 2)
+        return SwitchAgent(make_agent("semplice", seed), make_agent(late, seed), int(n))
     name, _, rest = spec.partition(":")
     name, _, lam = name.partition("@")
     lam = float(lam) if lam else LAMBDA

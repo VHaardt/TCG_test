@@ -54,7 +54,8 @@ def play_game(job):
         s.end_reason = "loop"
     return {"decks": list(decks), "agents": list(agents_spec), "seed": seed, "winner": s.winner,
             "end_reason": s.end_reason, "rounds": s.round, "life_end": [len(s.p[0].life), len(s.p[1].life)],
-            "stats": s.stats, "log": s.log}
+            "stats": s.stats, "log": s.log, "crep": dict(s.crep),
+            "spareggio_word": s.r.crepuscolo_spareggio}
 
 
 def all_decks():
@@ -162,6 +163,93 @@ def metrics(recs):
         m["end_reasons"][r["end_reason"]] = m["end_reasons"].get(r["end_reason"], 0) + 1
     cr = [r for r in recs if r["end_reason"] == "crepuscolo"]
     m["g1_win_crep"] = wilson(sum(r["winner"] == 0 for r in cr), len(cr))     # R-011 #2
+    r15 = [r for r in recs if r["rounds"] >= 15]
+    m["g1_win_r15"] = wilson(sum(r["winner"] == 0 for r in r15), len(r15))    # Q-019
+    c15 = [r for r in recs if r.get("crep", {}).get("r15_lives")]
+    par = [r for r in c15 if r["crep"]["pareggio"]]
+    m["crep_pareggi"] = wilson(len(par), len(c15))
+    m["crep_pari"] = wilson(sum(r["crep"]["r15_lives"][0] == r["crep"]["r15_lives"][1] for r in par), len(par))
+    m["crep_vivi_r16"] = wilson(sum(bool(r["crep"].get("vivo_r16")) for r in c15), len(c15))
+    m["crep_g1_pareggi"] = wilson(sum(r["winner"] == 0 for r in par), len(par))
+    lp = {}
+    for r in c15:
+        k = "%d-%d" % tuple(r["crep"]["r15_lives"])
+        lp[k] = lp.get(k, 0) + 1
+    m["crep_vite"] = dict(sorted(lp.items(), key=lambda x: -x[1])[:8])
+    sp = [r for r in recs if r.get("crep", {}).get("spareggio")]          # Q-019 esito §6: spareggi a ogni controllo
+    m["sp_n"], m["sp_rate"] = len(sp), wilson(len(sp), len(c15))
+    m["sp_pari"] = wilson(sum(r["crep"]["spareggio"]["vite"][0] == r["crep"]["spareggio"]["vite"][1] for r in sp), len(sp))
+    m["sp_round"] = {}
+    for r in sp:
+        k = r["crep"]["spareggio"]["round"]; m["sp_round"][k] = m["sp_round"].get(k, 0) + 1
+    m["sp_g2"] = wilson(sum(r["winner"] == 1 for r in sp), len(sp))
+    def no_hit(r, rounds):
+        return not any(rd in rounds and q == r["winner"] for rd, q in r["crep"].get("hits", []))
+    m["sp_stallo"] = wilson(sum(no_hit(r, {r["crep"]["spareggio"]["round"] - 1}) for r in sp), len(sp))
+    m["sp_noatk"] = wilson(sum(not any(rd == r["crep"]["spareggio"]["round"] - 1 and q == r["winner"]
+                                       for rd, q in r["crep"].get("atk", [])) for r in sp), len(sp))
+    gw = [r["crep"].get("guard", {}).get(f"{r['crep']['spareggio']['round'] - 1}-{r['winner']}") for r in sp]
+    gw = [g for g in gw if g is not None]
+    m["sp_guard"] = (sum(gw) / len(gw)) if gw else float("nan")
+    # Q-022: righe di stallo proposte nel round 1 (blu, architetto, critico, verde, ponti, analista, rosso, nero)
+    def atk_in(r, q):
+        return any(rd == r["crep"]["spareggio"]["round"] - 1 and qq == q for rd, qq in r["crep"].get("atk", []))
+    loser = lambda r: r["crep"]["spareggio"]["perde"]
+    pari = [r for r in sp if r["crep"]["spareggio"]["vite"][0] == r["crep"]["spareggio"]["vite"][1]]
+    dis = [r for r in sp if r not in pari]
+    m["sp_noatk_both"] = wilson(sum(not atk_in(r, 0) and not atk_in(r, 1) for r in sp), len(sp))
+    m["sp_loser_atk"] = wilson(sum(atk_in(r, loser(r)) for r in sp), len(sp))
+    m["sp_noatk_pari"] = wilson(sum(not atk_in(r, r["winner"]) for r in pari), len(pari))
+    m["sp_noatk_dis"] = wilson(sum(not atk_in(r, r["winner"]) for r in dis), len(dis))
+    m["sp_noatk_both_pari"] = wilson(sum(not atk_in(r, 0) and not atk_in(r, 1) for r in pari), len(pari))
+    def ultima(r):                                       # spareggio chiuso dall'ultima clausola (il posto)
+        c = r["crep"]["spareggio"]; pr = c.get("pronto"); gu = c.get("guardia")
+        if c["vite"][0] != c["vite"][1]:
+            return False
+        if spec_sp in ("vite_leader", "vite_ruotato") and pr is not None:
+            return pr[0] == pr[1]
+        if spec_sp == "vite_guardia" and gu is not None:
+            return gu[0] == gu[1]
+        return True
+    spec_sp = recs[0].get("spareggio_word") if recs else None
+    m["posto_tutte"] = wilson(sum(ultima(r) for r in sp), n)
+    m["posto_r15"] = wilson(sum(ultima(r) for r in sp), len(c15))
+    m["sp_g2_pari"] = wilson(sum(r["winner"] == 1 for r in pari), len(pari))
+    rot = {}
+    for r in pari:
+        for side, q in (("vinc", r["winner"]), ("perd", loser(r))):
+            hs = r["crep"].get("lrot", {}).get(f"{r['crep']['spareggio']['round'] - 1}-{q}", [])
+            k = side + ":" + (hs[0] if hs else "pronto")
+            rot[k] = rot.get(k, 0) + 1
+    m["sp_rot_pari"] = dict(sorted(rot.items()))
+    tp = {0: [0, 0], 1: [0, 0]}                         # Q-022 riga del critico: turni iniziati con entrambi Alle Corde a Vite pari
+    for r in recs:
+        atk = set(r.get("crep", {}).get("atk", []))
+        for rd, q in r.get("crep", {}).get("pari_inizio", []):
+            tp[q][0] += 1; tp[q][1] += (rd, q) not in atk
+    m["pari_noatk_g1"] = wilson(tp[0][1], tp[0][0]); m["pari_noatk_g2"] = wilson(tp[1][1], tp[1][0])
+    m["pari_turni"] = (tp[0][0], tp[1][0])
+    nb = [0, 0]                                          # Q-022 (blu, critico): nessuno dei due attacca nel round, popolazione fissata all'inizio del turno di G1
+    for r in recs:
+        atk = set(r.get("crep", {}).get("atk", []))
+        for rd, q in r.get("crep", {}).get("pari_inizio", []):
+            if q == 0:
+                nb[0] += 1; nb[1] += (rd, 0) not in atk and (rd, 1) not in atk
+    m["pari_noatk_both"] = wilson(nb[1], nb[0])
+    pre = [r for r in mir if r["rounds"] < 15]
+    m["g1_win_pre15"] = wilson(sum(r["winner"] == 0 for r in pre), len(pre))
+    fin = [r for r in c15 if r["winner"] is not None and r["rounds"] >= 15]
+    m["stallo_r15"] = wilson(sum(no_hit(r, {14, 15}) for r in fin), len(fin))
+    m["stallo_r15_g2"] = wilson(sum(no_hit(r, {14, 15}) and r["winner"] == 1 for r in fin), len(fin))
+    spd = {}
+    for r in sp:
+        d = D.label(r["decks"][r["winner"]]); spd[d] = spd.get(d, 0) + 1
+    m["sp_deck"] = dict(sorted(spd.items(), key=lambda x: -x[1]))
+    pair = {}
+    for r in c15:
+        k = " vs ".join(sorted(D.label(d) for d in r["decks"]))
+        x = pair.setdefault(k, [0, 0]); x[0] += r["winner"] == 0; x[1] += 1
+    m["g1_r15_pair"] = {k: (wilson(*v), v[1]) for k, v in sorted(pair.items())}
     dw = {}
     for r in recs:
         for q in (0, 1):
@@ -328,10 +416,89 @@ def render(title, m, spec, agents, elapsed):
          f"| Azioni legali per decisione | {m['legal_per_decision']:.1f} | <60 | {check(m['legal_per_decision'] < 60)} |",
          f"| Fine partita | {m['end_reasons']} | | |",
          f"| G1 vince fra le partite finite al Crepuscolo | {pct(m['g1_win_crep'])} | | |",
+         f"| G1 vince fra le partite arrivate al round 15 | {pct(m['g1_win_r15'])} | | |",
+         f"| Q-019: pareggi al primo Crepuscolo (entrambi Alle Corde) / Vite pari fra i pareggi | {pct(m['crep_pareggi'])} / {pct(m['crep_pari'])} | | |",
+         f"| Q-019: G1 vince fra i pareggi; partite vive al round 16 | {pct(m['crep_g1_pareggi'])}; {pct(m['crep_vivi_r16'])} | | |",
+         f"| Q-019: Vite G1-G2 al primo Crepuscolo (più frequenti) | {m['crep_vite']} | | |",
+         f"| Q-019: spareggi (entrambi Alle Corde) a qualunque controllo, fra le arrivate al R15 / Vite pari fra gli spareggi (n={m['sp_n']}) | {pct(m['sp_rate'])} / {pct(m['sp_pari'])} | | |",
+         f"| Q-019: spareggi per round; G2 vince lo spareggio | {m['sp_round']}; {pct(m['sp_g2'])} | | |",
+         f"| Q-019 R-1: stallo fra gli spareggi: il vincitore non va a segno / non attacca nel suo ultimo turno; Guardia media del vincitore nella sua ultima Fine | {pct(m['sp_stallo'])} / {pct(m['sp_noatk'])}; {m['sp_guard']:.2f} | ≤50% (Cr) | |",
+         f"| Q-022: fra gli spareggi, nessuno dei due attacca nel suo ultimo turno / il perdente attacca | {pct(m['sp_noatk_both'])} / {pct(m['sp_loser_atk'])} | | |",
+         f"| Q-022: il vincitore non attacca, spareggi a Vite pari (n={m['sp_pari'][0]*m['sp_n']:.0f}) / a Vite diverse; nessuno attacca a Vite pari | {pct(m['sp_noatk_pari'])} / {pct(m['sp_noatk_dis'])}; {pct(m['sp_noatk_both_pari'])} | | |",
+         f"| Q-022: partite decise dal posto (ultima clausola dello spareggio), su tutte / fra le arrivate al R15; G2 vince gli spareggi a Vite pari | {pct(m['posto_tutte'])} / {pct(m['posto_r15'])}; {pct(m['sp_g2_pari'])} | | |",
+         f"| Q-022: come si è ruotato il Leader nell'ultimo turno, spareggi a Vite pari (vincitore/perdente: atk, abil, rim, pronto) | {m['sp_rot_pari']} | | |",
+         f"| Q-022 (critico): turni iniziati con entrambi i Leader Alle Corde a Vite pari dal R14, il giocatore di turno non attacca: turno di G1 (n={m['pari_turni'][0]}) / turno di G2 (n={m['pari_turni'][1]}) | {pct(m['pari_noatk_g1'])} / {pct(m['pari_noatk_g2'])} | ≤30% per chi perde la parità | |",
+         f"| Q-022 (blu, critico): stessi round iniziati da G1 con entrambi Alle Corde a Vite pari, nessuno dei due attacca nel round (n={m['pari_turni'][0]}) | {pct(m['pari_noatk_both'])} | ≤25–30% | |",
+         f"| Q-022: G1 nei mirror fra le partite finite prima del R15 | {pct(m['g1_win_pre15'])} | | |",
+         f"| Q-019: partite finite dal R15 vinte senza colpi a segno del vincitore nei R14–15 (di cui vinte da G2) | {pct(m['stallo_r15'])} ({pct(m['stallo_r15_g2'])}) | | |",
+         f"| Q-019: vincitori degli spareggi per mazzo | {m['sp_deck']} | | |",
+         f"| Q-019: G1 fra le arrivate al R15 per coppia di mazzi | " + ", ".join(f"{k} {100*w[0]:.0f}% (n={n})" for k, (w, n) in m["g1_r15_pair"].items()) + " | | |",
          f"| Nelle fasce comuni | {'sì' if in_bands(m) else 'no'} | | |", "",
          "Vittorie per mazzo: " + ", ".join(f"{D.label(d)} {pct(w)}" for d, w in sorted(m["deck_win"].items())), ""]
     L += render_r005(m)
     return "\n".join(L) + "\n"
+
+
+def render_r012(recs, traccia=()):
+    """R-012: matrice degli incroci, contatori per mazzo e uso delle carte tracciate."""
+    decks = sorted({d for r in recs for d in r["decks"]})
+    if not recs or "leader_attacks" not in recs[0]["stats"]:
+        return []
+    L = ["## R-012: matrice degli incroci (vittorie della riga contro la colonna, n)", "",
+         "| | " + " | ".join(D.label(d) for d in decks) + " |", "|---|" + "---|" * len(decks)]
+    for x in decks:
+        row = []
+        for y in decks:
+            g = [r for r in recs if set(r["decks"]) == {x, y} and x != y]
+            if not g:
+                row.append("—")
+                continue
+            w = wilson(sum(r["winner"] is not None and r["decks"][r["winner"]] == x for r in g), len(g))
+            row.append(f"{100*w[0]:.1f} [{100*w[1]:.0f}–{100*w[2]:.0f}] ({len(g)})")
+        L.append(f"| {D.label(x)} | " + " | ".join(row) + " |")
+    per = {d: {"n": 0} for d in decks}
+    for r in recs:
+        st = r["stats"]
+        for q in (0, 1):
+            x = per[r["decks"][q]]
+            x["n"] += 1
+            for k in ("leader_attacks", "leader_on_attack", "furia_bonus_combats", "scudo_atk2", "solo_unit_turns", "caccia_leader_atk"):
+                x[k] = x.get(k, 0) + st[k][q]
+            x["act_then_hit"] = x.get("act_then_hit", 0) + sum(st["act_then_hit"][q].values())
+            x["lead_act"] = x.get("lead_act", 0) + sum(v for c, v in st["activations"][q].items() if c in LEADERS or c.startswith("LDR"))
+            fh = st["first_hit_round"][q]
+            if fh is not None:
+                x.setdefault("fh", []).append(fh)
+            x["peak2"] = max(x.get("peak2", 0), st["peak2"][q])
+            for cid, v in st["cards_played"][q].items():
+                for c in CARDS[cid].colors if cid in CARDS else ():
+                    col = x.setdefault("col", {})
+                    col[c] = col.get(c, 0) + v
+            for key, lab in (("cards_played", "g"), ("activations", "a"), ("hits_by", "h"), ("kills_by", "k")):
+                for cid, v in st[key][q].items():
+                    if cid in traccia:
+                        t = x.setdefault("tr", {}).setdefault(cid, {})
+                        t[lab] = t.get(lab, 0) + v
+    L += ["", "## R-012: contatori per mazzo (per partita)", "",
+          "| Mazzo | Attacchi del Leader | on_attack del Leader eseguiti | Attivazioni del Leader (⟳ e trigger) / ⟳ seguite da un colpo a segno | Scontri con furia_bonus | Scudo a ≥2 gemme | Round del primo colpo al Leader (media, n) | Forza max a 2 gemme | Carte giocate per colore | Turni con una sola Unità in campo | Attacchi al Leader di Unità con Caccia |",
+          "|---|---|---|---|---|---|---|---|---|---|---|"]
+    for d in decks:
+        x = per[d]; n = max(x["n"], 1)
+        fh = x.get("fh", [])
+        col = x.get("col", {}); ct = max(sum(col.values()), 1)
+        L.append(f"| {D.label(d)} | {x.get('leader_attacks', 0)/n:.2f} | {x.get('leader_on_attack', 0)/n:.2f} | "
+                 f"{x.get('lead_act', 0)/n:.2f} / {x.get('act_then_hit', 0)/n:.2f} | {x.get('furia_bonus_combats', 0)/n:.2f} | "
+                 f"{x.get('scudo_atk2', 0)/n:.2f} | {(sum(fh)/len(fh)) if fh else float('nan'):.1f} ({len(fh)}) | {x.get('peak2', 0)} | "
+                 + ", ".join(f"{c} {100*v/ct:.0f}%" for c, v in sorted(col.items()))
+                 + f" | {x.get('solo_unit_turns', 0)/n:.2f} | {x.get('caccia_leader_atk', 0)/n:.2f} |")
+    if traccia:
+        L += ["", "## R-012: carte tracciate (per partita del mazzo: giocate / attivazioni / colpi a segno sul Leader / Unità sconfitte)", "",
+              "| Mazzo | " + " | ".join(traccia) + " |", "|---|" + "---|" * len(traccia)]
+        for d in decks:
+            x = per[d]; n = max(x["n"], 1); tr = x.get("tr", {})
+            L.append(f"| {D.label(d)} | " + " | ".join(
+                "/".join(f"{tr.get(c, {}).get(k, 0)/n:.2f}" for k in "gahk") for c in traccia) + " |")
+    return L + [""]
 
 
 def render_r005(m):
@@ -433,6 +600,7 @@ def cmd_torneo(a):
     recs, el = arm(a.variante, a.ia, a.partite, a.mazzi, a.seed, a.incroci)
     m = metrics(recs)
     text = render(f"Torneo v0.2 — {a.variante}", m, a.variante, a.ia, el)
+    text += "\n".join(render_r012(recs, tuple(t for t in (a.traccia or "").split(",") if t))) + "\n"
     print(text)
     print("report:", save(f"torneo_{os.path.splitext(os.path.basename(a.variante))[0]}", text, recs, a.out))
 
@@ -526,7 +694,7 @@ def main(argv=None):
     sub = p.add_subparsers(dest="cmd", required=True)
 
     def common(x, partite=100):
-        x.add_argument("--variante", default="V02")
+        x.add_argument("--variante", default="V024")
         x.add_argument("--ia", default="semplice")
         x.add_argument("--partite", type=int, default=partite)
         x.add_argument("--mazzi", nargs="*", help="nomi in sim/decks, file .json o file.json#nome")
@@ -535,7 +703,8 @@ def main(argv=None):
         x.add_argument("--seed", type=int, default=1)
         x.add_argument("--out")
     t = sub.add_parser("torneo"); common(t)
-    ab = sub.add_parser("ab"); common(ab); ab.add_argument("--base", default="V02")
+    t.add_argument("--traccia", help="R-012: ID di carte e Leader da tracciare, separati da virgola")
+    ab = sub.add_parser("ab"); common(ab); ab.add_argument("--base", default="V024")
     lm = sub.add_parser("lambda"); common(lm, 200)
     co = sub.add_parser("collaudo"); common(co, 250)
     fo = sub.add_parser("forte"); common(fo, 25); fo.add_argument("--forte", default="forte:60")

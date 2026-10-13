@@ -691,6 +691,56 @@ def test_filters_read_forza_attuale_without_combat_bonuses():
     assert s.matches(1, u, {"side": "own", "power_le": 1}, {}, 1)
 
 
+
+def test_q019_crepuscolo_simultaneo():
+    """Q-019 B: one Crepuscolo check in G1's Ripristino for both players; only the one Alle Corde loses,
+    with both Alle Corde nobody loses there."""
+    s = _arena()
+    s.r = s.r.with_(crepuscolo_simultaneo=True)
+    s.round = 15
+    n0, n1 = len(s.p[0].life), len(s.p[1].life)
+    s._crepuscolo_both()
+    assert len(s.p[0].life) == n0 - 2 and len(s.p[1].life) == n1 - 2 and not s.over
+    s = _arena()
+    s.r = s.r.with_(crepuscolo_simultaneo=True)
+    s.round = 15
+    s.p[1].life = s.p[1].life[:1]
+    s._crepuscolo_both()
+    assert s.over and s.winner == 0
+
+
+def test_r012_leader_on_attack_trigger_and_att_mod():
+    """R-012 primitiva 1: "quando il tuo Leader attacca" fires like a Unit's on_attack; an att_mod
+    on the Leader counts in the combat."""
+    E.LEADERS["_v2"] = LeaderCard(id="_v2", name="v2", colors=("G", "B"), base=(
+        {"trigger": "on_attack", "target": {"side": "opp", "ready": True, "cost_le": 3},
+         "do": [{"op": "stanca", "target": "chosen"}]},
+        {"trigger": "on_attack", "do": [{"op": "att_mod", "n": 1}]}), awakened=())
+    small = _card("_small2", power=2, cost=2)
+    s = _arena()
+    s.p[0].leader = "_v2"
+    s.p[1].units = [Unit(901, small, True)]
+    s.step(("attack", "L"))
+    assert not s.unit(1, 901).ready                                      # Stancata quando il Leader attacca
+    fa, _, _ = s.compute(0, 0, None, None)
+    assert fa == s.r.leader_power + 1
+
+
+def test_q019_v024_spareggio_vite_attivo():
+    """Q-019 (V024): both Alle Corde in G1's Ripristino of round 15 -> fewer Lives loses, then the active player (G1)."""
+    s = _arena()
+    s.r = rules_from("V024")
+    s.round, s.active = 15, 0
+    s.p[0].life, s.p[1].life = s.p[0].life[:1], []
+    s._crepuscolo_both()
+    assert s.over and s.winner == 0                     # G2 a 0 Vite perde
+    s = _arena()
+    s.r = rules_from("V024")
+    s.round, s.active = 15, 0
+    s.p[0].life, s.p[1].life = s.p[0].life[:1], s.p[1].life[:1]
+    s._crepuscolo_both()
+    assert s.over and s.winner == 1                     # a Vite pari perde l'attivo (G1)
+
 if __name__ == "__main__":
     for k, f in list(globals().items()):
         if k.startswith("test_"):

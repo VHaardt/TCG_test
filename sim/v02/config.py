@@ -35,6 +35,7 @@ class Rules2:
     scintilla_g2_gems: int = 1         # G2 +1 gemma nel round 1
     scintilla_extra_gems: int = 0      # Scintilla divisa: gemme in più per G2 ...
     scintilla_extra_round: int = 2     # ... in questo round
+    scintilla_extra_rounds: tuple = ()  # ... e in questi round (Q-019: P6 ritarata, es. (3, 5))
     scintilla_guardia_g2: int = 0      # gemme di Guardia in più per G2 nella Fine del round 1
     g2_hand_extra: int = 0             # carte in più nella mano iniziale di G2 (dopo il mulligan)
     no_attack_round: int = 1
@@ -46,6 +47,9 @@ class Rules2:
     corde_one_life_round: int = 13
     crepuscolo_round: int = 15
     crepuscolo_loss: int = 2
+    crepuscolo_simultaneo: bool = False   # Q-019 B: un solo controllo, nel Ripristino di G1, per entrambi
+    crepuscolo_spareggio: str = "primo_colpo"  # Q-019 B con entrambi Alle Corde: primo_colpo, attivo, vite_attivo, vite_difensore, mazzo, cicatrici; Q-022: vite_leader, vite_ruotato, vite_guardia
+    guardia_stop_round: int = 0           # Q-019 C: da questo round non si forma la Guardia (0 = mai)
 
     # limits
     max_units: int = 5
@@ -77,6 +81,10 @@ PRESETS = {
     # nucleo v0.2 ratificato (Q-013 esito.md, 2026-10-08); G1 e Scudo sono default di punti aperti
     "V02": {"tempra": 4, "pugno": "sequenziale", "scudo": "vince_pareggi",
             "scintilla_extra_gems": 1, "scintilla_extra_round": 3},
+    # v0.2.4: V02 + Q-019 ratificata (2026-10-12): Crepuscolo di round, spareggio vite → attivo, G2 +1 gemma anche nel round 5
+    "V024": {"tempra": 4, "pugno": "sequenziale", "scudo": "vince_pareggi",
+             "scintilla_extra_gems": 1, "scintilla_extra_round": 3, "scintilla_extra_rounds": (5,),
+             "crepuscolo_simultaneo": True, "crepuscolo_spareggio": "vite_attivo"},
 }
 
 

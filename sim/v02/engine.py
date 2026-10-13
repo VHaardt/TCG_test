@@ -162,6 +162,13 @@ def new_stats():
         "activations": [{}, {}],                                         # M11
         "removals": [0, 0],                                              # M12
         "life_costs": [0, 0],                                            # M14
+        # R-012 (E-020): uso delle carte e contatori
+        "leader_attacks": [0, 0], "leader_on_attack": [0, 0],
+        "hits_by": [{}, {}], "kills_by": [{}, {}],                       # colpi a segno sul Leader / Unità sconfitte, per attaccante
+        "furia_bonus_combats": [0, 0], "scudo_atk2": [0, 0],
+        "act_then_hit": [{}, {}],                                        # ⟳ del Leader seguita da un colpo a segno nello stesso turno
+        "first_hit_round": [None, None], "peak2": [0, 0],                # M13 picco: Forza massima a 2 gemme
+        "solo_unit_turns": [0, 0], "caccia_leader_atk": [0, 0],          # R-013
     }
 
 
@@ -179,6 +186,7 @@ class GameState:
         self.rng = random.Random()
         self.stats = new_stats()
         self.log = None
+        self.crep = {}
         self.track = None           # stato delle metriche M6/M7 (solo la partita vera, non i cloni)
 
     # ------------------------------------------------------------------ basics
@@ -193,6 +201,7 @@ class GameState:
         s.stats = None
         s.log = None
         s.track = None
+        s.crep = {}
         return s
 
     @property
@@ -489,27 +498,100 @@ class GameState:
             if self.round == 7 and self.stats is not None:
                 self.stats["life_at_round6"] = (len(self.p[0].life), len(self.p[1].life))
         self.say(f"--- Round {self.round}, P{a+1} | Vite {len(self.p[0].life)}-{len(self.p[1].life)}")
+        if a == G1 and self.round == self.r.crepuscolo_round:   # Q-019: diagnostica al primo controllo
+            lv = (len(self.p[G1].life), len(self.p[G2].life))
+            # Q-022: update, non riassegnazione: prima i dati dei R13–14 (atk, hits, guard) si perdevano qui
+            self.crep.update({"r15_lives": lv, "pareggio": self.alle_corde(G1) and self.alle_corde(G2)})
+        if a == G1 and self.round == self.r.crepuscolo_round + 1:
+            self.crep["vivo_r16"] = True
         if self.round >= self.r.crepuscolo_round:          # 7b
-            if self.alle_corde(a):
-                self.lose(a, "crepuscolo")
-                return
-            for _ in range(self.r.crepuscolo_loss):
-                self.lose_life(a, "crepuscolo", ignore_saldo=True)
+            if self.r.crepuscolo_simultaneo:                # Q-019 B: nel Ripristino di G1, per entrambi
+                if a == G1:
+                    self._crepuscolo_both()
+                    if self.over:
+                        return
+            else:
+                if self.alle_corde(a):
+                    self.lose(a, "crepuscolo")
+                    return
+                for _ in range(self.r.crepuscolo_loss):
+                    self.lose_life(a, "crepuscolo", ignore_saldo=True)
         pl.guard = 0                                        # 7c
         if self.r.raddrizzo == "ripristino":                # 7d
             self._straighten(a)
         pl.brace = min(self.round, self.r.brace_max)        # 7e
         if a == G2 and self.round == 1:
             pl.brace += self.r.scintilla_g2_gems
-        if a == G2 and self.round == self.r.scintilla_extra_round:
+        if a == G2 and (self.round == self.r.scintilla_extra_round or self.round in self.r.scintilla_extra_rounds):
             pl.brace += self.r.scintilla_extra_gems
         self.state_checks()
         if not (a == G1 and self.round == 1):               # 8
             self.draw(a)
         self.state_checks()
         self.phase = "main"
+        if self.stats is not None and self.round >= self.r.crepuscolo_round - 1:   # Q-022 (critico): stato a inizio turno
+            if self.alle_corde(G1) and self.alle_corde(G2) and len(self.p[G1].life) == len(self.p[G2].life):
+                self.crep.setdefault("pari_inizio", []).append((self.round, a))
         if self.stats is not None:
             self.stats["turns"][a] += 1
+            if len(pl.units) == 1:
+                self.stats["solo_unit_turns"][a] += 1          # R-013: una sola Unità in campo a inizio fase principale
+
+    def _crepuscolo_both(self):
+        """Q-019 B: one Crepuscolo check for both players, in G1's Ripristino. Whoever is Alle Corde loses;
+        if both are, crepuscolo_spareggio decides (V024: fewer Lives loses, then the active player, G1;
+        "primo_colpo": nobody loses here and the next hit on a Leader ends the game)."""
+        corde = [q for q in (G1, G2) if self.alle_corde(q)]
+        if len(corde) == 1:
+            self.lose(corde[0], "crepuscolo")
+            return
+        if len(corde) == 2:
+            sp = self.r.crepuscolo_spareggio
+            if sp == "primo_colpo":
+                self.say("    Crepuscolo: entrambi Alle Corde, decide il primo colpo")
+                return
+            if sp == "attivo":                              # §7.4: perde il giocatore attivo
+                loser = self.active
+            elif sp in ("vite_attivo", "vite_difensore"):  # meno Vite; a parità l'attivo o il difensore
+                l0, l1 = len(self.p[G1].life), len(self.p[G2].life)
+                tie = self.active if sp == "vite_attivo" else 1 - self.active
+                loser = G1 if l0 < l1 else G2 if l1 < l0 else tie
+            elif sp in ("vite_leader", "vite_ruotato"):   # Q-022 (nero, rosso): a Vite pari perde chi ha il Leader Pronto
+                l0, l1 = len(self.p[G1].life), len(self.p[G2].life)
+                r0, r1 = self.p[G1].l_ready, self.p[G2].l_ready
+                tie = self.active if sp == "vite_leader" else 1 - self.active
+                loser = (G1 if l0 < l1 else G2 if l1 < l0 else
+                         G1 if (r0 and not r1) else G2 if (r1 and not r0) else tie)
+            elif sp == "vite_guardia":                      # Q-022 (ponti): a Vite pari perde chi ha più Guardia, poi l'attivo
+                l0, l1 = len(self.p[G1].life), len(self.p[G2].life)
+                g0, g1 = self.p[G1].guard, self.p[G2].guard
+                loser = (G1 if l0 < l1 else G2 if l1 < l0 else
+                         G1 if g0 > g1 else G2 if g1 > g0 else self.active)
+            elif sp == "mazzo":                             # meno carte nel mazzo, a parità l'attivo
+                d0, d1 = len(self.p[G1].deck), len(self.p[G2].deck)
+                loser = G1 if d0 < d1 else G2 if d1 < d0 else self.active
+            elif sp == "cicatrici":                         # più Cicatrici, a parità l'attivo
+                c0, c1 = len(self.p[G1].scars), len(self.p[G2].scars)
+                loser = G1 if c0 > c1 else G2 if c1 > c0 else self.active
+            else:
+                raise ValueError(f"crepuscolo_spareggio sconosciuto: {sp}")
+            if self.stats is not None:                      # Q-019: pari esatti a ogni controllo
+                self.crep["spareggio"] = {"round": self.round, "vite": [len(self.p[G1].life), len(self.p[G2].life)],
+                                          "perde": loser,
+                                          "pronto": [self.p[G1].l_ready, self.p[G2].l_ready],     # Q-022
+                                          "guardia": [self.p[G1].guard, self.p[G2].guard]}
+            self.lose(loser, "crepuscolo")
+            return
+        for q in (G1, G2):
+            for _ in range(self.r.crepuscolo_loss):
+                self.lose_life(q, "crepuscolo", ignore_saldo=True)
+                if self.over:
+                    return
+
+    def _lrot(self, q, how):
+        """Q-022: come si è ruotato il Leader nei round finali (atk, abil, rim), per la diagnostica dello spareggio."""
+        if self.round >= 13 and self.stats is not None:
+            self.crep.setdefault("lrot", {}).setdefault(f"{self.round}-{q}", []).append(how)
 
     def _straighten(self, q):
         pl = self.p[q]
@@ -535,14 +617,19 @@ class GameState:
                 self.stats["unit_turns"][a] += len(tr["seen"])
                 tr["cand"][a] = {u.uid for u in pl.units if u.ready and u.uid in tr["seen"]} - tr["attacked"]
             tr["seen"], tr["attacked"], tr["opposed"], tr["stancate"] = set(), set(), set(), set()
+            tr.pop("lead_act", None)
             if self.both_022(a):
                 self.stat_add("turns_both022", a)              # R-009 #6
         stored = min(pl.brace, self.guard_max(a))           # 10b
+        if self.r.guardia_stop_round and self.round >= self.r.guardia_stop_round:
+            stored = 0                                      # Q-019 C
         pl.guard = stored
         if a == G2 and self.round == 1:
             pl.guard += self.r.scintilla_guardia_g2          # oltre il massimo, per gli attacchi di G1 nel round 2
         pl.brace = 0
         self.stat_add("guard_stored", a, n=stored)
+        if self.round >= 13 and self.stats is not None:     # Q-019: Guardia formata nei round finali
+            self.crep.setdefault("guard", {})[f"{self.round}-{a}"] = pl.guard
         if self.r.raddrizzo == "fine":                      # 10c
             self._straighten(a)
         for q in (G1, G2):                                  # 10d
@@ -722,6 +809,7 @@ class GameState:
             self._play(a, act[1], act[2])
         elif k == "rim":
             pl.l_ready = False
+            self._lrot(a, "rim")
             pl.brace -= self.modifier(a, "rim_cost", 1)
             for sc in pl.scars:
                 if sc[0] == act[1] and not sc[1]:
@@ -735,6 +823,7 @@ class GameState:
             if src == "L":
                 ab = self.leader_abilities(a)[i]
                 pl.l_ready = False
+                self._lrot(a, "abil")
             else:
                 u = self.unit(a, src)
                 ab = CARDS[u.cid].abilities[i]
@@ -742,6 +831,8 @@ class GameState:
             pl.brace -= ab.get("cost", 0)
             self.pay_costs(a, ab.get("costs"))              # Cicatrici contate prima (bersaglio già scelto)
             self.stat_add("activations", a, LEADERS[pl.leader].id if src == "L" else u.cid)
+            if src == "L" and self.track is not None:
+                self.track.setdefault("lead_act", []).append(LEADERS[pl.leader].id)
             if self.log is not None:
                 who = "del Leader" if src == "L" else f"di {CARDS[u.cid].name}"
                 tgt = f" su {self.describe(self._chosen(a, ab.get('target'), t)['chosen_owner'], t)}" if t is not None else ""
@@ -904,15 +995,25 @@ class GameState:
             # Q-017 (Ne, An): attaccando, il Leader rinuncia a un Rimarginare legale?
             self.combat.rim_legal = pl.brace >= self.modifier(a, "rim_cost", 1) and any(not sc[1] for sc in pl.scars)
             pl.l_ready = False
+            self._lrot(a, "atk")
+            self.stat_add("leader_attacks", a)
+            before = self.stats["activations"][a].get(pl.leader, 0) if self.stats is not None else 0
+            self.fire(a, self.leader_abilities(a), "on_attack", dict(self.combat_ctx(self.combat), self="L"), src=pl.leader)
+            if self.stats is not None:                      # R-012 primitiva 1: on_attack del Leader eseguiti
+                self.stats["leader_on_attack"][a] += self.stats["activations"][a].get(pl.leader, 0) - before
         else:
             u = self.unit(a, att)
             u.ready = False
             self.fire(a, CARDS[u.cid].abilities, "on_attack", dict(self.combat_ctx(self.combat), self=att), src=u.cid)
         self.stat_add("attacks", a)
+        if self.round >= 13 and self.stats is not None:     # Q-019 R-1: attacchi dichiarati nei round finali
+            self.crep.setdefault("atk", []).append((self.round, a))
         if self.track is not None:
             self.track["attacked"].add(att)
             if hunted is None and self.both_022(a):
                 self.stat_add("atk_leader_both022", a)         # R-009 #6 (bersaglio dichiarato: il Leader)
+        if hunted is None and att != "L" and CARDS[self.unit(a, att).cid].has("caccia"):
+            self.stat_add("caccia_leader_atk", a)               # R-013: Unità con Caccia che attacca il Leader
         if hunted is not None:
             self.stat_add("hunt", a)
             self.stat_add("hunt_ready" if self.unit(d, hunted).ready else "hunt_rotated", a)
@@ -977,6 +1078,9 @@ class GameState:
             mods += fa != base_a
             if src is not None and fa != base_a:
                 src.append((a, self.p[a].leader))
+            am, _ = self.trigger_mods(a, self.leader_abilities(a), "on_attack", dict(ctx_a, self="L"))
+            fa += am
+            mods += am != 0
         else:
             u = self.unit(a, cb.att)
             fa = self.unit_power(a, u, ctx_a, src)
@@ -1109,6 +1213,25 @@ class GameState:
                     st[2] += gems == avail
                 st[3] += gems
             st_all["mods"][mods] = st_all["mods"].get(mods, 0) + 1
+            acid = LEADERS[pa.leader].id if cb.att == "L" else self.unit(a, cb.att).cid
+            if cb.att != "L":
+                if self.static_sum(a, "furia_bonus") > 0:
+                    st_all["furia_bonus_combats"][a] += 1
+                if CARDS[acid].has("scudo") and cb.a >= 2:
+                    st_all["scudo_atk2"][a] += 1
+            if cb.a == 2:
+                st_all["peak2"][a] = max(st_all["peak2"][a], fa)
+            if hit:
+                self.stat_add("hits_by", a, acid)
+                if self.round >= 13:                            # Q-019: colpi a segno sul Leader nei round finali
+                    self.crep.setdefault("hits", []).append((self.round, a))
+                if st_all["first_hit_round"][a] is None:
+                    st_all["first_hit_round"][a] = self.round
+                if self.track is not None and self.track.get("lead_act"):
+                    for lid in self.track.pop("lead_act"):
+                        self.stat_add("act_then_hit", a, lid)
+            if tgt_dead:
+                self.stat_add("kills_by", a, acid)
             if cb.react:
                 st_all["reactions"][d] += 1
             if any(max(CARDS[c].cost, 1) <= pd.guard for c, _ in self.reaction_options(d)):
