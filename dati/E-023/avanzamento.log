@@ -85,3 +85,11 @@ D06_vuoto forte:30 L3-L6 seed 3012 fatto
 D06_vuoto forte:30 L4-L6 seed 3014 fatto
 D06_vuoto forte:30 L5-L6 seed 3015 fatto
 2026-10-13T20:29:02Z fine D06_vuoto forte:30 100 3000 6
+2026-10-13T20:29:05Z push D06_vuoto forte:30 100 ok
+2026-10-13T20:29:05Z inizio D06_base_vuota forte:30 100 3000 6 (src /home/claude/e023_in/dati/E-023-input, traccia LDR-06,NER-002,NER-003,NER-009,NER-011,N…)
+D06_base_vuota forte:30 L1-L6 seed 3005 fatto
+D06_base_vuota forte:30 L2-L6 seed 3009 fatto
+D06_base_vuota forte:30 L3-L6 seed 3012 fatto
+D06_base_vuota forte:30 L4-L6 seed 3014 fatto
+D06_base_vuota forte:30 L5-L6 seed 3015 fatto
+2026-10-13T22:41:15Z fine D06_base_vuota forte:30 100 3000 6
