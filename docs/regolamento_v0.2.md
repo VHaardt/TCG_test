@@ -2,8 +2,8 @@
 
 | Campo | Valore |
 |---|---|
-| Versione | v0.2.4 (nucleo; ultima modifica Q-019) |
-| Data | 2026-10-12 |
+| Versione | v0.2.5 (nucleo; ultima modifica R-014, testo di Q-020) |
+| Data | 2026-10-13 |
 | Stato | **ratificato dallo swarm (Q-013, 8/8 APPROVO); pilastri 2–3–4–6 in revisione, vedi pilastri** (`pilastri_design_v0.2.md`) |
 | Fonte normativa | `swarm/questioni/Q-013_rework_nucleo_v0.2/esito.md`, sezione A "Specifica consolidata". Dati: `swarm/esperimenti/E-014/sintesi_r3.md` |
 | Sostituisce | `regolamento_v0.1.md`. Le parti di v0.1 non toccate da Q-013 restano valide e sono riportate qui |
@@ -368,6 +368,11 @@ Il Leader attacca come un personaggio (§8) con la sua Forza: 3, Risvegliato 4. 
 ### 10.3 Abilità di Reazione dei Leader
 Le abilità che in v0.1 erano Reazioni del Leader sono **statiche**: si leggono in C4 (d) quando il loro controllore è il difensore. Non ruotano il Leader, non costano gemme e valgono anche se il Leader è Ruotato.
 
+### 10.4 Abilità "quando il tuo Leader attacca"
+Un'abilità del Leader che inizia con **"Quando il tuo Leader attacca"** è un trigger (§7.5) e si risolve in **C1**: dopo che il Leader è stato dichiarato attaccante e ruotato, **prima dell'opposizione** (C2). Non ha costo, non ruota altro e scatta una volta per ogni attacco del Leader. Se l'abilità chiede un bersaglio e non ce n'è uno legale, non ha effetto.
+- Esempio: Thorn (LDR-04), Base: "Quando il tuo Leader attacca, Stanca un'Unità avversaria Pronta con costo ≤3". Il Leader attacca, la Stanca si risolve in C1 e l'Unità Stancata, ora Ruotata, non può opporsi in C2.
+- Pilastro 9: il trigger si risolve in un punto fisso della sequenza, non crea informazione nascosta e nel simulatore è la stessa primitiva dei trigger "quando attacca" delle Unità (`on_attack`).
+
 ---
 
 ## 11. Compensazione del primo giocatore
@@ -428,7 +433,7 @@ Le abilità che in v0.1 erano Reazioni del Leader sono **statiche**: si leggono 
 
 ## 13. Carte d'esempio convertite
 
-Sono le carte di v0.1 convertite con la tabella del §12.3, così come le usa il simulatore (`sim/v02/cards_v02.json`) per le misure del nucleo. **Non sono il set**: le carte e i Leader del primo set (LDR-01…06, con i testi approvati, es. Thorn = LDR-04 "⟳, 1 Brace: Stanca … costo ≤3") sono in `tcg/set/finale/set_v02.json`. Le conversioni dei Leader sono provvisorie e i valori vanno al thread carte. Formato: **Nome** — costo · tipo · Forza · testo. Il costo è in gemme.
+Sono le carte di v0.1 convertite con la tabella del §12.3, così come le usa il simulatore (`sim/v02/cards_v02.json`) per le misure del nucleo. **Non sono il set**: le carte e i Leader del primo set (LDR-01…06, con i testi approvati, es. Thorn = LDR-04 "Quando il tuo Leader attacca, Stanca … costo ≤3", da Q-020) sono in `tcg/set/finale/set_v02.json`. Le conversioni dei Leader sono provvisorie e i valori vanno al thread carte. Formato: **Nome** — costo · tipo · Forza · testo. Il costo è in gemme.
 
 **Leader** (tutti F3 / Tempra 4 / Vita 5; Risvegliati F4 / Tempra 4)
 - **Arden, Fabbro di Guerra** (Rosso/Verde). Base: se un tuo attaccante ha almeno 2 gemme impegnate, ha +1 Forza in questo scontro. Risvegliato: le tue Unità con Assalto hanno +1 Forza.
@@ -534,7 +539,7 @@ Il costo di una Reazione si paga con le gemme di Guardia impegnate in C4. Le car
 | **Stanca** | Ruota un'Unità avversaria Pronta; solo nel tuo turno, mai il Leader. |
 | **Tempra** | Valore di difesa del Leader: 4. |
 | **Tracciato del round** | Carta con il segnalino del round e le soglie stampate. |
-| **Trigger** | Abilità "quando…" o "a fine turno"; ordine del §7.5. |
+| **Trigger** | Abilità "quando…" o "a fine turno"; ordine del §7.5. Quelli "quando il tuo Leader attacca" si risolvono in C1, prima dell'opposizione (§10.4). |
 | **Turno** | Sempre il turno del giocatore attivo. |
 | **Valore di difesa** | Forza dell'Unità che si oppone o Tempra del Leader, più i bonus dello scontro. |
 | **Vite perse** | Vita iniziale − Vita attuale; determina il Risveglio. |
@@ -692,3 +697,4 @@ I moduli di v0.1 §17 (campo di battaglia, zone contese, round condiviso, Fulcro
 | v0.2.2 | 2026-10-08 | Refusi da R-009: Rimarginare "⟳, 1 Brace" (§6.3, §10.2, glossario, §16); richiamo di Impeto "contando solo le gemme di Parata"; Maera del §13 con "gemma di Parata"; nota al §13 che le carte d'esempio sono quelle del simulatore del nucleo, non il set. |
 | v0.2.3 | 2026-10-08 | Testi di Q-018 (livello 1, R-011 §4): richiami di Impeto e Caccia (§12.2, glossario); al §7.2 "Essere Ruotata non rende bersaglio di un attacco e non protegge dalla Caccia". Nessuna regola nuova. |
 | v0.2.4 | 2026-10-12 | Q-019 (livello 3, ratificata 8/8): Crepuscolo di round, un solo controllo nel Ripristino di G1 per entrambi i Leader, spareggio meno Vite poi giocatore attivo (G1); compensazione di G2 nei round 1, 3 e 5. Preset del simulatore V024. |
+| v0.2.5 | 2026-10-13 | R-014 (esito di Q-020, 8/8): nuovo §10.4 sulle abilità "quando il tuo Leader attacca" (trigger in C1, prima dell'opposizione; controllo del pilastro 9); Base di Thorn (LDR-04) "Quando il tuo Leader attacca, Stanca un'Unità avversaria Pronta con costo ≤3" al posto di "⟳, 1 Brace: …" (nota del §13, glossario). Nessuna regola del nucleo cambia. |
