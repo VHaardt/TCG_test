@@ -4,3 +4,6 @@
 2026-10-13T03:42:46Z push R1_vite_attivo ok
 2026-10-13T03:42:46Z inizio R1_vite_difensore (/home/claude/e020_in/dati/Q-019-input/spec/B_vite_difensore_P6_135.json, cambio:14:forte:30, 480/480, seed 19)
 2026-10-13T04:22:32Z fine R1_vite_difensore
+2026-10-13T04:22:34Z push R1_vite_difensore ok
+2026-10-13T04:22:34Z inizio R3_V024_forte (V024, forte:30, 50/6, seed 22)
+2026-10-13T06:29:28Z fine R3_V024_forte
