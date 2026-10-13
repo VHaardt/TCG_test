@@ -66,3 +66,6 @@ D_04a forte:30 L4-L5 seed 3013 fatto
 D_04a forte:30 L4-L6 seed 3014 fatto
 2026-10-13T03:00:40Z fine D_04a forte:30 60 3000 4
 2026-10-13T03:00:42Z push D_04a 60 4  ok
+2026-10-13T03:00:44Z push R2_F_FINE ok
+2026-10-13T03:00:44Z inizio 05_A3 forte:30 100 3000 5 (traccia LDR-03,LDR-04,LDR-05,ROS-001,ROS-010,ROS-018,BLU-015)
+2026-10-13T03:02:33Z STOP 05_A3/06_A4 (non servono al voto, thread carte 03:02Z): posto in coda a R-1/R-3 di Q-019
