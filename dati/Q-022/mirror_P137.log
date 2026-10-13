@@ -1,0 +1,97 @@
+# Torneo v0.2 — /home/claude/q022_in/dati/Q-022-input/spec_P137.json
+
+- Regole `v0.2`, configurazione `/home/claude/q022_in/dati/Q-022-input/spec_P137.json`; differenze da B0: {'pugno': 'sequenziale', 'scudo': 'vince_pareggi', 'tempra': 4, 'scintilla_extra_gems': 1, 'scintilla_extra_round': 3, 'scintilla_extra_rounds': [7], 'crepuscolo_simultaneo': True, 'crepuscolo_spareggio': 'vite_attivo'}
+- IA: forte:30; partite: 600; tempo 11236s
+
+| Metrica | Valore [IC 95%] | Fascia | Esito |
+|---|---|---|---|
+| Attacchi fermati | 40.2% [39.4–41.0] | 30–45% | ✅ |
+| Durata mediana (round) | 13.0 [12.0–13.0] (media 12.05) | 8–11 | ❌ |
+| Partite al round 13+ | 51.0% [47.0–55.0] | ≤12% | ❌ |
+| Partite oltre il 15 | 2.8% [1.8–4.5] | <2% | ❌ |
+| Vittorie prima del round 5 | 0.0% [0.0–0.6] | 0 | ✅ |
+| G1 vince (mirror) | 46.3% [42.4–50.3] | 48–52% | ❌ |
+| Rimonte (n=188) | 25.0% [19.4–31.6] | 20–35% | ✅ |
+| Attacchi con opposizione | 30.7% [30.0–31.5] | 15–35% (V4) | |
+| Turni con Unità Pronte ferme | 61.6% [60.8–62.4] (con ≥3: 23.2% [22.5–23.9]) | ≤35% (V4) | |
+| Attacchi a segno sul Leader | 34.6% [33.9–35.4] | | |
+| Colpi del Leader a segno senza gemme: Base / Risvegliato (Q-017) | 0.0% [0.0–0.3] (n=1204) / 80.4% [77.8–82.8] (n=940) | | |
+| Colpi a segno sui Leader dati dal Risvegliato senza gemme (drain, Q-017) | 14.7% [13.8–15.7] | <35% (Cr) | |
+| Colpi del Leader senza gemme con Rimarginare legale, per Leader e lato (Q-017) | LDR-01 Risvegliato 70.5% [62.7–77.3] (n=146), LDR-02 Risvegliato 86.8% [78.4–92.3] (n=91), LDR-03 Risvegliato 97.1% [92.7–98.9] (n=136), LDR-04 Risvegliato 78.2% [69.2–85.2] (n=101), LDR-05 Risvegliato 73.2% [64.7–80.2] (n=123), LDR-06 Risvegliato 74.8% [67.6–80.9] (n=159) | | |
+| Round 13+ nelle partite con entrambi Risvegliati (Q-017) | 52.5% [48.3–56.7] (n=541) | | |
+| Attacchi per partita | 24.7 | | |
+| Pugno attaccante vuoto / pieno | 48.7% [47.8–49.5] / 10.9% [10.3–11.4] (gemme medie 0.98) | non >90% | |
+| Pugno difensore vuoto / pieno | 54.6% [53.5–55.7] / 22.0% [21.1–22.9] (gemme medie 0.31) | non >90% | |
+| Reazioni per scontro | 0.08 | | |
+| Modificatori per scontro (max; distribuzione) | 7; {0: 4060, 1: 5452, 2: 3551, 3: 1223, 4: 371, 5: 157, 6: 23, 7: 1} | | |
+| Azioni legali per decisione | 5.4 | <60 | ✅ |
+| Fine partita | {'colpo_finale': 494, 'crepuscolo': 106} | | |
+| G1 vince fra le partite finite al Crepuscolo | 46.2% [37.0–55.7] | | |
+| G1 vince fra le partite arrivate al round 15 | 47.6% [39.5–55.7] | | |
+| Q-019: pareggi al primo Crepuscolo (entrambi Alle Corde) / Vite pari fra i pareggi | 34.3% [27.0–42.4] / 40.8% [28.2–54.8] | | |
+| Q-019: G1 vince fra i pareggi; partite vive al round 16 | 34.7% [22.9–48.7]; 11.9% [7.6–18.2] | | |
+| Q-019: Vite G1-G2 al primo Crepuscolo (più frequenti) | {'2-2': 21, '1-0': 17, '2-1': 16, '0-1': 12, '0-0': 11, '2-3': 10, '1-1': 9, '1-2': 8} | | |
+| Q-019: spareggi (entrambi Alle Corde) a qualunque controllo, fra le arrivate al R15 / Vite pari fra gli spareggi (n=61) | 42.7% [34.8–50.9] / 41.0% [29.5–53.5] | | |
+| Q-019: spareggi per round; G2 vince lo spareggio | {15: 49, 16: 11, 17: 1}; 63.9% [51.4–74.8] | | |
+| Q-019 R-1: stallo fra gli spareggi: il vincitore non va a segno / non attacca nel suo ultimo turno; Guardia media del vincitore nella sua ultima Fine | 77.0% [65.1–85.8] / 24.6% [15.5–36.7]; 2.54 | ≤50% (Cr) | |
+| Q-022: fra gli spareggi, nessuno dei due attacca nel suo ultimo turno / il perdente attacca | 0.0% [0.0–5.9] / 96.7% [88.8–99.1] | | |
+| Q-022: il vincitore non attacca, spareggi a Vite pari (n=25) / a Vite diverse; nessuno attacca a Vite pari | 0.0% [0.0–13.3] / 41.7% [27.1–57.8]; 0.0% [0.0–13.3] | | |
+| Q-022: partite decise dal posto (ultima clausola dello spareggio), su tutte / fra le arrivate al R15; G2 vince gli spareggi a Vite pari | 4.2% [2.8–6.1] / 17.5% [12.1–24.5]; 100.0% [86.7–100.0] | | |
+| Q-022: come si è ruotato il Leader nell'ultimo turno, spareggi a Vite pari (vincitore/perdente: atk, abil, rim, pronto) | {'perd:atk': 17, 'perd:pronto': 5, 'perd:rim': 3, 'vinc:atk': 25} | | |
+| Q-022 (critico): turni iniziati con entrambi i Leader Alle Corde a Vite pari dal R14, il giocatore di turno non attacca: turno di G1 (n=67) / turno di G2 (n=48) | 0.0% [0.0–5.4] / 0.0% [0.0–7.4] | ≤30% per chi perde la parità | |
+| Q-022 (blu, critico): stessi round iniziati da G1 con entrambi Alle Corde a Vite pari, nessuno dei due attacca nel round (n=67) | 0.0% [0.0–5.4] | ≤25–30% | |
+| Q-022: G1 nei mirror fra le partite finite prima del R15 | 46.0% [41.4–50.5] | | |
+| Q-019: partite finite dal R15 vinte senza colpi a segno del vincitore nei R14–15 (di cui vinte da G2) | 55.2% [47.1–63.2] (24.5% [18.2–32.1]) | | |
+| Q-019: vincitori degli spareggi per mazzo | {'rif_LDR02_muro_di_parata': 15, 'rif_LDR04_stanca_e_smonta': 15, 'rif_LDR03_sanguinare_per_accendere': 10, 'rif_LDR05_scudi_armati': 10, 'rif_LDR01_puntata_e_preda': 6, 'rif_LDR06_ferite_e_caccia': 5} | | |
+| Q-019: G1 fra le arrivate al R15 per coppia di mazzi | rif_LDR01_puntata_e_preda vs rif_LDR01_puntata_e_preda 18% (n=11), rif_LDR02_muro_di_parata vs rif_LDR02_muro_di_parata 29% (n=41), rif_LDR03_sanguinare_per_accendere vs rif_LDR03_sanguinare_per_accendere 56% (n=16), rif_LDR04_stanca_e_smonta vs rif_LDR04_stanca_e_smonta 56% (n=43), rif_LDR05_scudi_armati vs rif_LDR05_scudi_armati 73% (n=26), rif_LDR06_ferite_e_caccia vs rif_LDR06_ferite_e_caccia 33% (n=6) | | |
+| Nelle fasce comuni | no | | |
+
+Vittorie per mazzo: rif_LDR01_puntata_e_preda 50.0% [43.1–56.9], rif_LDR02_muro_di_parata 50.0% [43.1–56.9], rif_LDR03_sanguinare_per_accendere 50.0% [43.1–56.9], rif_LDR04_stanca_e_smonta 50.0% [43.1–56.9], rif_LDR05_scudi_armati 50.0% [43.1–56.9], rif_LDR06_ferite_e_caccia 50.0% [43.1–56.9]
+
+## Metriche diagnostiche R-005 (M1–M15)
+
+| # | Metrica | Valore | Obiettivo |
+|---|---|---|---|
+| M1 | Reazioni disponibili / giocate per scontro | 0.462 / 0.081 | giocate ≥0.10 |
+| M2 | Reazioni decisive per scontro | 0.079 | ≥0.05 |
+| M3 | Reazioni da Cicatrici dritte per partita (di cui nate da un costo in Vita) | rif_LDR01_puntata_e_preda 0.15 (0.00), rif_LDR02_muro_di_parata 0.10 (0.00), rif_LDR03_sanguinare_per_accendere 0.12 (0.03), rif_LDR04_stanca_e_smonta 0.11 (0.00), rif_LDR05_scudi_armati 0.17 (0.00), rif_LDR06_ferite_e_caccia 0.18 (0.08) | |
+| M4 | Scontri decisi prima dell'impegno | 25.9% [25.2–26.7] | |
+| M5 | Attacchi con Caccia per partita (su Pronte / Ruotate); attacchi sul Leader | 2.27 (390 / 971); 62.3% [61.5–63.1] | |
+| M6 | Unità ferme (né attaccano né si oppongono) | 51.7% [51.1–52.3]; rif_LDR01_puntata_e_preda 47.5%, rif_LDR02_muro_di_parata 49.1%, rif_LDR03_sanguinare_per_accendere 55.7%, rif_LDR04_stanca_e_smonta 54.9%, rif_LDR05_scudi_armati 53.9%, rif_LDR06_ferite_e_caccia 45.1% | ≤38%, verdi ≤35% |
+| M7 | Opposizioni ripetute della stessa Unità nel turno | 0.0% [0.0–0.1] | ≤3% |
+| M8 | Gemme contate sia per la Reazione sia per Impeto | 0 | 0 |
+| M9 | Opposizioni per Unità che può opporsi: con Impeto / tutte | 0.306 (1443) / 0.314 | |
+| M10 | Colore minore nei mazzi vincenti, per Leader (carte, quota) | LDR-01 G: 14.0 (37%, 100 vittorie), LDR-02 K: 9.0 (26%, 100 vittorie), LDR-03 R: 15.0 (38%, 100 vittorie), LDR-04 B: 15.0 (39%, 100 vittorie), LDR-05 R: 18.0 (49%, 100 vittorie), LDR-06 G: 16.0 (43%, 100 vittorie) | ≥35% |
+| M11 | Attivazioni per partita (prime 12) | LDR-04 5.99, LDR-05 4.92, LDR-06 2.38, LDR-02 1.72, ROS-016 1.59, VER-020 1.49, VER-008 1.42, LDR-01 1.34, BLU-015 1.32, NER-008 1.29, ROS-019 1.22, NER-001 1.17 | |
+| M12 | Rimozioni per partita (effetti e Caccia) | rif_LDR01_puntata_e_preda 0.77, rif_LDR02_muro_di_parata 1.23, rif_LDR03_sanguinare_per_accendere 0.98, rif_LDR04_stanca_e_smonta 3.18, rif_LDR05_scudi_armati 0.19, rif_LDR06_ferite_e_caccia 3.08 | |
+| R9-5 | Unità Stancate da Pronte e rimosse nello stesso turno, per partita | rif_LDR01_puntata_e_preda 0.06, rif_LDR02_muro_di_parata 0.00, rif_LDR03_sanguinare_per_accendere 0.00, rif_LDR04_stanca_e_smonta 0.26, rif_LDR05_scudi_armati 0.00, rif_LDR06_ferite_e_caccia 0.18 | allarme >1 con LDR-04/LDR-06 |
+| R9-6 | Attacchi dichiarati al Leader per turno con ROS-022 e VER-022 in gioco | mai insieme | |
+| R9-8 | Rimonte per mazzo (chi era indietro di ≥2 Vite al round 6) | rif_LDR01_puntata_e_preda 19% (n=36), rif_LDR02_muro_di_parata 24% (n=33), rif_LDR03_sanguinare_per_accendere 28% (n=25), rif_LDR04_stanca_e_smonta 13% (n=30), rif_LDR05_scudi_armati 30% (n=23), rif_LDR06_ferite_e_caccia 34% (n=41) | 20–35% |
+| M13 | Pugno d'attacco pieno | 10.9% [10.3–11.4] | |
+| M14 | Costi in Vita pagati per partita; vittorie per IA (partite miste) | rif_LDR01_puntata_e_preda 0.00, rif_LDR02_muro_di_parata 0.00, rif_LDR03_sanguinare_per_accendere 1.38, rif_LDR04_stanca_e_smonta 0.00, rif_LDR05_scudi_armati 0.00, rif_LDR06_ferite_e_caccia 1.96; nessuna partita mista (comando `vita`) | |
+| M15 | Presenza nei mazzi vincenti (slot e Caccia) | ponte 100%, caccia 67%, collante 67%, VER-001 50%, BLU-021 33%, NER-009 33%, NER-017 33%, VER-023 33%, VER-008 33%, BLU-010 33%, ROS-016 17%, VER-011 17%; oltre il 60%: nessuno | nessuno slot di Caccia o 11.1 >60% |
+
+## R-012: matrice degli incroci (vittorie della riga contro la colonna, n)
+
+| | rif_LDR01_puntata_e_preda | rif_LDR02_muro_di_parata | rif_LDR03_sanguinare_per_accendere | rif_LDR04_stanca_e_smonta | rif_LDR05_scudi_armati | rif_LDR06_ferite_e_caccia |
+|---|---|---|---|---|---|---|
+| rif_LDR01_puntata_e_preda | — | — | — | — | — | — |
+| rif_LDR02_muro_di_parata | — | — | — | — | — | — |
+| rif_LDR03_sanguinare_per_accendere | — | — | — | — | — | — |
+| rif_LDR04_stanca_e_smonta | — | — | — | — | — | — |
+| rif_LDR05_scudi_armati | — | — | — | — | — | — |
+| rif_LDR06_ferite_e_caccia | — | — | — | — | — | — |
+
+## R-012: contatori per mazzo (per partita)
+
+| Mazzo | Attacchi del Leader | on_attack del Leader eseguiti | Attivazioni del Leader (⟳ e trigger) / ⟳ seguite da un colpo a segno | Scontri con furia_bonus | Scudo a ≥2 gemme | Round del primo colpo al Leader (media, n) | Forza max a 2 gemme | Carte giocate per colore | Turni con una sola Unità in campo | Attacchi al Leader di Unità con Caccia |
+|---|---|---|---|---|---|---|---|---|---|---|
+| rif_LDR01_puntata_e_preda | 3.97 | 0.00 | 1.34 / 0.00 | 0.00 | 0.00 | 3.6 (199) | 13 | G 39%, R 61% | 2.25 | 0.49 |
+| rif_LDR02_muro_di_parata | 4.68 | 0.00 | 1.72 / 0.00 | 0.00 | 1.64 | 4.3 (200) | 8 | B 81%, K 19% | 3.19 | 0.00 |
+| rif_LDR03_sanguinare_per_accendere | 3.33 | 0.00 | 0.00 / 0.00 | 2.17 | 0.00 | 4.3 (200) | 8 | K 61%, R 39% | 2.34 | 0.28 |
+| rif_LDR04_stanca_e_smonta | 5.72 | 2.17 | 5.99 / 0.00 | 0.00 | 1.12 | 4.8 (196) | 10 | B 40%, G 60% | 2.17 | 0.92 |
+| rif_LDR05_scudi_armati | 3.87 | 0.00 | 4.92 / 0.00 | 0.00 | 0.78 | 3.6 (199) | 13 | B 44%, R 56% | 1.76 | 0.00 |
+| rif_LDR06_ferite_e_caccia | 3.85 | 0.00 | 2.38 / 0.01 | 0.00 | 0.34 | 5.5 (197) | 10 | G 54%, K 46% | 2.92 | 2.31 |
+
+
+report: /home/claude/e020_res/dati/Q-022/mirror_P137/20261013-181934_torneo_spec_P137.md
