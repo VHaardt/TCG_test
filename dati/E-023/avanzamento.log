@@ -101,3 +101,11 @@ D01_vuoto forte:30 L1-L4 seed 3003 fatto
 D01_vuoto forte:30 L1-L5 seed 3004 fatto
 D01_vuoto forte:30 L1-L6 seed 3005 fatto
 2026-10-14T01:04:47Z fine D01_vuoto forte:30 100 3000 1
+2026-10-14T01:04:49Z push D01_vuoto forte:30 100 ok
+2026-10-14T01:04:49Z inizio D05_tetto forte:30 60 3000 5 (src /home/claude/e023_in/dati/E-023-input, traccia LDR-05,NEU-013,ROS-020,BLU-013,ROS-010…)
+D05_tetto forte:30 L1-L5 seed 3004 fatto
+D05_tetto forte:30 L2-L5 seed 3008 fatto
+D05_tetto forte:30 L3-L5 seed 3011 fatto
+D05_tetto forte:30 L4-L5 seed 3013 fatto
+D05_tetto forte:30 L5-L6 seed 3015 fatto
+2026-10-14T02:46:47Z fine D05_tetto forte:30 60 3000 5
