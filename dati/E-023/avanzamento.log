@@ -93,3 +93,11 @@ D06_base_vuota forte:30 L3-L6 seed 3012 fatto
 D06_base_vuota forte:30 L4-L6 seed 3014 fatto
 D06_base_vuota forte:30 L5-L6 seed 3015 fatto
 2026-10-13T22:41:15Z fine D06_base_vuota forte:30 100 3000 6
+2026-10-13T22:41:18Z push D06_base_vuota forte:30 100 ok
+2026-10-13T22:41:18Z inizio D01_vuoto forte:30 100 3000 1 (src /home/claude/e023_in/dati/E-023-input, traccia LDR-01,NEU-006,ROS-001,ROS-003,ROS-005,R…)
+D01_vuoto forte:30 L1-L2 seed 3001 fatto
+D01_vuoto forte:30 L1-L3 seed 3002 fatto
+D01_vuoto forte:30 L1-L4 seed 3003 fatto
+D01_vuoto forte:30 L1-L5 seed 3004 fatto
+D01_vuoto forte:30 L1-L6 seed 3005 fatto
+2026-10-14T01:04:47Z fine D01_vuoto forte:30 100 3000 1
