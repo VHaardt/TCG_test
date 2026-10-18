@@ -462,7 +462,7 @@ def render_r012(recs, traccia=()):
         for q in (0, 1):
             x = per[r["decks"][q]]
             x["n"] += 1
-            for k in ("leader_attacks", "leader_on_attack", "furia_bonus_combats", "scudo_atk2", "solo_unit_turns", "caccia_leader_atk"):
+            for k in ("leader_attacks", "leader_on_attack", "furia_bonus_combats", "scudo_atk2", "solo_unit_turns", "caccia_leader_atk", "fa_alta_wins"):
                 x[k] = x.get(k, 0) + st[k][q]
             x["act_then_hit"] = x.get("act_then_hit", 0) + sum(st["act_then_hit"][q].values())
             x["lead_act"] = x.get("lead_act", 0) + sum(v for c, v in st["activations"][q].items() if c in LEADERS or c.startswith("LDR"))
@@ -474,7 +474,7 @@ def render_r012(recs, traccia=()):
                 for c in CARDS[cid].colors if cid in CARDS else ():
                     col = x.setdefault("col", {})
                     col[c] = col.get(c, 0) + v
-            for key, lab in (("cards_played", "g"), ("activations", "a"), ("hits_by", "h"), ("kills_by", "k")):
+            for key, lab in (("cards_played", "g"), ("activations", "a"), ("hits_by", "h"), ("kills_by", "k"), ("fa_alta_by", "f")):
                 for cid, v in st[key][q].items():
                     if cid in traccia:
                         t = x.setdefault("tr", {}).setdefault(cid, {})
@@ -498,6 +498,12 @@ def render_r012(recs, traccia=()):
             x = per[d]; n = max(x["n"], 1); tr = x.get("tr", {})
             L.append(f"| {D.label(d)} | " + " | ".join(
                 "/".join(f"{tr.get(c, {}).get(k, 0)/n:.2f}" for k in "gahk") for c in traccia) + " |")
+    if recs and "fa_alta_wins" in recs[0]["stats"]:
+        L += ["", f"## R-017: scontri vinti con Forza d'attacco ≥ {engine.FA_ALTA} (per partita del mazzo; vinto = colpo a segno sul Leader o bersaglio sconfitto)", "",
+              "| Mazzo | Totale | " + " | ".join(traccia) + " |", "|---|---|" + "---|" * len(traccia)]
+        for d in decks:
+            x = per[d]; n = max(x["n"], 1); tr = x.get("tr", {})
+            L.append(f"| {D.label(d)} | {x.get('fa_alta_wins', 0)/n:.2f} | " + " | ".join(f"{tr.get(c, {}).get('f', 0)/n:.2f}" for c in traccia) + " |")
     return L + [""]
 
 
