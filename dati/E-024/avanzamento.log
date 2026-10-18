@@ -93,3 +93,18 @@ A-IF forte:30 L3-L6 seed 3012 fatto
 A-IF forte:30 L4-L6 seed 3014 fatto
 A-IF forte:30 L5-L6 seed 3015 fatto
 2026-10-18T14:55:42Z fine A-IF forte:30
+2026-10-18T14:55:44Z push A-IF forte:30 ok
+2026-10-18T14:55:50Z copia nella cartella condivisa ok (A-IF forte:30)
+2026-10-18T14:55:50Z inizio B-R15 forte:30 100 1,5 (traccia LDR-01,LDR-05,ROS-015,ROS-003,…)
+2026-10-18T16:19:05Z ripresa dopo il riavvio del container (le celle con report già scritto si saltano)
+2026-10-18T16:19:05Z inizio B-R15 forte:30 100 1,5 (traccia LDR-01,LDR-05,ROS-015,ROS-003,…)
+B-R15 forte:30 L1-L2 seed 3001 fatto
+B-R15 forte:30 L1-L3 seed 3002 fatto
+B-R15 forte:30 L1-L4 seed 3003 fatto
+B-R15 forte:30 L1-L5 seed 3004 fatto
+B-R15 forte:30 L1-L6 seed 3005 fatto
+B-R15 forte:30 L2-L5 seed 3008 fatto
+B-R15 forte:30 L3-L5 seed 3011 fatto
+B-R15 forte:30 L4-L5 seed 3013 fatto
+B-R15 forte:30 L5-L6 seed 3015 fatto
+2026-10-18T20:56:10Z fine B-R15 forte:30
