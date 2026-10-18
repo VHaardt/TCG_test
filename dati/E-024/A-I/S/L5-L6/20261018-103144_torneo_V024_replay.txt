@@ -1,0 +1,115 @@
+--- Round 1, P1 | Vite 5-5
+  P1 gioca ROS-001
+--- Round 1, P2 | Vite 5-5
+  P2 gioca VER-001
+--- Round 2, P1 | Vite 5-5
+  P1 attacca con Leader LDR-05
+    pugni: attaccante 1, difensore 0 -> 4 contro 4
+    P2 perde 1 Vita (attacco_leader): restano 4
+--- Round 2, P2 | Vite 5-4
+    P2 perde 1 Vita (costo): restano 3
+  P2 usa ⟳ del Leader su ROS-001#1
+    ROS-001 di P1: Stancata
+--- Round 3, P1 | Vite 5-3
+  P1 gioca ROS-005
+  P1 attacca con Leader LDR-05
+    pugni: attaccante 0, difensore 0 -> 3 contro 4
+--- Round 3, P2 | Vite 5-3
+  P2 attacca con VER-001#2
+    P1 oppone ROS-001
+    pugni: attaccante 0, difensore 1 -> 2 contro 5
+    VER-001 di P2 è sconfitta
+  P2 attacca con Leader LDR-06
+    pugni: attaccante 3, difensore 1 + BLU-023 -> 6 contro 8
+--- Round 4, P1 | Vite 5-3
+  P1 gioca NEU-013
+  P1 attacca con Leader LDR-05
+    pugni: attaccante 0, difensore 0 -> 3 contro 4
+--- Round 4, P2 | Vite 5-3
+  P2 attacca con Leader LDR-06
+    pugni: attaccante 0, difensore 0 -> 3 contro 4
+--- Round 5, P1 | Vite 5-3
+  P1 gioca ROS-020
+  P1 attacca con Leader LDR-05
+    pugni: attaccante 0, difensore 0 -> 3 contro 4
+--- Round 5, P2 | Vite 5-3
+  P2 gioca VER-003
+  P2 Rimargina VER-024
+--- Round 6, P1 | Vite 5-3
+  P1 gioca ROS-020
+  P1 attacca con ROS-020#5
+    pugni: attaccante 0, difensore 0 -> 4 contro 4
+    P2 perde 1 Vita (attacco): restano 2
+    P2: il Leader si Risveglia
+  P1 attacca con NEU-013#4
+    pugni: attaccante 1, difensore 0 -> 6 contro 4
+    P2 perde 1 Vita (attacco): restano 1
+  P1 attacca con Leader LDR-05
+    pugni: attaccante 0, difensore 0 -> 3 contro 4
+--- Round 6, P2 | Vite 5-1
+  P2 gioca VER-020
+  P2 attacca con VER-003#6
+    P1 oppone ROS-001
+    pugni: attaccante 0, difensore 1 -> 5 contro 5
+    ROS-001 di P1 è sconfitta
+    VER-003 di P2 è sconfitta
+  P2 attacca con Leader LDR-06
+    P1 oppone ROS-005
+    pugni: attaccante 0, difensore 0 -> 4 contro 1
+    ROS-005 di P1 è sconfitta
+--- Round 7, P1 | Vite 5-1
+  P1 gioca ROS-015
+  P1 gioca BLU-008
+  P1 attacca con ROS-020#5
+    pugni: attaccante 0, difensore 1 -> 4 contro 6
+  P1 attacca con ROS-020#7
+    pugni: attaccante 0, difensore 1 -> 4 contro 6
+  P1 attacca con NEU-013#4
+    pugni: attaccante 1, difensore 0 -> 6 contro 4
+    P2 perde 1 Vita (attacco): restano 0
+  P1 attacca con Leader LDR-05
+    pugni: attaccante 0, difensore 0 -> 3 contro 4
+--- Round 7, P2 | Vite 5-0
+  P2 gioca NEU-015
+  P2 attacca con VER-020#8 (Caccia: ROS-020#5)
+    pugni: attaccante 0, difensore 0 -> 7 contro 4
+    ROS-020 di P1 è sconfitta
+  P2 attacca con Leader LDR-06
+    pugni: attaccante 0, difensore 0 -> 4 contro 4
+    P1 perde 1 Vita (attacco_leader): restano 4
+--- Round 8, P1 | Vite 4-0
+  P1 gioca ROS-015
+  P1 attacca con ROS-020#7
+    pugni: attaccante 0, difensore 1 -> 4 contro 6
+  P1 attacca con NEU-013#4
+    pugni: attaccante 0, difensore 0 -> 3 contro 4
+  P1 attacca con ROS-015#9
+    pugni: attaccante 0, difensore 0 -> 3 contro 4
+  P1 attacca con BLU-008#10
+    pugni: attaccante 0, difensore 0 -> 2 contro 4
+  P1 attacca con Leader LDR-05
+    pugni: attaccante 0, difensore 0 -> 3 contro 4
+--- Round 8, P2 | Vite 4-0
+  P2 gioca VER-019
+  P2 attacca con VER-020#8 (Caccia: ROS-020#7)
+    pugni: attaccante 0, difensore 1 -> 7 contro 8
+    VER-020 di P2 è sconfitta
+  P2 attacca con NEU-015#11
+    pugni: attaccante 0, difensore 0 -> 4 contro 4
+    P1 perde 1 Vita (attacco): restano 3
+  P2 attacca con Leader LDR-06
+    pugni: attaccante 0, difensore 0 -> 4 contro 4
+    P1 perde 1 Vita (attacco_leader): restano 2
+    P1: il Leader si Risveglia
+--- Round 9, P1 | Vite 2-0
+  P1 attacca con ROS-020#7
+    pugni: attaccante 0, difensore 1 -> 5 contro 6
+  P1 attacca con NEU-013#4
+    pugni: attaccante 0, difensore 1 -> 4 contro 6
+  P1 attacca con ROS-015#9
+    pugni: attaccante 0, difensore 1 -> 4 contro 6
+  P1 attacca con ROS-015#12
+    pugni: attaccante 0, difensore 1 -> 4 contro 6
+  P1 attacca con BLU-008#10
+    pugni: attaccante 1, difensore 0 -> 5 contro 4
+*** P2 perde (colpo_finale)
