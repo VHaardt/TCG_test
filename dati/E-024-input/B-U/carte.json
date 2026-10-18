@@ -1,0 +1,3594 @@
+{
+ "version": "set_v02+E-024_B-U",
+ "rules": "v0.2.1",
+ "data": "2026-10-08",
+ "note": "Primo set CICATRICI v0.2. Generato da carte/bozza_*.json con genera_finale.py. Braccio E-024 B-U: set di E-020 00_B0 con le leve del braccio (vedi LEGGIMI.md).",
+ "leaders": [
+  {
+   "id": "LDR-01",
+   "name": "LDR-01",
+   "_ex": "Arden, Fabbro di Guerra",
+   "colors": [
+    "R",
+    "G"
+   ],
+   "intent": "Rosso/Verde: pugno pieno in Base, Assalto in Risveglio; il Verde porta prede (Caccia) e Bracconiere.",
+   "base": [
+    {
+     "static": "power",
+     "applies_to": {
+      "side": "own",
+      "attacker": true,
+      "kind": "unit"
+     },
+     "if": [
+      {
+       "pugno_ge": 2
+      }
+     ],
+     "value": 1,
+     "text": "Ogni tua Unità che attacca ha +1 in questo scontro, se nell'impegno hai almeno 2 gemme."
+    }
+   ],
+   "awakened": [
+    {
+     "static": "power",
+     "applies_to": {
+      "side": "own",
+      "keyword": "assalto"
+     },
+     "value": 1,
+     "text": "Le tue Unità con Assalto hanno +1 Forza."
+    }
+   ]
+  },
+  {
+   "id": "LDR-02",
+   "name": "LDR-02",
+   "_ex": "Maera, Custode del Passo",
+   "colors": [
+    "B",
+    "K"
+   ],
+   "intent": "Blu/Nero: difesa con la Guardia; 63.7% negli incroci di E-014, da guardare in E6.",
+   "base": [
+    {
+     "static": "combat",
+     "role": "defense",
+     "if": [
+      {
+       "pugno_ge": 1
+      }
+     ],
+     "att_mod": -2,
+     "text": "Quando difendi, se hai almeno 1 gemma di Parata, l'attaccante ha −2 in questo scontro."
+    }
+   ],
+   "awakened": [
+    {
+     "static": "parata_per_gemma",
+     "value": 3,
+     "text": "Le tue gemme di Parata valgono +3 invece di +2."
+    }
+   ],
+   "_note": "S-2 A (Q-015): conta solo la Parata; motore allineato in R-007."
+  },
+  {
+   "id": "LDR-03",
+   "name": "LDR-03",
+   "_ex": "Sorella Vey, la Segnata",
+   "colors": [
+    "K",
+    "R"
+   ],
+   "intent": "Nero/Rosso: Furia anticipata di 1 Cicatrice. Innesco: estremo inferiore dell'IC >55% → Furia +1 passa al Risvegliato.",
+   "base": [
+    {
+     "static": "furia_bonus",
+     "value": 1,
+     "text": "Le tue carte con Furia contano 1 Cicatrice in più."
+    }
+   ],
+   "awakened": [
+    {
+     "modifier": "rim_cost",
+     "value": 0,
+     "text": "Rimarginare non costa gemme (resta ⟳)."
+    }
+   ]
+  },
+  {
+   "id": "LDR-04",
+   "name": "LDR-04",
+   "_ex": "Thorn, Voce del Branco",
+   "colors": [
+    "G",
+    "B"
+   ],
+   "intent": "Verde/Blu: Stanca economica dal Leader, poi Unità che vincono gli scontri fra Unità (Caccia e opposizione).",
+   "base": [
+    {
+     "activated": true,
+     "cost": 1,
+     "target": {
+      "side": "opp",
+      "cost_le": 3,
+      "ready": true
+     },
+     "do": [
+      {
+       "op": "stanca",
+       "target": "chosen"
+      }
+     ],
+     "text": "⟳, 1 Brace: Stanca un'Unità avversaria Pronta con costo ≤3."
+    }
+   ],
+   "awakened": [
+    {
+     "static": "power",
+     "applies_to": {
+      "side": "own",
+      "kind": "unit"
+     },
+     "if": [
+      {
+       "attacking": true
+      },
+      {
+       "target_is_unit": true
+      }
+     ],
+     "value": 1,
+     "text": "Le tue Unità hanno +1 in questo scontro quando attaccano e il loro bersaglio è un'Unità, e quando si oppongono."
+    },
+    {
+     "static": "power",
+     "applies_to": {
+      "side": "own",
+      "kind": "unit"
+     },
+     "if": [
+      {
+       "opposing": true
+      }
+     ],
+     "value": 1,
+     "_note": "seconda metà del testo; prima leva se Thorn >55%: togliere questa statica"
+    }
+   ]
+  },
+  {
+   "id": "LDR-05",
+   "name": "LDR-05",
+   "_ex": null,
+   "colors": [
+    "R",
+    "B"
+   ],
+   "intent": "Rosso/Blu: in Base lo Scudo attacca con le gemme (Blu), da Risvegliato l'Impeto (Rosso).",
+   "base": [
+    {
+     "static": "power",
+     "applies_to": {
+      "side": "own",
+      "attacker": true,
+      "keyword": "scudo"
+     },
+     "if": [
+      {
+       "pugno_ge": 1
+      }
+     ],
+     "value": 1,
+     "text": "Le tue Unità con Scudo hanno +1 in questo scontro quando attaccano, se nell'impegno hai almeno 1 gemma."
+    }
+   ],
+   "awakened": [
+    {
+     "static": "power",
+     "applies_to": {
+      "side": "own",
+      "attacker": true,
+      "keyword": "impeto"
+     },
+     "value": 1,
+     "text": "Le tue Unità con Impeto hanno +1 in questo scontro quando attaccano."
+    }
+   ]
+  },
+  {
+   "id": "LDR-06",
+   "name": "LDR-06",
+   "_ex": null,
+   "colors": [
+    "K",
+    "G"
+   ],
+   "intent": "Nero/Verde: paghi Vita per stancare in base alle Cicatrici; da Risvegliato la Caccia vince gli scontri fra Unità (non tocca la velocità sul Leader).",
+   "base": [
+    {
+     "activated": true,
+     "cost": 0,
+     "costs": [
+      {
+       "lose_life": 1,
+       "floor": 2
+      }
+     ],
+     "target": {
+      "side": "opp",
+      "ready": true,
+      "power_le": {
+       "scars": "own"
+      }
+     },
+     "do": [
+      {
+       "op": "stanca",
+       "target": "chosen"
+      }
+     ],
+     "text": "⟳, il tuo Leader perde 1 Vita *(rispetta il Saldo)*: Stanca un'Unità avversaria Pronta con Forza attuale inferiore alle tue Cicatrici. Non puoi usarla se il tuo Leader ha 2 Vite o meno.",
+     "_note": "il json conta le Cicatrici prima di pagare con ≤: stessi esiti di 'inferiore' dopo il pagamento"
+    }
+   ],
+   "awakened": [
+    {
+     "static": "power",
+     "applies_to": {
+      "side": "own",
+      "keyword": "caccia",
+      "kind": "unit"
+     },
+     "if": [
+      {
+       "attacking": true
+      },
+      {
+       "target_is_unit": true
+      }
+     ],
+     "value": 1,
+     "text": "Le tue Unità con Caccia hanno +1 in questo scontro quando attaccano e il loro bersaglio è un'Unità."
+    }
+   ]
+  }
+ ],
+ "cards": [
+  {
+   "id": "ROS-001",
+   "name": "ROS-001",
+   "type": "unit",
+   "cost": 1,
+   "colors": [
+    "R"
+   ],
+   "power": 1,
+   "keywords": [
+    "assalto",
+    "impeto"
+   ],
+   "abilities": [
+    {
+     "static": "power",
+     "if": [
+      {
+       "pugno_ge": 1
+      }
+     ],
+     "value": 2
+    }
+   ],
+   "text": "Assalto *(entra Pronta)*. Impeto 1: +2 *(se nell'impegno hai almeno 1 gemma, +2 in questo scontro; quando è il bersaglio contano solo le gemme di Parata)*.",
+   "rarity": "NC",
+   "intent": "Firma rossa: entra e con 1 sola gemma va a segno sul Leader (1+1+2 = Tempra 4) dal round 2.",
+   "vanilla_delta": 1,
+   "_ex": "Scudiera di Brace",
+   "_note": "Tabella 2-1-1 = 0, F1 = +1 NC (nota Ro 8 di Q-014, verificata). A 0/1/2 gemme: 1/4/5 contro il vanilla 2/3/4."
+  },
+  {
+   "id": "ROS-002",
+   "name": "ROS-002",
+   "type": "tactic",
+   "cost": 2,
+   "colors": [
+    "R"
+   ],
+   "play": {
+    "target": {
+     "side": "own",
+     "ready": false
+    },
+    "do": [
+     {
+      "op": "raddrizza",
+      "target": "chosen"
+     }
+    ]
+   },
+   "text": "Raddrizza una tua Unità Ruotata.",
+   "rarity": "NC",
+   "intent": "[sequenza] Secondo attacco dell'Unità appena caricata (ROS-003/021/023) o della Caccia di ROS-016.",
+   "vanilla_delta": 0,
+   "_ex": "Carica della Fornace",
+   "_note": "Tetto Raddrizza 2/2 (con BLU-002); mai il Leader (il selettore prende solo Unità). Con ROS-016: 2 cacce a turno, si misura in E6 (nota Cr)."
+  },
+  {
+   "id": "ROS-003",
+   "name": "ROS-003",
+   "type": "unit",
+   "cost": 4,
+   "colors": [
+    "R"
+   ],
+   "power": 4,
+   "keywords": [
+    "assalto",
+    "impeto"
+   ],
+   "abilities": [
+    {
+     "static": "power",
+     "if": [
+      {
+       "pugno_ge": 3
+      }
+     ],
+     "value": 4
+    }
+   ],
+   "text": "Assalto *(entra Pronta)*. Impeto 3: +4 *(se nell'impegno hai almeno 3 gemme, +4 in questo scontro; quando è il bersaglio contano solo le gemme di Parata)*.",
+   "rarity": "R",
+   "intent": "[sequenza] Chiusura: entra e colpisce; con 3 gemme F11 supera la Guardia piena di un Risvegliato (4+6).",
+   "vanilla_delta": 1,
+   "_ex": "Vesh, Lama Rovente",
+   "_note": "Tabella 5-1-1 = 3, F4 = +1 R. A 0/1/2/3 gemme: 4/5/6/11."
+  },
+  {
+   "id": "ROS-004",
+   "name": "ROS-004",
+   "type": "unit",
+   "cost": 1,
+   "colors": [
+    "R"
+   ],
+   "power": 1,
+   "keywords": [
+    "assalto"
+   ],
+   "text": "Assalto *(entra Pronta)*.",
+   "rarity": "C",
+   "intent": "Corpo minimo che attacca subito: con 3 gemme va a segno, oppure costringe a opporre o a spendere Guardia.",
+   "vanilla_delta": 0
+  },
+  {
+   "id": "ROS-005",
+   "name": "ROS-005",
+   "type": "unit",
+   "cost": 1,
+   "colors": [
+    "R"
+   ],
+   "power": 1,
+   "keywords": [
+    "impeto"
+   ],
+   "abilities": [
+    {
+     "static": "power",
+     "if": [
+      {
+       "pugno_ge": 1
+      }
+     ],
+     "value": 2
+    }
+   ],
+   "text": "Impeto 1: +2 *(se nell'impegno hai almeno 1 gemma, +2 in questo scontro; quando è il bersaglio contano solo le gemme di Parata)*.",
+   "rarity": "C",
+   "intent": "Impeto comune: 1 gemma = 4 sul Leader (Tempra); gemella senza Assalto di ROS-001.",
+   "vanilla_delta": 0,
+   "_note": "Il bonus dell'Impeto chiede gemme e non conta per la velocità (§3)."
+  },
+  {
+   "id": "ROS-006",
+   "name": "ROS-006",
+   "type": "unit",
+   "cost": 1,
+   "colors": [
+    "R"
+   ],
+   "power": 1,
+   "keywords": [
+    "bracconiere"
+   ],
+   "kw_params": {
+    "bracconiere": 2
+   },
+   "text": "Bracconiere 2 *(quando attacca e il suo bersaglio è un'Unità, anche una che si oppone, +2 in questo scontro)*.",
+   "rarity": "C",
+   "intent": "Risposta comune agli Scudo: chi la ferma con un'Unità affronta F3 + gemme.",
+   "vanilla_delta": 0,
+   "_note": "Comune con Bracconiere senza Caccia: 1 delle 3 del set. Velocità: 1+2 = 3. R-005 #2 #10."
+  },
+  {
+   "id": "ROS-007",
+   "name": "ROS-007",
+   "type": "reaction",
+   "cost": 1,
+   "colors": [
+    "R"
+   ],
+   "react": {
+    "do": [
+     {
+      "op": "att_mod",
+      "n": -3
+     }
+    ]
+   },
+   "text": "Reazione. L'attaccante ha −3 in questo scontro.",
+   "rarity": "C",
+   "intent": "Valvola difensiva del Rosso: salva 1 Vita nel turno avversario per vincere la corsa.",
+   "vanilla_delta": 0,
+   "_note": "Testo identico a ROS-007/025: il limite di 3 copie vale per ID (T-3, opzione A). Tratto di colore (opzione C) solo dopo E1."
+  },
+  {
+   "id": "ROS-008",
+   "name": "ROS-008",
+   "type": "unit",
+   "cost": 1,
+   "colors": [
+    "R"
+   ],
+   "power": 2,
+   "keywords": [
+    "assalto"
+   ],
+   "costs": [
+    {
+     "lose_life": 1,
+     "floor": 1
+    }
+   ],
+   "text": "Assalto *(entra Pronta)*. Costo aggiuntivo: il tuo Leader perde 1 Vita *(rispetta il Saldo)*. Non puoi giocarla se ha 1 Vita o meno.",
+   "rarity": "C",
+   "intent": "Pressione pagata in Vita: F2 Pronta subito; la Cicatrice accende Furia 2 (ROS-011/019, Vey).",
+   "vanilla_delta": 0,
+   "_note": "Costo in Vita = campo dati, non conta come frase (legge 6). 2-1+1 = 2. Solo fase principale (regola 3a)."
+  },
+  {
+   "id": "ROS-009",
+   "name": "ROS-009",
+   "type": "unit",
+   "cost": 2,
+   "colors": [
+    "R"
+   ],
+   "power": 2,
+   "keywords": [],
+   "abilities": [
+    {
+     "trigger": "on_attack",
+     "target": {
+      "side": "opp",
+      "ready": true,
+      "keyword": "scudo",
+      "cost_le": 3
+     },
+     "do": [
+      {
+       "op": "stanca",
+       "target": "chosen"
+      }
+     ]
+    }
+   ],
+   "text": "Quando attacca, Stanca *(ruota)* un'Unità avversaria Pronta con Scudo e costo ≤3.",
+   "rarity": "C",
+   "intent": "Apriscatole: toglie lo Scudo che si opporrebbe, così questo attacco e i successivi passano.",
+   "vanilla_delta": 0,
+   "_note": "Stanca comune -1: 3-1 = 2. Bersaglio nel trigger R-006 N1 (lo sceglie il motore: Forza più alta). Stanca in C1 del proprio turno: dipende da T-1 (regolamento §12.2)."
+  },
+  {
+   "id": "ROS-010",
+   "name": "ROS-010",
+   "type": "unit",
+   "cost": 2,
+   "colors": [
+    "R"
+   ],
+   "power": 2,
+   "keywords": [
+    "assalto"
+   ],
+   "text": "Assalto *(entra Pronta)*.",
+   "rarity": "C",
+   "intent": "Corpo d'urto a 2: attacca subito, con 2 gemme va a segno. Base di SONDA-01.",
+   "vanilla_delta": 0
+  },
+  {
+   "id": "ROS-011",
+   "name": "ROS-011",
+   "type": "unit",
+   "cost": 2,
+   "colors": [
+    "R"
+   ],
+   "power": 2,
+   "keywords": [
+    "furia"
+   ],
+   "abilities": [
+    {
+     "static": "power",
+     "if": [
+      {
+       "furia": 2
+      }
+     ],
+     "value": 1
+    }
+   ],
+   "text": "Furia 2: +1 *(se hai almeno 2 Cicatrici, +1 in questo scontro)*.",
+   "rarity": "NC",
+   "intent": "Gancio R/N (Vey): con 2 Cicatrici (o 1 con Vey) è un 2-drop a F3; regge da solo a F2.",
+   "vanilla_delta": 1,
+   "tags": [
+    "ponte"
+   ],
+   "_note": "Furia: base vanilla-2 = 1, +1 NC = F2; attiva 3 = tetto della velocità a costo 2 (vanilla+1 = 4 non ammesso)."
+  },
+  {
+   "id": "ROS-012",
+   "name": "ROS-012",
+   "type": "tactic",
+   "cost": 2,
+   "colors": [
+    "R"
+   ],
+   "play": {
+    "target": {
+     "side": "opp",
+     "ready": false,
+     "keyword": "scudo",
+     "cost_le": 3
+    },
+    "do": [
+     {
+      "op": "defeat",
+      "target": "chosen"
+     }
+    ]
+   },
+   "text": "Sconfiggi un'Unità avversaria Ruotata con Scudo e costo ≤3.",
+   "rarity": "NC",
+   "intent": "Risposta NC agli Scudo: toglie il muro che si è appena opposto, prima dell'attacco successivo.",
+   "vanilla_delta": 0,
+   "_note": "Rimozione economica su Ruotata di costo ≤3 (regola 9)."
+  },
+  {
+   "id": "ROS-013",
+   "name": "ROS-013",
+   "type": "tactic",
+   "cost": 2,
+   "colors": [
+    "R"
+   ],
+   "play": {
+    "target": {
+     "side": "opp",
+     "ready": false,
+     "cost_le": 4,
+     "power_le": {
+      "n": 2,
+      "plus": 1,
+      "if": [
+       {
+        "scars_ge": 1
+       }
+      ]
+     }
+    },
+    "do": [
+     {
+      "op": "defeat",
+      "target": "chosen"
+     }
+    ]
+   },
+   "text": "Sconfiggi un'Unità avversaria Ruotata con Forza attuale ≤2 (≤3 se hai almeno 1 Cicatrice) e costo ≤4.",
+   "rarity": "C",
+   "intent": "Slot 11.1: chi è sotto pulisce l'Unità che si è opposta o ha appena attaccato; senza Cicatrici resta giocabile.",
+   "vanilla_delta": 0,
+   "_note": "Forza attuale = stampata + bonus sempre attivi (S-4 A, M5 B). Forma R-006 E1. Costo ≤4: nota N-2."
+  },
+  {
+   "id": "ROS-014",
+   "name": "ROS-014",
+   "type": "unit",
+   "cost": 3,
+   "colors": [
+    "R"
+   ],
+   "power": 3,
+   "keywords": [
+    "bracconiere"
+   ],
+   "kw_params": {
+    "bracconiere": 2
+   },
+   "text": "Bracconiere 2 *(quando attacca e il suo bersaglio è un'Unità, anche una che si oppone, +2 in questo scontro)*.",
+   "rarity": "C",
+   "intent": "Risposta comune agli Scudo a costo 3: F5 contro chi si oppone, F3 + gemme sul Leader.",
+   "vanilla_delta": 0,
+   "_note": "Bracconiere 2 = -1: 4-1 = 3. Perde l'Assalto di v0.1 (legge 6). Comune senza Caccia: 2 delle 3."
+  },
+  {
+   "id": "ROS-015",
+   "name": "ROS-015",
+   "type": "unit",
+   "cost": 3,
+   "colors": [
+    "R"
+   ],
+   "power": 3,
+   "keywords": [
+    "impeto"
+   ],
+   "abilities": [
+    {
+     "static": "power",
+     "if": [
+      {
+       "pugno_ge": 2
+      }
+     ],
+     "value": 3
+    }
+   ],
+   "text": "Impeto 2: +3 *(se nell'impegno hai almeno 2 gemme, +3 in questo scontro; quando è il bersaglio contano solo le gemme di Parata)*.",
+   "rarity": "NC",
+   "intent": "La puntata: sotto il vanilla a 0–1 gemme, a 2 gemme F8 sfonda Tempra + 2 di Parata; con Arden F9.",
+   "vanilla_delta": 0,
+   "_note": "4-1 = 3. A 0/1/2 gemme: 3/4/8 contro il vanilla 4/5/6."
+  },
+  {
+   "id": "ROS-016",
+   "name": "ROS-016",
+   "type": "unit",
+   "cost": 3,
+   "colors": [
+    "R"
+   ],
+   "power": 3,
+   "keywords": [
+    "caccia",
+    "bracconiere"
+   ],
+   "kw_params": {
+    "bracconiere": 1
+   },
+   "text": "Caccia *(quando attacca, puoi scegliere come bersaglio un'Unità avversaria, anche Ruotata, invece del Leader; l'avversario può ancora opporsi con un'altra Unità, che diventa il bersaglio)*. Bracconiere 1 *(quando attacca e il suo bersaglio è un'Unità, anche una che si oppone, +1 in questo scontro)*.",
+   "rarity": "NC",
+   "intent": "Gancio R/V (Arden): caccia l'Unità ferma o stancata dal Verde (VER-002/009) a F4 + gemme.",
+   "vanilla_delta": 1,
+   "tags": [
+    "ponte"
+   ],
+   "_note": "Tabella 4-1-1 = 2, F3 = +1 NC. Unica Caccia rossa. R-005 #1 #2."
+  },
+  {
+   "id": "ROS-017",
+   "name": "ROS-017",
+   "type": "unit",
+   "cost": 3,
+   "colors": [
+    "R"
+   ],
+   "power": 5,
+   "keywords": [
+    "assalto"
+   ],
+   "costs": [
+    {
+     "lose_life": 2,
+     "floor": 1
+    }
+   ],
+   "text": "Assalto *(entra Pronta)*. Costo aggiuntivo: il tuo Leader perde 2 Vite *(rispetta il Saldo)*. Non puoi giocarla se ha 2 Vite o meno.",
+   "rarity": "NC",
+   "intent": "Colpo pagato in Vita: F5 Pronta nel turno in cui entra; 2 Cicatrici proprie accendono Furia 2.",
+   "vanilla_delta": 0,
+   "_note": "4-1+2 = 5. Pagabile solo senza Cicatrici fresche (Saldo 2) e con almeno 3 Vite."
+  },
+  {
+   "id": "ROS-018",
+   "name": "ROS-018",
+   "type": "relic",
+   "cost": 3,
+   "colors": [
+    "R"
+   ],
+   "abilities": [
+    {
+     "static": "power",
+     "applies_to": {
+      "side": "own",
+      "attacker": true,
+      "kind": "unit"
+     },
+     "if": [
+      {
+       "pugno_ge": 2
+      }
+     ],
+     "value": 1,
+     "stack": false
+    }
+   ],
+   "text": "Le tue Unità che attaccano hanno +1 in questo scontro, se nell'impegno hai almeno 2 gemme. Più copie non si sommano.",
+   "rarity": "R",
+   "intent": "Payoff della puntata: ogni attacco con 2 gemme vale +3; spinge a impegnare invece di tenere Guardia.",
+   "vanilla_delta": 0,
+   "_note": "Unica aura rossa (regola 6). 'kind: unit' (R-006 E4): non vale per il Leader; 'stack: false' (R-006 N2). Bonus di scontro: non conta nelle 2 fonti (S-7). Sotto-braccio E2 con LDR-05."
+  },
+  {
+   "id": "ROS-019",
+   "name": "ROS-019",
+   "type": "unit",
+   "cost": 4,
+   "colors": [
+    "R"
+   ],
+   "power": 3,
+   "keywords": [
+    "furia"
+   ],
+   "abilities": [
+    {
+     "static": "power",
+     "if": [
+      {
+       "furia": 2
+      }
+     ],
+     "value": 3
+    }
+   ],
+   "text": "Furia 2: +3 *(se hai almeno 2 Cicatrici, +3 in questo scontro)*.",
+   "rarity": "C",
+   "intent": "Chiusura per chi ha già perso 2 Vite (o le ha pagate): F6 senza gemme.",
+   "vanilla_delta": 0,
+   "_note": "Furia: base 5-2 = 3, attiva 6 = vanilla + (N-1)."
+  },
+  {
+   "id": "ROS-020",
+   "name": "ROS-020",
+   "type": "unit",
+   "cost": 4,
+   "colors": [
+    "R"
+   ],
+   "power": 4,
+   "keywords": [
+    "impeto"
+   ],
+   "abilities": [
+    {
+     "static": "power",
+     "if": [
+      {
+       "pugno_ge": 1
+      }
+     ],
+     "value": 2
+    }
+   ],
+   "text": "Impeto 1: +2 *(se nell'impegno hai almeno 1 gemma, +2 in questo scontro; quando è il bersaglio contano solo le gemme di Parata)*.",
+   "rarity": "NC",
+   "intent": "Gancio R/B: attacca a F7 con 1 gemma e, opposta con 1 gemma di Parata, difende a 8; regge il turno del Blu.",
+   "vanilla_delta": 0,
+   "tags": [
+    "ponte"
+   ],
+   "_note": "5-1 = 4. Impeto da bersaglio come tutte le Impeto (S-1 A): conta solo la Parata (S-2 A). Con LDR-05 Risvegliato +1 in attacco."
+  },
+  {
+   "id": "ROS-021",
+   "name": "ROS-021",
+   "type": "unit",
+   "cost": 5,
+   "colors": [
+    "R"
+   ],
+   "power": 5,
+   "keywords": [
+    "impeto"
+   ],
+   "abilities": [
+    {
+     "static": "power",
+     "if": [
+      {
+       "pugno_ge": 1
+      }
+     ],
+     "value": 3
+    }
+   ],
+   "text": "Impeto 1: +3 *(se nell'impegno hai almeno 1 gemma, +3 in questo scontro; quando è il bersaglio contano solo le gemme di Parata)*.",
+   "rarity": "NC",
+   "intent": "Chiusura: F5 va a segno da sola; con 1 gemma F9 supera Tempra + 2 di Parata.",
+   "vanilla_delta": 0,
+   "_note": "6-1 = 5. A 0/1/2 gemme: 5/9/10 contro il vanilla 6/7/8."
+  },
+  {
+   "id": "ROS-022",
+   "name": "ROS-022",
+   "type": "unit",
+   "cost": 5,
+   "colors": [
+    "R"
+   ],
+   "power": 5,
+   "keywords": [
+    "rinnovo"
+   ],
+   "abilities": [
+    {
+     "trigger": "on_attack_defeats_unit",
+     "do": [
+      {
+       "op": "raddrizza",
+       "target": "self"
+      }
+     ]
+    }
+   ],
+   "text": "Rinnovo *(quando attacca e sconfigge un'Unità, si raddrizza)*.",
+   "rarity": "R",
+   "intent": "Payoff contro chi si oppone: ogni opposizione che sconfigge le ridà un attacco; contro chi non oppone è un F5 che va a segno.",
+   "vanilla_delta": 0,
+   "_note": "6-1 = 5 (niente +1 R: due colpi a segno senza gemme). Si attiva solo contro chi si oppone (nota Ro 7 di Q-014). R-005 #4."
+  },
+  {
+   "id": "ROS-023",
+   "name": "ROS-023",
+   "type": "unit",
+   "cost": 6,
+   "colors": [
+    "R"
+   ],
+   "power": 6,
+   "keywords": [
+    "assalto",
+    "impeto"
+   ],
+   "abilities": [
+    {
+     "static": "power",
+     "if": [
+      {
+       "pugno_ge": 2
+      }
+     ],
+     "value": 3
+    }
+   ],
+   "text": "Assalto *(entra Pronta)*. Impeto 2: +3 *(se nell'impegno hai almeno 2 gemme, +3 in questo scontro; quando è il bersaglio contano solo le gemme di Parata)*.",
+   "rarity": "R",
+   "intent": "Payoff: entra e colpisce subito a F6 (effetto immediato = Assalto); con 2 gemme F11 contro qualunque Guardia di Base.",
+   "vanilla_delta": 1,
+   "_note": "Costo 6: 7-1-1 = 5, F6 = +1 R. A 0/1/2 gemme: 6/7/11."
+  },
+  {
+   "id": "ROS-024",
+   "name": "ROS-024",
+   "type": "reaction",
+   "cost": 1,
+   "colors": [
+    "R"
+   ],
+   "react": {
+    "do": [
+     {
+      "op": "def_mod",
+      "n": 3
+     }
+    ]
+   },
+   "text": "Reazione. Il bersaglio ha +3 in questo scontro.",
+   "rarity": "C",
+   "intent": "Salva un'Unità rossa con Impeto che è stata attaccata, o 1 Vita; utile dalle Cicatrici dritte.",
+   "vanilla_delta": 0
+  },
+  {
+   "id": "ROS-025",
+   "name": "ROS-025",
+   "type": "reaction",
+   "cost": 1,
+   "colors": [
+    "R"
+   ],
+   "react": {
+    "do": [
+     {
+      "op": "att_mod",
+      "n": -3
+     }
+    ]
+   },
+   "text": "Reazione. L'attaccante ha −3 in questo scontro.",
+   "rarity": "C",
+   "intent": "Terza Reazione comune: con 7 copie nel mazzo il Rosso ha sempre una risposta da 1 gemma.",
+   "vanilla_delta": 0,
+   "_note": "Testo identico a ROS-007/025: il limite di 3 copie vale per ID (T-3, opzione A). Tratto di colore (opzione C) solo dopo E1."
+  },
+  {
+   "id": "BLU-001",
+   "name": "BLU-001",
+   "type": "unit",
+   "cost": 2,
+   "colors": [
+    "B"
+   ],
+   "rarity": "NC",
+   "power": 2,
+   "keywords": [
+    "scudo"
+   ],
+   "abilities": [
+    {
+     "trigger": "on_oppose",
+     "do": [
+      {
+       "op": "def_mod",
+       "n": 2
+      }
+     ]
+    }
+   ],
+   "text": "Scudo *(quando è il bersaglio, vince i pareggi)*. Quando si oppone, +2 in questo scontro.",
+   "intent": "Muro economico: ferma le Unità di costo 2–3 senza spendere Guardia e invita a opporsi (Unità ferme).",
+   "vanilla_delta": "+1 (3 −1 Scudo −1 frase = 1; F2, tolleranza NC). Il +2 vale solo da bersaglio: fuori dalla velocità (N-4 confermata)",
+   "_ex": "Sentinella del Guado"
+  },
+  {
+   "id": "BLU-002",
+   "name": "BLU-002",
+   "type": "reaction",
+   "cost": 1,
+   "colors": [
+    "B"
+   ],
+   "rarity": "NC",
+   "react": {
+    "do": [
+     {
+      "op": "def_mod",
+      "n": 3
+     },
+     {
+      "op": "raddrizza",
+      "target": "opposer"
+     }
+    ]
+   },
+   "text": "Reazione. Il bersaglio ha +3 in questo scontro. Dopo lo scontro, se una tua Unità si è opposta ed è ancora in gioco, raddrizzala.",
+   "intent": "Difesa che si ripete: la stessa Unità può opporsi di nuovo nello stesso turno avversario (M7 ≤3%).",
+   "vanilla_delta": "0 (NC: ±3 + un effetto). Conta nel tetto Raddrizza",
+   "_ex": "Muro di Scudi"
+  },
+  {
+   "id": "BLU-003",
+   "name": "BLU-003",
+   "type": "unit",
+   "cost": 5,
+   "colors": [
+    "B"
+   ],
+   "rarity": "R",
+   "power": 5,
+   "keywords": [
+    "scudo"
+   ],
+   "abilities": [
+    {
+     "trigger": "on_defeats_attacker",
+     "do": [
+      {
+       "op": "draw",
+       "n": 1,
+       "if": [
+        {
+         "deck_nonempty": true
+        }
+       ]
+      }
+     ]
+    }
+   ],
+   "text": "Scudo *(quando è il bersaglio, vince i pareggi)*. Quando sconfigge un attaccante, se il tuo mazzo non è vuoto, pesca 1.",
+   "intent": "Payoff difensivo: ogni attacco respinto ripaga la carta; chiede risposta (Caccia con Bracconiere, Stanca, rimozione su Ruotata).",
+   "vanilla_delta": "+1 (6 −1 Scudo −1 frase = 4; F5, tolleranza R)",
+   "_ex": "Il Bastione Vivente"
+  },
+  {
+   "id": "BLU-004",
+   "name": "BLU-004",
+   "type": "unit",
+   "cost": 1,
+   "colors": [
+    "B"
+   ],
+   "rarity": "C",
+   "power": 1,
+   "keywords": [
+    "scudo"
+   ],
+   "abilities": [],
+   "text": "Scudo *(quando è il bersaglio, vince i pareggi)*.",
+   "intent": "Primo muro: blocca le Unità F1 a pari e protegge la Vita nei primi round.",
+   "vanilla_delta": "0 (2 −1 Scudo = 1)"
+  },
+  {
+   "id": "BLU-005",
+   "name": "BLU-005",
+   "type": "unit",
+   "cost": 1,
+   "colors": [
+    "B"
+   ],
+   "rarity": "C",
+   "power": 1,
+   "keywords": [],
+   "abilities": [
+    {
+     "trigger": "on_oppose",
+     "do": [
+      {
+       "op": "draw",
+       "n": 1,
+       "if": [
+        {
+         "deck_nonempty": true
+        }
+       ]
+      }
+     ]
+    }
+   ],
+   "text": "Quando si oppone, se il tuo mazzo non è vuoto, pesca 1.",
+   "intent": "Opposizione che si ripaga: tiene il flusso di carte (Reazioni in mano) e dà all'IA un motivo per opporsi.",
+   "vanilla_delta": "0 (2 −1 frase = 1)"
+  },
+  {
+   "id": "BLU-006",
+   "name": "BLU-006",
+   "type": "unit",
+   "cost": 2,
+   "colors": [
+    "B"
+   ],
+   "rarity": "C",
+   "power": 2,
+   "keywords": [
+    "bracconiere"
+   ],
+   "abilities": [],
+   "text": "Bracconiere 1 *(quando attacca e il suo bersaglio è un'Unità, anche una che si oppone, +1 in questo scontro)*.",
+   "intent": "Risposta comune agli Scudo (RS): F3 contro chi si oppone, batte gli Scudo F2 a costo 2; deterrente, non cacciatore.",
+   "vanilla_delta": "0 (3 −⌈1/2⌉ = 2). Velocità: 2 + 1 = 3",
+   "kw_params": {
+    "bracconiere": 1
+   }
+  },
+  {
+   "id": "BLU-007",
+   "name": "BLU-007",
+   "type": "unit",
+   "cost": 2,
+   "colors": [
+    "B"
+   ],
+   "rarity": "C",
+   "power": 2,
+   "keywords": [
+    "scudo"
+   ],
+   "abilities": [],
+   "text": "Scudo *(quando è il bersaglio, vince i pareggi)*.",
+   "intent": "Muro di base a costo 2: pari contro F2 a favore del Blu.",
+   "vanilla_delta": "0 (3 −1 Scudo = 2)"
+  },
+  {
+   "id": "BLU-008",
+   "name": "BLU-008",
+   "type": "unit",
+   "cost": 2,
+   "colors": [
+    "B"
+   ],
+   "rarity": "NC",
+   "power": 2,
+   "keywords": [
+    "scudo",
+    "impeto"
+   ],
+   "abilities": [
+    {
+     "static": "power",
+     "if": [
+      {
+       "pugno_ge": 1
+      }
+     ],
+     "value": 1
+    }
+   ],
+   "text": "Scudo *(quando è il bersaglio, vince i pareggi)*. Impeto 1: +1 *(se nell'impegno hai almeno 1 gemma, +1 in questo scontro; quando è il bersaglio contano solo le gemme di Parata)*.",
+   "intent": "Gancio R/B (LDR-05): Scudo che diventa F3–4 con 1 gemma, in attacco e da bersaglio (conta solo la Parata).",
+   "vanilla_delta": "+1 (3 −1 Scudo −1 Impeto = 1; F2, tolleranza NC). Velocità: l'Impeto chiede gemme",
+   "tags": [
+    "ponte"
+   ]
+  },
+  {
+   "id": "BLU-009",
+   "name": "BLU-009",
+   "type": "reaction",
+   "cost": 1,
+   "colors": [
+    "B"
+   ],
+   "rarity": "C",
+   "react": {
+    "do": [
+     {
+      "op": "att_mod",
+      "n": -3
+     }
+    ]
+   },
+   "text": "Reazione. L'attaccante ha −3 in questo scontro.",
+   "intent": "Reazione di base: a 1 gemma toglie 3, uno in più della gemma in Parata.",
+   "vanilla_delta": "0 (comune ±3)"
+  },
+  {
+   "id": "BLU-010",
+   "name": "BLU-010",
+   "type": "unit",
+   "cost": 3,
+   "colors": [
+    "B"
+   ],
+   "rarity": "NC",
+   "power": 3,
+   "keywords": [
+    "scudo",
+    "bracconiere"
+   ],
+   "abilities": [],
+   "text": "Scudo *(quando è il bersaglio, vince i pareggi)*. Bracconiere 2 *(quando attacca e il suo bersaglio è un'Unità, anche una che si oppone, +2 in questo scontro)*.",
+   "intent": "Gancio B/V (Thorn): difende con Scudo, attacca le Unità che si oppongono a F5 (F6 con Thorn Risvegliato).",
+   "vanilla_delta": "+1 (4 −1 Scudo −⌈2/2⌉ = 2; F3, tolleranza NC)",
+   "kw_params": {
+    "bracconiere": 2
+   },
+   "tags": [
+    "ponte"
+   ]
+  },
+  {
+   "id": "BLU-011",
+   "name": "BLU-011",
+   "type": "unit",
+   "cost": 3,
+   "colors": [
+    "B"
+   ],
+   "rarity": "C",
+   "power": 1,
+   "keywords": [],
+   "abilities": [
+    {
+     "activated": true,
+     "cost": 3,
+     "target": {
+      "side": "opp",
+      "ready": false,
+      "cost_le": 2
+     },
+     "do": [
+      {
+       "op": "defeat",
+       "target": "chosen"
+      }
+     ]
+    }
+   ],
+   "text": "⟳, 3 Brace: sconfiggi un'Unità avversaria Ruotata con costo ≤2.",
+   "intent": "Contrattacco lento: nel tuo turno toglie un'Unità piccola Ruotata, ma costa 3 Brace e l'opposizione del turno avversario. Con Stanca (Thorn, VER-002/009/013) [sequenza].",
+   "vanilla_delta": "0 (4 −3 per ⟳ da 3 gemme = 1). Rimozione economica su Ruotata con costo ≤2 (regola 9)"
+  },
+  {
+   "id": "BLU-012",
+   "name": "BLU-012",
+   "type": "unit",
+   "cost": 3,
+   "colors": [
+    "B"
+   ],
+   "rarity": "C",
+   "power": 3,
+   "keywords": [
+    "scudo"
+   ],
+   "abilities": [],
+   "text": "Scudo *(quando è il bersaglio, vince i pareggi)*.",
+   "intent": "Muro a costo 3: regge F3 a pari e F4 con 1 gemma di Parata.",
+   "vanilla_delta": "0 (4 −1 Scudo = 3)"
+  },
+  {
+   "id": "BLU-013",
+   "name": "BLU-013",
+   "type": "tactic",
+   "cost": 3,
+   "colors": [
+    "B"
+   ],
+   "rarity": "C",
+   "play": {
+    "do": [
+     {
+      "op": "draw",
+      "n": 2
+     }
+    ]
+   },
+   "text": "Pesca 2.",
+   "intent": "Carburante: tiene in mano le Reazioni (disponibilità D di M1); costa il turno di Guardia.",
+   "vanilla_delta": "rif. Tattica: 3 gemme ≈ pesca 2"
+  },
+  {
+   "id": "BLU-014",
+   "name": "BLU-014",
+   "type": "relic",
+   "cost": 3,
+   "colors": [
+    "B"
+   ],
+   "rarity": "NC",
+   "abilities": [
+    {
+     "static": "combat",
+     "role": "defense",
+     "if": [
+      {
+       "scars_ge": 2
+      }
+     ],
+     "att_mod": -1,
+     "stack": false
+    }
+   ],
+   "text": "Quando difendi, se hai almeno 2 Cicatrici, l'attaccante ha −1 in questo scontro. Più copie non si sommano.",
+   "intent": "Rimonta del Blu (B/N): da 2 Cicatrici ogni difesa vale 1 in più; nessuna gemma, nessuna aura di Forza.",
+   "vanilla_delta": "rif. Reliquia NC: −1 a ogni scontro in difesa, condizionato; conta fra le aure (S-6, tetto 5). Da guardare con Maera (−2) in E6"
+  },
+  {
+   "id": "BLU-015",
+   "name": "BLU-015",
+   "type": "unit",
+   "cost": 4,
+   "colors": [
+    "B"
+   ],
+   "rarity": "C",
+   "power": 4,
+   "keywords": [],
+   "abilities": [
+    {
+     "static": "power",
+     "if": [
+      {
+       "attacking": true
+      }
+     ],
+     "value": 1
+    }
+   ],
+   "text": "Quando attacca, +1 in questo scontro.",
+   "intent": "Chiusura: attacca a F5 contro Tempra 4, il difensore deve spendere Guardia; difende a F4.",
+   "vanilla_delta": "0 (5 −1 frase = 4)"
+  },
+  {
+   "id": "BLU-016",
+   "name": "BLU-016",
+   "type": "unit",
+   "cost": 4,
+   "colors": [
+    "B"
+   ],
+   "rarity": "R",
+   "power": 4,
+   "keywords": [],
+   "abilities": [
+    {
+     "activated": true,
+     "cost": 1,
+     "do": [
+      {
+       "op": "draw",
+       "n": 1
+      }
+     ]
+    }
+   ],
+   "text": "⟳, 1 Brace: pesca 1.",
+   "intent": "Motore di carte del controllo: ogni turno scegli fra una carta in più e un corpo F4 pronto a opporsi.",
+   "vanilla_delta": "0 (5 −1 per ⟳ da 1 gemma = 4). Pesca ripetibile: solo R/NC"
+  },
+  {
+   "id": "BLU-017",
+   "name": "BLU-017",
+   "type": "tactic",
+   "cost": 4,
+   "colors": [
+    "B"
+   ],
+   "rarity": "NC",
+   "play": {
+    "target": {
+     "side": "opp",
+     "ready": false,
+     "cost_le": 3
+    },
+    "do": [
+     {
+      "op": "defeat",
+      "target": "chosen"
+     },
+     {
+      "op": "draw",
+      "n": 1
+     }
+    ]
+   },
+   "text": "Sconfiggi un'Unità avversaria Ruotata con costo ≤3. Pesca 1.",
+   "intent": "Contrattacco con carta: rimuove chi ti ha attaccato e si ripaga.",
+   "vanilla_delta": "rif. Tattica: rimozione ≤3 (3) + pesca 1 (1). Rimozione economica su Ruotata (regola 9)"
+  },
+  {
+   "id": "BLU-018",
+   "name": "BLU-018",
+   "type": "relic",
+   "cost": 4,
+   "colors": [
+    "B"
+   ],
+   "rarity": "NC",
+   "abilities": [
+    {
+     "trigger": "on_own_reaction",
+     "do": [
+      {
+       "op": "draw",
+       "n": 1,
+       "if": [
+        {
+         "deck_nonempty": true
+        }
+       ]
+      }
+     ],
+     "stack": false
+    }
+   ],
+   "text": "Quando giochi una Reazione, dopo lo scontro, se il tuo mazzo non è vuoto, pesca 1. Più copie non si sommano.",
+   "intent": "Payoff delle Reazioni: ogni Reazione si ripaga, così il Blu ne ha in mano più spesso (Reazioni giocate davvero, M1/M2).",
+   "vanilla_delta": "rif. Reliquia NC: pesca ripetibile condizionata"
+  },
+  {
+   "id": "BLU-019",
+   "name": "BLU-019",
+   "type": "tactic",
+   "cost": 5,
+   "colors": [
+    "B"
+   ],
+   "rarity": "C",
+   "play": {
+    "target": {
+     "side": "opp",
+     "ready": false
+    },
+    "do": [
+     {
+      "op": "defeat",
+      "target": "chosen"
+     }
+    ]
+   },
+   "text": "Sconfiggi un'Unità avversaria Ruotata.",
+   "intent": "Risposta del Blu alle Unità grandi (6–7, Furia, Impeto): dopo che hanno attaccato, nel tuo turno le togli.",
+   "vanilla_delta": "rif. Tattica: 5 gemme, non economica; condizione Ruotata"
+  },
+  {
+   "id": "BLU-020",
+   "name": "BLU-020",
+   "type": "unit",
+   "cost": 6,
+   "colors": [
+    "B"
+   ],
+   "rarity": "R",
+   "power": 6,
+   "keywords": [],
+   "abilities": [
+    {
+     "trigger": "on_enter",
+     "do": [
+      {
+       "op": "draw",
+       "n": 2
+      }
+     ]
+    }
+   ],
+   "text": "Quando entra, pesca 2.",
+   "intent": "Payoff 6–7 e chiusura: F6 va a segno sul Leader con 1 gemma di Parata avversaria e ricarica la mano di Reazioni.",
+   "vanilla_delta": "+1 (7 −2 pesca 2 = 5; F6, tolleranza R)"
+  },
+  {
+   "id": "BLU-021",
+   "name": "BLU-021",
+   "type": "reaction",
+   "cost": 1,
+   "colors": [
+    "B"
+   ],
+   "rarity": "NC",
+   "react": {
+    "do": [
+     {
+      "op": "att_mod",
+      "n": -4
+     }
+    ],
+    "do_from_scars": [
+     {
+      "op": "att_mod",
+      "n": -3
+     },
+     {
+      "op": "draw",
+      "n": 1,
+      "if": [
+       {
+        "deck_nonempty": true
+       }
+      ]
+     }
+    ]
+   },
+   "text": "Reazione. L'attaccante ha −4 in questo scontro. Se la giochi da una tua Cicatrice, l'attaccante ha invece −3 e, se il tuo mazzo non è vuoto, pesca 1.",
+   "intent": "Gancio B/N (Maera): dalla mano è la NC forte, dalle Cicatrici si ripaga con una carta (non +2: quello è del Nero).",
+   "vanilla_delta": "0 (NC: ±4 dalla mano; ±3 + effetto dalle Cicatrici)",
+   "tags": [
+    "ponte"
+   ]
+  },
+  {
+   "id": "BLU-022",
+   "name": "BLU-022",
+   "type": "reaction",
+   "cost": 1,
+   "colors": [
+    "B"
+   ],
+   "rarity": "C",
+   "react": {
+    "do": [
+     {
+      "op": "def_mod",
+      "n": 3
+     },
+     {
+      "op": "def_mod",
+      "n": 1,
+      "if": [
+       {
+        "scars_ge": 2
+       }
+      ]
+     }
+    ]
+   },
+   "text": "Reazione. Il bersaglio ha +3 in questo scontro; +4 se hai almeno 2 Cicatrici.",
+   "intent": "Slot 11.1: chi è indietro difende meglio; resta ±3 senza Cicatrici.",
+   "vanilla_delta": "0 (comune ±3; +4 con la condizione, come da slot)",
+   "slot": [
+    "11.1"
+   ]
+  },
+  {
+   "id": "BLU-023",
+   "name": "BLU-023",
+   "type": "reaction",
+   "cost": 1,
+   "colors": [
+    "B"
+   ],
+   "rarity": "C",
+   "react": {
+    "do": [
+     {
+      "op": "def_mod",
+      "n": 4
+     }
+    ]
+   },
+   "text": "Reazione. Il bersaglio ha +4 in questo scontro.",
+   "intent": "L'unica comune a +4 del set: identità del Blu (risponde meglio), +2 netti sulla gemma di Parata.",
+   "vanilla_delta": "0 (slot: +4 in sola difesa)"
+  },
+  {
+   "id": "BLU-024",
+   "name": "BLU-024",
+   "type": "reaction",
+   "cost": 2,
+   "colors": [
+    "B"
+   ],
+   "rarity": "NC",
+   "react": {
+    "do": [
+     {
+      "op": "def_mod",
+      "n": 5
+     },
+     {
+      "op": "draw",
+      "n": 1,
+      "if": [
+       {
+        "deck_nonempty": true
+       }
+      ]
+     }
+    ]
+   },
+   "text": "Reazione. Il bersaglio ha +5 in questo scontro. Se il tuo mazzo non è vuoto, pesca 1.",
+   "intent": "Muro grande che si ripaga: con 2 gemme di Guardia (tutta la Guardia Base) ferma un attacco e rende la carta.",
+   "vanilla_delta": "0 (2 gemme: ±5 + un effetto)"
+  },
+  {
+   "id": "BLU-025",
+   "name": "BLU-025",
+   "type": "reaction",
+   "cost": 2,
+   "colors": [
+    "B"
+   ],
+   "rarity": "R",
+   "react": {
+    "do": [
+     {
+      "op": "att_mod",
+      "n": -5
+     },
+     {
+      "op": "defeat",
+      "target": "attacker",
+      "sel": {
+       "cost_le": 4
+      }
+     }
+    ]
+   },
+   "text": "Reazione. L'attaccante ha −5 in questo scontro. Dopo lo scontro, se l'attaccante è un'Unità con costo ≤4, sconfiggila.",
+   "intent": "Payoff del contrattacco: la risposta che punisce. Rimozione su Unità Ruotata (l'attaccante) di costo ≤4, dentro la regola 9.",
+   "vanilla_delta": "0 sul numero (±5 + un effetto), ma l'effetto vale più di una pesca: da tenere d'occhio"
+  },
+  {
+   "id": "NER-001",
+   "name": "NER-001",
+   "rarity": "C",
+   "type": "unit",
+   "cost": 3,
+   "colors": [
+    "K"
+   ],
+   "power": 2,
+   "keywords": [
+    "furia"
+   ],
+   "abilities": [
+    {
+     "static": "power",
+     "if": [
+      {
+       "furia": 2
+      }
+     ],
+     "value": 3
+    }
+   ],
+   "text": "Furia 2: +3 *(se hai almeno 2 Cicatrici, +3 in questo scontro)*.",
+   "intent": "Corpo di metà curva che diventa F5 appena hai 2 Cicatrici: la rimonta base del Nero.",
+   "vanilla_delta": "base 2 = 4−2; attiva 5 = vanilla+1 (tetto N−1). Costo 3 come da revisione (N-1)"
+  },
+  {
+   "id": "NER-002",
+   "name": "NER-002",
+   "rarity": "C",
+   "type": "tactic",
+   "cost": 1,
+   "colors": [
+    "K"
+   ],
+   "play": {
+    "costs": [
+     {
+      "lose_life": 1,
+      "floor": 1
+     }
+    ],
+    "do": [
+     {
+      "op": "draw",
+      "n": 1
+     }
+    ]
+   },
+   "text": "Costo aggiuntivo: il tuo Leader perde 1 Vita *(rispetta il Saldo)*. Non puoi giocarla se ha 1 Vita o meno. Pesca 1.",
+   "intent": "Converte 1 Vita in una carta e in una Cicatrice (Furia, Reazione dalle Cicatrici, Rimarginare).",
+   "vanilla_delta": "Tattica 1 = pesca 1; la Vita paga la Cicatrice, non la carta"
+  },
+  {
+   "id": "NER-003",
+   "name": "NER-003",
+   "rarity": "C",
+   "type": "reaction",
+   "cost": 1,
+   "colors": [
+    "K"
+   ],
+   "react": {
+    "do": [
+     {
+      "op": "att_mod",
+      "n": -3
+     }
+    ],
+    "do_from_scars": [
+     {
+      "op": "att_mod",
+      "n": -5
+     }
+    ]
+   },
+   "text": "Reazione. L'attaccante ha −3 in questo scontro; −5 se la giochi da una tua Cicatrice.",
+   "intent": "Difesa base che rende di più quando è già una ferita: la Vita persa torna come scudo.",
+   "vanilla_delta": "k=1 comune ±3; +2 dalle Cicatrici (eccezione nera del §3)"
+  },
+  {
+   "id": "NER-004",
+   "name": "NER-004",
+   "rarity": "C",
+   "type": "unit",
+   "cost": 1,
+   "colors": [
+    "K"
+   ],
+   "power": 1,
+   "keywords": [],
+   "abilities": [
+    {
+     "trigger": "on_enter",
+     "if": [
+      {
+       "scars_ge": 2
+      }
+     ],
+     "do": [
+      {
+       "op": "draw",
+       "n": 1
+      }
+     ]
+    }
+   ],
+   "text": "Quando entra, se hai almeno 2 Cicatrici, pesca 1.",
+   "intent": "Primo turno che a metà partita si ripaga con una carta (condizione sulle Cicatrici, non Furia: M10).",
+   "vanilla_delta": "F1 = vanilla−1 (una frase); pesca nella propria fase principale, niente 3b. Non è più Furia (Furia nera 7)"
+  },
+  {
+   "id": "NER-005",
+   "name": "NER-005",
+   "rarity": "C",
+   "type": "unit",
+   "cost": 1,
+   "colors": [
+    "K"
+   ],
+   "power": 1,
+   "keywords": [
+    "assalto"
+   ],
+   "text": "Assalto *(entra Pronta)*.",
+   "intent": "Pressione immediata che scambia con le Unità piccole; apre la curva aggressiva di Vey.",
+   "vanilla_delta": "0 (2−1 Assalto)"
+  },
+  {
+   "id": "NER-006",
+   "name": "NER-006",
+   "rarity": "C",
+   "type": "unit",
+   "cost": 1,
+   "colors": [
+    "K"
+   ],
+   "power": 1,
+   "keywords": [
+    "furia"
+   ],
+   "abilities": [
+    {
+     "static": "power",
+     "if": [
+      {
+       "furia": 1
+      }
+     ],
+     "value": 1
+    }
+   ],
+   "text": "Furia 1: +1 *(se hai almeno 1 Cicatrice, +1 in questo scontro)*.",
+   "intent": "Slot 11.1: F1 senza ferite, F2 dalla prima Cicatrice; utile a chi è indietro, mai morta.",
+   "vanilla_delta": "base 1 = vanilla−1 (N=1); attiva 2 = vanilla"
+  },
+  {
+   "id": "NER-007",
+   "name": "NER-007",
+   "rarity": "C",
+   "type": "reaction",
+   "cost": 1,
+   "colors": [
+    "K"
+   ],
+   "react": {
+    "do": [
+     {
+      "op": "def_mod",
+      "n": 3
+     }
+    ]
+   },
+   "text": "Reazione. Il bersaglio ha +3 in questo scontro.",
+   "intent": "Densità di Reazioni nere (7 copie nel mazzo con NER-023/024): difesa giocabile anche dalle Cicatrici.",
+   "vanilla_delta": "k=1 comune ±3"
+  },
+  {
+   "id": "NER-008",
+   "name": "NER-008",
+   "rarity": "C",
+   "type": "unit",
+   "cost": 2,
+   "colors": [
+    "K"
+   ],
+   "power": 1,
+   "keywords": [
+    "furia"
+   ],
+   "abilities": [
+    {
+     "static": "power",
+     "if": [
+      {
+       "furia": 2
+      }
+     ],
+     "value": 2
+    }
+   ],
+   "text": "Furia 2: +2 *(se hai almeno 2 Cicatrici, +2 in questo scontro)*.",
+   "intent": "Due gemme che con 2 Cicatrici attaccano a F3, al tetto della velocità.",
+   "vanilla_delta": "base 1 = 3−2; attiva 3 = vanilla (velocità ≤3)"
+  },
+  {
+   "id": "NER-009",
+   "name": "NER-009",
+   "rarity": "C",
+   "type": "unit",
+   "cost": 2,
+   "colors": [
+    "K"
+   ],
+   "power": 3,
+   "keywords": [
+    "caccia"
+   ],
+   "costs": [
+    {
+     "lose_life": 1,
+     "floor": 1
+    }
+   ],
+   "text": "Caccia *(quando attacca, puoi scegliere come bersaglio un'Unità avversaria, anche Ruotata, invece del Leader; l'avversario può ancora opporsi con un'altra Unità, che diventa il bersaglio)*. Costo aggiuntivo: il tuo Leader perde 1 Vita *(rispetta il Saldo)*. Non puoi giocarla se ha 1 Vita o meno.",
+   "intent": "Caccia presto pagata con 1 Vita: toglie un'Unità piccola e accende la Furia.",
+   "vanilla_delta": "0 (3−1 Caccia +1 Vita); velocità 3",
+   "_nota": "Velocità con bersaglio Leader (S-8): resta F3, perché LDR-06 Risvegliato è stato corretto (Q-015 S-8, opzione A)."
+  },
+  {
+   "id": "NER-010",
+   "name": "NER-010",
+   "rarity": "NC",
+   "type": "unit",
+   "cost": 2,
+   "colors": [
+    "K"
+   ],
+   "power": 1,
+   "keywords": [
+    "assalto",
+    "furia"
+   ],
+   "abilities": [
+    {
+     "static": "power",
+     "if": [
+      {
+       "furia": 3
+      }
+     ],
+     "value": 2
+    }
+   ],
+   "tags": [
+    "ponte"
+   ],
+   "text": "Assalto *(entra Pronta)*. Furia 3: +2 *(se hai almeno 3 Cicatrici, +2 in questo scontro)*.",
+   "intent": "Gancio N/R (LDR-03): da sotto entra e colpisce a F3 nello stesso turno. [sequenza]",
+   "vanilla_delta": "base 1 = 3−1 Assalto −2 Furia +1 NC; attiva 3 (velocità)"
+  },
+  {
+   "id": "NER-011",
+   "name": "NER-011",
+   "rarity": "C",
+   "type": "tactic",
+   "cost": 2,
+   "colors": [
+    "K"
+   ],
+   "play": {
+    "target": {
+     "side": "opp",
+     "ready": true,
+     "cost_le": 3,
+     "power_le": {
+      "scars": "own"
+     }
+    },
+    "do": [
+     {
+      "op": "stanca",
+      "target": "chosen"
+     }
+    ]
+   },
+   "text": "Stanca *(ruota)* un'Unità avversaria Pronta con Forza attuale pari o inferiore alle tue Cicatrici e costo ≤3.",
+   "intent": "Risposta agli Scudo che cresce con le ferite: toglie l'opposizione prima dell'attacco al Leader.",
+   "vanilla_delta": "Tattica 2 = Stanca condizionata (≤3); conta nella Stanca economica"
+  },
+  {
+   "id": "NER-012",
+   "name": "NER-012",
+   "rarity": "NC",
+   "type": "tactic",
+   "cost": 2,
+   "colors": [
+    "K"
+   ],
+   "play": {
+    "costs": [
+     {
+      "lose_life": 2,
+      "floor": 1
+     }
+    ],
+    "do": [
+     {
+      "op": "draw",
+      "n": 2
+     }
+    ]
+   },
+   "text": "Costo aggiuntivo: il tuo Leader perde 2 Vite *(rispetta il Saldo)*. Non puoi giocarla se ha 2 Vite o meno. Pesca 2.",
+   "intent": "Rifornimento rischioso: 2 carte e 2 Cicatrici subito, ma usa tutto il Saldo del turno e avvicina le Corde.",
+   "vanilla_delta": "Tattica 2 = pesca 2; le 2 Vite pagano le 2 Cicatrici"
+  },
+  {
+   "id": "NER-013",
+   "name": "NER-013",
+   "rarity": "NC",
+   "type": "unit",
+   "cost": 3,
+   "colors": [
+    "K"
+   ],
+   "power": 3,
+   "keywords": [
+    "furia"
+   ],
+   "abilities": [
+    {
+     "static": "power",
+     "if": [
+      {
+       "furia": 3
+      }
+     ],
+     "value": 3
+    }
+   ],
+   "text": "Furia 3: +3 *(se hai almeno 3 Cicatrici, +3 in questo scontro)*.",
+   "intent": "Metà curva che regge senza ferite (F3) e a 3 Cicatrici attacca a F6.",
+   "vanilla_delta": "base 3 = 4−2 +1 NC; attiva 6 = vanilla+2 (tetto N−1)"
+  },
+  {
+   "id": "NER-014",
+   "name": "NER-014",
+   "rarity": "NC",
+   "type": "unit",
+   "cost": 3,
+   "colors": [
+    "K"
+   ],
+   "power": 3,
+   "keywords": [
+    "scudo"
+   ],
+   "abilities": [
+    {
+     "trigger": "on_oppose",
+     "if": [
+      {
+       "scars_ge": 3
+      }
+     ],
+     "do": [
+      {
+       "op": "draw",
+       "n": 1,
+       "if": [
+        {
+         "deck_nonempty": true
+        }
+       ]
+      }
+     ]
+    }
+   ],
+   "tags": [
+    "ponte"
+   ],
+   "text": "Scudo *(quando è il bersaglio, vince i pareggi)*. Quando si oppone, se hai almeno 3 Cicatrici e il tuo mazzo non è vuoto, pesca 1.",
+   "intent": "Gancio B/N (LDR-02): muro che da sotto trasforma ogni opposizione in carte, cioè Reazioni per il turno dopo.",
+   "vanilla_delta": "3 = 4−1 Scudo −1 frase +1 NC; pesca 3b"
+  },
+  {
+   "id": "NER-015",
+   "name": "NER-015",
+   "rarity": "NC",
+   "type": "unit",
+   "cost": 3,
+   "colors": [
+    "K"
+   ],
+   "power": 2,
+   "keywords": [],
+   "abilities": [
+    {
+     "activated": true,
+     "cost": 1,
+     "target": {
+      "side": "opp",
+      "ready": true,
+      "cost_le": 5,
+      "power_le": {
+       "scars": "own"
+      }
+     },
+     "do": [
+      {
+       "op": "stanca",
+       "target": "chosen"
+      }
+     ]
+    }
+   ],
+   "tags": [
+    "ponte"
+   ],
+   "text": "⟳, 1 Brace: Stanca *(ruota)* un'Unità avversaria Pronta con Forza attuale pari o inferiore alle tue Cicatrici e costo ≤5.",
+   "intent": "Gancio N/V (LDR-06): a 1 gemma per turno toglie un'opposizione o prepara una preda per Caccia e rimozione su Ruotate. [sequenza]",
+   "vanilla_delta": "2 = 4−2 (Stanca NC); ⟳ a 1 gemma come Thorn (LDR-04), il corpo non conta"
+  },
+  {
+   "id": "NER-016",
+   "name": "NER-016",
+   "rarity": "NC",
+   "type": "relic",
+   "cost": 3,
+   "colors": [
+    "K"
+   ],
+   "abilities": [
+    {
+     "static": "power",
+     "applies_to": {
+      "side": "own",
+      "keyword": "furia"
+     },
+     "if": [
+      {
+       "opposing": true
+      }
+     ],
+     "value": 1,
+     "stack": false
+    }
+   ],
+   "text": "Le tue Unità con Furia hanno +1 in questo scontro quando si oppongono. Più copie non si sommano.",
+   "intent": "Unica aura nera: le Unità con Furia diventano muri mentre il Leader prende le ferite che le accendono.",
+   "vanilla_delta": "aura solo difensiva: non conta per la velocità (lettura N-4); 1 fonte di Forza"
+  },
+  {
+   "id": "NER-017",
+   "name": "NER-017",
+   "rarity": "NC",
+   "type": "unit",
+   "cost": 4,
+   "colors": [
+    "K"
+   ],
+   "power": 2,
+   "keywords": [
+    "furia",
+    "caccia"
+   ],
+   "abilities": [
+    {
+     "static": "power",
+     "if": [
+      {
+       "furia": 3
+      }
+     ],
+     "value": 4
+    }
+   ],
+   "text": "Caccia *(quando attacca, puoi scegliere come bersaglio un'Unità avversaria, anche Ruotata, invece del Leader; l'avversario può ancora opporsi con un'altra Unità, che diventa il bersaglio)*. Furia 3: +4 *(se hai almeno 3 Cicatrici, +4 in questo scontro)*.",
+   "intent": "Cacciatrice di rimonta: a 3 Cicatrici sceglie la preda e la batte a F6.",
+   "vanilla_delta": "base 2 = 5−1 Caccia −2 Furia; attiva 6 = 5+2−1"
+  },
+  {
+   "id": "NER-018",
+   "name": "NER-018",
+   "rarity": "R",
+   "type": "unit",
+   "cost": 4,
+   "colors": [
+    "K"
+   ],
+   "power": 4,
+   "keywords": [
+    "rinnovo"
+   ],
+   "abilities": [
+    {
+     "trigger": "on_attack_defeats_unit",
+     "do": [
+      {
+       "op": "raddrizza",
+       "target": "self"
+      }
+     ]
+    }
+   ],
+   "text": "Rinnovo *(quando attacca e sconfigge un'Unità, si raddrizza)*.",
+   "intent": "Punisce chi si oppone: ogni Unità che lo blocca e perde gli ridà l'attacco al Leader.",
+   "vanilla_delta": "0 (5−1 Rinnovo); gemella di costo 4 di ROS-022"
+  },
+  {
+   "id": "NER-019",
+   "name": "NER-019",
+   "rarity": "NC",
+   "type": "tactic",
+   "cost": 4,
+   "colors": [
+    "K"
+   ],
+   "play": {
+    "costs": [
+     {
+      "lose_life": 2,
+      "floor": 1
+     }
+    ],
+    "target": {
+     "side": "opp",
+     "ready": false,
+     "cost_le": 4
+    },
+    "do": [
+     {
+      "op": "defeat",
+      "target": "chosen"
+     },
+     {
+      "op": "draw",
+      "n": 1
+     }
+    ]
+   },
+   "text": "Costo aggiuntivo: il tuo Leader perde 2 Vite *(rispetta il Saldo)*. Non puoi giocarla se ha 2 Vite o meno. Sconfiggi un'Unità avversaria Ruotata con costo ≤4. Pesca 1.",
+   "intent": "Rimozione di rimonta: 2 Vite rendono una carta in più rispetto alla rimozione neutra, e 2 Cicatrici.",
+   "vanilla_delta": "rimozione economica su Ruotate costo ≤4 (regola 9) + pesca 1; le 2 Vite pagano la pesca"
+  },
+  {
+   "id": "NER-020",
+   "name": "NER-020",
+   "rarity": "R",
+   "type": "unit",
+   "cost": 5,
+   "colors": [
+    "K"
+   ],
+   "power": 5,
+   "keywords": [
+    "furia"
+   ],
+   "abilities": [
+    {
+     "static": "power",
+     "if": [
+      {
+       "furia": 4
+      }
+     ],
+     "value": 3
+    }
+   ],
+   "text": "Furia 4: +3 *(se hai almeno 4 Cicatrici, +3 in questo scontro)*.",
+   "intent": "Chiusura: F5 va a segno già senza ferite, F8 a 4 Cicatrici sfonda una Parata da 2.",
+   "vanilla_delta": "base 5 = 6−2 +1 R; attiva 8 = vanilla+2 (tetto 9)"
+  },
+  {
+   "id": "NER-021",
+   "name": "NER-021",
+   "rarity": "R",
+   "type": "relic",
+   "cost": 5,
+   "colors": [
+    "K"
+   ],
+   "abilities": [
+    {
+     "static": "combat",
+     "role": "defense",
+     "if": [
+      {
+       "react_from_scars": true
+      }
+     ],
+     "att_mod": -2,
+     "stack": false
+    }
+   ],
+   "text": "Quando giochi una Reazione da una tua Cicatrice, anche l'attaccante ha −2 in questo scontro. Più copie non si sommano.",
+   "intent": "Payoff del Nero: ogni Vita persa diventa una difesa più grossa; spinge a giocare davvero le Reazioni e le rimonte.",
+   "vanilla_delta": "+2 a ogni Reazione dalle Cicatrici (NER-003 dalle Cicatrici arriva a −7)",
+   "_nota": "Se LDR-02 (Maera) >55% in E6: −1 invece di −2 (Cr)"
+  },
+  {
+   "id": "NER-022",
+   "name": "NER-022",
+   "rarity": "R",
+   "type": "unit",
+   "cost": 6,
+   "colors": [
+    "K"
+   ],
+   "power": 6,
+   "abilities": [
+    {
+     "trigger": "on_enter",
+     "target": {
+      "side": "opp",
+      "power_le": {
+       "scars": "own"
+      }
+     },
+     "do": [
+      {
+       "op": "defeat",
+       "target": "chosen"
+      }
+     ]
+    }
+   ],
+   "text": "Quando entra, sconfiggi un'Unità avversaria con Forza attuale pari o inferiore alle tue Cicatrici.",
+   "intent": "Chiusura del Nero: toglie il muro che ferma l'ultimo colpo, tanto più grande quanto più sei ferito.",
+   "vanilla_delta": "6 = 7−1 frase; rimozione non economica (6 gemme, R, regola 9)",
+   "_nota": "Bersaglio scelto dal motore (N1): Forza più alta legale"
+  },
+  {
+   "id": "NER-023",
+   "name": "NER-023",
+   "rarity": "C",
+   "type": "reaction",
+   "cost": 1,
+   "colors": [
+    "K"
+   ],
+   "react": {
+    "do": [
+     {
+      "op": "att_mod",
+      "n": -3
+     }
+    ]
+   },
+   "text": "Reazione. L'attaccante ha −3 in questo scontro.",
+   "intent": "Densità di Reazioni a 1 gemma; dalle Cicatrici è una Vita che torna difesa.",
+   "vanilla_delta": "k=1 comune ±3"
+  },
+  {
+   "id": "NER-024",
+   "name": "NER-024",
+   "rarity": "C",
+   "type": "reaction",
+   "cost": 1,
+   "colors": [
+    "K"
+   ],
+   "react": {
+    "do": [
+     {
+      "op": "def_mod",
+      "n": 3
+     }
+    ]
+   },
+   "text": "Reazione. Il bersaglio ha +3 in questo scontro.",
+   "intent": "Densità di Reazioni a 1 gemma per i mazzi B/N e N/R.",
+   "vanilla_delta": "k=1 comune ±3"
+  },
+  {
+   "id": "NER-025",
+   "name": "NER-025",
+   "rarity": "NC",
+   "type": "reaction",
+   "cost": 2,
+   "colors": [
+    "K"
+   ],
+   "react": {
+    "do": [
+     {
+      "op": "att_mod",
+      "n": -5
+     },
+     {
+      "op": "draw",
+      "n": 1,
+      "if": [
+       {
+        "deck_nonempty": true
+       }
+      ]
+     }
+    ]
+   },
+   "text": "Reazione. L'attaccante ha −5 in questo scontro. Se il tuo mazzo non è vuoto, pesca 1.",
+   "intent": "Reazione pesante per chi è Alle Corde: ferma un colpo finale e rimpiazza se stessa.",
+   "vanilla_delta": "k=2 NC: ±5 + effetto (pesca 3b)"
+  },
+  {
+   "id": "VER-001",
+   "name": "VER-001",
+   "type": "unit",
+   "cost": 2,
+   "colors": [
+    "G"
+   ],
+   "rarity": "C",
+   "power": 2,
+   "keywords": [
+    "caccia"
+   ],
+   "abilities": [],
+   "text": "Caccia *(quando attacca, puoi scegliere come bersaglio un'Unità avversaria, anche Ruotata, invece del Leader; l'avversario può ancora opporsi con un'altra Unità, che diventa il bersaglio)*.",
+   "intent": "Cacciatore base: sceglie la preda (meglio se Ruotata, cioè ha agito) invece di sbattere sul Leader.",
+   "vanilla_delta": 0,
+   "_r005": [
+    1
+   ],
+   "_ex": "Lince del Sottobosco"
+  },
+  {
+   "id": "VER-002",
+   "name": "VER-002",
+   "type": "tactic",
+   "cost": 1,
+   "colors": [
+    "G"
+   ],
+   "rarity": "C",
+   "play": {
+    "target": {
+     "side": "opp",
+     "ready": true,
+     "cost_le": 3
+    },
+    "do": [
+     {
+      "op": "stanca",
+      "target": "chosen"
+     }
+    ]
+   },
+   "text": "Stanca *(ruota)* un'Unità avversaria Pronta con costo ≤3.",
+   "intent": "Stanca economica e risposta comune agli Scudo: toglie un'opposizione prima degli attacchi del turno.",
+   "vanilla_delta": 0,
+   "_ex": "Esca"
+  },
+  {
+   "id": "VER-003",
+   "name": "VER-003",
+   "type": "unit",
+   "cost": 5,
+   "colors": [
+    "G"
+   ],
+   "rarity": "NC",
+   "power": 5,
+   "keywords": [],
+   "abilities": [
+    {
+     "trigger": "on_own_unit_defeats_unit",
+     "do": [
+      {
+       "op": "draw",
+       "n": 1,
+       "if": [
+        {
+         "deck_nonempty": true
+        }
+       ]
+      }
+     ]
+    }
+   ],
+   "text": "Quando una tua Unità sconfigge un'Unità in uno scontro (anche se è sconfitta anch'essa), se il tuo mazzo non è vuoto, pesca 1.",
+   "intent": "Motore della caccia (anche in difesa); F5 va a segno da sola sul Leader.",
+   "vanilla_delta": 0,
+   "_r005": [
+    8
+   ],
+   "_ex": "Matriarca del Branco"
+  },
+  {
+   "id": "VER-004",
+   "name": "VER-004",
+   "type": "unit",
+   "cost": 1,
+   "colors": [
+    "G"
+   ],
+   "rarity": "C",
+   "power": 2,
+   "keywords": [],
+   "abilities": [],
+   "text": "",
+   "intent": "Corpo vanilla da 1: opposizione e pressione precoce.",
+   "vanilla_delta": 0
+  },
+  {
+   "id": "VER-005",
+   "name": "VER-005",
+   "type": "unit",
+   "cost": 1,
+   "colors": [
+    "G"
+   ],
+   "rarity": "C",
+   "power": 1,
+   "keywords": [
+    "assalto"
+   ],
+   "abilities": [],
+   "text": "Assalto *(entra Pronta)*.",
+   "intent": "Attacca subito: con Arden Risvegliato F2; caccia immediata dopo VER-002 su un'Unità grande.",
+   "vanilla_delta": 0
+  },
+  {
+   "id": "VER-006",
+   "name": "VER-006",
+   "type": "unit",
+   "cost": 1,
+   "colors": [
+    "G"
+   ],
+   "rarity": "C",
+   "power": 1,
+   "keywords": [],
+   "abilities": [
+    {
+     "activated": true,
+     "cost": 1,
+     "target": {
+      "side": "opp",
+      "ready": false,
+      "power_le": 1,
+      "cost_le": 1
+     },
+     "do": [
+      {
+       "op": "defeat",
+       "target": "chosen"
+      }
+     ]
+    }
+   ],
+   "text": "⟳, 1 Brace: sconfiggi un'Unità avversaria Ruotata con Forza attuale ≤1 e costo ≤1.",
+   "intent": "Punisce le Unità da 1 che hanno agito; usarla la lascia Ruotata ed esposta alla caccia avversaria.",
+   "vanilla_delta": 0
+  },
+  {
+   "id": "VER-007",
+   "name": "VER-007",
+   "type": "reaction",
+   "cost": 1,
+   "colors": [
+    "G"
+   ],
+   "rarity": "C",
+   "react": {
+    "do": [
+     {
+      "op": "def_mod",
+      "n": 3
+     }
+    ]
+   },
+   "text": "Reazione. Il bersaglio ha +3 in questo scontro.",
+   "intent": "Salva il cacciatore che si oppone o il Leader; gemella difensiva di VER-024.",
+   "vanilla_delta": 0
+  },
+  {
+   "id": "VER-008",
+   "name": "VER-008",
+   "type": "unit",
+   "cost": 2,
+   "colors": [
+    "G"
+   ],
+   "rarity": "C",
+   "power": 1,
+   "keywords": [
+    "caccia"
+   ],
+   "abilities": [
+    {
+     "static": "power",
+     "if": [
+      {
+       "attacking": true
+      },
+      {
+       "hunted_ready": false
+      }
+     ],
+     "value": 2
+    }
+   ],
+   "text": "Caccia *(quando attacca, puoi scegliere come bersaglio un'Unità avversaria, anche Ruotata, invece del Leader; l'avversario può ancora opporsi con un'altra Unità, che diventa il bersaglio)*. Quando attacca, se il suo bersaglio è un'Unità Ruotata scelta con Caccia, +2 in questo scontro.",
+   "intent": "Cacciatore di chi ha agito: F3 contro una preda Ruotata, F1 altrimenti.",
+   "vanilla_delta": 0,
+   "_r005": [
+    1
+   ]
+  },
+  {
+   "id": "VER-009",
+   "name": "VER-009",
+   "type": "unit",
+   "cost": 2,
+   "colors": [
+    "G"
+   ],
+   "rarity": "C",
+   "power": 2,
+   "keywords": [],
+   "abilities": [
+    {
+     "trigger": "on_enter",
+     "target": {
+      "side": "opp",
+      "ready": true,
+      "cost_le": 3
+     },
+     "do": [
+      {
+       "op": "stanca",
+       "target": "chosen"
+      }
+     ]
+    }
+   ],
+   "text": "Quando entra, Stanca *(ruota)* un'Unità avversaria Pronta con costo ≤3.",
+   "intent": "Stanca su corpo e risposta agli Scudo: apre la strada agli attaccanti già in campo.",
+   "vanilla_delta": 0
+  },
+  {
+   "id": "VER-010",
+   "name": "VER-010",
+   "type": "unit",
+   "cost": 2,
+   "colors": [
+    "G"
+   ],
+   "rarity": "NC",
+   "power": 1,
+   "keywords": [
+    "bracconiere"
+   ],
+   "abilities": [
+    {
+     "trigger": "on_enter",
+     "target": {
+      "side": "opp",
+      "ready": true,
+      "cost_le": 5
+     },
+     "do": [
+      {
+       "op": "stanca",
+       "target": "chosen"
+      }
+     ]
+    }
+   ],
+   "text": "Bracconiere 2 *(quando attacca e il suo bersaglio è un'Unità, anche una che si oppone, +2 in questo scontro)*. Quando entra, Stanca *(ruota)* un'Unità avversaria Pronta con costo ≤5.",
+   "intent": "Toglie di mezzo un'Unità grande per il turno; poi chi la oppone affronta F3.",
+   "vanilla_delta": 1,
+   "kw_params": {
+    "bracconiere": 2
+   },
+   "_r005": [
+    2,
+    10
+   ]
+  },
+  {
+   "id": "VER-011",
+   "name": "VER-011",
+   "type": "unit",
+   "cost": 2,
+   "colors": [
+    "G"
+   ],
+   "rarity": "NC",
+   "power": 2,
+   "keywords": [
+    "impeto",
+    "bracconiere"
+   ],
+   "abilities": [
+    {
+     "static": "power",
+     "if": [
+      {
+       "pugno_ge": 1
+      }
+     ],
+     "value": 2
+    }
+   ],
+   "text": "Impeto 1: +2 *(se nell'impegno hai almeno 1 gemma, +2 in questo scontro; quando è il bersaglio contano solo le gemme di Parata)*. Bracconiere 1 *(quando attacca e il suo bersaglio è un'Unità, anche una che si oppone, +1 in questo scontro)*.",
+   "intent": "Gancio R/V (Arden): con 2 gemme e Arden arriva a 2+2+2+1(+1 Bracconiere) e punisce chi si oppone. [sequenza]",
+   "vanilla_delta": 1,
+   "kw_params": {
+    "bracconiere": 1
+   },
+   "tags": [
+    "ponte"
+   ],
+   "_r005": [
+    2,
+    3,
+    10
+   ]
+  },
+  {
+   "id": "VER-012",
+   "name": "VER-012",
+   "type": "tactic",
+   "cost": 2,
+   "colors": [
+    "G"
+   ],
+   "rarity": "NC",
+   "play": {
+    "target": {
+     "side": "opp",
+     "ready": true,
+     "cost_le": 5
+    },
+    "do": [
+     {
+      "op": "stanca",
+      "target": "chosen"
+     }
+    ]
+   },
+   "text": "Stanca *(ruota)* un'Unità avversaria Pronta con costo ≤5.",
+   "intent": "Stanca sui corpi medi (costo 4–5) che le comuni non toccano.",
+   "vanilla_delta": 0
+  },
+  {
+   "id": "VER-013",
+   "name": "VER-013",
+   "type": "tactic",
+   "cost": 2,
+   "colors": [
+    "G"
+   ],
+   "rarity": "C",
+   "play": {
+    "target": {
+     "side": "opp",
+     "ready": true,
+     "cost_le": 3
+    },
+    "do": [
+     {
+      "op": "stanca",
+      "target": "chosen"
+     },
+     {
+      "op": "draw",
+      "n": 1,
+      "if": [
+       {
+        "scars_ge": 2
+       }
+      ]
+     }
+    ]
+   },
+   "text": "Stanca *(ruota)* un'Unità avversaria Pronta con costo ≤3; se hai almeno 2 Cicatrici, pesca anche 1.",
+   "intent": "Slot 11.1: VER-002 a +1 gemma per chi è avanti, ricarica la mano a chi è indietro.",
+   "vanilla_delta": -1,
+   "_r005": [
+    8
+   ]
+  },
+  {
+   "id": "VER-014",
+   "name": "VER-014",
+   "type": "unit",
+   "cost": 3,
+   "colors": [
+    "G"
+   ],
+   "rarity": "NC",
+   "power": 2,
+   "keywords": [
+    "scudo"
+   ],
+   "abilities": [
+    {
+     "trigger": "on_oppose",
+     "do": [
+      {
+       "op": "def_mod",
+       "n": 2
+      }
+     ]
+    },
+    {
+     "trigger": "on_defeats_attacker",
+     "do": [
+      {
+       "op": "draw",
+       "n": 1,
+       "if": [
+        {
+         "deck_nonempty": true
+        }
+       ]
+      }
+     ]
+    }
+   ],
+   "text": "Scudo *(quando è il bersaglio, vince i pareggi)*. Quando si oppone, +2 in questo scontro. Quando sconfigge un attaccante, se il tuo mazzo non è vuoto, pesca 1.",
+   "intent": "Gancio V/B (Thorn): muro da 4 (5 con Thorn Risvegliato) che pesca e attiva VER-003.",
+   "vanilla_delta": 1,
+   "tags": [
+    "ponte"
+   ],
+   "_r005": [
+    8
+   ]
+  },
+  {
+   "id": "VER-015",
+   "name": "VER-015",
+   "type": "unit",
+   "cost": 3,
+   "colors": [
+    "G"
+   ],
+   "rarity": "C",
+   "power": 3,
+   "keywords": [
+    "scudo"
+   ],
+   "abilities": [],
+   "text": "Scudo *(quando è il bersaglio, vince i pareggi)*.",
+   "intent": "Difesa comune: regge un'Unità da 3 e protegge i cacciatori Ruotati.",
+   "vanilla_delta": 0
+  },
+  {
+   "id": "VER-016",
+   "name": "VER-016",
+   "type": "unit",
+   "cost": 3,
+   "colors": [
+    "G"
+   ],
+   "rarity": "NC",
+   "power": 3,
+   "keywords": [],
+   "abilities": [
+    {
+     "activated": true,
+     "cost": 1,
+     "do": [
+      {
+       "op": "draw",
+       "n": 1
+      }
+     ]
+    }
+   ],
+   "text": "⟳, 1 Brace: pesca 1.",
+   "intent": "Motore di carte che si paga agendo: Ruotata, non si oppone ed è preda della Caccia avversaria.",
+   "vanilla_delta": 0
+  },
+  {
+   "id": "VER-017",
+   "name": "VER-017",
+   "type": "tactic",
+   "cost": 3,
+   "colors": [
+    "G"
+   ],
+   "rarity": "R",
+   "play": {
+    "target": {
+     "side": "opp",
+     "ready": true
+    },
+    "do": [
+     {
+      "op": "stanca",
+      "target": "chosen"
+     },
+     {
+      "op": "draw",
+      "n": 1
+     }
+    ]
+   },
+   "text": "Stanca *(ruota)* un'Unità avversaria Pronta. Pesca 1.",
+   "intent": "Stanca qualsiasi bersaglio (anche il muro grande) e si ripaga; non economica.",
+   "vanilla_delta": 0
+  },
+  {
+   "id": "VER-018",
+   "name": "VER-018",
+   "type": "relic",
+   "cost": 3,
+   "colors": [
+    "G"
+   ],
+   "rarity": "NC",
+   "abilities": [
+    {
+     "static": "power",
+     "applies_to": {
+      "side": "own",
+      "attacker": true,
+      "kind": "unit"
+     },
+     "if": [
+      {
+       "pugno_ge": 1
+      },
+      {
+       "target_is_unit": true
+      }
+     ],
+     "value": 1,
+     "stack": false
+    }
+   ],
+   "text": "Le tue Unità hanno +1 in questo scontro quando attaccano e il loro bersaglio è un'Unità, se nell'impegno hai almeno 1 gemma. Più copie non si sommano.",
+   "intent": "Aura verde (unica): ogni caccia con una gemma passa la soglia; chiede gemme, quindi non tocca la velocità.",
+   "vanilla_delta": "—",
+   "_r005": [
+    10
+   ]
+  },
+  {
+   "id": "VER-019",
+   "name": "VER-019",
+   "type": "unit",
+   "cost": 4,
+   "colors": [
+    "G"
+   ],
+   "rarity": "C",
+   "power": 4,
+   "keywords": [
+    "impeto"
+   ],
+   "abilities": [
+    {
+     "static": "power",
+     "if": [
+      {
+       "pugno_ge": 1
+      }
+     ],
+     "value": 2
+    }
+   ],
+   "text": "Impeto 1: +2 *(se nell'impegno hai almeno 1 gemma, +2 in questo scontro; quando è il bersaglio contano solo le gemme di Parata)*.",
+   "intent": "Chiusura: F4 va a segno da sola; con 1 gemma F7 contro Tempra 4 + 1 Parata.",
+   "vanilla_delta": 0,
+   "_r005": [
+    3
+   ]
+  },
+  {
+   "id": "VER-020",
+   "name": "VER-020",
+   "type": "unit",
+   "cost": 4,
+   "colors": [
+    "G"
+   ],
+   "rarity": "NC",
+   "power": 3,
+   "keywords": [
+    "caccia",
+    "bracconiere"
+   ],
+   "abilities": [
+    {
+     "static": "power",
+     "if": [
+      {
+       "attacking": true
+      },
+      {
+       "target_is_unit": true
+      },
+      {
+       "scars_ge": 2
+      }
+     ],
+     "value": 1
+    }
+   ],
+   "text": "Caccia *(quando attacca, puoi scegliere come bersaglio un'Unità avversaria, anche Ruotata, invece del Leader; l'avversario può ancora opporsi con un'altra Unità, che diventa il bersaglio)*. Bracconiere 2 *(quando attacca e il suo bersaglio è un'Unità, anche una che si oppone, +2 in questo scontro)*. Se hai almeno 2 Cicatrici, il suo Bracconiere dà +3 invece di +2.",
+   "intent": "Gancio N/V (LDR-06): caccia a F5, F6 con 2 Cicatrici (Bracconiere 3), F7 con LDR-06 Risvegliato.",
+   "vanilla_delta": 1,
+   "kw_params": {
+    "bracconiere": 2
+   },
+   "tags": [
+    "ponte"
+   ],
+   "_r005": [
+    1,
+    2,
+    10
+   ]
+  },
+  {
+   "id": "VER-021",
+   "name": "VER-021",
+   "type": "tactic",
+   "cost": 4,
+   "colors": [
+    "G"
+   ],
+   "rarity": "R",
+   "play": {
+    "target": {
+     "side": "opp",
+     "ready": false,
+     "cost_le": 4
+    },
+    "do": [
+     {
+      "op": "defeat",
+      "target": "chosen"
+     },
+     {
+      "op": "draw",
+      "n": 1
+     }
+    ]
+   },
+   "text": "Sconfiggi un'Unità avversaria Ruotata con costo ≤4. Pesca 1.",
+   "intent": "Rimozione forte su chi ha agito, entro la regola 9 (costo ≤4).",
+   "vanilla_delta": 0
+  },
+  {
+   "id": "VER-022",
+   "name": "VER-022",
+   "type": "relic",
+   "cost": 5,
+   "colors": [
+    "G"
+   ],
+   "rarity": "R",
+   "abilities": [
+    {
+     "trigger": "on_own_unit_attack_defeats_unit",
+     "target": {
+      "side": "opp",
+      "ready": true,
+      "cost_le": 4
+     },
+     "do": [
+      {
+       "op": "stanca",
+       "target": "chosen"
+      }
+     ],
+     "stack": false
+    }
+   ],
+   "text": "Quando una tua Unità che attacca sconfigge un'Unità (anche se è sconfitta anch'essa), Stanca *(ruota)* un'Unità avversaria Pronta con costo ≤4. Più copie non si sommano.",
+   "intent": "Payoff: ogni preda abbattuta toglie un'opposizione, la caccia si converte in attacchi al Leader nello stesso turno. [sequenza]",
+   "vanilla_delta": "—"
+  },
+  {
+   "id": "VER-023",
+   "name": "VER-023",
+   "type": "unit",
+   "cost": 6,
+   "colors": [
+    "G"
+   ],
+   "rarity": "R",
+   "power": 5,
+   "keywords": [
+    "caccia",
+    "bracconiere"
+   ],
+   "abilities": [
+    {
+     "trigger": "on_enter",
+     "target": {
+      "side": "opp",
+      "ready": true
+     },
+     "do": [
+      {
+       "op": "stanca",
+       "target": "chosen"
+      }
+     ]
+    }
+   ],
+   "text": "Caccia *(quando attacca, puoi scegliere come bersaglio un'Unità avversaria, anche Ruotata, invece del Leader; l'avversario può ancora opporsi con un'altra Unità, che diventa il bersaglio)*. Bracconiere 2 *(quando attacca e il suo bersaglio è un'Unità, anche una che si oppone, +2 in questo scontro)*. Quando entra, Stanca *(ruota)* un'Unità avversaria Pronta.",
+   "intent": "Payoff 6: all'ingresso toglie un'opposizione; poi F5 sul Leader (chiusura) o F7 sulla preda.",
+   "vanilla_delta": 1,
+   "kw_params": {
+    "bracconiere": 2
+   },
+   "_r005": [
+    1,
+    2,
+    10
+   ]
+  },
+  {
+   "id": "VER-024",
+   "name": "VER-024",
+   "type": "reaction",
+   "cost": 1,
+   "colors": [
+    "G"
+   ],
+   "rarity": "C",
+   "react": {
+    "do": [
+     {
+      "op": "att_mod",
+      "n": -3
+     }
+    ]
+   },
+   "text": "Reazione. L'attaccante ha −3 in questo scontro.",
+   "intent": "Reazione comune: salva il cacciatore o il Leader e lascia l'attaccante Ruotato da cacciare.",
+   "vanilla_delta": 0
+  },
+  {
+   "id": "VER-025",
+   "name": "VER-025",
+   "type": "reaction",
+   "cost": 2,
+   "colors": [
+    "G"
+   ],
+   "rarity": "NC",
+   "react": {
+    "do": [
+     {
+      "op": "att_mod",
+      "n": -5
+     },
+     {
+      "op": "draw",
+      "n": 1,
+      "if": [
+       {
+        "deck_nonempty": true
+       }
+      ]
+     }
+    ]
+   },
+   "text": "Reazione. L'attaccante ha −5 in questo scontro. Se il tuo mazzo non è vuoto, pesca 1.",
+   "intent": "Ferma un attacco grosso e ricarica la mano (±5 + effetto).",
+   "vanilla_delta": 0,
+   "_r005": [
+    7,
+    8
+   ]
+  },
+  {
+   "id": "NEU-001",
+   "name": "NEU-001",
+   "type": "unit",
+   "cost": 1,
+   "colors": [],
+   "rarity": "NC",
+   "power": 1,
+   "keywords": [
+    "scudo"
+   ],
+   "abilities": [
+    {
+     "static": "power",
+     "if": [
+      {
+       "scars_ge": 2
+      }
+     ],
+     "value": 1
+    }
+   ],
+   "text": "Scudo *(quando è il bersaglio, vince i pareggi)*. Se hai almeno 2 Cicatrici, ha +1 in questo scontro.",
+   "intent": "Collante delle coppie col Nero (Vey, Maera, LDR-06): muro da 1 che cresce quando sei ferito.",
+   "vanilla_delta": "tabella 2 − 1 (Scudo) = 1; collante: niente tassa neutrale; +1 condizionato = NC +1 (F2 con ≥2 Cicatrici, velocità ok)",
+   "tags": [
+    "collante"
+   ],
+   "_ex": "Recluta del Crocevia"
+  },
+  {
+   "id": "NEU-002",
+   "name": "NEU-002",
+   "type": "relic",
+   "cost": 2,
+   "colors": [],
+   "rarity": "R",
+   "abilities": [
+    {
+     "static": "guard_max",
+     "value": 1,
+     "cap": 4,
+     "stack": false
+    }
+   ],
+   "text": "Il tuo massimo di Guardia aumenta di 1 (in totale mai più di 4, anche Alle Corde). Più copie non si sommano.",
+   "intent": "Unico aumento della Guardia del set: più gemme in difesa vuol dire più Reazioni pagabili.",
+   "vanilla_delta": "Reliquia rara, regola di set 2 (unica eccezione); tetto 4 applicato per ultimo",
+   "_ex": "Lanterna del Pellegrino"
+  },
+  {
+   "id": "NEU-003",
+   "name": "NEU-003",
+   "type": "tactic",
+   "cost": 3,
+   "colors": [],
+   "rarity": "C",
+   "play": {
+    "target": {
+     "side": "opp",
+     "ready": false,
+     "power_le": 3,
+     "cost_le": 4
+    },
+    "do": [
+     {
+      "op": "defeat",
+      "target": "chosen"
+     }
+    ]
+   },
+   "text": "Sconfiggi un'Unità avversaria Ruotata con Forza attuale ≤3 e costo ≤4.",
+   "intent": "Risposta neutra agli Scudo: l'Unità che si è opposta resta Ruotata nel tuo turno e la togli dopo l'attacco.",
+   "vanilla_delta": "Tattica da 3 = effetto da 3, sotto le rimozioni colorate (Forza ≤3); regola 9 rispettata (Ruotata, costo ≤4)",
+   "tags": [
+    "RS"
+   ],
+   "_ex": "Colpo Mirato"
+  },
+  {
+   "id": "NEU-004",
+   "name": "NEU-004",
+   "type": "unit",
+   "cost": 1,
+   "colors": [],
+   "rarity": "C",
+   "power": 1,
+   "keywords": [],
+   "abilities": [
+    {
+     "trigger": "on_oppose",
+     "do": [
+      {
+       "op": "def_mod",
+       "n": 2
+      }
+     ]
+    }
+   ],
+   "text": "Quando si oppone, +2 in questo scontro.",
+   "intent": "Opposizione economica per ogni mazzo: un'Unità da 1 che ha un motivo per non restare ferma.",
+   "vanilla_delta": "tabella 2 − 1 (frase) = 1 → 0; niente tassa neutrale perché il bonus è condizionato (solo opponendosi); +2 difensivo fuori dalla velocità (N-4)"
+  },
+  {
+   "id": "NEU-005",
+   "name": "NEU-005",
+   "type": "unit",
+   "cost": 1,
+   "colors": [],
+   "rarity": "C",
+   "power": 0,
+   "keywords": [],
+   "abilities": [
+    {
+     "trigger": "on_enter",
+     "do": [
+      {
+       "op": "draw",
+       "n": 1
+      }
+     ]
+    }
+   ],
+   "text": "Quando entra, pesca 1.",
+   "intent": "Rimpiazza sé stessa: aiuta i mazzi misti a trovare i ganci; corpo da 0 che si oppone solo per salvare il Leader.",
+   "vanilla_delta": "tabella 2 − 1 (pesca 1) − 1 (Neutrale senza condizione) = 0 → 0; pesca nella fase principale: niente 3b"
+  },
+  {
+   "id": "NEU-006",
+   "name": "NEU-006",
+   "type": "reaction",
+   "cost": 1,
+   "colors": [],
+   "rarity": "C",
+   "react": {
+    "do": [
+     {
+      "op": "def_mod",
+      "n": 3
+     }
+    ]
+   },
+   "text": "Reazione. Il bersaglio ha +3 in questo scontro.",
+   "intent": "Reazione neutra ±3: porta ogni mazzo a 7 copie di Reazioni giocabili.",
+   "vanilla_delta": "Reazione comune a 1 gemma: ±3 = tabella (>2k)"
+  },
+  {
+   "id": "NEU-007",
+   "name": "NEU-007",
+   "type": "unit",
+   "cost": 2,
+   "colors": [],
+   "rarity": "C",
+   "power": 1,
+   "keywords": [
+    "assalto"
+   ],
+   "abilities": [
+    {
+     "trigger": "on_oppose",
+     "do": [
+      {
+       "op": "def_mod",
+       "n": 2
+      }
+     ]
+    }
+   ],
+   "text": "Assalto *(entra Pronta)*. Quando si oppone, +2 in questo scontro.",
+   "intent": "Assalto per Blu, Nero e Verde che serve anche in difesa: non più dominata dalle F1 Assalto a costo 1.",
+   "vanilla_delta": "tabella 3 − 1 (Assalto) − 1 (frase) = 1 → 0; niente tassa neutrale perché la frase è condizionata (solo opponendosi), come NEU-004"
+  },
+  {
+   "id": "NEU-008",
+   "name": "NEU-008",
+   "type": "unit",
+   "cost": 2,
+   "colors": [],
+   "rarity": "C",
+   "power": 1,
+   "keywords": [
+    "furia"
+   ],
+   "abilities": [
+    {
+     "static": "power",
+     "if": [
+      {
+       "furia": 2
+      }
+     ],
+     "value": 2
+    }
+   ],
+   "text": "Furia 2: +2 *(se hai almeno 2 Cicatrici, +2 in questo scontro)*.",
+   "intent": "Slot 11.1: corpo da 2 che torna sulla tabella quando sei indietro (≥2 Cicatrici).",
+   "vanilla_delta": "Furia N=2: base 3 − 2 = 1, attiva 3 = tabella e tetto della velocità → 0 (nota N-5 risolta: era F2, +1 su una comune)",
+   "tags": [
+    "11.1"
+   ]
+  },
+  {
+   "id": "NEU-009",
+   "name": "NEU-009",
+   "type": "unit",
+   "cost": 2,
+   "colors": [],
+   "rarity": "NC",
+   "power": 2,
+   "keywords": [
+    "scudo"
+   ],
+   "abilities": [
+    {
+     "trigger": "on_oppose",
+     "if": [
+      {
+       "attacker_has": "caccia"
+      }
+     ],
+     "do": [
+      {
+       "op": "def_mod",
+       "n": 2
+      }
+     ]
+    }
+   ],
+   "text": "Scudo *(quando è il bersaglio, vince i pareggi)*. Quando si oppone a un'Unità con Caccia, +2 in questo scontro.",
+   "intent": "Collante Verde/Blu: lo Scudo che protegge le tue Unità dalla Caccia (difesa del mirror Thorn/LDR-06).",
+   "vanilla_delta": "tabella 3 − 1 (Scudo) − 1 (frase) = 1; collante 0; NC +1 → F2; +2 difensivo fuori dalla velocità (N-4)",
+   "tags": [
+    "collante"
+   ]
+  },
+  {
+   "id": "NEU-010",
+   "name": "NEU-010",
+   "type": "unit",
+   "cost": 2,
+   "colors": [],
+   "rarity": "NC",
+   "power": 1,
+   "keywords": [],
+   "abilities": [
+    {
+     "trigger": "on_enter",
+     "target": {
+      "side": "opp",
+      "ready": true,
+      "cost_le": 5
+     },
+     "do": [
+      {
+       "op": "stanca",
+       "target": "chosen"
+      }
+     ]
+    }
+   ],
+   "text": "Quando entra, Stanca *(ruota)* un'Unità avversaria Pronta con costo ≤5.",
+   "intent": "Stanca neutra da NC: apre la strada a un attacco nello stesso turno a chi non ha il Verde.",
+   "vanilla_delta": "tabella 3 − 2 (Stanca NC, ≤5) − 1 (Neutrale senza condizione) = 0; NC +1 → F1",
+   "_note": "R-006 N1: il bersaglio del trigger lo sceglie il motore"
+  },
+  {
+   "id": "NEU-011",
+   "name": "NEU-011",
+   "type": "tactic",
+   "cost": 2,
+   "colors": [],
+   "rarity": "C",
+   "play": {
+    "target": {
+     "side": "opp",
+     "ready": true,
+     "cost_le": 3
+    },
+    "do": [
+     {
+      "op": "stanca",
+      "target": "chosen"
+     }
+    ]
+   },
+   "text": "Stanca *(ruota)* un'Unità avversaria Pronta con costo ≤3.",
+   "intent": "Risposta comune agli Scudo per tutti: toglie un'opposizione prima dell'attacco.",
+   "vanilla_delta": "come VER-002 ma 1 gemma in più (tassa neutrale)",
+   "tags": [
+    "RS"
+   ]
+  },
+  {
+   "id": "NEU-012",
+   "name": "NEU-012",
+   "type": "unit",
+   "cost": 3,
+   "colors": [],
+   "rarity": "C",
+   "power": 2,
+   "keywords": [
+    "caccia"
+   ],
+   "abilities": [],
+   "text": "Caccia *(quando attacca, puoi scegliere come bersaglio un'Unità avversaria, anche Ruotata, invece del Leader; l'avversario può ancora opporsi con un'altra Unità, che diventa il bersaglio)*.",
+   "intent": "Caccia neutra: preda per i mazzi senza Verde; +1 con LDR-06 Risvegliato.",
+   "vanilla_delta": "tabella 4 − 1 (Caccia) − 1 (Neutrale senza condizione) = 2 → 0"
+  },
+  {
+   "id": "NEU-013",
+   "name": "NEU-013",
+   "type": "unit",
+   "cost": 3,
+   "colors": [],
+   "rarity": "NC",
+   "power": 3,
+   "keywords": [
+    "scudo",
+    "impeto"
+   ],
+   "abilities": [
+    {
+     "static": "power",
+     "if": [
+      {
+       "pugno_ge": 1
+      }
+     ],
+     "value": 1
+    }
+   ],
+   "text": "Scudo *(quando è il bersaglio, vince i pareggi)*. Impeto 1: +1 *(se nell'impegno hai almeno 1 gemma, +1 in questo scontro; quando è il bersaglio contano solo le gemme di Parata)*.",
+   "intent": "Collante Rosso/Blu, gemella di BLU-008: attacca con le gemme e difende con la Parata; legge entrambi i testi di LDR-05.",
+   "vanilla_delta": "tabella 4 − 1 (Scudo) − 1 (Impeto) = 2; collante 0; NC +1 → F3",
+   "tags": [
+    "collante"
+   ]
+  },
+  {
+   "id": "NEU-014",
+   "name": "NEU-014",
+   "type": "relic",
+   "cost": 3,
+   "colors": [],
+   "rarity": "NC",
+   "abilities": [
+    {
+     "static": "combat",
+     "role": "defense",
+     "if": [
+      {
+       "opposing": true
+      }
+     ],
+     "att_mod": 0,
+     "def_mod": 1,
+     "stack": false
+    }
+   ],
+   "text": "Quando una tua Unità si oppone, ha +1 in questo scontro. Più copie non si sommano.",
+   "intent": "Premia l'opposizione (meno Unità ferme) senza toccare la Guardia; non vale sul bersaglio cacciato.",
+   "vanilla_delta": "Reliquia NC da 3: +1 di scontro; conta fra le aure (S-6, tetto 5)"
+  },
+  {
+   "id": "NEU-015",
+   "name": "NEU-015",
+   "type": "unit",
+   "cost": 4,
+   "colors": [],
+   "rarity": "C",
+   "power": 4,
+   "keywords": [],
+   "abilities": [
+    {
+     "static": "power",
+     "if": [
+      {
+       "opposing": true
+      },
+      {
+       "scars_ge": 2
+      },
+      {
+       "pugno_ge": 1
+      }
+     ],
+     "value": 2
+    }
+   ],
+   "text": "Quando si oppone, se hai almeno 2 Cicatrici e almeno 1 gemma di Parata, +2 in questo scontro.",
+   "intent": "Collante Blu/Nero: difensore che legge Cicatrici (Nero) e Guardia impegnata (Blu).",
+   "vanilla_delta": "tabella 5 − 1 (frase) = 4 → 0; collante 0",
+   "tags": [
+    "collante"
+   ]
+  },
+  {
+   "id": "NEU-016",
+   "name": "NEU-016",
+   "type": "tactic",
+   "cost": 4,
+   "colors": [],
+   "rarity": "NC",
+   "play": {
+    "do": [
+     {
+      "op": "draw",
+      "n": 2
+     },
+     {
+      "op": "draw",
+      "n": 1,
+      "if": [
+       {
+        "awakened": true
+       }
+      ]
+     }
+    ]
+   },
+   "text": "Pesca 2. Se il tuo Leader è Risvegliato, pesca 1 in più.",
+   "intent": "Rimonta: chi è sotto di 3 Vite ricarica la mano; per tutti i colori, non solo per la Furia.",
+   "vanilla_delta": "Tattica da 4: pesca 2 (≈ effetto da 4), +1 carta condizionata (NC); fase principale: niente 3b"
+  },
+  {
+   "id": "NEU-017",
+   "name": "NEU-017",
+   "type": "tactic",
+   "cost": 5,
+   "colors": [],
+   "rarity": "NC",
+   "play": {
+    "target": {
+     "side": "opp",
+     "ready": false,
+     "cost_le": 5
+    },
+    "do": [
+     {
+      "op": "defeat",
+      "target": "chosen"
+     }
+    ]
+   },
+   "text": "Sconfiggi un'Unità avversaria Ruotata con costo ≤5.",
+   "intent": "Rimozione neutrale pesante, dopo che hanno agito: Unità Ruotate fino al costo 5 (la carta blu BLU-019 resta la migliore).",
+   "vanilla_delta": "5 gemme: non è rimozione economica (regola 9); costo ≤5 = tassa neutrale rispetto a BLU-019"
+  },
+  {
+   "id": "NEU-018",
+   "name": "NEU-018",
+   "type": "unit",
+   "cost": 6,
+   "colors": [],
+   "rarity": "R",
+   "power": 5,
+   "keywords": [],
+   "abilities": [
+    {
+     "trigger": "on_attack",
+     "target": {
+      "side": "opp",
+      "ready": true
+     },
+     "do": [
+      {
+       "op": "stanca",
+       "target": "chosen"
+      }
+     ]
+    }
+   ],
+   "text": "Quando attacca, Stanca *(ruota)* un'Unità avversaria Pronta.",
+   "intent": "Chiusura neutra: F5 va a segno da sola e toglie un'opposizione a ogni attacco.",
+   "vanilla_delta": "tabella 7 − 2 (Stanca, qualsiasi bersaglio) − 1 (Neutrale senza condizione) = 4; R +1 → F5. Deroga S-5",
+   "tags": [
+    "Chiusura"
+   ],
+   "_note": "S-5 (Q-015): deroga dichiarata al tetto della Stanca economica. R-006 N1: il bersaglio del trigger lo sceglie il motore"
+  },
+  {
+   "id": "NEU-019",
+   "name": "NEU-019",
+   "type": "reaction",
+   "cost": 1,
+   "colors": [],
+   "rarity": "C",
+   "react": {
+    "do": [
+     {
+      "op": "att_mod",
+      "n": -3
+     }
+    ]
+   },
+   "text": "Reazione. L'attaccante ha −3 in questo scontro.",
+   "intent": "Reazione neutra ±3 (lato attaccante): copie 4–6 delle Reazioni neutre.",
+   "vanilla_delta": "Reazione comune a 1 gemma: ±3 = tabella (>2k)"
+  },
+  {
+   "id": "NEU-020",
+   "name": "NEU-020",
+   "type": "reaction",
+   "cost": 1,
+   "colors": [],
+   "rarity": "C",
+   "react": {
+    "do": [
+     {
+      "op": "def_mod",
+      "n": 3
+     }
+    ]
+   },
+   "text": "Reazione. Il bersaglio ha +3 in questo scontro.",
+   "intent": "Reazione neutra ±3: con NEU-006/019 fa 9 copie possibili; ogni coppia arriva a ≥8 comuni.",
+   "vanilla_delta": "Reazione comune a 1 gemma: ±3 = tabella (>2k)"
+  }
+ ]
+}
