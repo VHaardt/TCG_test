@@ -84,3 +84,12 @@ A-FV forte:30 L3-L6 seed 3012 fatto
 A-FV forte:30 L4-L6 seed 3014 fatto
 A-FV forte:30 L5-L6 seed 3015 fatto
 2026-10-18T12:56:21Z fine A-FV forte:30
+2026-10-18T12:56:23Z push A-FV forte:30 ok
+2026-10-18T12:56:29Z copia nella cartella condivisa ok (A-FV forte:30)
+2026-10-18T12:56:29Z inizio A-IF forte:30 100 6 (traccia LDR-06,NER-013,VER-019,NER-018…)
+A-IF forte:30 L1-L6 seed 3005 fatto
+A-IF forte:30 L2-L6 seed 3009 fatto
+A-IF forte:30 L3-L6 seed 3012 fatto
+A-IF forte:30 L4-L6 seed 3014 fatto
+A-IF forte:30 L5-L6 seed 3015 fatto
+2026-10-18T14:55:42Z fine A-IF forte:30
