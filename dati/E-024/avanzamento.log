@@ -117,3 +117,16 @@ B-U forte:30 L1-L4 seed 3003 fatto
 B-U forte:30 L1-L5 seed 3004 fatto
 B-U forte:30 L1-L6 seed 3005 fatto
 2026-10-18T23:28:30Z fine B-U forte:30
+2026-10-18T23:28:32Z push B-U forte:30 ok
+2026-10-18T23:28:39Z copia nella cartella condivisa ok (B-U forte:30)
+2026-10-18T23:28:39Z inizio B-3g forte:30 100 1 (traccia LDR-01,LDR-05,ROS-015,ROS-003,…)
+B-3g forte:30 L1-L2 seed 3001 fatto
+B-3g forte:30 L1-L3 seed 3002 fatto
+2026-10-19T00:55:20Z ripresa dopo il secondo riavvio del container (le celle con report già scritto si saltano)
+2026-10-19T00:55:20Z inizio B-3g forte:30 100 1 (traccia LDR-01,LDR-05,ROS-015,ROS-003,…)
+B-3g forte:30 L1-L2 gia' fatto, salto
+B-3g forte:30 L1-L3 gia' fatto, salto
+B-3g forte:30 L1-L4 seed 3003 fatto
+B-3g forte:30 L1-L5 seed 3004 fatto
+B-3g forte:30 L1-L6 seed 3005 fatto
+2026-10-19T02:14:38Z fine B-3g forte:30
