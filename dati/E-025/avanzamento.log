@@ -56,3 +56,13 @@ D05b_c02 forte:30 L5-L6 seed 3015 fatto
 2026-10-19T11:41:27Z fine D05b_c02 forte:30
 2026-10-19T11:41:29Z push D05b_c02 forte:30 ok
 2026-10-19T11:41:32Z copia nella cartella condivisa ok (D05b_c02 forte:30)
+2026-10-19T11:41:34Z push E-025 finito ok
+2026-10-19T11:41:34Z copia nella cartella condivisa ok (E-025 finito)
+2026-10-19T11:42:38Z A-FV_c02 (aggiunta a R-017, input ca03b69 = cartella condivisa), motore 8e9290a, preset V026
+2026-10-19T11:42:38Z inizio A-FV_c02 semplice 400 6 
+A-FV_c02 semplice L1-L6 seed 2005 fatto
+A-FV_c02 semplice L2-L6 seed 2009 fatto
+A-FV_c02 semplice L3-L6 seed 2012 fatto
+A-FV_c02 semplice L4-L6 seed 2014 fatto
+A-FV_c02 semplice L5-L6 seed 2015 fatto
+2026-10-19T11:43:54Z fine A-FV_c02 semplice
