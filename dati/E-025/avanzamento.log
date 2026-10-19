@@ -45,3 +45,12 @@
 00_B0c02 forte:30 M3-L5 seed 3025 fatto
 00_B0c02 forte:30 M3-L6 seed 3026 fatto
 2026-10-19T10:18:49Z fine 00_B0c02 forte:30
+2026-10-19T10:18:52Z push 00_B0c02 forte:30 ok
+2026-10-19T10:18:56Z copia nella cartella condivisa ok (00_B0c02 forte:30)
+2026-10-19T10:18:56Z inizio D05b_c02 forte:30 60 5 
+D05b_c02 forte:30 L1-L5 seed 3004 fatto
+D05b_c02 forte:30 L2-L5 seed 3008 fatto
+D05b_c02 forte:30 L3-L5 seed 3011 fatto
+D05b_c02 forte:30 L4-L5 seed 3013 fatto
+D05b_c02 forte:30 L5-L6 seed 3015 fatto
+2026-10-19T11:41:27Z fine D05b_c02 forte:30
