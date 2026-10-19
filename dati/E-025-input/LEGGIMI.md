@@ -1,6 +1,6 @@
 # E-025_B0c02 — ciclo 02, gruppo (b): riferimento B0c02 e diagnostica di LDR-05
 
-- **Preset:** V024 con P6 = [1,3], cioè G2 +1 gemma nei round 1 e 3 (opzione B di Vittorio, che Q-022 chiude). Il nome esatto del preset nel motore lo decide il thread principale. Fino ad allora si usa il file `variante_V024_P13.json` (`{"base": "V024", "set": {"scintilla_extra_rounds": [1]}}`), predefinito in `lancia_e025.sh`. Il preset si cambia con `E025_VARIANTE=<nome>`.
+- **Preset:** V026, cioè V024 con P6 = [1,3]: G2 riceve +1 gemma nei round 1 e 3 (opzione B di Vittorio, Q-022). Regolamento v0.2.6, motore 8e9290a, dove V026 è il default. Il vecchio file `variante_V024_P13.json` era sbagliato (dava +2 gemme nel round 1) ed è stato corretto il 2026-10-18; da non usare.
 - **Motore:** 934a469 (origin/claude/regolamento-v0.1). Tutti i file sono validati su una copia temporanea: 0 errori. Le prove di fumo con la semplice confermano che la variante dà `scintilla_extra_rounds [1]` con `scintilla_extra_round 3`.
 - **Lancio:** `bash tcg/set/esperimenti/E-025_B0c02/lancia_e025.sh <braccio> <ia> <N> <seed> <protagonisti> [mix]`, dalla radice della repo. Seed: F 3000+k, S 2000+k, mix 20+o.
 

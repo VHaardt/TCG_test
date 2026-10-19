@@ -13,7 +13,7 @@
 set -euo pipefail
 B=$1; IA=$2; N=$3; SB=$4; PROT=$5; MIX=${6:-}
 BASE=/mnt/project-files/tcg/set/esperimenti/E-025_B0c02; SRC=$BASE/$B
-VAR=${E025_VARIANTE:-$BASE/variante_V024_P13.json}
+VAR=${E025_VARIANTE:-V026}
 OUT=${E025_OUT:-/mnt/project-files/tcg/swarm/esperimenti/E-025_B0c02}/$B/$( [ "$IA" = semplice ] && echo S || echo F )
 TR=(); [ -n "${E025_TRACCIA:-}" ] && TR=(--traccia "$E025_TRACCIA")
 [ -f "$SRC/carte.json" ] || { echo "$B: nessun carte.json"; exit 1; }
