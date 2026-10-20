@@ -264,3 +264,16 @@ B5 forte:30 L5-L6 seed 3015 fatto
 00_B0c03 forte:30 L4-L5 seed 3113 fatto
 00_B0c03 forte:30 L5-L6 seed 3115 fatto
 2026-10-20T11:21:11Z fine 00_B0c03 forte:30 3100
+2026-10-20T11:21:14Z push 00_B0c03 forte:30 ok
+2026-10-20T11:21:19Z copia nella cartella condivisa ok (00_B0c03 forte:30)
+2026-10-20T11:21:19Z inizio R21 forte:30 100 3100 1,5
+R21 forte:30 L1-L2 seed 3101 fatto
+R21 forte:30 L1-L3 seed 3102 fatto
+R21 forte:30 L1-L4 seed 3103 fatto
+R21 forte:30 L1-L5 seed 3104 fatto
+R21 forte:30 L1-L6 seed 3105 fatto
+R21 forte:30 L2-L5 seed 3108 fatto
+R21 forte:30 L3-L5 seed 3111 fatto
+R21 forte:30 L4-L5 seed 3113 fatto
+R21 forte:30 L5-L6 seed 3115 fatto
+2026-10-20T14:51:53Z fine R21 forte:30 3100
