@@ -1,6 +1,6 @@
 # E-020 / R20 — dati con IA forte:30 (v2)
 
-Motore commit 8e9290a (branch `claude/regolamento-v0.1`), preset V026, un torneo per incrocio (`lancia_e020.sh`), partite appaiate per seme con B0. Incroci: 5 rif; partite: 500 (100 per incrocio). Solo dati: le regole d'uscita sono nel piano e nel LEGGIMI.
+Motore commit 4e13d90 (branch `claude/regolamento-v0.1`), preset V026, un torneo per incrocio (`lancia_e020.sh`), partite appaiate per seme con B0. Incroci: 5 rif; partite: 500 (100 per incrocio). Solo dati: le regole d'uscita sono nel piano e nel LEGGIMI.
 
 ## Vittorie per Leader (incroci rif)
 
