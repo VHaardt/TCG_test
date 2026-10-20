@@ -138,3 +138,12 @@ R20 forte:30 L5-L6 gia' fatto, salto
 R21 forte:30 L1-L2 gia' fatto, salto
 R21 forte:30 L1-L3 gia' fatto, salto
 2026-10-20T03:40:00Z E-027 blocco 1 (R-019, input 2b30577 = cartella condivisa), motore 8e9290a, V026; riferimento 00_B0c03 = E-025 00_B0c02 (celle senza L6) + A-FV_c02
+2026-10-20T03:40:03Z push riferimento 00_B0c03 ok
+2026-10-20T03:40:07Z copia nella cartella condivisa ok (riferimento 00_B0c03)
+2026-10-20T03:40:07Z inizio R20 semplice 400 5
+R20 semplice L1-L5 gia' fatto, salto
+R20 semplice L2-L5 gia' fatto, salto
+R20 semplice L3-L5 gia' fatto, salto
+R20 semplice L4-L5 gia' fatto, salto
+R20 semplice L5-L6 gia' fatto, salto
+2026-10-20T03:40:07Z fine R20 semplice
