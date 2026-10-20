@@ -249,3 +249,18 @@ B5 forte:30 L3-L5 seed 3011 fatto
 B5 forte:30 L4-L5 seed 3013 fatto
 B5 forte:30 L5-L6 seed 3015 fatto
 2026-10-20T07:57:17Z fine B5 forte:30
+2026-10-20T07:57:20Z push B5 forte:30 ok
+2026-10-20T07:57:24Z copia nella cartella condivisa ok (B5 forte:30)
+2026-10-20T07:57:24Z blocco 1 finito: fermo in attesa di R-020
+2026-10-20T08:03:58Z E-027 blocco 2 (R-020), motore 4e13d90, V026, seed_base 3100, --riprendi
+2026-10-20T08:03:58Z inizio 00_B0c03 forte:30 100 3100 1,5
+00_B0c03 forte:30 L1-L2 seed 3101 fatto
+00_B0c03 forte:30 L1-L3 seed 3102 fatto
+00_B0c03 forte:30 L1-L4 seed 3103 fatto
+00_B0c03 forte:30 L1-L5 seed 3104 fatto
+00_B0c03 forte:30 L1-L6 seed 3105 fatto
+00_B0c03 forte:30 L2-L5 seed 3108 fatto
+00_B0c03 forte:30 L3-L5 seed 3111 fatto
+00_B0c03 forte:30 L4-L5 seed 3113 fatto
+00_B0c03 forte:30 L5-L6 seed 3115 fatto
+2026-10-20T11:21:11Z fine 00_B0c03 forte:30 3100
