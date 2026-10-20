@@ -40,3 +40,7 @@ R20 forte:30 L3-L5 seed 3011 fatto
 R20 forte:30 L4-L5 seed 3013 fatto
 R20 forte:30 L5-L6 seed 3015 fatto
 2026-10-20T01:43:36Z fine R20 forte:30
+2026-10-20T01:43:38Z push R20 forte:30 ok
+2026-10-20T01:43:41Z copia nella cartella condivisa ok (R20 forte:30)
+2026-10-20T01:43:41Z inizio R21 forte:30 100 1,5
+2026-10-20T02:10:32Z E-027 blocco 1 (R-019, input 2b30577 = cartella condivisa), motore 8e9290a, V026; riferimento 00_B0c03 = E-025 00_B0c02 (celle senza L6) + A-FV_c02
