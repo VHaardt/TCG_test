@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CICATRICI online</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header>
+  <h1>CICATRICI <small>POC online</small></h1>
+  <div id="info-stanza"></div>
+</header>
+
+<main>
+  <section id="home" class="nascosto">
+    <div class="pannello">
+      <h2>Nuova stanza</h2>
+      <label>Il tuo nome <input id="nome" maxlength="24" placeholder="es. Vittorio"></label>
+      <fieldset>
+        <legend>Modalità</legend>
+        <label><input type="radio" name="modalita" value="costruito" checked> Costruito: ognuno porta il suo mazzo</label>
+        <label><input type="radio" name="modalita" value="draft"> Draft (Arena): Leader 1 su 3, poi 1 carta su 3 fino a 40</label>
+      </fieldset>
+      <fieldset>
+        <legend>Avversario</legend>
+        <label><input type="radio" name="avv" value="umano" checked> Un amico (gli mandi il codice)</label>
+        <label><input type="radio" name="avv" value="ia"> L'IA semplice del simulatore</label>
+      </fieldset>
+      <button id="crea">Crea stanza</button>
+    </div>
+    <div class="pannello">
+      <h2>Entra in una stanza</h2>
+      <label>Codice <input id="codice" maxlength="5" placeholder="ABCDE"></label>
+      <button id="entra">Entra</button>
+    </div>
+    <p class="nota" id="info-set"></p>
+  </section>
+
+  <section id="stanza" class="nascosto">
+    <div id="prep"></div>
+    <div id="gioco"></div>
+  </section>
+  <p id="errore"></p>
+</main>
+<script src="app.js"></script>
+</body>
+</html>
