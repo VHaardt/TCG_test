@@ -227,3 +227,16 @@ R20 forte:30 L3-L5 gia' fatto, salto
 R20 forte:30 L4-L5 gia' fatto, salto
 R20 forte:30 L5-L6 gia' fatto, salto
 2026-10-20T03:41:45Z fine R20 forte:30
+2026-10-20T03:41:47Z push R20 forte:30 ok
+2026-10-20T03:41:50Z copia nella cartella condivisa ok (R20 forte:30)
+2026-10-20T03:41:50Z inizio R21 forte:30 100 1,5
+R21 forte:30 L1-L2 gia' fatto, salto
+R21 forte:30 L1-L3 gia' fatto, salto
+R21 forte:30 L1-L4 seed 3003 fatto
+R21 forte:30 L1-L5 seed 3004 fatto
+R21 forte:30 L1-L6 seed 3005 fatto
+R21 forte:30 L2-L5 seed 3008 fatto
+R21 forte:30 L3-L5 seed 3011 fatto
+R21 forte:30 L4-L5 seed 3013 fatto
+R21 forte:30 L5-L6 seed 3015 fatto
+2026-10-20T06:01:37Z fine R21 forte:30
