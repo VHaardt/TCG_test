@@ -62,15 +62,42 @@ def all_decks():
     return D.reference_decks()
 
 
-def run_jobs(jobs, workers=None):
+def run_jobs(jobs, workers=None, ckpt=None):
+    """ckpt: file where each finished game is appended, so a run cut short (container restart)
+    resumes with the games still missing; the results are the same as an uninterrupted run."""
     jobs = [j[:5] + (CARTE[0],) for j in jobs]
     for ref in {d for j in jobs for d in j[0]}:          # errori chiari prima di partire
         D.load(ref)
     workers = workers or os.cpu_count() or 2
-    if workers == 1 or len(jobs) < 8:
-        return [play_game(j) for j in jobs]
-    with Pool(workers) as pool:
-        return pool.map(play_game, jobs, chunksize=max(1, len(jobs) // (workers * 8)))
+    if ckpt is None:
+        if workers == 1 or len(jobs) < 8:
+            return [play_game(j) for j in jobs]
+        with Pool(workers) as pool:
+            return pool.map(play_game, jobs, chunksize=max(1, len(jobs) // (workers * 8)))
+    import pickle
+    done = {}
+    if os.path.exists(ckpt):
+        with open(ckpt, "r+b") as f:
+            good = 0
+            while True:
+                try:
+                    i, rec = pickle.load(f)
+                except Exception:                       # fine del file o ultima partita scritta a metà
+                    break
+                done[i] = rec
+                good = f.tell()
+            f.truncate(good)
+    todo = [(i, j) for i, j in enumerate(jobs) if i not in done]
+    with open(ckpt, "ab") as f, Pool(workers) as pool:
+        for i, rec in pool.imap_unordered(_play_indexed, todo):
+            pickle.dump((i, rec), f)
+            f.flush()
+            done[i] = rec
+    return [done[i] for i in range(len(jobs))]
+
+
+def _play_indexed(item):
+    return item[0], play_game(item[1])
 
 
 def mirror_jobs(spec, agent, games, decks=None, seed0=1, agent2=None):
@@ -552,13 +579,13 @@ def save(name, text, recs, out_dir=None):
     return path
 
 
-def arm(spec, agent, games, decks=None, seed0=1, cross=0):
+def arm(spec, agent, games, decks=None, seed0=1, cross=0, ckpt=None):
     jobs = mirror_jobs(spec, agent, games, decks, seed0)
     if cross:
         jobs += cross_jobs(spec, agent, cross, decks, seed0)
     jobs[0] = jobs[0][:4] + (True,)
     t = time.time()
-    recs = run_jobs(jobs)
+    recs = run_jobs(jobs, ckpt=ckpt)
     return recs, time.time() - t
 
 
@@ -603,12 +630,18 @@ def cmd_ab(a):
 
 
 def cmd_torneo(a):
-    recs, el = arm(a.variante, a.ia, a.partite, a.mazzi, a.seed, a.incroci)
+    ckpt = None
+    if a.riprendi:
+        os.makedirs(a.out or REPORT_DIR, exist_ok=True)
+        ckpt = os.path.join(a.out or REPORT_DIR, ".partite_fatte.pkl")
+    recs, el = arm(a.variante, a.ia, a.partite, a.mazzi, a.seed, a.incroci, ckpt=ckpt)
     m = metrics(recs)
     text = render(f"Torneo v0.2 — {a.variante}", m, a.variante, a.ia, el)
     text += "\n".join(render_r012(recs, tuple(t for t in (a.traccia or "").split(",") if t))) + "\n"
     print(text)
     print("report:", save(f"torneo_{os.path.splitext(os.path.basename(a.variante))[0]}", text, recs, a.out))
+    if ckpt and os.path.exists(ckpt):
+        os.remove(ckpt)
 
 
 def head_to_head(spec, x, y, games, decks=None, seed0=7):
@@ -709,6 +742,8 @@ def main(argv=None):
         x.add_argument("--seed", type=int, default=1)
         x.add_argument("--out")
     t = sub.add_parser("torneo"); common(t)
+    t.add_argument("--riprendi", action="store_true",
+                   help="salva ogni partita finita in --out e, se la corsa si interrompe, al rilancio gioca solo quelle mancanti")
     t.add_argument("--traccia", help="R-012: ID di carte e Leader da tracciare, separati da virgola")
     ab = sub.add_parser("ab"); common(ab); ab.add_argument("--base", default="V026")
     lm = sub.add_parser("lambda"); common(lm, 200)
