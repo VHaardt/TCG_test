@@ -71,6 +71,10 @@ def _api(method, path, q, body):
             st.draft_scelta(i, body.get("carta"))
         elif path == "/api/azione":
             st.azione(i, int(body.get("versione", -1)), int(body.get("indice", -1)))
+        elif path == "/api/mulligan":
+            st.mulligan(i, body.get("carte"))
+        elif path == "/api/bersaglio":
+            st.bersaglio(i, int(body.get("versione", -1)), body.get("uid"))
         elif path == "/api/resa":
             st.resa(i)
         elif path == "/api/rivincita":

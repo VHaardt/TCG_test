@@ -264,58 +264,159 @@ class Stanza:
             self.inizia()
 
     def inizia(self):
+        """Sorteggio di G1, poi il mulligan (§4.4): le mani si mostrano e ognuno sceglie da 0 a 3 carte.
+        La partita vera nasce con lo stesso seme, applicando le scelte dentro setup()."""
         first = self.rng.randrange(2)                       # chi è G1 si tira a sorte
         seats = [first, 1 - first]                          # seats[q] = indice del posto che gioca come q
         mazzi = [(self.posti[i].leader, [cid for cid, k in self.posti[i].carte.items() for _ in range(k)])
                  for i in seats]
-        s = engine.new_game(mazzi[0][0], mazzi[0][1], mazzi[1][0], mazzi[1][1], rules=dati().rules,
-                            seed=self.rng.randrange(1 << 30), log=True)
-        self.partita = {"s": s, "seats": seats, "versione": 0}
+        seed = self.rng.randrange(1 << 30)
+        mani = [None, None]
+
+        def guarda(s, q):
+            mani[q] = list(s.p[q].hand)
+        engine.new_game(mazzi[0][0], mazzi[0][1], mazzi[1][0], mazzi[1][1], rules=dati().rules, seed=seed,
+                        mulligan=guarda)
+        self.partita = {"s": None, "seats": seats, "versione": 0, "mazzi": mazzi, "seed": seed, "mani": mani,
+                        "mulligan": [None, None], "attesa": None}
         self.n_partita += 1
         if any(p.ia for p in self.posti):
             from sim.v02.agents import RuleAgent2
             self.agente = RuleAgent2(seed=self.rng.randrange(1 << 30))
-        self._turni_ia()
+        for q in (G1, G2):
+            if self.posti[seats[q]].ia:                     # l'IA rimette in fondo le carte di costo ≥5, come nel simulatore
+                self.partita["mulligan"][q] = [c for c in mani[q] if CARDS[c].cost >= 5][:dati().rules.mulligan_max]
+        self._forse_parti()
 
     def q_di(self, i):
         return self.partita["seats"].index(i)
 
+    def mulligan(self, i, carte):
+        m = self.partita
+        if not m or m["s"] is not None:
+            raise ValueError("il mulligan si fa solo prima della partita")
+        q = self.q_di(i)
+        if m["mulligan"][q] is not None:
+            raise ValueError("hai già fatto il mulligan")
+        carte = list(carte or [])
+        if len(carte) > dati().rules.mulligan_max:
+            raise ValueError(f"al massimo {dati().rules.mulligan_max} carte")
+        resto = list(m["mani"][q])
+        for c in carte:
+            if c not in resto:
+                raise ValueError(f"{c} non è nella tua mano")
+            resto.remove(c)
+        m["mulligan"][q] = carte
+        m["versione"] += 1
+        self._forse_parti()
+
+    def _forse_parti(self):
+        m = self.partita
+        if any(x is None for x in m["mulligan"]):
+            return
+        scelte = m["mulligan"]
+
+        def applica(s, q):                                  # §4.4: in fondo al mazzo, poi si pesca dalla cima
+            pl = s.p[q]
+            for c in scelte[q]:
+                pl.hand.remove(c)
+                pl.deck.insert(0, c)
+            s.draw(q, len(scelte[q]))
+        mz = m["mazzi"]
+        m["s"] = engine.new_game(mz[0][0], mz[0][1], mz[1][0], mz[1][1], rules=dati().rules, seed=m["seed"],
+                                 log=True, mulligan=applica)
+        for q in (G1, G2):
+            if scelte[q]:
+                m["s"].say(f"  P{q+1} fa il mulligan di {len(scelte[q])} carte")
+        m["versione"] += 1
+        self._turni_ia()
+
+    def _seat_ia(self, q):
+        return self.posti[self.partita["seats"][q]].ia
+
     def azione(self, i, versione, indice):
         m = self.partita
-        if not m:
+        if not m or m["s"] is None:
             raise ValueError("nessuna partita in corso")
         if versione != m["versione"]:
             raise ValueError("stato cambiato, aggiorna")
         s = m["s"]
-        if s.over or s.decider() != self.q_di(i):
+        if s.over or m["attesa"] or s.decider() != self.q_di(i):
             raise ValueError("non è il tuo turno di decidere")
         acts = s.legal_actions()
         if not 0 <= indice < len(acts):
             raise ValueError("azione non valida")
-        s.step(acts[indice])
+        m["attesa"] = {"act": acts[indice], "scelte": [], "domanda": None}
+        if self._esegui():
+            self._turni_ia()
+
+    def bersaglio(self, i, versione, uid):
+        """Risposta alla domanda aperta da un trigger con più bersagli possibili."""
+        m = self.partita
+        if not m or not m["attesa"] or not m["attesa"]["domanda"]:
+            raise ValueError("nessun bersaglio da scegliere")
+        if versione != m["versione"]:
+            raise ValueError("stato cambiato, aggiorna")
+        d = m["attesa"]["domanda"]
+        if self.q_di(i) != d["q"]:
+            raise ValueError("il bersaglio lo sceglie l'avversario")
+        if uid not in d["cands"]:
+            raise ValueError("bersaglio non valido")
+        m["attesa"]["scelte"].append(uid)
+        m["attesa"]["domanda"] = None
+        if self._esegui():
+            self._turni_ia()
+
+    def _esegui(self):
+        """Esegue l'azione in attesa. Ogni trigger con più bersagli possibili diventa una domanda al
+        giocatore che lo controlla (o la scelta del motore per l'IA): l'azione si prova su un clone
+        finché tutte le scelte sono note, poi si esegue sulla partita vera. False = serve una risposta."""
+        m = self.partita
+        s, att = m["s"], m["attesa"]
+        while True:
+            extra, need = prova(s, att["act"], att["scelte"])
+            att["scelte"] += extra
+            if not need:
+                break
+            if self._seat_ia(need["q"]):
+                att["scelte"].append(need["default"])
+                continue
+            att["domanda"] = need
+            m["versione"] += 1
+            return False
+        scelte = list(att["scelte"])
+        s.trigger_target = lambda q, sel, cands: (scelte.pop(0) if scelte else
+                                                  engine.GameState.trigger_target(s, q, sel, cands))
+        try:
+            s.step(att["act"])
+        finally:
+            del s.trigger_target
+        m["attesa"] = None
         m["versione"] += 1
-        self._turni_ia()
+        return True
 
     def _turni_ia(self):
         m = self.partita
         s = m["s"]
         for _ in range(2000):
-            if s.over:
+            if s.over or m["attesa"]:
                 return
             q = s.decider()
-            if not self.posti[m["seats"][q]].ia:
+            if not self._seat_ia(q):
                 return
-            s.step(self.agente.act(s))
-            m["versione"] += 1
+            m["attesa"] = {"act": self.agente.act(s), "scelte": [], "domanda": None}
+            if not self._esegui():
+                return
 
     def resa(self, i):
-        s = self.partita["s"]
-        if not s.over:
-            s.lose(self.q_di(i), "resa")
-            self.partita["versione"] += 1
+        m = self.partita
+        if m and m["s"] is not None and not m["s"].over:
+            m["s"].lose(self.q_di(i), "resa")
+            m["attesa"] = None
+            m["versione"] += 1
 
     def rivincita(self):
-        if self.partita and not self.partita["s"].over:
+        if self.partita and (self.partita["s"] is None or not self.partita["s"].over):
             raise ValueError("la partita non è finita")
         self.partita = None
         self._prepara()
@@ -346,7 +447,13 @@ def vista_partita(stanza, i):
     s = m["s"]
     q = stanza.q_di(i)
     nomi = _nomi(stanza)
-    dec = s.decider()
+    if s is None:
+        return {"versione": m["versione"], "sei": "G1" if q == G1 else "G2", "nomi": {"io": nomi[q], "avversario": nomi[1 - q]},
+                "mulligan": {"mano": m["mani"][q], "max": dati().rules.mulligan_max, "fatto": m["mulligan"][q] is not None,
+                             "avversario_fatto": m["mulligan"][1 - q] is not None,
+                             "leader": m["mazzi"][q][0], "leader_avv": m["mazzi"][1 - q][0]}}
+    domanda = m["attesa"]["domanda"] if m["attesa"] else None
+    dec = domanda["q"] if domanda else s.decider()
     out = {
         "versione": m["versione"], "round": s.round, "fase": s.phase, "fase_testo": FASI.get(s.phase, s.phase),
         "sei": "G1" if q == G1 else "G2", "attivo_sei_tu": s.active == q, "tocca_a_te": dec == q,
@@ -360,9 +467,53 @@ def vista_partita(stanza, i):
     if s.over:
         out["fine"] = {"vincitore": None if s.winner is None else nomi[s.winner],
                        "hai_vinto": s.winner == q, "motivo": FINE.get(s.end_reason, s.end_reason)}
+    elif domanda:
+        side = domanda["side"]
+        out["bersaglio"] = {"tuo": dec == q, "fonte": domanda["fonte"], "testo": domanda["testo"],
+                            "cands": [{"lato": "io" if side == q else "avv", "uid": u} for u in domanda["cands"]]}
     elif dec == q:
         out["azioni"] = [{"i": k, **etichetta(s, q, a)} for k, a in enumerate(s.legal_actions())]
     return out
+
+
+def prova(s, act, scelte):
+    """Esegue act su un clone di s con le scelte di bersaglio già note (in ordine di chiamata).
+    Ritorna (scelte forzate in più, domanda): le chiamate con un solo candidato si aggiungono da sole;
+    la domanda è il primo trigger con più candidati ancora senza risposta (None se non ce ne sono)."""
+    c = s.clone()
+    calls = [0]
+    extra, need, fonti = [], [], []
+    base_fire = c.fire
+
+    def fire(q, abilities, event, ctx, src=None, once=None):
+        fonti.append(src or (c.unit(q, ctx.get("self")).cid if isinstance(ctx.get("self"), int) and c.unit(q, ctx.get("self")) else None))
+        try:
+            return base_fire(q, abilities, event, ctx, src, once)
+        finally:
+            fonti.pop()
+
+    def tt(q, sel, cands):
+        k = calls[0]
+        calls[0] += 1
+        default = engine.GameState.trigger_target(c, q, sel, cands)
+        if k < len(scelte):
+            return scelte[k] if scelte[k] in cands else default
+        if need:
+            return default
+        if len(cands) == 1:
+            extra.append(cands[0])
+            return cands[0]
+        fonte = fonti[-1] if fonti else None
+        testo = CARDS[fonte].text if fonte in CARDS else ""
+        if fonte in LEADERS:
+            testo = " ".join(ab.get("text", "") for ab in c.leader_abilities(q))
+        need.append({"q": q, "side": q if sel.get("side", "own") == "own" else 1 - q, "cands": list(cands),
+                     "default": default, "fonte": fonte, "testo": testo})
+        return default
+    c.fire = fire
+    c.trigger_target = tt
+    c.step(act)
+    return extra, (need[0] if need else None)
 
 
 EVENTI = [
