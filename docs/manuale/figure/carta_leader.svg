@@ -1,0 +1,47 @@
+<svg viewBox="0 0 660 300" role="img" aria-label="Carta Leader, lato Base e lato Risvegliato" class="fig-svg">
+  <defs><marker id="punta-ldr" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" class="punta"/></marker></defs>
+  <!-- lato Base -->
+  <g transform="translate(30,14)">
+    <rect width="230" height="272" rx="14" class="carta-f"/>
+    <rect x="0" y="0" width="230" height="44" rx="14" class="riq-scuro"/>
+    <rect x="0" y="30" width="230" height="14" class="riq-scuro"/>
+    <text x="16" y="28" class="t-tit t-chiaro">Leader · Base</text>
+    <circle cx="190" cy="22" r="7" style="fill:var(--c-rosso)"/><circle cx="208" cy="22" r="7" style="fill:var(--c-verde)"/>
+    <text x="16" y="66" class="t-tenue">LDR-01</text>
+    <g transform="translate(16,82)">
+      <rect width="62" height="62" rx="8" class="riq-att"/><text x="31" y="38" text-anchor="middle" class="t-gr">{{leader_power}}</text><text x="31" y="56" text-anchor="middle" class="t-tenue">Forza</text>
+      <rect x="68" width="62" height="62" rx="8" class="riq-dif"/><text x="99" y="38" text-anchor="middle" class="t-gr">{{tempra}}</text><text x="99" y="56" text-anchor="middle" class="t-tenue">Tempra</text>
+      <rect x="136" width="62" height="62" rx="8" class="riq-cic"/><text x="167" y="38" text-anchor="middle" class="t-gr">{{life}}</text><text x="167" y="56" text-anchor="middle" class="t-tenue">Vite</text>
+    </g>
+    <text x="16" y="170" class="t-b">Guardia massima {{guard_max}}</text>
+    <circle cx="190" cy="165" r="7" class="gemma"/><circle cx="208" cy="165" r="7" class="gemma"/>
+    <line x1="16" y1="186" x2="214" y2="186" class="divisore"/>
+    <text x="16" y="208" class="t-tenue">Abilità del lato Base</text>
+    <text x="16" y="230">+ Rimarginare (tutti i Leader)</text>
+    <text x="16" y="252" class="t-tenue">Si attacca sempre il Leader</text>
+  </g>
+  <!-- freccia -->
+  <path d="M276,150 C300,130 340,130 364,150" class="freccia" marker-end="url(#punta-ldr)"/>
+  <text x="320" y="112" text-anchor="middle" class="t-cic">si gira</text>
+  <text x="320" y="178" text-anchor="middle" class="t-tenue">a {{awaken_at_life}} Vite</text>
+  <text x="320" y="194" text-anchor="middle" class="t-tenue">o meno</text>
+  <!-- lato Risvegliato -->
+  <g transform="translate(380,14)">
+    <rect width="230" height="272" rx="14" class="carta-f"/>
+    <rect x="0" y="0" width="230" height="44" rx="14" style="fill:var(--cicatrice)"/>
+    <rect x="0" y="30" width="230" height="14" style="fill:var(--cicatrice)"/>
+    <text x="16" y="28" class="t-tit t-chiaro">Leader · Risvegliato</text>
+    <text x="16" y="66" class="t-tenue">LDR-01</text>
+    <g transform="translate(16,82)">
+      <rect width="62" height="62" rx="8" class="riq-att"/><text x="31" y="38" text-anchor="middle" class="t-gr">{{leader_power_awakened}}</text><text x="31" y="56" text-anchor="middle" class="t-tenue">Forza</text>
+      <rect x="68" width="62" height="62" rx="8" class="riq-dif"/><text x="99" y="38" text-anchor="middle" class="t-gr">{{tempra_risv}}</text><text x="99" y="56" text-anchor="middle" class="t-tenue">Tempra</text>
+      <rect x="136" width="62" height="62" rx="8" class="riq-neutro"/><text x="167" y="38" text-anchor="middle" class="t-gr">—</text><text x="167" y="56" text-anchor="middle" class="t-tenue">Vite</text>
+    </g>
+    <text x="16" y="170" class="t-b">Guardia massima {{guard_max_awakened}}</text>
+    <circle cx="172" cy="165" r="7" class="gemma"/><circle cx="190" cy="165" r="7" class="gemma"/><circle cx="208" cy="165" r="7" class="gemma"/>
+    <line x1="16" y1="186" x2="214" y2="186" class="divisore"/>
+    <text x="16" y="208" class="t-tenue">Abilità del lato Risvegliato</text>
+    <text x="16" y="230">+ Rimarginare</text>
+    <text x="16" y="252" class="t-tenue">Una volta sola, per sempre</text>
+  </g>
+</svg>

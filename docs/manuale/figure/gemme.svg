@@ -1,0 +1,48 @@
+<svg viewBox="0 0 860 330" role="img" aria-label="Il giro delle gemme" class="fig-svg">
+  <defs><marker id="punta-gem" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" class="punta"/></marker></defs>
+  <rect x="0" y="0" width="860" height="150" rx="12" class="riq-att" style="fill-opacity:.4;stroke:none"/>
+  <rect x="0" y="164" width="860" height="150" rx="12" class="riq-dif" style="fill-opacity:.4;stroke:none"/>
+  <text x="16" y="28" class="t-tit t-att">Il tuo turno</text>
+  <text x="16" y="244" class="t-tit t-dif">Turno</text><text x="16" y="266" class="t-tit t-dif">avversario</text>
+
+  <!-- riga 1 -->
+  <rect x="16" y="44" width="130" height="90" rx="10" class="riq-scuro"/>
+  <text x="81" y="84" text-anchor="middle" class="t-tit t-chiaro">Scorta</text>
+  <text x="81" y="106" text-anchor="middle" class="t-chiaro" style="font-size:13px">comune</text>
+  <path d="M148,89 L186,89" class="freccia" marker-end="url(#punta-gem)"/>
+  <rect x="190" y="44" width="160" height="90" rx="10" class="riq-neutro"/>
+  <circle cx="212" cy="66" r="9" class="gemma"/><circle cx="234" cy="66" r="9" class="gemma"/><circle cx="256" cy="66" r="9" class="gemma"/>
+  <text x="206" y="100" class="t-tit t-att">Brace</text>
+  <text x="206" y="122" class="t-tenue" style="font-size:13px">round, massimo {{brace_max}}</text>
+  <path d="M352,89 L386,89" class="freccia" marker-end="url(#punta-gem)"/>
+  <rect x="390" y="44" width="215" height="90" rx="10" class="riq-neutro"/>
+  <text x="406" y="74" class="t-b" style="font-size:15px">Spendi</text>
+  <text x="406" y="96" style="font-size:14px">carte e abilità</text>
+  <text x="406" y="120" class="t-tenue" style="font-size:13px">↩ torna nella scorta</text>
+  <rect x="625" y="44" width="215" height="90" rx="10" class="riq-neutro"/>
+  <text x="641" y="74" class="t-b" style="font-size:15px">Impegna in attacco</text>
+  <text x="641" y="96" style="font-size:14px">+{{forza_per_gemma}} Forza ciascuna</text>
+  <text x="641" y="120" class="t-tenue" style="font-size:13px">↩ nella scorta dopo l'attacco</text>
+
+  <!-- passaggio -->
+  <path d="M270,136 L270,206" class="freccia" marker-end="url(#punta-gem)"/>
+  <text x="258" y="166" text-anchor="end" class="t-b" style="font-size:14px">Fine del turno:</text>
+  <text x="258" y="184" text-anchor="end" style="font-size:13px">la Brace avanzata va sul Leader</text>
+  <text x="282" y="166" class="t-tenue" style="font-size:13px">fino al massimo di Guardia,</text>
+  <text x="282" y="184" class="t-tenue" style="font-size:13px">il resto ↩ nella scorta</text>
+
+  <!-- riga 2 -->
+  <rect x="190" y="210" width="160" height="90" rx="10" class="riq-neutro"/>
+  <circle cx="212" cy="232" r="9" class="gemma"/><circle cx="234" cy="232" r="9" class="gemma"/>
+  <text x="206" y="266" class="t-tit t-dif">Guardia</text>
+  <text x="206" y="288" class="t-tenue" style="font-size:13px">sul Leader</text>
+  <path d="M352,255 L386,255" class="freccia" marker-end="url(#punta-gem)"/>
+  <rect x="390" y="210" width="215" height="90" rx="10" class="riq-neutro"/>
+  <text x="406" y="240" class="t-b" style="font-size:15px">Impegna in difesa</text>
+  <text x="406" y="262" style="font-size:14px">Parata +{{parata_per_gemma}} o paga una Reazione</text>
+  <text x="406" y="286" class="t-tenue" style="font-size:13px">↩ nella scorta dopo l'attacco</text>
+  <rect x="625" y="210" width="215" height="90" rx="10" class="riq-neutro"/>
+  <text x="641" y="240" class="t-b" style="font-size:15px">Non usata</text>
+  <text x="641" y="262" style="font-size:14px">resta per gli attacchi dopo</text>
+  <text x="641" y="286" class="t-tenue" style="font-size:13px">↩ nella scorta al tuo Ripristino</text>
+</svg>

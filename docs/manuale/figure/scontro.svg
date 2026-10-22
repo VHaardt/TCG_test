@@ -1,0 +1,28 @@
+<svg viewBox="0 0 880 512" role="img" aria-label="I sei passi di un attacco" class="fig-svg">
+<defs><marker id="punta-sco" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" class="punta"/></marker></defs>
+<text x="20" y="24" class="t-tit t-att">Attaccante</text>
+<text x="860" y="24" class="t-tit t-dif" text-anchor="end">Difensore</text>
+<rect x="20" y="40" width="540" height="58" rx="10" class="riq-att"/>
+<text x="36" y="64" class="t-b" style="font-size:17px">1 · Dichiara</text>
+<text x="36" y="86" style="font-size:15px">ruota un tuo personaggio dritto</text>
+<path d="M440.0,100 L440.0,115" class="freccia" marker-end="url(#punta-sco)"/>
+<rect x="320" y="118" width="540" height="58" rx="10" class="riq-dif"/>
+<text x="336" y="142" class="t-b" style="font-size:17px">2 · Opposizione</text>
+<text x="336" y="164" style="font-size:15px">facoltativa: ruota una tua Unità dritta, diventa lei il bersaglio</text>
+<path d="M440.0,178 L440.0,193" class="freccia" marker-end="url(#punta-sco)"/>
+<rect x="20" y="196" width="540" height="58" rx="10" class="riq-att"/>
+<text x="36" y="220" class="t-b" style="font-size:17px">3 · Impegno</text>
+<text x="36" y="242" style="font-size:15px">gemme di Brace scoperte: +{{forza_per_gemma}} ciascuna</text>
+<path d="M440.0,256 L440.0,271" class="freccia" marker-end="url(#punta-sco)"/>
+<rect x="320" y="274" width="540" height="58" rx="10" class="riq-dif"/>
+<text x="336" y="298" class="t-b" style="font-size:17px">4 · Risposta</text>
+<text x="336" y="320" style="font-size:15px">gemme di Guardia: Parata +{{parata_per_gemma}} · al massimo 1 Reazione</text>
+<path d="M440.0,334 L440.0,349" class="freccia" marker-end="url(#punta-sco)"/>
+<rect x="110" y="352" width="660" height="58" rx="10" class="riq-neutro"/>
+<text x="126" y="376" class="t-b" style="font-size:17px">5 · Confronto</text>
+<text x="126" y="398" style="font-size:15px">attacco ≥ difesa? Sul Leader va a segno; tra Unità perde la più bassa</text>
+<path d="M440.0,412 L440.0,427" class="freccia" marker-end="url(#punta-sco)"/>
+<rect x="110" y="430" width="660" height="58" rx="10" class="riq-neutro"/>
+<text x="126" y="454" class="t-b" style="font-size:17px">6 · Esiti</text>
+<text x="126" y="476" style="font-size:15px">Unità sconfitte negli Scarti · Vita → Cicatrice fresca · gemme nella scorta</text>
+</svg>

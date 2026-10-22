@@ -1,0 +1,39 @@
+<svg viewBox="0 0 880 270" role="img" aria-label="Da Vita a Cicatrice" class="fig-svg">
+  <defs><marker id="punta-cic" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" class="punta"/></marker></defs>
+  <!-- Vita -->
+  <g transform="translate(30,40)">
+    <rect x="8" y="8" width="80" height="112" rx="8" class="carta-dorso"/><rect x="4" y="4" width="80" height="112" rx="8" class="carta-dorso"/><rect width="80" height="112" rx="8" class="carta-dorso"/>
+    <text x="44" y="146" text-anchor="middle" class="t-tit">Vita</text>
+    <text x="44" y="164" text-anchor="middle" class="t-tenue">coperta, segreta</text>
+  </g>
+  <path d="M128,96 L208,96" class="freccia" marker-end="url(#punta-cic)"/>
+  <text x="168" y="84" text-anchor="middle" class="t-b">a segno</text>
+  <!-- fresca -->
+  <g transform="translate(220,56)">
+    <rect width="112" height="80" rx="8" class="carta-cic"/>
+    <text x="56" y="46" text-anchor="middle" class="t-cic">fresca</text>
+    <text x="56" y="110" text-anchor="middle" class="t-tit t-cic">Cicatrice fresca</text>
+    <text x="56" y="130" text-anchor="middle" class="t-tenue">ruotata · conta per il Saldo</text>
+    <text x="56" y="148" text-anchor="middle" class="t-tenue">blocca il colpo finale</text>
+  </g>
+  <path d="M342,96 L428,96" class="freccia" marker-end="url(#punta-cic)"/>
+  <text x="386" y="84" text-anchor="middle" class="t-b">Fine del turno</text>
+  <!-- dritta -->
+  <g transform="translate(440,40)">
+    <rect width="80" height="112" rx="8" class="carta-cic"/>
+    <text x="40" y="62" text-anchor="middle" class="t-cic">dritta</text>
+    <text x="40" y="146" text-anchor="middle" class="t-tit t-cic">Dritta</text>
+    <text x="40" y="164" text-anchor="middle" class="t-tenue">pubblica, usabile</text>
+  </g>
+  <!-- usi -->
+  <path d="M530,70 L608,46" class="freccia" marker-end="url(#punta-cic)"/>
+  <path d="M530,96 L608,112" class="freccia" marker-end="url(#punta-cic)"/>
+  <path d="M530,122 L608,180" class="freccia" marker-end="url(#punta-cic)"/>
+  <rect x="612" y="18" width="250" height="56" rx="10" class="riq-neutro"/>
+  <text x="626" y="40" class="t-b">Rimarginare → in mano</text><text x="626" y="60" class="t-tenue">⟳ del Leader + 1 gemma di Brace</text>
+  <rect x="612" y="86" width="250" height="56" rx="10" class="riq-dif"/>
+  <text x="626" y="108" class="t-b">Reazione → poi Scarti</text><text x="626" y="128" class="t-tenue">se è una carta Reazione, quando difendi</text>
+  <rect x="612" y="154" width="250" height="56" rx="10" class="riq-att"/>
+  <text x="626" y="176" class="t-b">Furia la conta</text><text x="626" y="196" class="t-tenue">come tutte le Cicatrici, anche fresche</text>
+  <text x="30" y="254" class="t-tenue">Saldo: al massimo {{saldo}} Cicatrici fresche per Leader ({{saldo_late}} dal round {{saldo_late_round}}); le ferite in più si ignorano. Il Crepuscolo crea Cicatrici già dritte.</text>
+</svg>
