@@ -353,7 +353,8 @@ def vista_partita(stanza, i):
         "decide": nomi[dec] if dec is not None else None,
         "io": vista_giocatore(s, q, True), "avversario": vista_giocatore(s, 1 - q, False),
         "nomi": {"io": nomi[q], "avversario": nomi[1 - q]},
-        "combattimento": vista_scontro(s, q), "azioni": [], "log": tradotto(s.log[-80:], nomi),
+        "combattimento": vista_scontro(s, q), "azioni": [], "log": tradotto(s.log[-80:], nomi), "log_n": len(s.log),
+        "eventi": eventi(s.log, q, max(0, len(s.log) - 80)),
         "regole": {"saldo": s.saldo_cap(), "crepuscolo": s.r.crepuscolo_round, "round_max": s.r.max_rounds},
     }
     if s.over:
@@ -361,6 +362,36 @@ def vista_partita(stanza, i):
                        "hai_vinto": s.winner == q, "motivo": FINE.get(s.end_reason, s.end_reason)}
     elif dec == q:
         out["azioni"] = [{"i": k, **etichetta(s, q, a)} for k, a in enumerate(s.legal_actions())]
+    return out
+
+
+EVENTI = [
+    ("turno", re.compile(r"^--- Round (?P<round>\d+), P(?P<p>[12])")),
+    ("gioca", re.compile(r"^  P(?P<p>[12]) gioca (?P<carta>\S+)$")),
+    ("rimargina", re.compile(r"^  P(?P<p>[12]) Rimargina (?P<carta>\S+)$")),
+    ("abilita", re.compile(r"^  P(?P<p>[12]) usa ⟳")),
+    ("attacco", re.compile(r"^  P(?P<p>[12]) attacca con")),
+    ("oppone", re.compile(r"^    P(?P<p>[12]) oppone (?P<carta>\S+)")),
+    ("scontro", re.compile(r"pugni: attaccante (?P<a>\d+), difensore (?P<d>\d+)(?: \+ (?P<carta>\S+))? -> (?P<fa>-?\d+) contro (?P<db>-?\d+)")),
+    ("vita", re.compile(r"^    P(?P<p>[12]) perde 1 Vita")),
+    ("sconfitta", re.compile(r"^    (?P<carta>\S+) di P(?P<p>[12]) è sconfitta")),
+    ("risveglio", re.compile(r"^    P(?P<p>[12]): il Leader si Risveglia")),
+]
+
+
+def eventi(log, q, start):
+    """Eventi strutturati delle righe del registro da start in poi, per le animazioni del client;
+    "chi" è "io" o "avv" visto dal giocatore q."""
+    out = []
+    for n in range(start, len(log)):
+        for tipo, rx in EVENTI:
+            m = rx.search(log[n])
+            if m:
+                e = {"n": n, "t": tipo, **{k: v for k, v in m.groupdict().items() if v is not None and k != "p"}}
+                if m.groupdict().get("p"):
+                    e["chi"] = "io" if int(m["p"]) - 1 == q else "avv"
+                out.append(e)
+                break
     return out
 
 
@@ -393,7 +424,8 @@ def vista_scontro(s, q):
     a = s.active
     tgt = cb.target()
     visibile = cb.a is not None and (cb.a_visible or q == a)
-    return {"attaccante": s.describe(a, cb.att), "attacca_tu": q == a,
+    return {"attaccante": s.describe(a, cb.att), "attacca_tu": q == a, "att_ref": cb.att, "bersaglio_ref": tgt,
+            "opposta_ref": cb.opposer,
             "bersaglio": s.describe(1 - a, tgt) if tgt is not None else "Leader",
             "opposta_da": s.describe(1 - a, cb.opposer) if cb.opposer is not None else None,
             "gemme_attacco": cb.a if visibile else None}
@@ -405,6 +437,14 @@ def _forza_su(s, a_gems, d_gems=0, react=None):
         return fa, db
     except Exception:           # anteprima: mai bloccare l'azione
         return None, None
+
+
+def _ref(q, spec, t):
+    """Bersaglio scelto di una carta o abilità: {"lato": "io"|"avv", "uid": ...} o None."""
+    if t is None:
+        return None
+    sel = (spec or {}).get("target") or {}
+    return {"lato": "io" if sel.get("side", "own") == "own" else "avv", "uid": t}
 
 
 def etichetta(s, q, act):
@@ -420,7 +460,8 @@ def etichetta(s, q, act):
             sel = (c.play or {}).get("target") or {}
             owner = q if sel.get("side", "own") == "own" else 1 - q
             t = f" → {'tua' if owner == q else 'avversaria'} {s.describe(owner, act[2])}"
-        return {"gruppo": "gioca", "testo": f"Gioca {c.name} ({c.cost} Brace){t}", "carta": c.id}
+        return {"gruppo": "gioca", "testo": f"Gioca {c.name} ({c.cost} Brace){t}", "carta": c.id,
+                "bersaglio": _ref(q, c.play, act[2])}
     if k == "rim":
         return {"gruppo": "rimargina", "testo": f"Rimargina {act[1]}: ruota il Leader, {s.modifier(q, 'rim_cost', 1)} Brace, la carta torna in mano",
                 "carta": act[1]}
@@ -439,20 +480,21 @@ def etichetta(s, q, act):
             owner = q if sel.get("side", "own") == "own" else 1 - q
             tt = f" → {'tua' if owner == q else 'avversaria'} {s.describe(owner, t)}"
         return {"gruppo": "abilita", "testo": f"⟳ {who} ({ab.get('cost', 0)} Brace){tt}"
-                + (f": {ab['text']}" if ab.get("text") else "")}
+                + (f": {ab['text']}" if ab.get("text") else ""), "sorgente": src, "bersaglio": _ref(q, ab, t)}
     if k == "attack":
         t = f" (Caccia: {s.describe(1 - q, act[2])})" if len(act) > 2 else " il Leader avversario"
-        return {"gruppo": "attacca", "testo": f"Attacca con {s.describe(q, act[1])}{t}"}
+        return {"gruppo": "attacca", "testo": f"Attacca con {s.describe(q, act[1])}{t}", "sorgente": act[1],
+                "bersaglio": {"lato": "avv", "uid": act[2]} if len(act) > 2 else {"lato": "avv", "uid": "L"}}
     if k == "gems":
         fa, db = _forza_su(s, act[1])
         extra = f" → Forza d'attacco {fa} contro difesa {db} senza Parata" if fa is not None else ""
-        return {"gruppo": "gemme", "testo": f"Impegna {act[1]} gemme{extra}"}
+        return {"gruppo": "gemme", "testo": f"Impegna {act[1]} gemme{extra}", "n": act[1], "fa": fa, "db": db}
     if k == "no_oppose":
         return {"gruppo": "opposizione", "testo": "Non opporti"}
     if k == "oppose":
         u = s.unit(q, act[1])
         return {"gruppo": "opposizione",
-                "testo": f"Opponi {s.describe(q, act[1])} (Forza {s.unit_power(q, u, outside=True)})"}
+                "testo": f"Opponi {s.describe(q, act[1])} (Forza {s.unit_power(q, u, outside=True)})", "sorgente": act[1]}
     if k == "parry":
         gems, react = act[1], act[2]
         txt = f"Impegna {gems} gemme di Guardia"
@@ -464,7 +506,11 @@ def etichetta(s, q, act):
             fa, db = _forza_su(s, cb.a, gems, react)
             if fa is not None:
                 txt += f" → attacco {fa} contro difesa {db}"
-        return {"gruppo": "parata", "testo": txt, "carta": react[0] if react else None}
+        out = {"gruppo": "parata", "testo": txt, "carta": react[0] if react else None, "n": gems,
+               "da": react[1] if react else None}
+        if cb.a is not None and (cb.a_visible or q == a):
+            out["fa"], out["db"] = _forza_su(s, cb.a, gems, react)
+        return out
     return {"gruppo": "altro", "testo": str(act)}
 
 
