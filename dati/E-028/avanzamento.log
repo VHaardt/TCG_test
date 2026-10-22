@@ -1,0 +1,23 @@
+2026-10-22T08:24:47Z E-028 parte A (R-021, input 57a4415 = cartella condivisa), motore 4e13d90, V026, --riprendi
+2026-10-22T08:24:47Z inizio 00_B0c03 semplice 400 2200 1,5
+00_B0c03 semplice L1-L2 seed 2201 fatto
+00_B0c03 semplice L1-L3 seed 2202 fatto
+00_B0c03 semplice L1-L4 seed 2203 fatto
+00_B0c03 semplice L1-L5 seed 2204 fatto
+00_B0c03 semplice L1-L6 seed 2205 fatto
+00_B0c03 semplice L2-L5 seed 2208 fatto
+00_B0c03 semplice L3-L5 seed 2211 fatto
+00_B0c03 semplice L4-L5 seed 2213 fatto
+00_B0c03 semplice L5-L6 seed 2215 fatto
+2026-10-22T08:26:52Z fine 00_B0c03 semplice 2200
+2026-10-22T08:26:52Z inizio RB semplice 400 2200 1,5
+RB semplice L1-L2 seed 2201 fatto
+RB semplice L1-L3 seed 2202 fatto
+RB semplice L1-L4 seed 2203 fatto
+RB semplice L1-L5 seed 2204 fatto
+RB semplice L1-L6 seed 2205 fatto
+RB semplice L2-L5 seed 2208 fatto
+RB semplice L3-L5 seed 2211 fatto
+RB semplice L4-L5 seed 2213 fatto
+RB semplice L5-L6 seed 2215 fatto
+2026-10-22T08:29:05Z fine RB semplice 2200
