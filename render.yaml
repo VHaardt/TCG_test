@@ -1,0 +1,9 @@
+# Deploy guidato su Render (render.com): New > Blueprint > questo repo. Piano gratuito: il servizio
+# si addormenta dopo un po' senza visite e le stanze aperte si perdono (POC, nessuna persistenza).
+services:
+  - type: web
+    name: cicatrici
+    runtime: docker
+    plan: free
+    branch: main
+    healthCheckPath: /api/catalogo
