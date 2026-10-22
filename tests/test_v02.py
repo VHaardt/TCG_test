@@ -741,6 +741,15 @@ def test_q019_v024_spareggio_vite_attivo():
     s._crepuscolo_both()
     assert s.over and s.winner == 1                     # a Vite pari perde l'attivo (G1)
 
+
+def test_q022_v026_p6_round_1_3():
+    """Q-022 (V026): V024 with G2's extra gem in rounds 1 and 3 only, nothing else changed."""
+    a, b = rules_from("V024"), rules_from("V026")
+    assert b.scintilla_extra_rounds == () and a.scintilla_extra_rounds == (5,)
+    assert b.with_(scintilla_extra_rounds=(5,)) == a
+    extra = [r for r in range(1, 16) if r == b.scintilla_extra_round or r in b.scintilla_extra_rounds]
+    assert b.scintilla_g2_gems == 1 and extra == [3]       # round 1 via scintilla_g2_gems, round 3 via extra_round
+
 if __name__ == "__main__":
     for k, f in list(globals().items()):
         if k.startswith("test_"):

@@ -35,6 +35,7 @@ KW_ALIAS = {"infuso": "impeto"}     # nome di v0.1/Q-013, accettato nei file vec
 CARDS, LEADERS = {}, {}
 META = {}                           # campi di carta non letti dal motore (slot, rarity): metriche M15
 LOADED = [None]                     # file di carte caricato
+FA_ALTA = 8                         # R-017: soglia della Forza d'attacco per il contatore degli scontri vinti (metrica, non regola)
 
 
 def load_cards(path=DATA):
@@ -169,6 +170,7 @@ def new_stats():
         "act_then_hit": [{}, {}],                                        # ⟳ del Leader seguita da un colpo a segno nello stesso turno
         "first_hit_round": [None, None], "peak2": [0, 0],                # M13 picco: Forza massima a 2 gemme
         "solo_unit_turns": [0, 0], "caccia_leader_atk": [0, 0],          # R-013
+        "fa_alta_wins": [0, 0], "fa_alta_by": [{}, {}],                  # R-017: scontri vinti con Forza d'attacco ≥ FA_ALTA
     }
 
 
@@ -1232,6 +1234,9 @@ class GameState:
                         self.stat_add("act_then_hit", a, lid)
             if tgt_dead:
                 self.stat_add("kills_by", a, acid)
+            if (hit or tgt_dead) and fa >= FA_ALTA:                     # R-017: scontro vinto (colpo a segno o bersaglio sconfitto)
+                self.stat_add("fa_alta_wins", a)
+                self.stat_add("fa_alta_by", a, acid)
             if cb.react:
                 st_all["reactions"][d] += 1
             if any(max(CARDS[c].cost, 1) <= pd.guard for c, _ in self.reaction_options(d)):

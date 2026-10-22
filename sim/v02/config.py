@@ -85,6 +85,10 @@ PRESETS = {
     "V024": {"tempra": 4, "pugno": "sequenziale", "scudo": "vince_pareggi",
              "scintilla_extra_gems": 1, "scintilla_extra_round": 3, "scintilla_extra_rounds": (5,),
              "crepuscolo_simultaneo": True, "crepuscolo_spareggio": "vite_attivo"},
+    # v0.2.6: V024 + P6 ritarata da Q-022 sull'IA forte (scelta di Vittorio, 2026-10-18): G2 +1 gemma nei soli round 1 e 3
+    "V026": {"tempra": 4, "pugno": "sequenziale", "scudo": "vince_pareggi",
+             "scintilla_extra_gems": 1, "scintilla_extra_round": 3, "scintilla_extra_rounds": (),
+             "crepuscolo_simultaneo": True, "crepuscolo_spareggio": "vite_attivo"},
 }
 
 
