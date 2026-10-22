@@ -36,6 +36,8 @@ Serve un servizio che esegua un container. Il repo ha `Dockerfile` e `render.yam
 ## Limiti voluti della POC
 
 - Le stanze vivono in memoria: si perdono al riavvio, scadono dopo 6 ore senza visite.
-- Il mulligan è quello automatico del simulatore (le carte di costo ≥5 tornano in fondo al mazzo).
-- I bersagli dei trigger automatici li sceglie il motore, come nel simulatore.
+- Mulligan (§4.4) e bersagli dei trigger li scelgono i giocatori; per l'IA restano le scelte del simulatore.
+  Il motore non ha punti di decisione per questi due casi, quindi l'app li aggiunge da fuori: il mulligan
+  rigioca setup() con lo stesso seme applicando le scelte, e un'azione che innesca un trigger con più
+  bersagli si prova su un clone finché ogni scelta è nota, poi si esegue sulla partita vera.
 - Il client interroga il server ogni secondo, niente websocket.

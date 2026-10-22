@@ -183,7 +183,7 @@ function render() {
   $("#esci").onclick = esci;
   if (stato.fase === "partita") {
     $("#prep").innerHTML = ""; chiavePrep = "";
-    renderGioco();
+    if (stato.partita.mulligan) renderMulligan(); else renderGioco();
   } else {
     $("#gioco").innerHTML = ""; chiaveGioco = ""; prec = null;
     $("#strato svg").innerHTML = "";
@@ -393,7 +393,7 @@ function disegnaMira() {
   if (b) { b.classList.remove("nascosto"); $("span", b).textContent = `${mira.titolo}: scegli il bersaglio`; }
 }
 
-function annullaMira() { mira = null; disegnaMira(); }
+function annullaMira() { if (mira && mira.obbligo) return; mira = null; disegnaMira(); }
 
 function manda(a) {
   mira = null;
@@ -426,7 +426,9 @@ function clicEntita(e) {
   const key = el.dataset.ent || (el.dataset.mano ? `mano:${el.dataset.mano}` : `scar:${el.dataset.scar}`);
   if (mira) {
     const o = mira.opts.find((x) => x.bersaglio && `${x.bersaglio.lato}:${x.bersaglio.uid}` === key);
+    if (o && o.trigger) return act("/api/bersaglio", { versione: stato.partita.versione, uid: o.bersaglio.uid });
     if (o) return manda(o);
+    if (mira.obbligo) return;
     return annullaMira();
   }
   const subs = Object.values(intenzioni(stato.partita.azioni)[key] || {});
@@ -505,6 +507,10 @@ function centroHTML(p) {
   if (cb) s += `<span class="fase">⚔ <b>${esc(cb.attaccante)}</b> → <b>${esc(cb.bersaglio)}</b>${cb.opposta_da ? ` (si oppone ${esc(cb.opposta_da)})` : ""}${cb.gemme_attacco != null ? ` · gemme d'attacco ${cb.gemme_attacco}` : ""}</span>`;
   if (p.fine) return `${s}<span class="fase"><b>${p.fine.hai_vinto ? "Hai vinto" : "Hai perso"}</b> (${esc(p.fine.motivo)})</span>
     <button class="oro" id="rivincita-c">Nuova partita</button>`;
+  if (p.bersaglio) {
+    const b = p.bersaglio;
+    return `${s}<span class="fase"><b>Effetto di ${esc(b.fonte || "una carta")}</b>: ${b.tuo ? "scegli il bersaglio fra quelli illuminati di rosso" : `${esc(p.decide)} sceglie il bersaglio…`}</span>`;
+  }
   if (!p.tocca_a_te) return `${s}<span class="fase" style="opacity:.7">… decide ${esc(p.decide)}</span>`;
   const az = p.azioni;
   if (p.fase === "pugno_att" || p.fase === "impeto") {
@@ -533,6 +539,44 @@ function registroHTML(p) {
     const cl = !e ? "" : e.t === "turno" ? "r-turno" : e.chi ? `r-${e.chi}` : "";
     return `<div class="${cl}">${esc(l.trim())}</div>`;
   }).join("");
+}
+
+// ------------------------------------------------------------------ mulligan (§4.4)
+let scartoMull = new Set();
+function renderMulligan() {
+  const p = stato.partita, m = p.mulligan;
+  const chiave = `mull:${p.versione}`;
+  if (chiave === chiaveGioco) return;
+  chiaveGioco = chiave;
+  prec = null;
+  if (m.fatto) {
+    $("#gioco").innerHTML = `<div class="pannello" style="text-align:center"><h2>Mulligan fatto</h2>
+      <p>${m.avversario_fatto ? "Si parte!" : `Aspetto il mulligan di ${esc(p.nomi.avversario)}…`}</p></div>`;
+    return;
+  }
+  const n = scartoMull.size;
+  $("#gioco").innerHTML = `<div class="pannello" style="text-align:center">
+      <div class="riga" style="justify-content:center;gap:30px">${eroeHTML(m.leader)}<span style="font:800 30px Georgia,serif;color:var(--gold)">VS</span>${eroeHTML(m.leader_avv)}</div>
+      <h2>La tua mano iniziale · sei ${p.sei === "G1" ? "il primo giocatore" : "il secondo giocatore"}</h2>
+      <p class="nota">Clicca fino a ${m.max} carte da rimettere in fondo al mazzo: ne peschi altrettante dalla cima. Il mazzo non si rimescola.</p>
+      <div class="offerta">${m.mano.map((id, k) => `<div class="slot">${cartaHTML(id, { classi: "grande" + (scartoMull.has(k) ? " illegale" : ""), attr: `data-k="${k}"` })}
+        <span class="nota">${scartoMull.has(k) ? "⤓ in fondo al mazzo" : "tieni"}</span></div>`).join("")}</div>
+      <button class="oro" id="conferma-mull">${n ? `Rimetti ${n} ${n === 1 ? "carta" : "carte"} in fondo e pesca` : "Tieni questa mano"}</button></div>`;
+  $$("[data-k]", $("#gioco")).forEach((el) => (el.onclick = () => {
+    const k = +el.dataset.k;
+    if (scartoMull.has(k)) scartoMull.delete(k);
+    else if (scartoMull.size < m.max) scartoMull.add(k);
+    else return errore(`Al massimo ${m.max} carte`);
+    const via = scartoMull.has(k), n = scartoMull.size;
+    el.classList.toggle("illegale", via);
+    el.nextElementSibling.textContent = via ? "⤓ in fondo al mazzo" : "tieni";
+    $("#conferma-mull").textContent = n ? `Rimetti ${n} ${n === 1 ? "carta" : "carte"} in fondo e pesca` : "Tieni questa mano";
+  }));
+  $("#conferma-mull").onclick = () => {
+    const carte = [...scartoMull].map((k) => m.mano[k]);
+    scartoMull = new Set();
+    act("/api/mulligan", { carte });
+  };
 }
 
 function renderGioco() {
@@ -564,6 +608,12 @@ function renderGioco() {
         <p class="nota">Tu sei ${p.sei} · Saldo ${p.regole.saldo} · Crepuscolo al round ${p.regole.crepuscolo}. Clicca le carte illuminate di verde; passa sopra una carta per ingrandirla.</p></div>
     </div></div>`;
   collega(p);
+  if (p.bersaglio && p.bersaglio.tuo) {
+    mira = { titolo: `Effetto di ${p.bersaglio.fonte || "una carta"}`, obbligo: true,
+      opts: p.bersaglio.cands.map((c) => ({ bersaglio: c, trigger: true })) };
+    disegnaMira();
+    $("#annulla-mira").classList.add("nascosto");
+  }
   const reg = $("#registro"); reg.scrollTop = reg.scrollHeight;
   disegnaFreccia();
   anima(vecchio, p, rects);
