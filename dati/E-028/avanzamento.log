@@ -23,3 +23,18 @@ RB semplice L5-L6 seed 2215 fatto
 2026-10-22T08:29:05Z fine RB semplice 2200
 2026-10-22T08:29:07Z push IA semplice, semi 2200 ok
 2026-10-22T08:29:11Z copia nella cartella condivisa ok (IA semplice, semi 2200)
+2026-10-22T08:29:13Z push RB IA semplice ok
+2026-10-22T08:29:14Z copia nella cartella condivisa ok (RB IA semplice)
+2026-10-22T08:29:14Z inizio 00_B0c03 forte:30 200 3200 1,5
+2026-10-22T08:29:25Z R-021 correzione: RB con la semplice a seed_base 2000; riferimento S = E-027/00_B0c03/S (stesse liste e carte)
+2026-10-22T08:29:25Z inizio RB semplice 400 2000 1,5
+RB semplice L1-L2 seed 2001 fatto
+RB semplice L1-L3 seed 2002 fatto
+RB semplice L1-L4 seed 2003 fatto
+RB semplice L1-L5 seed 2004 fatto
+RB semplice L1-L6 seed 2005 fatto
+RB semplice L2-L5 seed 2008 fatto
+RB semplice L3-L5 seed 2011 fatto
+RB semplice L4-L5 seed 2013 fatto
+RB semplice L5-L6 seed 2015 fatto
+2026-10-22T08:33:48Z fine RB semplice 2000
