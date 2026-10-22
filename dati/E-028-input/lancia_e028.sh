@@ -1,15 +1,17 @@
 #!/usr/bin/env bash
-# E-028 (ciclo 04, Q-024 parte A): bracci 00_B0c03 e RB (R21 + B5). Copiato da lancia_e027.sh.
+# E-028 (ciclo 04, Q-024): parte A 00_B0c03 e RB (R21 + B5); parte B diagnostici DT, D20-21, D20-15, D21-15, D20, D21, D15.
+# Copiato da lancia_e027.sh.
 # Da eseguire dalla radice della repo (dove c'e' sim/). Motore: 8e9290a o successivo, validato su 4e13d90 (preset V026, contatore R-017).
 #
 #   bash lancia_e028.sh <braccio> <ia> <partite_per_incrocio> <seed_base> <protagonisti|tutti> [mix]
 #
 #   seed_base     2000 semplice, 3000 forte (stessi indici di coppia di E-020/E-023/E-024/E-025);
-#                 3200 = semi nuovi di Q-024 (seed 3201..3215, mai usati per selezionare RB): scrive in <braccio>/F_s3200.
+#                 3200 = semi nuovi di Q-024 parte A (seed 3201..3215, mai usati per selezionare RB): scrive in <braccio>/F_s3200.
+#                 3300 = semi della parte B (seed 3301..3315): scrive in <braccio>/F_s3300.
 #                 Ogni seed_base diverso da 2000/3000 scrive in una cartella a parte: <braccio>/F_s<seed_base> (o S_s<seed_base>).
 #   E028_VARIANTE facoltativa: preset o file JSON per --variante (default V026)
 #   E028_OUT      facoltativa: cartella risultati (default tcg/swarm/esperimenti/E-028_c04)
-#   E028_TRACCIA  facoltativa: ID per --traccia (es. LDR-05,ROS-020,ROS-021,ROS-003,LDR-01)
+#   E028_TRACCIA  facoltativa: ID per --traccia (anche le copie diagnostiche D-ROS-*) (es. LDR-05,ROS-020,ROS-021,ROS-003,LDR-01)
 #   mix           se presente: anche mix_M3_thorn_lucchetto (serve mazzi_mix_M3.json nel braccio; i bracci E-028 non lo hanno)
 set -euo pipefail
 B=$1; IA=$2; N=$3; SB=$4; PROT=$5; MIX=${6:-}
