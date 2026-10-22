@@ -2,7 +2,7 @@
 
 | Campo | Valore |
 |---|---|
-| Versione | v0.2.6 (nucleo; ultima modifica Q-022, P6 scelta da Vittorio) |
+| Versione | v0.2.6 (nucleo; ultima modifica Q-022, P6 scelta da Vittorio; correzioni di testo 2026-10-22) |
 | Data | 2026-10-13 |
 | Stato | **ratificato dallo swarm (Q-013, 8/8 APPROVO); pilastri 2–3–4–6 in revisione, vedi pilastri** (`pilastri_design_v0.2.md`) |
 | Fonte normativa | `swarm/questioni/Q-013_rework_nucleo_v0.2/esito.md`, sezione A "Specifica consolidata". Dati: `swarm/esperimenti/E-014/sintesi_r3.md` |
@@ -355,7 +355,7 @@ Il Leader attacca come un personaggio (§8) con la sua Forza: 3, Risvegliato 4. 
 - Contro un Leader che non si difende (Tempra 4, nessuna gemma impegnata, nessuna opposizione) il Leader Base deve impegnare **almeno 1 gemma** per andare a segno. Il Leader Risvegliato va a segno **senza impegnare gemme**.
 - Se il difensore gli oppone un'Unità, il Leader la sconfigge se Db ≤ Fa (con Scudo: se Db < Fa) e non è mai sconfitto.
 
-*Questo punto è in attesa di Vittorio:* il pilastro 2 di v0.1 ("il Leader non colpisce gratis") non vale più sul lato Risvegliato. Vedi `pilastri_design_v0.2.md`, pilastro 2.
+Il pilastro 2 di v0.1 ("il Leader non colpisce gratis") non vale sul lato Risvegliato: l'eccezione è stata ratificata 8/8 (Q-017, 2026-10-08) e il pilastro 2 riformulato. Vedi `pilastri_design_v0.2.md`, pilastro 2.
 
 ### 10.2 Rimarginare (abilità ⟳ di ogni Leader)
 > **⟳, 1 Brace**: prendi in mano una tua Cicatrice **dritta**.
@@ -403,7 +403,7 @@ Un'abilità del Leader che inizia con **"Quando il tuo Leader attacca"** è un t
 
 ### 12.2 Parole chiave (ognuna compare in almeno due colori)
 - **Assalto**: questa Unità entra **Pronta**, quindi può attaccare nel turno in cui entra (mai nel round 1).
-- **Scudo**: quando questa Unità si oppone, vince i pareggi nel Confronto: contro un'Unità a pari è sconfitto solo l'attaccante; contro un Leader è sconfitta solo se Db < Fa. Si ruota come le altre Unità **[default, aperto: P7]**.
+- **Scudo**: quando questa Unità è il bersaglio (si oppone o è cacciata), vince i pareggi nel Confronto: contro un'Unità a pari è sconfitto solo l'attaccante; contro un Leader è sconfitta solo se Db < Fa. Si ruota come le altre Unità **[default, aperto: P7]**.
 - **Impeto N: +X** *(se nell'impegno hai almeno N gemme, +X in questo scontro; quando è il bersaglio contano solo le gemme di Parata)*: si legge in C4 (d), è pubblica. Il difensore conta solo la Parata (C4 b). Sostituisce Infuso N (Q-014, forma Q-015 M2).
 - **Caccia** *(quando attacca, puoi scegliere come bersaglio un'Unità avversaria, anche Ruotata, invece del Leader; l'avversario può ancora opporsi con un'altra Unità, che diventa il bersaglio)*: il bersaglio cacciato può essere Pronto o Ruotato e si difende con la sua Forza, la Parata, la Reazione e lo Scudo; non "si oppone", quindi i suoi "quando si oppone" non scattano (Q-014).
 - **Furia N: +X**: +X al Confronto se hai almeno N Cicatrici, contando **tutte** le Cicatrici (dritte e fresche). Si legge solo in C5: non è mai un'aura.
@@ -420,13 +420,13 @@ Un'abilità del Leader che inizia con **"Quando il tuo Leader attacca"** è un t
 | Esponi | **Stanca**: ruota un'Unità avversaria Pronta; solo nel tuo turno, mai il Leader |
 | Bracconiere +X | Bracconiere X: +X quando attacca e il suo bersaglio è un'Unità |
 | Furia N | +X al Confronto se hai almeno N Cicatrici, contando tutte le Cicatrici; mai come aura |
-| Scudo (può intercettare) | vince i pareggi quando si oppone (C5) **[aperto: P7]** |
+| Scudo (può intercettare) | vince i pareggi quando è il bersaglio (C5) **[aperto: P7]** |
 | Rinnovo | quando attacca e sconfigge un'Unità, si raddrizza |
 | "fino a fine turno" | "per questo scontro", oppure effetto permanente |
 | Rimozione economica (legge 7) | solo su Unità Ruotate; legge 8: gli effetti che stancano hanno per bersaglio solo Unità |
 | Abilità di Reazione dei Leader | testi statici letti in C4 (es. Maera Risvegliata: le tue gemme di Parata valgono +3) |
 | Intercetto, "quando intercetta" | "quando si oppone" |
-| Esposto, "Unità Esposta" | Ruotata; ma una carta Ruotata non è mai bersaglio |
+| Esposto, "Unità Esposta" | Ruotata; ma una carta Ruotata non è mai bersaglio, salvo Caccia |
 | Fornace, "Brace pari alla Fornace" | Brace = min(round, 8) dal tracciato |
 | Guardia "accantonata" | gemme di Brace spostate sul Leader nella Fine |
 | Scintilla | +1 gemma a G2 nei round 1 e 3, stampata sul tracciato **[aperto: P6]** |
@@ -537,7 +537,7 @@ Il costo di una Reazione si paga con le gemme di Guardia impegnate in C4. Le car
 | **Scontro** | Un attacco da C1 a C6. |
 | **Sconfiggere** | Mandare un'Unità negli Scarti per esito di scontro o per effetto. |
 | **Scorta** | Riserva comune delle gemme. Spendere = rimettere nella scorta. |
-| **Scudo** | L'Unità che si oppone vince i pareggi [aperto: P7]. |
+| **Scudo** | L'Unità che è il bersaglio (si oppone o è cacciata) vince i pareggi [aperto: P7]. |
 | **Stanca** | Ruota un'Unità avversaria Pronta; solo nel tuo turno, mai il Leader. |
 | **Tempra** | Valore di difesa del Leader: 4. |
 | **Tracciato del round** | Carta con il segnalino del round e le soglie stampate. |
@@ -703,3 +703,4 @@ I moduli di v0.1 §17 (campo di battaglia, zone contese, round condiviso, Fulcro
 | v0.2.4 | 2026-10-12 | Q-019 (livello 3, ratificata 8/8): Crepuscolo di round, un solo controllo nel Ripristino di G1 per entrambi i Leader, spareggio meno Vite poi giocatore attivo (G1); compensazione di G2 nei round 1, 3 e 5. Preset del simulatore V024. |
 | v0.2.5 | 2026-10-13 | R-014 (esito di Q-020, 8/8): nuovo §10.4 sulle abilità "quando il tuo Leader attacca" (trigger in C1, prima dell'opposizione; controllo del pilastro 9); Base di Thorn (LDR-04) "Quando il tuo Leader attacca, Stanca un'Unità avversaria Pronta con costo ≤3" al posto di "⟳, 1 Brace: …" (nota del §13, glossario). Nessuna regola del nucleo cambia. |
 | v0.2.6 | 2026-10-18 | Q-022 (livello 3, ratificata 8/8; P6 scelta da Vittorio: opzione B, taratura sull'IA forte): compensazione di G2 nei soli round 1 e 3 (§2, §6, §11, §16, §17.1); al §11 la dichiarazione che a Vite pari allo spareggio perde G1 come parte del vantaggio di posto; spareggio `vite_attivo` invariato. Preset del simulatore V026. |
+| v0.2.6 (testo) | 2026-10-22 | Solo testo, nessuna regola cambiata: §10.1 chiude il rimando a Q-017; §12.3 Esposto "salvo Caccia"; Scudo "quando è il bersaglio" in §12.2, §12.3 e glossario, come già nel motore e nei testi del set. |
