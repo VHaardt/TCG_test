@@ -138,6 +138,53 @@ def test_trigger_targets_are_asked_and_applied():
     assert asked >= 3
 
 
+def test_premade_decks_mode():
+    a = _api("/api/stanza", {"nome": "A", "modalita": "pronti"})
+    b = _api("/api/entra", {"nome": "B", "codice": a["codice"]})
+    mz = core.dati().catalogo()["mazzi"]
+    code, out = server.api("POST", "/api/mazzo", {}, {**a, "leader": mz[0]["leader"], "carte": mz[0]["carte"]})
+    assert code == 400
+    code, out = server.api("POST", "/api/mazzo/pronto", {}, {**a, "nome": "non esiste"})
+    assert code == 400
+    _api("/api/mazzo/pronto", {**a, "nome": mz[0]["nome"]})
+    _api("/api/mazzo/annulla", a)
+    _api("/api/mazzo/pronto", {**a, "nome": mz[2]["nome"]})
+    v = _api("/api/mazzo/pronto", {**b, "nome": mz[1]["nome"]})
+    assert v["fase"] == "partita"
+    st = server.REG.get(a["codice"])
+    assert st.posti[0].carte == mz[2]["carte"] and st.posti[1].leader == mz[1]["leader"]
+    ia = _api("/api/stanza", {"nome": "C", "modalita": "pronti", "contro_ia": True})
+    v = _api("/api/mazzo/pronto", {**ia, "nome": mz[3]["nome"]})
+    assert v["fase"] == "partita"
+
+
+def test_hits_that_take_no_life_say_why():
+    """§9.2-9.5: every attack on the Leader with Fa >= Db takes a Life, wins, or the log says why not."""
+    import random, re
+    rx = re.compile(r"-> (-?\d+) contro (-?\d+)")
+    told = 0
+    for seed in range(60):
+        rng = random.Random(seed)
+        L = lambda m: [c for c, k in m["carte"].items() for _ in range(k)]
+        a, b = rng.choice(core.dati().riferimento), rng.choice(core.dati().riferimento)
+        s = E.new_game(a["leader"], L(a), b["leader"], L(b), rules=core.dati().rules, seed=seed, log=True)
+        for _ in range(4000):
+            if s.over:
+                break
+            acts = s.legal_actions()
+            pool = [x for x in acts if x[0] != "end_turn"] if rng.random() < .85 else acts
+            core.passo(s, rng.choice(pool or acts))
+        log = s.log
+        for n, ln in enumerate(log):
+            m = rx.search(ln)
+            if not m or int(m[1]) < int(m[2]) or "oppone" in log[n - 1] or "(Caccia" in log[n - 1]:
+                continue
+            nxt = log[n + 1] if n + 1 < len(log) else ""
+            assert "perde 1 Vita" in nxt or "non perde Vite" in nxt or nxt.startswith("***"), (seed, ln, nxt)
+            told += "non perde Vite" in nxt
+    assert told > 0
+
+
 def teardown_module():
     E.load_cards()          # the app loads the set into the engine: restore the default for the other tests
 

@@ -177,7 +177,7 @@ function render() {
   if (!inStanza) { $("#info-stanza").innerHTML = ""; $("#gioco").innerHTML = ""; return; }
   const link = `${location.origin}${location.pathname}?stanza=${stato.codice}`;
   const gioc = stato.giocatori.map((g, i) => `${esc(g.nome)}${i === stato.io ? " (tu)" : ""}${g.pronto ? " ✓" : ""}`).join(" · ");
-  $("#info-stanza").innerHTML = `Stanza <b>${stato.codice}</b> · ${stato.modalita === "draft" ? "Draft" : "Costruito"} · ${gioc}
+  $("#info-stanza").innerHTML = `Stanza <b>${stato.codice}</b> · ${{ draft: "Draft", pronti: "Mazzi pronti" }[stato.modalita] || "Costruito"} · ${gioc}
     ${stato.giocatori.length < 2 ? ` · invita: <input readonly value="${esc(link)}" onclick="this.select()" size="30">` : ""}
     <button class="piccolo" id="esci">Esci</button>`;
   $("#esci").onclick = esci;
@@ -201,11 +201,29 @@ function renderPrep() {
   if (io.pronto) {
     const altro = stato.giocatori.length < 2 ? "Aspetto che entri il secondo giocatore." : "Aspetto l'avversario.";
     $("#prep").innerHTML = `<div class="pannello" style="text-align:center"><h2>Pronto!</h2><p>${altro} La partita inizia da sola quando siete pronti entrambi.</p>
-      ${stato.modalita === "costruito" ? '<button class="piccolo" id="annulla">Modifica il mazzo</button>' : ""}</div>`;
+      ${stato.modalita !== "draft" ? `<button class="piccolo" id="annulla">${stato.modalita === "pronti" ? "Cambia mazzo" : "Modifica il mazzo"}</button>` : ""}</div>`;
     if ($("#annulla")) $("#annulla").onclick = () => act("/api/mazzo/annulla");
     return;
   }
-  if (stato.modalita === "draft") renderDraft(d); else renderCostruttore();
+  if (stato.modalita === "draft") renderDraft(d);
+  else if (stato.modalita === "pronti") renderPronti();
+  else renderCostruttore();
+}
+
+// ------------------------------------------------------------------ mazzi pronti
+function renderPronti() {
+  $("#prep").innerHTML = `<h2 style="text-align:center">Scegli un mazzo pronto</h2>
+    <p class="nota" style="text-align:center">Sono i mazzi di riferimento del set, già legali. Apri «Carte» per vedere la lista.</p>
+    <div class="mazzi-pronti">${CAT.mazzi.map((m, i) => {
+      const L = LEAD[m.leader], n = Object.values(m.carte).reduce((a, b) => a + b, 0);
+      return `<div class="pannello pronto-mazzo" style="${colVars(L.colori)}">
+        <div class="riga">${eroeHTML(m.leader)}<div><h3>${esc(m.nome.replace(/^(rif|mix)_/, "").replace(/_/g, " "))}</h3>
+          <p class="nota">${esc(m.leader)} · ${L.colori.map((c) => CAT.colori[c]).join("/")} · ${n} carte</p></div></div>
+        <p>${esc(m.note || "")}</p>
+        <details><summary>Carte</summary>${listaMazzo(m.carte)}</details>
+        <button class="oro" data-pm="${i}">Gioca con questo mazzo</button></div>`;
+    }).join("")}</div>`;
+  $$("[data-pm]", $("#prep")).forEach((b) => (b.onclick = () => act("/api/mazzo/pronto", { nome: CAT.mazzi[+b.dataset.pm].nome })));
 }
 
 // ------------------------------------------------------------------ draft
@@ -472,6 +490,7 @@ function plancia(g, nome, lato) {
     <div class="risorse">
       <div class="nome-g">${esc(nome)} ${g.alle_corde ? '<span style="color:var(--life)">· Alle Corde</span>' : ""}</div>
       <div class="cuori" title="Vite" data-vite="${lato}">${cuori}</div>
+      ${statoVita(g)}
       <div class="gemme" title="Brace: gemme da spendere in questo turno">${gemmeHTML(g.brace, 0, "brace")} <span>Brace ${g.brace}</span></div>
       <div class="gemme" title="Guardia: gemme per difendersi">${gemmeHTML(g.guardia, g.guardia_max, "guardia")} <span>Guardia ${g.guardia}/${g.guardia_max}</span></div>
     </div>
@@ -480,6 +499,18 @@ function plancia(g, nome, lato) {
         <span class="pila" title="${esc(g.scarti.join(", "))}">🗑 ${g.scarti.length}</span></div>
       <div class="cicatrici"><span class="nota">Cicatrici:</span> ${cic || '<span class="nota">nessuna</span>'}</div>
     </div></div>`;
+}
+
+// Perché un colpo a segno può non togliere Vite (§9.2–9.5): lo si dice sotto i cuori
+function statoVita(g) {
+  const R = stato.partita.regole, fresche = g.cicatrici.filter((c) => c.fresca).length;
+  let t = "";
+  if (g.alle_corde && fresche) t = "Alle Corde, ma la Cicatrice fresca lo protegge fino a fine turno";
+  else if (g.alle_corde) t = "Alle Corde: il prossimo colpo a segno vince la partita";
+  else if (fresche >= R.saldo) t = `Saldo pieno (${fresche}/${R.saldo}): altri colpi in questo turno non tolgono Vite`;
+  else if (fresche) t = `Cicatrici fresche ${fresche}/${R.saldo}: oltre il Saldo i colpi non tolgono Vite`;
+  else if (g.vite === 1 && stato.partita.round < R.corde_a_1) t = `1 Vita: dal round ${R.corde_a_1} basta per essere Alle Corde`;
+  return t ? `<div class="stato-vita ${g.alle_corde && !fresche ? "pericolo" : ""}">${t}</div>` : "";
 }
 
 function campo(g, lato) {
@@ -724,7 +755,12 @@ function anima(v, p, rects) {
   for (const e of ev) {
     if (e.t === "gioca" || (e.t === "rimargina" && e.chi === "avv")) passi.push(() => volaCarta(e, p));
     else if (e.t === "attacco") passi.push(() => affondo(e, p));
-    else if (e.t === "scontro") passi.push(() => scoppioScontro(e));
+    else if (e.t === "scontro") {
+      const dopo = ev.slice(ev.indexOf(e) + 1);
+      const fine = dopo.findIndex((x) => x.t === "scontro" || x.t === "attacco" || x.t === "turno");
+      const ign = (fine < 0 ? dopo : dopo.slice(0, fine)).find((x) => x.t === "ignorata");
+      passi.push(() => scoppioScontro(e, ign));
+    }
   }
   const turni = ev.filter((e) => e.t === "turno");
   if (turni.length && !p.fine) {
@@ -753,12 +789,14 @@ function affondo(e) {
   return sleep(350);
 }
 
-function scoppioScontro(e) {
+function scoppioScontro(e, ign) {
   const colpo = +e.fa >= +e.db;
   effimero(`<span class="vs"><span class="att">${e.fa}</span> ⚔ <span class="dif">${e.db}</span></span>
     <span class="esito ${colpo ? "colpo" : "parato"}">${colpo ? "A SEGNO!" : "RESPINTO"}</span>
-    ${e.carta ? `<span class="esito" style="font-size:16px">Reazione ${esc(e.carta)}</span>` : ""}`, "scontro-pop", 1400);
-  return sleep(900);
+    ${ign ? `<span class="esito perche">Nessuna Vita persa: ${esc(ign.perche)}</span>` : ""}
+    ${e.carta ? `<span class="esito" style="font-size:16px">Reazione ${esc(e.carta)}</span>` : ""}`,
+    ign ? "scontro-pop lungo" : "scontro-pop", ign ? 2600 : 1400);
+  return sleep(ign ? 1500 : 900);
 }
 
 function fineAnim(p) {

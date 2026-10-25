@@ -181,7 +181,7 @@ class Posto:
 
 class Stanza:
     def __init__(self, modalita, nome, contro_ia=False):
-        if modalita not in ("costruito", "draft"):
+        if modalita not in ("costruito", "pronti", "draft"):
             raise ValueError("modalità sconosciuta")
         dati()
         self.codice = None
@@ -236,7 +236,7 @@ class Stanza:
         if self.partita:
             raise ValueError("partita in corso")
         if self.modalita != "costruito":
-            raise ValueError("in modalità draft il mazzo nasce dal draft")
+            raise ValueError("in questa modalità non si costruisce il mazzo")
         carte = {cid: int(k) for cid, k in (carte or {}).items() if int(k) > 0}
         pr = decks.problems(leader, carte)
         if pr:
@@ -245,8 +245,21 @@ class Stanza:
         p.leader, p.carte, p.pronto = leader, carte, True
         self._forse_inizia()
 
+    def scegli_pronto(self, i, nome):
+        """Modalità "pronti": il mazzo è uno dei mazzi di riferimento, scelto per nome."""
+        if self.partita:
+            raise ValueError("partita in corso")
+        if self.modalita != "pronti":
+            raise ValueError("questa stanza non usa i mazzi pronti")
+        m = next((m for m in dati().riferimento if m["nome"] == nome), None)
+        if m is None:
+            raise ValueError("mazzo sconosciuto")
+        p = self.posti[i]
+        p.leader, p.carte, p.pronto = m["leader"], dict(m["carte"]), True
+        self._forse_inizia()
+
     def annulla_pronto(self, i):
-        if not self.partita and self.modalita == "costruito":
+        if not self.partita and self.modalita in ("costruito", "pronti"):
             self.posti[i].pronto = False
 
     def draft_leader(self, i, lid):
@@ -388,7 +401,7 @@ class Stanza:
         s.trigger_target = lambda q, sel, cands: (scelte.pop(0) if scelte else
                                                   engine.GameState.trigger_target(s, q, sel, cands))
         try:
-            s.step(att["act"])
+            passo(s, att["act"])
         finally:
             del s.trigger_target
         m["attesa"] = None
@@ -430,7 +443,7 @@ class Stanza:
                "fase": "partita" if self.partita else "preparazione", "n_partita": self.n_partita}
         if me.draft and not self.partita:
             out["draft"] = me.draft.vista()
-        if not self.partita and self.modalita == "costruito" and me.carte:
+        if not self.partita and self.modalita in ("costruito", "pronti") and me.carte:
             out["mio_mazzo"] = {"leader": me.leader, "carte": me.carte}
         if self.partita:
             out["partita"] = vista_partita(self, i)
@@ -462,7 +475,8 @@ def vista_partita(stanza, i):
         "nomi": {"io": nomi[q], "avversario": nomi[1 - q]},
         "combattimento": vista_scontro(s, q), "azioni": [], "log": tradotto(s.log[-80:], nomi), "log_n": len(s.log),
         "eventi": eventi(s.log, q, max(0, len(s.log) - 80)),
-        "regole": {"saldo": s.saldo_cap(), "crepuscolo": s.r.crepuscolo_round, "round_max": s.r.max_rounds},
+        "regole": {"saldo": s.saldo_cap(), "crepuscolo": s.r.crepuscolo_round, "round_max": s.r.max_rounds,
+                   "corde_a_1": s.r.corde_one_life_round},
     }
     if s.over:
         out["fine"] = {"vincitore": None if s.winner is None else nomi[s.winner],
@@ -474,6 +488,35 @@ def vista_partita(stanza, i):
     elif dec == q:
         out["azioni"] = [{"i": k, **etichetta(s, q, a)} for k, a in enumerate(s.legal_actions())]
     return out
+
+
+def passo(s, act):
+    """s.step(act). Se un attacco va a segno sul Leader e non toglie Vite, il motore lo tace: l'app
+    aggiunge al registro una riga che dice perché (Saldo raggiunto, §9.3, o 0 Vite con una Cicatrice
+    fresca, §9.2 e §9.5), così al tavolo si capisce che è la regola e non un errore."""
+    pre = [(len(p.life), p.fresh()) for p in s.p]
+    cap, k = s.saldo_cap(), len(s.log)
+    s.step(act)
+    if s.over:
+        return
+    log = s.log
+    for n in range(len(log) - 1, k - 1, -1):
+        m = EVENTI_RX["scontro"].search(log[n])
+        if not m or int(m["fa"]) < int(m["db"]) or "oppone" in log[n - 1] or "(Caccia" in log[n - 1]:
+            continue
+        att = next(int(x[3]) - 1 for x in reversed(log[:n]) if " attacca con" in x)
+        d = 1 - att
+        dopo = log[n + 1:]
+        if any(x.startswith(f"    P{d + 1} perde 1 Vita") for x in dopo):
+            continue
+        vite, fresche = pre[d]
+        if fresche >= cap:
+            perche = f"Saldo raggiunto ({fresche} Cicatrici fresche in questo turno, il massimo è {cap})"
+        elif vite == 0:
+            perche = "è già a 0 Vite e ha una Cicatrice fresca, quindi niente colpo finale in questo turno"
+        else:
+            continue
+        log.insert(n + 1, f"    P{d + 1} non perde Vite: {perche}")
 
 
 def prova(s, act, scelte):
@@ -527,7 +570,9 @@ EVENTI = [
     ("vita", re.compile(r"^    P(?P<p>[12]) perde 1 Vita")),
     ("sconfitta", re.compile(r"^    (?P<carta>\S+) di P(?P<p>[12]) è sconfitta")),
     ("risveglio", re.compile(r"^    P(?P<p>[12]): il Leader si Risveglia")),
+    ("ignorata", re.compile(r"^    P(?P<p>[12]) non perde Vite: (?P<perche>.+)$")),
 ]
+EVENTI_RX = dict(EVENTI)
 
 
 def eventi(log, q, start):

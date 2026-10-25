@@ -3,6 +3,7 @@
 App web minimale per giocare a CICATRICI fra amici e testare il gioco. Carte solo testo (ID, attributi, testo), nessun account, nessuna immagine.
 
 - **Costruito**: ognuno sceglie un Leader e costruisce il suo mazzo (o parte da un mazzo di riferimento), poi si gioca.
+- **Mazzi pronti**: ognuno sceglie uno dei mazzi di riferimento del set (già legali) e si gioca subito.
 - **Draft (Arena)**: si sceglie il Leader fra 3 a caso, poi 40 volte una carta fra 3. Le carte offerte sono solo dei colori del Leader o Neutrali e mai oltre le 3 copie; le 3 carte di ogni scelta hanno la stessa rarità (C 60%, NC 30%, R 10%).
 - **Avversario**: un amico, che entra col codice della stanza o col link d'invito, oppure l'IA semplice del simulatore.
 
@@ -40,4 +41,7 @@ Serve un servizio che esegua un container. Il repo ha `Dockerfile` e `render.yam
   Il motore non ha punti di decisione per questi due casi, quindi l'app li aggiunge da fuori: il mulligan
   rigioca setup() con lo stesso seme applicando le scelte, e un'azione che innesca un trigger con più
   bersagli si prova su un clone finché ogni scelta è nota, poi si esegue sulla partita vera.
+- Un colpo a segno sul Leader non toglie Vite quando il Saldo è pieno (§9.3) o quando il Leader è a 0 Vite con
+  una Cicatrice fresca (§9.2, §9.5). Il motore lo tace; l'app aggiunge al registro una riga che dice perché
+  e sotto i cuori di ogni Leader scrive lo stato (Saldo, Alle Corde, protezione della Cicatrice fresca).
 - Il client interroga il server ogni secondo, niente websocket.

@@ -63,6 +63,8 @@ def _api(method, path, q, body):
             return 405, {"errore": "usa POST"}
         elif path == "/api/mazzo":
             st.imposta_mazzo(i, body.get("leader"), body.get("carte"))
+        elif path == "/api/mazzo/pronto":
+            st.scegli_pronto(i, body.get("nome"))
         elif path == "/api/mazzo/annulla":
             st.annulla_pronto(i)
         elif path == "/api/draft/leader":
