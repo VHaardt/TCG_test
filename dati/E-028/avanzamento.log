@@ -95,3 +95,14 @@ RB forte:30 L3-L5 seed 3211 fatto
 RB forte:30 L4-L5 seed 3213 fatto
 RB forte:30 L5-L6 seed 3215 fatto
 2026-10-25T19:40:09Z fine RB forte:30 3200
+2026-10-25T19:40:12Z push RB forte, semi 3200 ok
+2026-10-25T19:40:16Z copia nella cartella condivisa ok (RB forte, semi 3200)
+2026-10-25T19:40:16Z parte A finita
+2026-10-25T19:40:25Z E-028 parte B, fase B1 (R-022, input 0995a04 = cartella condivisa), motore 4e13d90, V026, semi 3301-3315
+2026-10-25T19:40:25Z inizio 00_B0c03 forte:30 100 3300 5
+00_B0c03 forte:30 L1-L5 seed 3304 fatto
+00_B0c03 forte:30 L2-L5 seed 3308 fatto
+00_B0c03 forte:30 L3-L5 seed 3311 fatto
+00_B0c03 forte:30 L4-L5 seed 3313 fatto
+00_B0c03 forte:30 L5-L6 seed 3315 fatto
+2026-10-25T21:28:59Z fine 00_B0c03 forte:30 3300
