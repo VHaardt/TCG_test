@@ -69,3 +69,16 @@ RB semplice L5-L6 gia' fatto, salto
 2026-10-25T10:02:23Z fine RB semplice 2200
 2026-10-25T10:02:26Z push IA semplice, semi 2200 ok
 2026-10-25T10:02:28Z copia nella cartella condivisa ok (IA semplice, semi 2200)
+2026-10-25T10:02:30Z push RB IA semplice ok
+2026-10-25T10:02:30Z copia nella cartella condivisa ok (RB IA semplice)
+2026-10-25T10:02:30Z inizio 00_B0c03 forte:30 200 3200 1,5
+00_B0c03 forte:30 L1-L2 gia' fatto, salto
+00_B0c03 forte:30 L1-L3 gia' fatto, salto
+00_B0c03 forte:30 L1-L4 gia' fatto, salto
+00_B0c03 forte:30 L1-L5 gia' fatto, salto
+00_B0c03 forte:30 L1-L6 seed 3205 fatto
+00_B0c03 forte:30 L2-L5 seed 3208 fatto
+00_B0c03 forte:30 L3-L5 seed 3211 fatto
+00_B0c03 forte:30 L4-L5 seed 3213 fatto
+00_B0c03 forte:30 L5-L6 seed 3215 fatto
+2026-10-25T13:13:14Z fine 00_B0c03 forte:30 3200

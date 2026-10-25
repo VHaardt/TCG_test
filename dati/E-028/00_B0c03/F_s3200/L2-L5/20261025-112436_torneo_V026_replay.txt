@@ -1,0 +1,123 @@
+--- Round 1, P1 | Vite 5-5
+--- Round 1, P2 | Vite 5-5
+  P2 gioca ROS-001
+  P2 gioca ROS-005
+--- Round 2, P1 | Vite 5-5
+  P1 attacca con Leader LDR-02
+    P2 oppone ROS-001
+    pugni: attaccante 0, difensore 0 -> 3 contro 1
+    ROS-001 di P2 è sconfitta
+  P1 gioca BLU-001
+--- Round 2, P2 | Vite 5-5
+  P2 attacca con Leader LDR-05
+    pugni: attaccante 1, difensore 0 -> 4 contro 4
+    P1 perde 1 Vita (attacco_leader): restano 4
+  P2 gioca ROS-005
+--- Round 3, P1 | Vite 4-5
+  P1 attacca con Leader LDR-02
+    pugni: attaccante 1, difensore 0 -> 4 contro 4
+    P2 perde 1 Vita (attacco_leader): restano 4
+  P1 attacca con BLU-001#3
+    pugni: attaccante 2, difensore 0 -> 4 contro 4
+    P2 perde 1 Vita (attacco): restano 3
+--- Round 3, P2 | Vite 4-3
+  P2 gioca BLU-015
+--- Round 4, P1 | Vite 4-3
+  P1 attacca con Leader LDR-02
+    pugni: attaccante 1, difensore 0 -> 4 contro 4
+    P2 perde 1 Vita (attacco_leader): restano 2
+    P2: il Leader si Risveglia
+  P1 attacca con BLU-001#3
+    pugni: attaccante 2, difensore 0 -> 4 contro 4
+    P2 perde 1 Vita (attacco): restano 1
+--- Round 4, P2 | Vite 4-1
+  P2 gioca NEU-013
+--- Round 5, P1 | Vite 4-1
+  P1 gioca BLU-017
+    NEU-013 di P2: sconfitta da un effetto
+  P1 attacca con Leader LDR-02
+    pugni: attaccante 0, difensore 0 -> 3 contro 4
+--- Round 5, P2 | Vite 4-1
+  P2 attacca con ROS-005#4
+    pugni: attaccante 4, difensore 0 -> 8 contro 4
+    P1 perde 1 Vita (attacco): restano 3
+--- Round 6, P1 | Vite 3-1
+  P1 attacca con Leader LDR-02
+    P2 oppone BLU-015
+    pugni: attaccante 5, difensore 0 -> 8 contro 4
+    BLU-015 di P2 è sconfitta
+--- Round 6, P2 | Vite 3-1
+  P2 Rimargina BLU-023
+  P2 gioca ROS-020
+--- Round 7, P1 | Vite 3-1
+--- Round 7, P2 | Vite 3-1
+--- Round 8, P1 | Vite 3-1
+  P1 Rimargina BLU-025
+  P1 gioca BLU-003
+--- Round 8, P2 | Vite 3-1
+  P2 gioca ROS-001
+--- Round 9, P1 | Vite 3-1
+  P1 gioca BLU-007
+  P1 gioca NEU-015
+--- Round 9, P2 | Vite 3-1
+--- Round 10, P1 | Vite 3-1
+--- Round 10, P2 | Vite 3-1
+--- Round 11, P1 | Vite 3-1
+--- Round 11, P2 | Vite 3-1
+  P2 gioca ROS-020
+--- Round 12, P1 | Vite 3-1
+  P1 Rimargina NEU-002
+  P1 gioca BLU-007
+  P1 gioca NEU-002
+  P1 gioca NEU-002
+--- Round 12, P2 | Vite 3-1
+  P2 Rimargina ROS-015
+  P2 attacca con ROS-020#7
+    P1 oppone BLU-001
+    pugni: attaccante 2, difensore 0 -> 9 contro 4
+    BLU-001 di P1 è sconfitta
+--- Round 13, P1 | Vite 3-1
+  P1 attacca con BLU-003#8
+    P2 oppone ROS-020
+    pugni: attaccante 3, difensore 2 -> 8 contro 10
+    BLU-003 di P1 è sconfitta
+  P1 attacca con NEU-015#11
+    P2 oppone ROS-005
+    pugni: attaccante 2, difensore 0 -> 6 contro 1
+    ROS-005 di P2 è sconfitta
+  P1 attacca con BLU-007#10
+    pugni: attaccante 0, difensore 0 -> 2 contro 4
+  P1 attacca con BLU-007#13
+    P2 oppone ROS-005
+    pugni: attaccante 0, difensore 1 -> 2 contro 5
+    BLU-007 di P1 è sconfitta
+  P1 attacca con Leader LDR-02
+    P2 oppone ROS-001
+    pugni: attaccante 0, difensore 0 -> 3 contro 1
+    ROS-001 di P2 è sconfitta
+--- Round 13, P2 | Vite 3-1
+  P2 gioca BLU-010
+  P2 gioca ROS-005
+--- Round 14, P1 | Vite 3-1
+--- Round 14, P2 | Vite 3-1
+  P2 gioca ROS-018
+  P2 attacca con ROS-020#7
+    pugni: attaccante 1, difensore 2 + BLU-025 -> 3 contro 4
+    ROS-020 di P2: sconfitta da un effetto
+  P2 attacca con ROS-005#2
+    pugni: attaccante 0, difensore 0 -> 2 contro 4
+  P2 attacca con ROS-005#15
+    pugni: attaccante 0, difensore 0 -> 2 contro 4
+  P2 gioca BLU-010
+  P2 attacca con Leader LDR-05
+    pugni: attaccante 0, difensore 1 -> 2 contro 6
+  P2 attacca con ROS-020#12
+    P1 oppone BLU-007
+    pugni: attaccante 0, difensore 0 -> 5 contro 2
+    BLU-007 di P1 è sconfitta
+  P2 attacca con BLU-010#14
+    pugni: attaccante 1, difensore 0 -> 4 contro 4
+    P1 perde 1 Vita (attacco): restano 2
+    P1: il Leader si Risveglia
+--- Round 15, P1 | Vite 2-1
+*** P2 perde (crepuscolo)
