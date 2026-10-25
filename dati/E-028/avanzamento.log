@@ -106,3 +106,12 @@ RB forte:30 L5-L6 seed 3215 fatto
 00_B0c03 forte:30 L4-L5 seed 3313 fatto
 00_B0c03 forte:30 L5-L6 seed 3315 fatto
 2026-10-25T21:28:59Z fine 00_B0c03 forte:30 3300
+2026-10-25T21:29:02Z push 00_B0c03 forte, semi 3300 ok
+2026-10-25T21:29:05Z copia nella cartella condivisa ok (00_B0c03 forte, semi 3300)
+2026-10-25T21:29:05Z inizio DT forte:30 100 3300 5
+DT forte:30 L1-L5 seed 3304 fatto
+DT forte:30 L2-L5 seed 3308 fatto
+DT forte:30 L3-L5 seed 3311 fatto
+DT forte:30 L4-L5 seed 3313 fatto
+DT forte:30 L5-L6 seed 3315 fatto
+2026-10-25T23:15:36Z fine DT forte:30 3300
