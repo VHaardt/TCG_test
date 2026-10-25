@@ -82,3 +82,16 @@ RB semplice L5-L6 gia' fatto, salto
 00_B0c03 forte:30 L4-L5 seed 3213 fatto
 00_B0c03 forte:30 L5-L6 seed 3215 fatto
 2026-10-25T13:13:14Z fine 00_B0c03 forte:30 3200
+2026-10-25T13:13:16Z push 00_B0c03 forte, semi 3200 ok
+2026-10-25T13:13:19Z copia nella cartella condivisa ok (00_B0c03 forte, semi 3200)
+2026-10-25T13:13:19Z inizio RB forte:30 200 3200 1,5
+RB forte:30 L1-L2 seed 3201 fatto
+RB forte:30 L1-L3 seed 3202 fatto
+RB forte:30 L1-L4 seed 3203 fatto
+RB forte:30 L1-L5 seed 3204 fatto
+RB forte:30 L1-L6 seed 3205 fatto
+RB forte:30 L2-L5 seed 3208 fatto
+RB forte:30 L3-L5 seed 3211 fatto
+RB forte:30 L4-L5 seed 3213 fatto
+RB forte:30 L5-L6 seed 3215 fatto
+2026-10-25T19:40:09Z fine RB forte:30 3200
