@@ -777,6 +777,27 @@ def test_q026_stanca_own_cost_and_choice():
     assert s.stats["life_costs_round"][0] == {s.round: 1}
 
 
+def test_q026_stanca_own_on_abilities_and_without_life():
+    """A ⟳ with stanca_own never Stancas its own source; with Vita not payable only the Stanca ways remain."""
+    src = _card("_ab", power=3, abilities=[{"activated": True, "cost": 0, "costs": [{"stanca_own": 1}],
+                                            "do": [{"op": "draw", "n": 1}]}])
+    t = _card("_any", type="tactic", cost=1, colors=("K",), power=0,
+              play={"costs": [{"any": [{"lose_life": 1, "floor": 1}, {"stanca_own": 1}]}], "do": [{"op": "draw", "n": 1}]})
+    s = _arena()
+    s.p[0].brace = 1
+    s.p[0].units = [Unit(900, src, True), Unit(901, "t_r6", True)]
+    abil = [x for x in s.legal_actions() if x[0] == "ability" and x[1] == 900]
+    assert [x[4] for x in abil] == [(("stanca", 901),)]
+    s.step(abil[0])
+    assert not s.unit(0, 900).ready and not s.unit(0, 901).ready
+    assert not [x for x in s.legal_actions() if x[0] == "ability"]       # nessun'altra Unità Pronta
+    s = _arena()
+    s.p[0].brace, s.p[0].hand = 1, [t]
+    s.p[0].units = [Unit(900, "t_r6", True)]
+    s.p[0].life = s.p[0].life[:1]                                         # 1 Vita: floor 1, la Vita non si paga
+    assert [x[3] for x in s.legal_actions() if x[0] == "play"] == [(("stanca", 900),)]
+
+
 def test_q026_fixed_costs_keep_their_actions():
     """Cards with only a Vita cost keep the actions of before (3 elements): old results replay identically."""
     c = _card("_ros008", cost=1, colors=("R",), costs=[{"lose_life": 1, "floor": 1}])
