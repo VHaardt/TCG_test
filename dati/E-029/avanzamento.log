@@ -59,3 +59,18 @@ P forte:30 L3-L5 seed 3211 fatto
 P forte:30 L4-L5 seed 3213 fatto
 P forte:30 L5-L6 seed 3215 fatto
 2026-10-26T18:57:44Z fine P forte:30 3200
+2026-10-26T18:57:46Z push P forte, semi 3200 ok
+2026-10-26T18:57:49Z copia nella cartella condivisa ok (P forte, semi 3200)
+2026-10-26T18:57:49Z inizio 00_B0c03 forte:30 200 3300 5
+2026-10-26T21:32:53Z E-029 (R-023, input 503d9bd), motore 4e13d90, V026, --riprendi
+2026-10-26T21:32:53Z inizio P semplice 400 2000 1,5
+P semplice L1-L2 gia' fatto, salto
+P semplice L1-L3 gia' fatto, salto
+P semplice L1-L4 gia' fatto, salto
+P semplice L1-L5 gia' fatto, salto
+P semplice L1-L6 gia' fatto, salto
+P semplice L2-L5 gia' fatto, salto
+P semplice L3-L5 gia' fatto, salto
+P semplice L4-L5 gia' fatto, salto
+P semplice L5-L6 gia' fatto, salto
+2026-10-26T21:32:53Z fine P semplice 2000
