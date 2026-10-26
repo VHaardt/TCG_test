@@ -55,17 +55,18 @@ def swap(m, name, out, inn):
 # ------------------------------------------------------------------ leve
 def M2(s, m):
     s["cards"].append(copy.deepcopy(NEW_V05))
-    swap(m, L4, ["VER-012", "VER-002"], ["NEW-V05", "NEW-V05"])
+    swap(m, L4, ["NEU-011", "VER-002"], ["NEW-V05", "NEW-V05"])
     swap(m, L6, ["VER-013", "VER-013"], ["NEW-V05", "NEW-V05"])
     swap(m, L1, ["VER-013", "VER-013"], ["NEW-V05", "NEW-V05"])
     return ["Nuova carta `NEW-V05` (Tattica verde, costo 2, rarità R): `play` con bersaglio `{side: opp, ready: true, keyword: scudo}`, "
             "`stanca` sul bersaglio; nessun `cost_le`.",
-            f"`{L4}`: −1 VER-012, −1 VER-002, +2 NEW-V05. Escono le due Stanca verdi più simili (Tattiche a bersaglio Pronta): "
-            "VER-012 è la sola altra Stanca da 2; resta 1 VER-002 per la curva bassa.",
+            f"`{L4}`: −1 NEU-011, −1 VER-002, +2 NEW-V05. Escono le due Tattiche di Stanca più simili: NEU-011 (Stanca ≤3 da 2, "
+            "entrata con la correzione del critico al posto di VER-012) è la sola altra Stanca da 2; resta 1 VER-002 per la curva bassa. "
+            "Colori: neutra −1, verde +1.",
             f"`{L6}`: −2 VER-013, +2 NEW-V05. VER-013 (Stanca ≤3 da 2) è la sola Tattica di Stanca della lista ed è entrata in B0c05 al posto di NER-015.",
             f"`{L1}`: −2 VER-013, +2 NEW-V05. VER-013 ×2 sono entrate in B0c05 come riempitivi (sostituti di Reazioni gemelle G2) "
             "e sono le carte più simili; restano le 2 VER-002.",
-            "Colori invariati in tutte e tre le liste (verde per verde); copie per nome ≤2."]
+            "Copie per nome ≤2; in L1 e L6 colori invariati (verde per verde)."]
 
 
 def M3(s, m):
@@ -89,6 +90,23 @@ def P(s, m):
             f"`{L5}` è quella di B0c05: NEU-013 ×{d['cards'].count('NEU-013')}, BLU-008 ×{d['cards'].count('BLU-008')} (in B0c03 erano ×3 e ×3)."]
 
 
+ROTT_L5 = ["BLU-001", "BLU-001", "BLU-003", "BLU-007", "BLU-007", "BLU-008", "BLU-008", "BLU-010", "BLU-010", "BLU-012", "BLU-012",
+           "BLU-015", "BLU-015", "BLU-021", "BLU-021", "BLU-023", "BLU-023", "BLU-025", "NEU-001", "NEU-001", "NEU-013", "NEU-013",
+           "ROS-001", "ROS-001", "ROS-003", "ROS-003", "ROS-005", "ROS-005", "ROS-007", "ROS-007", "ROS-008", "ROS-008", "ROS-015",
+           "ROS-015", "ROS-018", "ROS-020", "ROS-020", "ROS-021", "ROS-021", "ROS-023"]   # rott_LDR05_2c, liste_B0c05/verifica_critico.md
+
+
+def R52C(s, m):
+    d = deck(m, L5)
+    diff = Counter(ROTT_L5)
+    diff.subtract(Counter(d["cards"]))
+    d["cards"] = list(ROTT_L5)
+    d["note"] = d.get("note", "") + " E-030 R5-2c: carte di rott_LDR05_2c del critico (verifica_critico.md); nome lasciato per il lanciatore."
+    return [f"`{L5}` sostituita dalla lista di rottura a 2 copie del critico (`rott_LDR05_2c`, `liste_B0c05/verifica_critico.md`), "
+            "con il nome della rif_ perché il lanciatore la trovi: "
+            + ", ".join(f"{'+' if v > 0 else '−'}{abs(v)} {k}" for k, v in sorted(diff.items()) if v) + ". Gli Scudo restano 15."]
+
+
 # ------------------------------------------------------------------ traccia: quella di E-029 + Leader + carte nuove di B0c05 + NEW-*
 BASETR = ("LDR-01,LDR-05,BLU-001,BLU-007,BLU-008,BLU-010,BLU-012,BLU-015,BLU-021,BLU-023,BLU-025,NEU-006,NEU-013,ROS-001,ROS-003,"
           "ROS-005,ROS-007,ROS-010,ROS-015,ROS-016,ROS-018,ROS-020,ROS-021,ROS-023,ROS-025,VER-001,VER-002,VER-009,VER-011,VER-019,VER-024")
@@ -96,7 +114,7 @@ base_ids = BASETR.split(",")
 # carte entrate in B0c05: per ogni lista, gli ID che la stessa lista di B0c03 non aveva
 entrate = sorted({c for d in MAZ["mazzi"] for c in d["cards"] if c not in deck(OLD, d["name"])["cards"]})
 TRACCIA = ",".join(dict.fromkeys(base_ids + ["LDR-02", "LDR-03", "LDR-04", "LDR-06", "VER-012", "VER-013", "VER-023"] + entrate
-                                 + ["NEW-V05", "NEW-B06"]))
+                                 + sorted(set(ROTT_L5) - set(base_ids)) + ["NEW-V05", "NEW-B06"]))
 
 ARMS = {  # nome: (leve, voto, protagonisti, incroci, ore, riferimento)
     "00_B0c05": ([], "riferimento B0c05 (V1, 2 copie per nome)", "tutti", 15, 10.8,
@@ -104,6 +122,8 @@ ARMS = {  # nome: (leve, voto, protagonisti, incroci, ore, riferimento)
     "M2": ([M2], "M2, 8/8; LDR-01 su richiesta del critico (round1/discussione_critico.md)", "1,4,6", 12, 8.7,
            "E-030_q026/00_B0c05 F_s3400"),
     "M3": ([M3], "M3, 8/8 (costo 6, F5)", "6", 5, 3.6, "E-030_q026/00_B0c05 F_s3400"),
+    "R5-2c": ([R52C], "rottura a 2 copie di L5 del critico (verifica_critico.md, proposta di misura)", "5", 5, 3.6,
+              "E-030_q026/00_B0c05 F_s3400"),
     "P-2c": ([P], "C: P rimisurata su B0c05 solo se lo screening di E-029 dà Δ05 ≤ −1.5 (condizionale)", "1,5", 9, 6.5,
              "E-030_q026/00_B0c05 F_s3400"),
 }

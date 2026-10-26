@@ -12,8 +12,9 @@
 #   2. 00_B0c05  forte:30     tutti     semi 3400  200/incrocio  15 incroci  3.000 partite  ~10.8 h
 #   3. M2        forte:30     1,4,6     semi 3400  200/incrocio  12 incroci  2.400 partite  ~8.7 h
 #   4. M3        forte:30     6         semi 3400  200/incrocio   5 incroci  1.000 partite  ~3.6 h
-#   5. P-2c      forte:30     1,5       semi 3400  200/incrocio   9 incroci  1.800 partite  ~6.5 h  (solo con E030_P2C=1)
-#   Totale: 12.400 partite, circa 23.3 h senza P-2c; 14.200 partite, circa 29.8 h con P-2c.
+#   5. R5-2c     forte:30     5         semi 3400  200/incrocio   5 incroci  1.000 partite  ~3.6 h  (rottura a 2 copie di L5, critico)
+#   6. P-2c      forte:30     1,5       semi 3400  200/incrocio   9 incroci  1.800 partite  ~6.5 h  (solo con E030_P2C=1)
+#   Totale: 13.400 partite, circa 26.9 h senza P-2c; 15.200 partite, circa 33.4 h con P-2c.
 #   Ordine: il riferimento prima, così M2 e M3 si leggono appena finiscono.
 set -uo pipefail
 DIR=/mnt/project-files/tcg/set/esperimenti/E-030_q026
@@ -33,6 +34,7 @@ corsa 00_B0c05 semplice 400 2000 tutti  || exit 1
 corsa 00_B0c05 forte:30 200 3400 tutti  || exit 1
 corsa M2 forte:30 200 3400 1,4,6        || exit 1
 corsa M3 forte:30 200 3400 6            || exit 1
+corsa R5-2c forte:30 200 3400 5         || exit 1
 if [ "${E030_P2C:-0}" = 1 ]; then
   corsa P-2c forte:30 200 3400 1,5      || exit 1
 else
