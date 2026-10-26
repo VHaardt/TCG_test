@@ -124,3 +124,12 @@ D20-21 forte:30 L3-L5 seed 3311 fatto
 D20-21 forte:30 L4-L5 seed 3313 fatto
 D20-21 forte:30 L5-L6 seed 3315 fatto
 2026-10-26T01:00:51Z fine D20-21 forte:30 3300
+2026-10-26T01:00:53Z push D20-21 forte, semi 3300 ok
+2026-10-26T01:00:58Z copia nella cartella condivisa ok (D20-21 forte, semi 3300)
+2026-10-26T01:00:58Z inizio D20-15 forte:30 100 3300 5
+D20-15 forte:30 L1-L5 seed 3304 fatto
+D20-15 forte:30 L2-L5 seed 3308 fatto
+D20-15 forte:30 L3-L5 seed 3311 fatto
+D20-15 forte:30 L4-L5 seed 3313 fatto
+D20-15 forte:30 L5-L6 seed 3315 fatto
+2026-10-26T02:54:11Z fine D20-15 forte:30 3300
