@@ -44,4 +44,10 @@ Serve un servizio che esegua un container. Il repo ha `Dockerfile` e `render.yam
 - Un colpo a segno sul Leader non toglie Vite quando il Saldo è pieno (§9.3) o quando il Leader è a 0 Vite con
   una Cicatrice fresca (§9.2, §9.5). Il motore lo tace; l'app aggiunge al registro una riga che dice perché
   e sotto i cuori di ogni Leader scrive lo stato (Saldo, Alle Corde, protezione della Cicatrice fresca).
+- **Torna indietro**: si annulla la propria ultima scelta (anche più volte di fila) finché l'avversario umano non
+  ha scelto nulla e non si è scoperta nessuna carta nascosta (pescate, Vite girate, carte dalla mano avversaria).
+  È un aiuto da playtest, non una regola del gioco.
+- **Modificatori dal vivo**: ogni Unità mostra i bonus alla Forza e da dove vengono (passandoci sopra), più i
+  bonus da scontro già attivi (Furia); durante uno scontro Attacco e Difesa sono scomposti in base, gemme,
+  Parata, Reazione e abilità.
 - Il client interroga il server ogni secondo, niente websocket.

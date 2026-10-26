@@ -269,3 +269,13 @@ table.lista .pallino { display: inline-block; width: 10px; height: 10px; border-
 .pronto-mazzo h3 { margin: 0; text-transform: capitalize; }
 .pronto-mazzo .riga { align-items: center; }
 .pronto-mazzo button { margin-top: auto; }
+
+/* modificatori dal vivo */
+.u-mod { position: absolute; top: 2px; right: 2px; display: flex; gap: 2px; }
+.u-mod span { font: 700 10px system-ui, sans-serif; padding: 0 3px; border-radius: 6px; background: #000a; }
+.u-mod .su, .mod-box .su { color: #7dff8a; } .u-mod .giu, .mod-box .giu { color: #ff7a6a; } .u-mod .cond, .mod-box .cond { color: #ffd166; }
+.u-forza small { font-size: 10px; color: #ffd166; margin-left: 1px; }
+.mod-box { margin-top: 6px; font-size: 13px; width: 240px; }
+.conto { display: flex; flex-direction: column; gap: 2px; font-size: 13px; margin: 4px 0; }
+.conto .att b { color: #ff8a6a; } .conto .dif b { color: #8cc4ff; } .conto small { opacity: .75; }
+#indietro { width: 100%; margin-bottom: 8px; background: #3a2d1c; color: #f3e2bd; border: 1px solid #a07c3e; }

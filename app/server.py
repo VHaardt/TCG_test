@@ -65,6 +65,8 @@ def _api(method, path, q, body):
             st.imposta_mazzo(i, body.get("leader"), body.get("carte"))
         elif path == "/api/mazzo/pronto":
             st.scegli_pronto(i, body.get("nome"))
+        elif path == "/api/annulla":
+            st.annulla(i)
         elif path == "/api/mazzo/annulla":
             st.annulla_pronto(i)
         elif path == "/api/draft/leader":

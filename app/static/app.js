@@ -86,12 +86,20 @@ function leaderTesti(id, risv = null) {
     <div style="${risv === false ? "opacity:.45" : ""}"><b>Risvegliato.</b> ${l.risvegliato.map(mdish).join(" ")}</div></div>`;
 }
 
+// modificatori dal vivo di un'Unità in campo, sotto l'anteprima
+function modHTML(el) {
+  if (!el.dataset.mod) return "";
+  const mod = JSON.parse(el.dataset.mod), c = CARTA[el.dataset.card];
+  return `<div class="pannello mod-box"><b>Forza ${c.forza}</b> stampata${mod.map((m) =>
+    `<div class="${m.scontro ? "cond" : m.v > 0 ? "su" : "giu"}">${m.v > 0 ? "+" : ""}${m.v} ${m.fonte === "altro" ? "altri effetti" : m.fonte === el.dataset.card ? "propria abilità" : `da ${esc(m.fonte)}`}${m.scontro ? " (solo negli scontri, già attivo)" : ""}</div>`).join("")}</div>`;
+}
+
 // anteprima ingrandita al passaggio del mouse
 function anteprima(e) {
   const el = e.target.closest("[data-card],[data-leader]");
   const box = $("#anteprima");
   if (!el || el.closest("#anteprima") || el.closest(".offerta")) { box.style.opacity = 0; return; }
-  if (el.dataset.card) box.innerHTML = cartaHTML(el.dataset.card, { classi: "grande" });
+  if (el.dataset.card) box.innerHTML = cartaHTML(el.dataset.card, { classi: "grande" }) + modHTML(el);
   else box.innerHTML = `<div class="pannello" style="width:280px">${eroeHTML(el.dataset.leader)}<h3>${esc(el.dataset.leader)}</h3>${leaderTesti(el.dataset.leader)}</div>`;
   const r = el.getBoundingClientRect();
   const w = 240, h = 340;
@@ -460,10 +468,12 @@ function unitaHTML(u, lato, extraCl = "") {
   const c = CARTA[u.id];
   const kw = c.parole.map((k) => KW[k] || "").join("");
   const delta = u.forza > u.forza_stampata ? "su" : u.forza < u.forza_stampata ? "giu" : "";
+  const mod = u.mod || [], inScontro = mod.filter((m) => m.scontro).reduce((a, m) => a + m.v, 0);
   return `<div class="unita ${u.pronta ? "" : "ruotata"} ${c.parole.includes("scudo") ? "scudo" : ""} ${extraCl}" style="${colVars(c.colori)}"
-      data-ent="${lato}:${u.uid}" data-card="${u.id}" data-uid="${lato}:${u.uid}">
+      data-ent="${lato}:${u.uid}" data-card="${u.id}" data-uid="${lato}:${u.uid}" ${mod.length ? `data-mod="${esc(JSON.stringify(mod))}"` : ""}>
     <div class="u-dentro"><span class="u-kw">${kw}</span><span class="icona">${ICONA[c.tipo]}</span><span class="u-nome">${esc(u.id)}</span></div>
-    <div class="u-forza ${delta}"><b>${u.forza}</b></div></div>`;
+    ${mod.length ? `<div class="u-mod">${mod.map((m) => `<span class="${m.scontro ? "cond" : m.v > 0 ? "su" : "giu"}">${m.v > 0 ? "+" : ""}${m.v}</span>`).join("")}</div>` : ""}
+    <div class="u-forza ${delta}"><b>${u.forza}</b>${inScontro ? `<small>+${inScontro}⚔</small>` : ""}</div></div>`;
 }
 
 function reliquiaHTML(id, k) {
@@ -535,7 +545,7 @@ function centroHTML(p) {
   const n = p.nomi;
   let s = `<span class="round">Round ${p.round}</span><span class="fase">${p.attivo_sei_tu ? "Il tuo turno" : `Turno di ${esc(n.avversario)}`} · ${esc(p.fase_testo)}</span>`;
   const cb = p.combattimento;
-  if (cb) s += `<span class="fase">⚔ <b>${esc(cb.attaccante)}</b> → <b>${esc(cb.bersaglio)}</b>${cb.opposta_da ? ` (si oppone ${esc(cb.opposta_da)})` : ""}${cb.gemme_attacco != null ? ` · gemme d'attacco ${cb.gemme_attacco}` : ""}</span>`;
+  if (cb) s += `<span class="fase">⚔ <b>${esc(cb.attaccante)}</b> → <b>${esc(cb.bersaglio)}</b>${cb.opposta_da ? ` (si oppone ${esc(cb.opposta_da)})` : ""}${cb.gemme_attacco != null ? ` · gemme d'attacco ${cb.gemme_attacco}` : ""}</span>${contoHTML(cb.conto)}`;
   if (p.fine) return `${s}<span class="fase"><b>${p.fine.hai_vinto ? "Hai vinto" : "Hai perso"}</b> (${esc(p.fine.motivo)})</span>
     <button class="oro" id="rivincita-c">Nuova partita</button>`;
   if (p.bersaglio) {
@@ -560,6 +570,14 @@ function centroHTML(p) {
       ${az.filter((a) => a.gruppo === "opposizione" && a.sorgente == null).map((a) => `<button data-i="${a.i}">${esc(a.testo)}</button>`).join("")}</div>`;
   }
   return s;
+}
+
+// Fa e Db dello scontro in corso, con le parti che li compongono
+function contoHTML(c) {
+  if (!c) return "";
+  const parti = (xs) => xs.map((x, k) => `${k ? (x.v != null && x.v < 0 ? " − " : " + ") : ""}${x.v != null ? Math.abs(x.v) : ""} <small>${esc(x.t)}</small>`).join("");
+  return `<span class="conto"><span class="att">Attacco <b>${c.fa}</b> = ${parti(c.att)}</span>
+    <span class="dif">Difesa <b>${c.db}</b> = ${parti(c.dif)}</span></span>`;
 }
 
 function registroHTML(p) {
@@ -631,6 +649,7 @@ function renderGioco() {
     </div>
     <div class="colonna">
       <button id="fine-turno" class="${p.tocca_a_te && p.fase === "main" ? "attivo" : "attesa"}">${p.fine ? "Partita finita" : p.tocca_a_te && p.fase === "main" ? "FINE TURNO" : p.tocca_a_te ? "Scegli…" : `Turno di ${esc(p.attivo_sei_tu ? p.nomi.io : p.nomi.avversario)}`}</button>
+      ${p.puoi_annullare ? '<button id="indietro" title="Annulla la tua ultima scelta: si può finché l\'avversario non ha scelto nulla e non si è scoperta nessuna carta">↶ Torna indietro</button>' : ""}
       <div id="mira-info" class="pannello nascosto"><span></span> <button class="piccolo" id="annulla-mira">Annulla</button></div>
       <div class="pannello"><h3>Registro</h3><div class="registro" id="registro">${registroHTML(p)}</div></div>
       <div class="pannello"><details><summary>Tutte le azioni (${p.azioni.length})</summary>
@@ -656,6 +675,7 @@ function collega(p) {
   const fine = tutte.find((a) => a.gruppo === "turno");
   $("#fine-turno").onclick = () => { if (fine) manda(fine); };
   $$("[data-i]").forEach((b) => (b.onclick = (e) => { e.stopPropagation(); manda(tutte.find((a) => a.i === +b.dataset.i)); }));
+  if ($("#indietro")) $("#indietro").onclick = () => act("/api/annulla");
   if ($("#resa")) $("#resa").onclick = () => { if (confirm("Vuoi davvero arrenderti?")) act("/api/resa"); };
   $("#annulla-mira").onclick = annullaMira;
   if ($("#rivincita-c")) $("#rivincita-c").onclick = () => { const f = $("#fine-partita"); if (f) f.remove(); act("/api/rivincita"); };

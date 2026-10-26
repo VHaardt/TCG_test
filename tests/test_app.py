@@ -185,6 +185,92 @@ def test_hits_that_take_no_life_say_why():
     assert told > 0
 
 
+def test_undo_own_choice_until_something_is_revealed():
+    import random
+    rng = random.Random(3)
+    undone = 0
+    for g in range(30):
+        a = _api("/api/stanza", {"nome": "A", "modalita": "pronti", "contro_ia": True})
+        mz = core.dati().catalogo()["mazzi"]
+        _api("/api/mazzo/pronto", {**a, "nome": mz[g % len(mz)]["nome"]})
+        _api("/api/mulligan", {**a, "carte": []})
+        st = server.REG.get(a["codice"])
+        for _ in range(400):
+            v = _api("/api/stato", a, "GET")["partita"]
+            if "fine" in v or undone >= 5:
+                break
+            if v.get("bersaglio"):
+                _api("/api/bersaglio", {**a, "versione": v["versione"], "uid": v["bersaglio"]["cands"][0]["uid"]})
+                continue
+            s0 = st.partita["s"]
+            before = (list(s0.p[0].hand), list(s0.p[1].hand), [u.uid for p in s0.p for u in p.units],
+                      [p.brace for p in s0.p], s0.phase)
+            act = rng.choice(v["azioni"])
+            v2 = _api("/api/azione", {**a, "versione": v["versione"], "indice": act["i"]})["partita"]
+            if v2.get("puoi_annullare") and rng.random() < .5:
+                v3 = _api("/api/annulla", a)["partita"]
+                s1 = st.partita["s"]
+                assert (list(s1.p[0].hand), list(s1.p[1].hand), [u.uid for p in s1.p for u in p.units],
+                        [p.brace for p in s1.p], s1.phase) == before
+                assert v3["versione"] > v2["versione"] and "torna indietro" in s1.log[-1]
+                undone += 1
+    assert undone >= 5
+    # contro un umano: dopo una sua scelta non si torna indietro
+    a = _api("/api/stanza", {"nome": "A", "modalita": "pronti"})
+    b = _api("/api/entra", {"nome": "B", "codice": a["codice"]})
+    _api("/api/mazzo/pronto", {**a, "nome": mz[0]["nome"]})
+    _api("/api/mazzo/pronto", {**b, "nome": mz[1]["nome"]})
+    _api("/api/mulligan", {**a, "carte": []})
+    _api("/api/mulligan", {**b, "carte": []})
+    st = server.REG.get(a["codice"])
+    for _ in range(200):
+        va, vb = (_api("/api/stato", t, "GET")["partita"] for t in (a, b))
+        me, other, v = (a, b, va) if va["tocca_a_te"] else (b, a, vb)
+        if st.annullabile(st.posti.index(next(p for p in st.posti if p.token == other["token"]))):
+            break
+        if v.get("bersaglio"):
+            _api("/api/bersaglio", {**me, "versione": v["versione"], "uid": v["bersaglio"]["cands"][0]["uid"]})
+        else:
+            pick = next((x for x in v["azioni"] if x["gruppo"] != "turno"), v["azioni"][0])
+            _api("/api/azione", {**me, "versione": v["versione"], "indice": pick["i"]})
+    i_other = next(k for k, p in enumerate(st.posti) if p.token == other["token"])
+    assert st.annullabile(i_other)
+    v = _api("/api/stato", me, "GET")["partita"]
+    if v["tocca_a_te"] and not v.get("bersaglio"):
+        _api("/api/azione", {**me, "versione": v["versione"], "indice": v["azioni"][0]["i"]})
+        assert not st.annullabile(i_other)
+
+
+def test_live_modifiers_add_up():
+    import random
+    rng = random.Random(5)
+    seen = combats = 0
+    for g in range(25):
+        a = _api("/api/stanza", {"nome": "A", "modalita": "pronti", "contro_ia": True})
+        mz = core.dati().catalogo()["mazzi"]
+        _api("/api/mazzo/pronto", {**a, "nome": mz[g % len(mz)]["nome"]})
+        _api("/api/mulligan", {**a, "carte": []})
+        for _ in range(500):
+            v = _api("/api/stato", a, "GET")["partita"]
+            if "fine" in v:
+                break
+            for side in ("io", "avversario"):
+                for u in v[side]["unita"]:
+                    assert u["forza_stampata"] + sum(m["v"] for m in u["mod"] if not m.get("scontro")) == u["forza"]
+                    seen += bool(u["mod"])
+            c = (v["combattimento"] or {}).get("conto")
+            if c:
+                combats += 1
+                assert sum(x["v"] for x in c["att"]) == c["fa"]
+                assert sum(x["v"] or 0 for x in c["dif"]) == c["db"]
+            if v.get("bersaglio"):
+                _api("/api/bersaglio", {**a, "versione": v["versione"], "uid": v["bersaglio"]["cands"][0]["uid"]})
+            elif v["tocca_a_te"]:
+                pool = [x for x in v["azioni"] if x["gruppo"] != "turno"] if rng.random() < .8 else v["azioni"]
+                _api("/api/azione", {**a, "versione": v["versione"], "indice": rng.choice(pool or v["azioni"])["i"]})
+    assert seen > 0 and combats > 0
+
+
 def teardown_module():
     E.load_cards()          # the app loads the set into the engine: restore the default for the other tests
 
