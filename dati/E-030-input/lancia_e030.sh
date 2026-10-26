@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # E-030 (Q-026, esito_passata2.md): bracci 00_B0c05, M2, M3, P-2c. Copiato da lancia_e029.sh; passa --riprendi.
-# Da eseguire dalla radice della repo (dove c'e' sim/). Motore: 4e13d90 o successivo (preset V026, contatore R-017, --riprendi).
+# Da eseguire dalla radice della repo (dove c'e' sim/). Motore: ab6f2dd o successivo (R-025: M1 usa i costi stanca_own/any; preset V026, --riprendi).
 #
 #   bash lancia_e030.sh <braccio> <ia> <partite_per_incrocio> <seed_base> <protagonisti|tutti>
 #

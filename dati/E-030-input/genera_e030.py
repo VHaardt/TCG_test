@@ -78,6 +78,30 @@ def M3(s, m):
             "Colori: V −1, N/V +1 (la carta bicolore conta per entrambi)."]
 
 
+COSTO_M1 = [{"any": [{"lose_life": 1, "floor": 1}, {"stanca_own": 1}]}]   # Q-026 M1 (variante del nero, 6/8); motore R-025 (ab6f2dd)
+TESTO_M1 = ("Costo aggiuntivo: il tuo Leader perde 1 Vita *(rispetta il Saldo; non puoi pagarlo se ha 1 Vita o meno)* "
+            "**oppure** Stanca *(ruota)* una tua Unità Pronta.")
+
+
+def M1(s, m):
+    for cid, resto in (("NER-002", " Pesca 1."), ("NER-019", " Sconfiggi un'Unità avversaria Ruotata con costo ≤4. Pesca 1.")):
+        c = card(s, cid)
+        c["play"]["costs"] = copy.deepcopy(COSTO_M1)
+        c["text"] = TESTO_M1 + resto
+        c["_note"] = (c.get("_note", "") + " E-030 M1 (Q-026): costo in Vita sostituito da 'perdi 1 Vita oppure Stanca una tua Unità Pronta'.").strip()
+    swap(m, L6, ["NEU-004", "VER-010", "VER-021"], ["NER-002", "NER-002", "NER-019"])
+    return ["NER-002: `play.costs` da `[{lose_life: 1, floor: 1}]` a `[{any: [{lose_life: 1, floor: 1}, {stanca_own: 1}]}]`; testo aggiornato. "
+            "Il `floor` vale per il ramo in Vita (come oggi: non pagabile con 1 Vita o meno); la Stanca di una propria Unità Pronta resta sempre pagabile.",
+            "NER-019: `play.costs` da `[{lose_life: 2, floor: 1}]` (2 Vite, non giocabile con 2 o meno) allo stesso costo `any` di NER-002 "
+            "(1 Vita con floor 1, oppure Stanca una tua Unità Pronta); bersaglio ed effetti invariati.",
+            "Rientro nelle liste (senza le carte il braccio non misura nulla). In B0c05 NER-002 è solo in `rif_LDR03` (×2, invariata) "
+            "e NER-019 in nessuna lista; LDR-06 le aveva tolte per il costo nel ciclo 02.",
+            f"`{L6}`: −1 NEU-004, −1 VER-010, +2 NER-002 (escono le due carte da 1–2 più deboli della lista, "
+            "entrate in B0c05 come sostituti di NEU-001 e VER-001); −1 VER-021, +1 NER-019 (stessa carta: Sconfiggi Ruotata costo ≤4 e pesca 1, costo 4). "
+            "Colori: V −2, N +3; Unità 27 → 25.",
+            "Il contatore `cost_paid` del motore R-025 registra quale costo si paga, per carta."]
+
+
 def P(s, m):
     card(s, "NEU-013")["power"] = 2
     card(s, "NEU-013")["_note"] = (card(s, "NEU-013").get("_note", "") + " E-030 P-2c: Forza 3 → 2 (testo invariato).").strip()
@@ -114,7 +138,7 @@ base_ids = BASETR.split(",")
 # carte entrate in B0c05: per ogni lista, gli ID che la stessa lista di B0c03 non aveva
 entrate = sorted({c for d in MAZ["mazzi"] for c in d["cards"] if c not in deck(OLD, d["name"])["cards"]})
 TRACCIA = ",".join(dict.fromkeys(base_ids + ["LDR-02", "LDR-03", "LDR-04", "LDR-06", "VER-012", "VER-013", "VER-023"] + entrate
-                                 + sorted(set(ROTT_L5) - set(base_ids)) + ["NEW-V05", "NEW-B06"]))
+                                 + sorted(set(ROTT_L5) - set(base_ids)) + ["NER-002", "NER-019", "NEU-004", "VER-021", "NEW-V05", "NEW-B06"]))
 
 ARMS = {  # nome: (leve, voto, protagonisti, incroci, ore, riferimento)
     "00_B0c05": ([], "riferimento B0c05 (V1, 2 copie per nome)", "tutti", 15, 10.8,
@@ -124,7 +148,9 @@ ARMS = {  # nome: (leve, voto, protagonisti, incroci, ore, riferimento)
     "M3": ([M3], "M3, 8/8 (costo 6, F5)", "6", 5, 3.6, "E-030_q026/00_B0c05 F_s3400"),
     "R5-2c": ([R52C], "rottura a 2 copie di L5 del critico (verifica_critico.md, proposta di misura)", "5", 5, 3.6,
               "E-030_q026/00_B0c05 F_s3400"),
-    "P-2c": ([P], "C: P rimisurata su B0c05 solo se lo screening di E-029 dà Δ05 ≤ −1.5 (condizionale)", "1,5", 9, 6.5,
+    "M1": ([M1], "M1, variante del nero 6/8 (approvata con condizione: contatore del costo pagato)", "3,6", 9, 6.5,
+           "E-030_q026/00_B0c05 F_s3400"),
+    "P-2c": ([P], "C: P rimisurata su B0c05 (lo screening di E-029 dà Δ05 −2.5 ≤ −1.5: si lancia)", "1,5", 9, 6.5,
              "E-030_q026/00_B0c05 F_s3400"),
 }
 for name, (levers, who, prot, inc, ore, ref) in ARMS.items():

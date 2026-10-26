@@ -3,7 +3,7 @@
 - **Cosa cambia rispetto a B0c05 (carte B0c03 + liste B0c05):**
   - Le leve di P di E-029, identiche: NEU-013 Forza 3 → 2, BLU-008 Forza 2 → 1 (`power`, testo invariato); LDR-05 Base senza testo (`base: []`), Risvegliato invariato.
   - `rif_LDR05_scudi_armati` è quella di B0c05: NEU-013 ×2, BLU-008 ×2 (in B0c03 erano ×3 e ×3).
-- **Voto / ruolo:** C: P rimisurata su B0c05 solo se lo screening di E-029 dà Δ05 ≤ −1.5 (condizionale).
+- **Voto / ruolo:** C: P rimisurata su B0c05 (lo screening di E-029 dà Δ05 −2.5 ≤ −1.5: si lancia).
 - **Liste nel braccio:**
   - `rif_LDR01_puntata_e_preda`: 40 carte, 28 Unità, 0 Scudo, colori G 16 R 22, massimo copie 2.
   - `rif_LDR02_muro_di_parata`: 40 carte, 17 Unità, 11 Scudo, colori B 25 K 9, massimo copie 2.
