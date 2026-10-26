@@ -115,3 +115,12 @@ DT forte:30 L3-L5 seed 3311 fatto
 DT forte:30 L4-L5 seed 3313 fatto
 DT forte:30 L5-L6 seed 3315 fatto
 2026-10-25T23:15:36Z fine DT forte:30 3300
+2026-10-25T23:15:38Z push DT forte, semi 3300 ok
+2026-10-25T23:15:42Z copia nella cartella condivisa ok (DT forte, semi 3300)
+2026-10-25T23:15:42Z inizio D20-21 forte:30 100 3300 5
+D20-21 forte:30 L1-L5 seed 3304 fatto
+D20-21 forte:30 L2-L5 seed 3308 fatto
+D20-21 forte:30 L3-L5 seed 3311 fatto
+D20-21 forte:30 L4-L5 seed 3313 fatto
+D20-21 forte:30 L5-L6 seed 3315 fatto
+2026-10-26T01:00:51Z fine D20-21 forte:30 3300
