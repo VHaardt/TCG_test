@@ -20,6 +20,7 @@ Decision points (`state.phase`):
 With pugno = "simultaneo" the defender's agent must not read `combat.a`; with
 "sequenziale" it may (`combat.a_visible`)."""
 import dataclasses
+import itertools
 import json
 import os
 import random
@@ -61,6 +62,11 @@ def load_cards(path=DATA):
 from .validate import CONDITIONS as CONDS, SELECTOR as SEL_KEYS   # noqa: E402
 
 load_cards()
+
+
+def _plan(plan):
+    """Extra element of an action for a cost plan; nothing for the fixed costs of before (same actions)."""
+    return () if plan is None else (plan,)
 
 
 class Unit:
@@ -171,6 +177,9 @@ def new_stats():
         "first_hit_round": [None, None], "peak2": [0, 0],                # M13 picco: Forza massima a 2 gemme
         "solo_unit_turns": [0, 0], "caccia_leader_atk": [0, 0],          # R-013
         "fa_alta_wins": [0, 0], "fa_alta_by": [{}, {}],                  # R-017: scontri vinti con Forza d'attacco ≥ FA_ALTA
+        # Q-026 M5: Rimarginare e costi per round, costo scelto
+        "rim_round": [{}, {}], "life_costs_round": [{}, {}],
+        "cost_paid": [{}, {}],                                           # "<carta> vita" / "<carta> stanca": costo pagato, per carta
     }
 
 
@@ -703,32 +712,34 @@ class GameState:
             c = CARDS[cid]
             if c.cost > pl.brace or c.type == "reaction":
                 continue
-            if c.costs and not self.pay_costs(a, c.costs, check_only=True):
+            spec = (c.play or {}) if c.type == "tactic" else {}
+            plans = self.cost_plans(a, tuple(c.costs or ()) + tuple(spec.get("costs") or ()))
+            if not plans:
                 continue
             if c.type == "unit" and len(pl.units) < self.r.max_units:
-                acts.append(("play", cid, None))
+                acts += [("play", cid, None) + _plan(pp) for pp in plans]
             elif c.type == "relic" and len(pl.relics) < self.r.max_relics:
-                acts.append(("play", cid, None))
+                acts += [("play", cid, None) + _plan(pp) for pp in plans]
             elif c.type == "tactic":
-                spec = c.play or {}
-                if self.pay_costs(a, spec.get("costs"), check_only=True):
-                    for t in self._targets(a, spec.get("target")):
-                        acts.append(("play", cid, t))
+                for t in self._targets(a, spec.get("target")):
+                    acts += [("play", cid, t) + _plan(pp) for pp in plans]
         rim_cost = self.modifier(a, "rim_cost", 1)
         if pl.l_ready and pl.brace >= rim_cost:
             for cid in sorted({sc[0] for sc in pl.scars if not sc[1]}):
                 acts.append(("rim", cid))
         if pl.l_ready:
             for i, ab in enumerate(self.leader_abilities(a)):
-                if ab.get("activated") and pl.brace >= ab.get("cost", 0) and self.pay_costs(a, ab.get("costs"), True):
-                    for t in self._targets(a, ab.get("target")):
-                        acts.append(("ability", "L", i, t))
+                if ab.get("activated") and pl.brace >= ab.get("cost", 0):
+                    plans = self.cost_plans(a, ab.get("costs"))
+                    for t in self._targets(a, ab.get("target")) if plans else ():
+                        acts += [("ability", "L", i, t) + _plan(pp) for pp in plans]
         for u in pl.units:
             if u.ready:
                 for i, ab in enumerate(CARDS[u.cid].abilities):
-                    if ab.get("activated") and pl.brace >= ab.get("cost", 0) and self.pay_costs(a, ab.get("costs"), True):
-                        for t in self._targets(a, ab.get("target")):
-                            acts.append(("ability", u.uid, i, t))
+                    if ab.get("activated") and pl.brace >= ab.get("cost", 0):
+                        plans = self.cost_plans(a, ab.get("costs"), exclude=u.uid)
+                        for t in self._targets(a, ab.get("target")) if plans else ():
+                            acts += [("ability", u.uid, i, t) + _plan(pp) for pp in plans]
         if self.can_attack(a):
             if pl.l_ready:
                 acts.append(("attack", "L"))
@@ -755,7 +766,49 @@ class GameState:
                 for _ in range(c.get("lose_life", 0)):
                     self.lose_life(q, "costo")
                     self.stat_add("life_costs", q)
+                    self.stat_add("life_costs_round", q, self.round)
         return True
+
+    def cost_plans(self, q, costs, exclude=None):
+        """Ways to pay costs. [None]: only fixed costs (Vita), payable as before; []: not payable.
+        With stanca_own or any (Q-026 M1) every way is its own plan, a tuple of ("vita", n, floor)
+        and ("stanca", uid), offered as a separate legal action: no way is tried before another."""
+        costs = tuple(costs or ())
+        if not any("stanca_own" in c or "any" in c for c in costs):
+            return [None] if self.pay_costs(q, costs, check_only=True) else []
+        ready = [u.uid for u in self.p[q].units if u.ready and u.uid != exclude]
+
+        def ways(c):
+            if "any" in c:
+                return [w for x in c["any"] for w in ways(x)]
+            if "stanca_own" in c:
+                return [tuple(("stanca", uid) for uid in comb) for comb in itertools.combinations(ready, c["stanca_own"])]
+            return [(("vita", c["lose_life"], c.get("floor", 0)),)]
+        plans = [()]
+        for c in costs:
+            plans = [p + w for p in plans for w in ways(c)]
+        out = []
+        for p in plans:
+            uids = [x[1] for x in p if x[0] == "stanca"]
+            life = sum(x[1] for x in p if x[0] == "vita")
+            floor = max([x[2] for x in p if x[0] == "vita"] or [0])
+            if len(uids) == len(set(uids)) and (not life or self.can_pay_life(q, life, floor)) and p not in out:
+                out.append(p)
+        return out
+
+    def pay_plan(self, q, plan, cid):
+        """Pays a plan of cost_plans; the cost chosen is counted per card (Q-026 M1)."""
+        for x in plan:
+            if x[0] == "vita":
+                for _ in range(x[1]):
+                    self.lose_life(q, "costo")
+                    self.stat_add("life_costs", q)
+                    self.stat_add("life_costs_round", q, self.round)
+            else:
+                u = self.unit(q, x[1])
+                u.ready = False
+                self.say(f"    P{q+1} Stanca {CARDS[u.cid].name} per pagare il costo")
+            self.stat_add("cost_paid", q, f"{cid} {x[0]}")
 
     # ------------------------------------------------------------------ step
     def step(self, act):
@@ -808,7 +861,7 @@ class GameState:
         if k == "end":
             self.end_turn()
         elif k == "play":
-            self._play(a, act[1], act[2])
+            self._play(a, act[1], act[2], act[3] if len(act) > 3 else None)
         elif k == "rim":
             pl.l_ready = False
             self._lrot(a, "rim")
@@ -819,6 +872,7 @@ class GameState:
                     break
             pl.hand.append(act[1])
             self.stat_add("rim_used", a)
+            self.stat_add("rim_round", a, self.round)
             self.say(f"  P{a+1} Rimargina {CARDS[act[1]].name}")
         elif k == "ability":
             src, i, t = act[1], act[2], act[3]
@@ -831,7 +885,10 @@ class GameState:
                 ab = CARDS[u.cid].abilities[i]
                 u.ready = False
             pl.brace -= ab.get("cost", 0)
-            self.pay_costs(a, ab.get("costs"))              # Cicatrici contate prima (bersaglio già scelto)
+            if len(act) > 4:
+                self.pay_plan(a, act[4], LEADERS[pl.leader].id if src == "L" else u.cid)
+            else:
+                self.pay_costs(a, ab.get("costs"))          # Cicatrici contate prima (bersaglio già scelto)
             self.stat_add("activations", a, LEADERS[pl.leader].id if src == "L" else u.cid)
             if src == "L" and self.track is not None:
                 self.track.setdefault("lead_act", []).append(LEADERS[pl.leader].id)
@@ -849,14 +906,17 @@ class GameState:
         owner = a if (sel or {}).get("side", "own") == "own" else 1 - a
         return {"chosen": t, "chosen_owner": owner}
 
-    def _play(self, a, cid, target):
+    def _play(self, a, cid, target, plan=None):
         pl = self.p[a]
         c = CARDS[cid]
         pl.hand.remove(cid)
         pl.brace -= c.cost
         self.stat_add("cards_played", a, cid)
         self.say(f"  P{a+1} gioca {c.name}")
-        self.pay_costs(a, c.costs)
+        if plan is not None:
+            self.pay_plan(a, plan, cid)                     # tutti i costi della carta, nel modo scelto
+        else:
+            self.pay_costs(a, c.costs)
         if c.type == "unit":
             u = Unit(self.next_uid, cid, ready=c.has("assalto"))
             self.next_uid += 1
@@ -866,7 +926,8 @@ class GameState:
             pl.relics.append(cid)
         else:
             spec = c.play or {}
-            self.pay_costs(a, spec.get("costs"))
+            if plan is None:
+                self.pay_costs(a, spec.get("costs"))
             self.run_ops(a, spec.get("do", []), self._chosen(a, spec.get("target"), target))
             pl.discard.append(cid)
 

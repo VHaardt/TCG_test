@@ -146,9 +146,27 @@ class _V:
             self.err(where, "'costs' deve essere una lista")
             return
         for i, c in enumerate(costs):
-            if self.keys(f"{where}[{i}]", c, {"lose_life", "floor"}):
-                if not isinstance(c.get("lose_life"), int):
-                    self.err(f"{where}[{i}]", "'lose_life' vuole un intero")
+            self.cost(f"{where}[{i}]", c, nested=False)
+
+    def cost(self, where, c, nested):
+        """One cost: {"lose_life": N, "floor": F}, {"stanca_own": N} (Stanca N tue Unità Pronte) or
+        {"any": [cost, ...]} (paghi uno dei costi a scelta; Q-026 M1)."""
+        if not isinstance(c, dict):
+            self.err(where, "un costo è un oggetto")
+            return
+        if "any" in c and not nested:
+            if self.keys(where, c, {"any"}):
+                if not isinstance(c["any"], list) or len(c["any"]) < 2:
+                    self.err(where, "'any' vuole una lista di almeno 2 costi")
+                    return
+                for j, x in enumerate(c["any"]):
+                    self.cost(f"{where}.any[{j}]", x, nested=True)
+        elif "stanca_own" in c:
+            if self.keys(where, c, {"stanca_own"}) and (not isinstance(c["stanca_own"], int) or c["stanca_own"] < 1):
+                self.err(where, "'stanca_own' vuole un intero ≥ 1")
+        elif self.keys(where, c, {"lose_life", "floor"}):
+            if not isinstance(c.get("lose_life"), int):
+                self.err(where, "'lose_life' vuole un intero")
 
     def ability(self, where, ab):
         if not isinstance(ab, dict):
