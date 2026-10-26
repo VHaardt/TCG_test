@@ -74,3 +74,16 @@ P semplice L3-L5 gia' fatto, salto
 P semplice L4-L5 gia' fatto, salto
 P semplice L5-L6 gia' fatto, salto
 2026-10-26T21:32:53Z fine P semplice 2000
+2026-10-26T21:32:57Z push P IA semplice, semi 2000 ok
+2026-10-26T21:33:00Z copia nella cartella condivisa ok (P IA semplice, semi 2000)
+2026-10-26T21:33:00Z inizio P forte:30 200 3200 1,5
+P forte:30 L1-L2 gia' fatto, salto
+P forte:30 L1-L3 gia' fatto, salto
+P forte:30 L1-L4 gia' fatto, salto
+P forte:30 L1-L5 gia' fatto, salto
+P forte:30 L1-L6 gia' fatto, salto
+P forte:30 L2-L5 gia' fatto, salto
+P forte:30 L3-L5 gia' fatto, salto
+P forte:30 L4-L5 gia' fatto, salto
+P forte:30 L5-L6 gia' fatto, salto
+2026-10-26T21:33:00Z fine P forte:30 3200
