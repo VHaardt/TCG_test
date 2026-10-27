@@ -118,3 +118,12 @@ P forte:30 L3-L5 gia' fatto, salto
 P forte:30 L4-L5 gia' fatto, salto
 P forte:30 L5-L6 gia' fatto, salto
 2026-10-27T01:17:24Z fine P forte:30 3200
+2026-10-27T01:17:26Z push P forte, semi 3200 ok
+2026-10-27T01:17:26Z copia nella cartella condivisa ok (P forte, semi 3200)
+2026-10-27T01:17:26Z inizio 00_B0c03 forte:30 200 3300 5
+00_B0c03 forte:30 L1-L5 gia' fatto, salto
+00_B0c03 forte:30 L2-L5 gia' fatto, salto
+00_B0c03 forte:30 L3-L5 gia' fatto, salto
+00_B0c03 forte:30 L4-L5 seed 3313 fatto
+00_B0c03 forte:30 L5-L6 seed 3315 fatto
+2026-10-27T02:37:10Z fine 00_B0c03 forte:30 3300
