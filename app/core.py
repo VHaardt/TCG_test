@@ -5,6 +5,7 @@ Il motore è sim/v02 usato come libreria: l'app non contiene regole del gioco.
 - Regole: un preset di sim/v02/config.py o un file json di variante (CICATRICI_REGOLE).
 - Costruzione: sim/v02/decks.problems (40 carte, 3 copie per ID, colori del Leader o Neutrali).
 Ogni azione mostrata al giocatore è un elemento di GameState.legal_actions()."""
+import copy
 import json
 import os
 import random
@@ -16,7 +17,7 @@ import time
 
 from sim.v02 import engine, decks
 from sim.v02.config import PRESETS, rules_from
-from sim.v02.engine import CARDS, LEADERS, G1, G2
+from sim.v02.engine import CARDS, LEADERS, G1, G2, COMBAT_CONDS
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 SHARED = "/mnt/project-files/tcg/set/finale"
@@ -181,7 +182,7 @@ class Posto:
 
 class Stanza:
     def __init__(self, modalita, nome, contro_ia=False):
-        if modalita not in ("costruito", "draft"):
+        if modalita not in ("costruito", "pronti", "draft"):
             raise ValueError("modalità sconosciuta")
         dati()
         self.codice = None
@@ -236,7 +237,7 @@ class Stanza:
         if self.partita:
             raise ValueError("partita in corso")
         if self.modalita != "costruito":
-            raise ValueError("in modalità draft il mazzo nasce dal draft")
+            raise ValueError("in questa modalità non si costruisce il mazzo")
         carte = {cid: int(k) for cid, k in (carte or {}).items() if int(k) > 0}
         pr = decks.problems(leader, carte)
         if pr:
@@ -245,8 +246,21 @@ class Stanza:
         p.leader, p.carte, p.pronto = leader, carte, True
         self._forse_inizia()
 
+    def scegli_pronto(self, i, nome):
+        """Modalità "pronti": il mazzo è uno dei mazzi di riferimento, scelto per nome."""
+        if self.partita:
+            raise ValueError("partita in corso")
+        if self.modalita != "pronti":
+            raise ValueError("questa stanza non usa i mazzi pronti")
+        m = next((m for m in dati().riferimento if m["nome"] == nome), None)
+        if m is None:
+            raise ValueError("mazzo sconosciuto")
+        p = self.posti[i]
+        p.leader, p.carte, p.pronto = m["leader"], dict(m["carte"]), True
+        self._forse_inizia()
+
     def annulla_pronto(self, i):
-        if not self.partita and self.modalita == "costruito":
+        if not self.partita and self.modalita in ("costruito", "pronti"):
             self.posti[i].pronto = False
 
     def draft_leader(self, i, lid):
@@ -278,7 +292,7 @@ class Stanza:
         engine.new_game(mazzi[0][0], mazzi[0][1], mazzi[1][0], mazzi[1][1], rules=dati().rules, seed=seed,
                         mulligan=guarda)
         self.partita = {"s": None, "seats": seats, "versione": 0, "mazzi": mazzi, "seed": seed, "mani": mani,
-                        "mulligan": [None, None], "attesa": None}
+                        "mulligan": [None, None], "attesa": None, "storia": []}
         self.n_partita += 1
         if any(p.ia for p in self.posti):
             from sim.v02.agents import RuleAgent2
@@ -346,9 +360,35 @@ class Stanza:
         acts = s.legal_actions()
         if not 0 <= indice < len(acts):
             raise ValueError("azione non valida")
+        q = self.q_di(i)
+        # si torna indietro solo sulle proprie scelte fatte dopo l'ultima scelta dell'avversario
+        m["storia"] = [h for h in m["storia"] if h["i"] == i][-STORIA_MAX + 1:]
+        m["storia"].append({"i": i, "s": istantanea(s), "segreti": segreti(s, q)})
         m["attesa"] = {"act": acts[indice], "scelte": [], "domanda": None}
         if self._esegui():
             self._turni_ia()
+
+    def annullabile(self, i):
+        """Si può tornare a prima dell'ultima scelta di i finché l'avversario umano non ha scelto
+        nulla e non si è scoperta nessuna carta nascosta (pescate, Vite girate, carte dalla mano
+        dell'avversario): tornare indietro non deve far vedere niente di nuovo."""
+        m = self.partita
+        if not m or m["s"] is None or m["s"].over or not m["storia"] or m["storia"][-1]["i"] != i:
+            return False
+        att = m["attesa"]
+        if att and att["domanda"] and self.q_di(i) != att["domanda"]["q"]:
+            return False
+        return segreti(m["s"], self.q_di(i)) == m["storia"][-1]["segreti"]
+
+    def annulla(self, i):
+        m = self.partita
+        if not self.annullabile(i):
+            raise ValueError("non puoi più tornare indietro su questa scelta")
+        h = m["storia"].pop()
+        m["s"] = h["s"]
+        m["attesa"] = None
+        m["s"].say(f"  P{self.q_di(i) + 1} torna indietro sull'ultima scelta")
+        m["versione"] += 1
 
     def bersaglio(self, i, versione, uid):
         """Risposta alla domanda aperta da un trigger con più bersagli possibili."""
@@ -362,6 +402,7 @@ class Stanza:
             raise ValueError("il bersaglio lo sceglie l'avversario")
         if uid not in d["cands"]:
             raise ValueError("bersaglio non valido")
+        m["storia"] = [h for h in m["storia"] if h["i"] == i]
         m["attesa"]["scelte"].append(uid)
         m["attesa"]["domanda"] = None
         if self._esegui():
@@ -388,7 +429,7 @@ class Stanza:
         s.trigger_target = lambda q, sel, cands: (scelte.pop(0) if scelte else
                                                   engine.GameState.trigger_target(s, q, sel, cands))
         try:
-            s.step(att["act"])
+            passo(s, att["act"])
         finally:
             del s.trigger_target
         m["attesa"] = None
@@ -430,7 +471,7 @@ class Stanza:
                "fase": "partita" if self.partita else "preparazione", "n_partita": self.n_partita}
         if me.draft and not self.partita:
             out["draft"] = me.draft.vista()
-        if not self.partita and self.modalita == "costruito" and me.carte:
+        if not self.partita and self.modalita in ("costruito", "pronti") and me.carte:
             out["mio_mazzo"] = {"leader": me.leader, "carte": me.carte}
         if self.partita:
             out["partita"] = vista_partita(self, i)
@@ -462,7 +503,9 @@ def vista_partita(stanza, i):
         "nomi": {"io": nomi[q], "avversario": nomi[1 - q]},
         "combattimento": vista_scontro(s, q), "azioni": [], "log": tradotto(s.log[-80:], nomi), "log_n": len(s.log),
         "eventi": eventi(s.log, q, max(0, len(s.log) - 80)),
-        "regole": {"saldo": s.saldo_cap(), "crepuscolo": s.r.crepuscolo_round, "round_max": s.r.max_rounds},
+        "regole": {"saldo": s.saldo_cap(), "crepuscolo": s.r.crepuscolo_round, "round_max": s.r.max_rounds,
+                   "corde_a_1": s.r.corde_one_life_round},
+        "puoi_annullare": stanza.annullabile(i),
     }
     if s.over:
         out["fine"] = {"vincitore": None if s.winner is None else nomi[s.winner],
@@ -474,6 +517,49 @@ def vista_partita(stanza, i):
     elif dec == q:
         out["azioni"] = [{"i": k, **etichetta(s, q, a)} for k, a in enumerate(s.legal_actions())]
     return out
+
+
+STORIA_MAX = 30
+
+
+def istantanea(s):
+    """Copia completa della partita (registro e statistiche compresi); le regole restano condivise."""
+    return copy.deepcopy(s, {id(s.r): s.r})
+
+
+def segreti(s, q):
+    """Ciò che, se cambia, ha mostrato a q qualcosa di nascosto: carte pescate, Vite girate,
+    carte uscite dalla mano dell'avversario."""
+    return (tuple(len(p.deck) for p in s.p), tuple(len(p.life) for p in s.p), tuple(s.p[1 - q].hand))
+
+
+def passo(s, act):
+    """s.step(act). Se un attacco va a segno sul Leader e non toglie Vite, il motore lo tace: l'app
+    aggiunge al registro una riga che dice perché (Saldo raggiunto, §9.3, o 0 Vite con una Cicatrice
+    fresca, §9.2 e §9.5), così al tavolo si capisce che è la regola e non un errore."""
+    pre = [(len(p.life), p.fresh()) for p in s.p]
+    cap, k = s.saldo_cap(), len(s.log)
+    s.step(act)
+    if s.over:
+        return
+    log = s.log
+    for n in range(len(log) - 1, k - 1, -1):
+        m = EVENTI_RX["scontro"].search(log[n])
+        if not m or int(m["fa"]) < int(m["db"]) or "oppone" in log[n - 1] or "(Caccia" in log[n - 1]:
+            continue
+        att = next(int(x[3]) - 1 for x in reversed(log[:n]) if " attacca con" in x)
+        d = 1 - att
+        dopo = log[n + 1:]
+        if any(x.startswith(f"    P{d + 1} perde 1 Vita") for x in dopo):
+            continue
+        vite, fresche = pre[d]
+        if fresche >= cap:
+            perche = f"Saldo raggiunto ({fresche} Cicatrici fresche in questo turno, il massimo è {cap})"
+        elif vite == 0:
+            perche = "è già a 0 Vite e ha una Cicatrice fresca, quindi niente colpo finale in questo turno"
+        else:
+            continue
+        log.insert(n + 1, f"    P{d + 1} non perde Vite: {perche}")
 
 
 def prova(s, act, scelte):
@@ -527,7 +613,9 @@ EVENTI = [
     ("vita", re.compile(r"^    P(?P<p>[12]) perde 1 Vita")),
     ("sconfitta", re.compile(r"^    (?P<carta>\S+) di P(?P<p>[12]) è sconfitta")),
     ("risveglio", re.compile(r"^    P(?P<p>[12]): il Leader si Risveglia")),
+    ("ignorata", re.compile(r"^    P(?P<p>[12]) non perde Vite: (?P<perche>.+)$")),
 ]
+EVENTI_RX = dict(EVENTI)
 
 
 def eventi(log, q, start):
@@ -560,12 +648,79 @@ def vista_giocatore(s, q, mio):
         "guardia_max": s.guard_max(q), "mazzo": len(pl.deck), "mano_n": len(pl.hand),
         "cicatrici": [{"id": sc[0], "fresca": bool(sc[1])} for sc in pl.scars],
         "unita": [{"uid": u.uid, "id": u.cid, "pronta": u.ready, "forza": s.unit_power(q, u, outside=True),
-                   "forza_stampata": CARDS[u.cid].power} for u in pl.units],
+                   "forza_stampata": CARDS[u.cid].power, "mod": modificatori(s, q, u)} for u in pl.units],
         "reliquie": list(pl.relics), "scarti": list(pl.discard),
     }
     if mio:
         out["mano"] = list(pl.hand)
     return out
+
+
+def modificatori(s, q, u):
+    """Da dove viene la Forza attuale di un'Unità: [{"fonte", "v"}], più i bonus "in scontro" già attivi
+    adesso (Furia, Cicatrici, Risveglio) con "scontro": True. Ricalca unit_power(outside=True); se un
+    giorno non torna, la differenza compare come "altro" invece di sparire."""
+    c = CARDS[u.cid]
+    out = []
+    for ab in c.abilities:
+        if ab.get("static") != "power" or "applies_to" in ab:
+            continue
+        conds = ab.get("if") or []
+        if not conds:
+            out.append({"fonte": u.cid, "v": s.num(ab["value"], q)})
+        elif not any(set(k) & COMBAT_CONDS for k in conds) and s.cond_ok(q, conds, {"self": u.uid}):
+            out.append({"fonte": u.cid, "v": s.num(ab["value"], q), "scontro": True})
+    for sid, ab in s.sources(q, "aura"):
+        if ab.get("static") != "power" or "applies_to" not in ab:
+            continue
+        sel = ab["applies_to"]
+        if sel.get("attacker") or any(set(k) & COMBAT_CONDS for k in ab.get("if") or []):
+            continue
+        if sel.get("side", "own") == "own" and s.matches(q, u, sel, {"self": u.uid}) \
+                and s.cond_ok(q, ab.get("if"), {"self": u.uid}):
+            out.append({"fonte": sid, "v": s.num(ab["value"], q)})
+    resto = s.unit_power(q, u, outside=True) - c.power - sum(x["v"] for x in out if not x.get("scontro"))
+    if resto:
+        out.append({"fonte": "altro", "v": resto})
+    return [x for x in out if x["v"]]
+
+
+def conto_scontro(s, cb, a_gems, d_gems):
+    """Fa e Db dal vivo con le gemme già impegnate, divisi in parti: base, gemme, Parata, Reazione,
+    abilità ed effetti (con le carte che li danno, dalla traccia del motore)."""
+    a, d = s.active, 1 - s.active
+    react = cb.react if d_gems else None
+    trace = {"src": []}
+    try:
+        fa, db, _ = s.compute(a_gems, d_gems, react, cb.opposer, trace=trace)
+    except Exception:
+        return None
+    pa = s.p[a]
+    tgt = cb.target()
+    if cb.att == "L":
+        base_a, nome_a = (s.r.leader_power_awakened if pa.awakened else s.r.leader_power), "Forza del Leader"
+    else:
+        u = s.unit(a, cb.att)
+        base_a, nome_a = (CARDS[u.cid].power if u else 0), "Forza stampata"
+    if tgt is None:
+        base_d, nome_d = s.tempra(d), "Tempra del Leader"
+    else:
+        tu = s.unit(d, tgt)
+        base_d, nome_d = (CARDS[tu.cid].power if tu else 0), "Forza stampata"
+    costo = max(CARDS[react[0]].cost, 1) if react and d_gems >= max(CARDS[react[0]].cost, 1) else 0
+    parata = (d_gems - costo) * s.parata_per_gemma(d)
+    gem_a = a_gems * s.r.forza_per_gemma
+    fonti = lambda side: sorted({cid for qq, cid in trace["src"] if qq == side and (not react or cid != react[0])})
+    att = [{"t": nome_a, "v": base_a}, {"t": f"{a_gems} gemme di Brace", "v": gem_a}]
+    dif = [{"t": nome_d, "v": base_d}, {"t": f"Parata ({d_gems - costo} gemme)", "v": parata}]
+    ra, rd = fa - base_a - gem_a, db - base_d - parata
+    if costo:
+        dif.append({"t": f"Reazione {react[0]}", "v": None})
+    if ra:
+        att.append({"t": "abilità ed effetti" + (": " + ", ".join(fonti(a)) if fonti(a) else ""), "v": ra})
+    if rd:
+        dif.append({"t": "abilità ed effetti" + (": " + ", ".join(fonti(d)) if fonti(d) else ""), "v": rd})
+    return {"fa": fa, "db": db, "att": [x for x in att if x["v"] != 0], "dif": [x for x in dif if x["v"] != 0]}
 
 
 def vista_scontro(s, q):
@@ -579,7 +734,8 @@ def vista_scontro(s, q):
             "opposta_ref": cb.opposer,
             "bersaglio": s.describe(1 - a, tgt) if tgt is not None else "Leader",
             "opposta_da": s.describe(1 - a, cb.opposer) if cb.opposer is not None else None,
-            "gemme_attacco": cb.a if visibile else None}
+            "gemme_attacco": cb.a if visibile else None,
+            "conto": conto_scontro(s, cb, cb.a if visibile else 0, cb.d or 0)}
 
 
 def _forza_su(s, a_gems, d_gems=0, react=None):

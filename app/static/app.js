@@ -86,12 +86,20 @@ function leaderTesti(id, risv = null) {
     <div style="${risv === false ? "opacity:.45" : ""}"><b>Risvegliato.</b> ${l.risvegliato.map(mdish).join(" ")}</div></div>`;
 }
 
+// modificatori dal vivo di un'Unità in campo, sotto l'anteprima
+function modHTML(el) {
+  if (!el.dataset.mod) return "";
+  const mod = JSON.parse(el.dataset.mod), c = CARTA[el.dataset.card];
+  return `<div class="pannello mod-box"><b>Forza ${c.forza}</b> stampata${mod.map((m) =>
+    `<div class="${m.scontro ? "cond" : m.v > 0 ? "su" : "giu"}">${m.v > 0 ? "+" : ""}${m.v} ${m.fonte === "altro" ? "altri effetti" : m.fonte === el.dataset.card ? "propria abilità" : `da ${esc(m.fonte)}`}${m.scontro ? " (solo negli scontri, già attivo)" : ""}</div>`).join("")}</div>`;
+}
+
 // anteprima ingrandita al passaggio del mouse
 function anteprima(e) {
   const el = e.target.closest("[data-card],[data-leader]");
   const box = $("#anteprima");
   if (!el || el.closest("#anteprima") || el.closest(".offerta")) { box.style.opacity = 0; return; }
-  if (el.dataset.card) box.innerHTML = cartaHTML(el.dataset.card, { classi: "grande" });
+  if (el.dataset.card) box.innerHTML = cartaHTML(el.dataset.card, { classi: "grande" }) + modHTML(el);
   else box.innerHTML = `<div class="pannello" style="width:280px">${eroeHTML(el.dataset.leader)}<h3>${esc(el.dataset.leader)}</h3>${leaderTesti(el.dataset.leader)}</div>`;
   const r = el.getBoundingClientRect();
   const w = 240, h = 340;
@@ -177,7 +185,7 @@ function render() {
   if (!inStanza) { $("#info-stanza").innerHTML = ""; $("#gioco").innerHTML = ""; return; }
   const link = `${location.origin}${location.pathname}?stanza=${stato.codice}`;
   const gioc = stato.giocatori.map((g, i) => `${esc(g.nome)}${i === stato.io ? " (tu)" : ""}${g.pronto ? " ✓" : ""}`).join(" · ");
-  $("#info-stanza").innerHTML = `Stanza <b>${stato.codice}</b> · ${stato.modalita === "draft" ? "Draft" : "Costruito"} · ${gioc}
+  $("#info-stanza").innerHTML = `Stanza <b>${stato.codice}</b> · ${{ draft: "Draft", pronti: "Mazzi pronti" }[stato.modalita] || "Costruito"} · ${gioc}
     ${stato.giocatori.length < 2 ? ` · invita: <input readonly value="${esc(link)}" onclick="this.select()" size="30">` : ""}
     <button class="piccolo" id="esci">Esci</button>`;
   $("#esci").onclick = esci;
@@ -201,11 +209,29 @@ function renderPrep() {
   if (io.pronto) {
     const altro = stato.giocatori.length < 2 ? "Aspetto che entri il secondo giocatore." : "Aspetto l'avversario.";
     $("#prep").innerHTML = `<div class="pannello" style="text-align:center"><h2>Pronto!</h2><p>${altro} La partita inizia da sola quando siete pronti entrambi.</p>
-      ${stato.modalita === "costruito" ? '<button class="piccolo" id="annulla">Modifica il mazzo</button>' : ""}</div>`;
+      ${stato.modalita !== "draft" ? `<button class="piccolo" id="annulla">${stato.modalita === "pronti" ? "Cambia mazzo" : "Modifica il mazzo"}</button>` : ""}</div>`;
     if ($("#annulla")) $("#annulla").onclick = () => act("/api/mazzo/annulla");
     return;
   }
-  if (stato.modalita === "draft") renderDraft(d); else renderCostruttore();
+  if (stato.modalita === "draft") renderDraft(d);
+  else if (stato.modalita === "pronti") renderPronti();
+  else renderCostruttore();
+}
+
+// ------------------------------------------------------------------ mazzi pronti
+function renderPronti() {
+  $("#prep").innerHTML = `<h2 style="text-align:center">Scegli un mazzo pronto</h2>
+    <p class="nota" style="text-align:center">Sono i mazzi di riferimento del set, già legali. Apri «Carte» per vedere la lista.</p>
+    <div class="mazzi-pronti">${CAT.mazzi.map((m, i) => {
+      const L = LEAD[m.leader], n = Object.values(m.carte).reduce((a, b) => a + b, 0);
+      return `<div class="pannello pronto-mazzo" style="${colVars(L.colori)}">
+        <div class="riga">${eroeHTML(m.leader)}<div><h3>${esc(m.nome.replace(/^(rif|mix)_/, "").replace(/_/g, " "))}</h3>
+          <p class="nota">${esc(m.leader)} · ${L.colori.map((c) => CAT.colori[c]).join("/")} · ${n} carte</p></div></div>
+        <p>${esc(m.note || "")}</p>
+        <details><summary>Carte</summary>${listaMazzo(m.carte)}</details>
+        <button class="oro" data-pm="${i}">Gioca con questo mazzo</button></div>`;
+    }).join("")}</div>`;
+  $$("[data-pm]", $("#prep")).forEach((b) => (b.onclick = () => act("/api/mazzo/pronto", { nome: CAT.mazzi[+b.dataset.pm].nome })));
 }
 
 // ------------------------------------------------------------------ draft
@@ -442,10 +468,12 @@ function unitaHTML(u, lato, extraCl = "") {
   const c = CARTA[u.id];
   const kw = c.parole.map((k) => KW[k] || "").join("");
   const delta = u.forza > u.forza_stampata ? "su" : u.forza < u.forza_stampata ? "giu" : "";
+  const mod = u.mod || [], inScontro = mod.filter((m) => m.scontro).reduce((a, m) => a + m.v, 0);
   return `<div class="unita ${u.pronta ? "" : "ruotata"} ${c.parole.includes("scudo") ? "scudo" : ""} ${extraCl}" style="${colVars(c.colori)}"
-      data-ent="${lato}:${u.uid}" data-card="${u.id}" data-uid="${lato}:${u.uid}">
+      data-ent="${lato}:${u.uid}" data-card="${u.id}" data-uid="${lato}:${u.uid}" ${mod.length ? `data-mod="${esc(JSON.stringify(mod))}"` : ""}>
     <div class="u-dentro"><span class="u-kw">${kw}</span><span class="icona">${ICONA[c.tipo]}</span><span class="u-nome">${esc(u.id)}</span></div>
-    <div class="u-forza ${delta}"><b>${u.forza}</b></div></div>`;
+    ${mod.length ? `<div class="u-mod">${mod.map((m) => `<span class="${m.scontro ? "cond" : m.v > 0 ? "su" : "giu"}">${m.v > 0 ? "+" : ""}${m.v}</span>`).join("")}</div>` : ""}
+    <div class="u-forza ${delta}"><b>${u.forza}</b>${inScontro ? `<small>+${inScontro}⚔</small>` : ""}</div></div>`;
 }
 
 function reliquiaHTML(id, k) {
@@ -472,6 +500,7 @@ function plancia(g, nome, lato) {
     <div class="risorse">
       <div class="nome-g">${esc(nome)} ${g.alle_corde ? '<span style="color:var(--life)">· Alle Corde</span>' : ""}</div>
       <div class="cuori" title="Vite" data-vite="${lato}">${cuori}</div>
+      ${statoVita(g)}
       <div class="gemme" title="Brace: gemme da spendere in questo turno">${gemmeHTML(g.brace, 0, "brace")} <span>Brace ${g.brace}</span></div>
       <div class="gemme" title="Guardia: gemme per difendersi">${gemmeHTML(g.guardia, g.guardia_max, "guardia")} <span>Guardia ${g.guardia}/${g.guardia_max}</span></div>
     </div>
@@ -480,6 +509,18 @@ function plancia(g, nome, lato) {
         <span class="pila" title="${esc(g.scarti.join(", "))}">🗑 ${g.scarti.length}</span></div>
       <div class="cicatrici"><span class="nota">Cicatrici:</span> ${cic || '<span class="nota">nessuna</span>'}</div>
     </div></div>`;
+}
+
+// Perché un colpo a segno può non togliere Vite (§9.2–9.5): lo si dice sotto i cuori
+function statoVita(g) {
+  const R = stato.partita.regole, fresche = g.cicatrici.filter((c) => c.fresca).length;
+  let t = "";
+  if (g.alle_corde && fresche) t = "Alle Corde, ma la Cicatrice fresca lo protegge fino a fine turno";
+  else if (g.alle_corde) t = "Alle Corde: il prossimo colpo a segno vince la partita";
+  else if (fresche >= R.saldo) t = `Saldo pieno (${fresche}/${R.saldo}): altri colpi in questo turno non tolgono Vite`;
+  else if (fresche) t = `Cicatrici fresche ${fresche}/${R.saldo}: oltre il Saldo i colpi non tolgono Vite`;
+  else if (g.vite === 1 && stato.partita.round < R.corde_a_1) t = `1 Vita: dal round ${R.corde_a_1} basta per essere Alle Corde`;
+  return t ? `<div class="stato-vita ${g.alle_corde && !fresche ? "pericolo" : ""}">${t}</div>` : "";
 }
 
 function campo(g, lato) {
@@ -504,7 +545,7 @@ function centroHTML(p) {
   const n = p.nomi;
   let s = `<span class="round">Round ${p.round}</span><span class="fase">${p.attivo_sei_tu ? "Il tuo turno" : `Turno di ${esc(n.avversario)}`} · ${esc(p.fase_testo)}</span>`;
   const cb = p.combattimento;
-  if (cb) s += `<span class="fase">⚔ <b>${esc(cb.attaccante)}</b> → <b>${esc(cb.bersaglio)}</b>${cb.opposta_da ? ` (si oppone ${esc(cb.opposta_da)})` : ""}${cb.gemme_attacco != null ? ` · gemme d'attacco ${cb.gemme_attacco}` : ""}</span>`;
+  if (cb) s += `<span class="fase">⚔ <b>${esc(cb.attaccante)}</b> → <b>${esc(cb.bersaglio)}</b>${cb.opposta_da ? ` (si oppone ${esc(cb.opposta_da)})` : ""}${cb.gemme_attacco != null ? ` · gemme d'attacco ${cb.gemme_attacco}` : ""}</span>${contoHTML(cb.conto)}`;
   if (p.fine) return `${s}<span class="fase"><b>${p.fine.hai_vinto ? "Hai vinto" : "Hai perso"}</b> (${esc(p.fine.motivo)})</span>
     <button class="oro" id="rivincita-c">Nuova partita</button>`;
   if (p.bersaglio) {
@@ -529,6 +570,14 @@ function centroHTML(p) {
       ${az.filter((a) => a.gruppo === "opposizione" && a.sorgente == null).map((a) => `<button data-i="${a.i}">${esc(a.testo)}</button>`).join("")}</div>`;
   }
   return s;
+}
+
+// Fa e Db dello scontro in corso, con le parti che li compongono
+function contoHTML(c) {
+  if (!c) return "";
+  const parti = (xs) => xs.map((x, k) => `${k ? (x.v != null && x.v < 0 ? " − " : " + ") : ""}${x.v != null ? Math.abs(x.v) : ""} <small>${esc(x.t)}</small>`).join("");
+  return `<span class="conto"><span class="att">Attacco <b>${c.fa}</b> = ${parti(c.att)}</span>
+    <span class="dif">Difesa <b>${c.db}</b> = ${parti(c.dif)}</span></span>`;
 }
 
 function registroHTML(p) {
@@ -600,6 +649,7 @@ function renderGioco() {
     </div>
     <div class="colonna">
       <button id="fine-turno" class="${p.tocca_a_te && p.fase === "main" ? "attivo" : "attesa"}">${p.fine ? "Partita finita" : p.tocca_a_te && p.fase === "main" ? "FINE TURNO" : p.tocca_a_te ? "Scegli…" : `Turno di ${esc(p.attivo_sei_tu ? p.nomi.io : p.nomi.avversario)}`}</button>
+      ${p.puoi_annullare ? '<button id="indietro" title="Annulla la tua ultima scelta: si può finché l\'avversario non ha scelto nulla e non si è scoperta nessuna carta">↶ Torna indietro</button>' : ""}
       <div id="mira-info" class="pannello nascosto"><span></span> <button class="piccolo" id="annulla-mira">Annulla</button></div>
       <div class="pannello"><h3>Registro</h3><div class="registro" id="registro">${registroHTML(p)}</div></div>
       <div class="pannello"><details><summary>Tutte le azioni (${p.azioni.length})</summary>
@@ -625,6 +675,7 @@ function collega(p) {
   const fine = tutte.find((a) => a.gruppo === "turno");
   $("#fine-turno").onclick = () => { if (fine) manda(fine); };
   $$("[data-i]").forEach((b) => (b.onclick = (e) => { e.stopPropagation(); manda(tutte.find((a) => a.i === +b.dataset.i)); }));
+  if ($("#indietro")) $("#indietro").onclick = () => act("/api/annulla");
   if ($("#resa")) $("#resa").onclick = () => { if (confirm("Vuoi davvero arrenderti?")) act("/api/resa"); };
   $("#annulla-mira").onclick = annullaMira;
   if ($("#rivincita-c")) $("#rivincita-c").onclick = () => { const f = $("#fine-partita"); if (f) f.remove(); act("/api/rivincita"); };
@@ -724,7 +775,12 @@ function anima(v, p, rects) {
   for (const e of ev) {
     if (e.t === "gioca" || (e.t === "rimargina" && e.chi === "avv")) passi.push(() => volaCarta(e, p));
     else if (e.t === "attacco") passi.push(() => affondo(e, p));
-    else if (e.t === "scontro") passi.push(() => scoppioScontro(e));
+    else if (e.t === "scontro") {
+      const dopo = ev.slice(ev.indexOf(e) + 1);
+      const fine = dopo.findIndex((x) => x.t === "scontro" || x.t === "attacco" || x.t === "turno");
+      const ign = (fine < 0 ? dopo : dopo.slice(0, fine)).find((x) => x.t === "ignorata");
+      passi.push(() => scoppioScontro(e, ign));
+    }
   }
   const turni = ev.filter((e) => e.t === "turno");
   if (turni.length && !p.fine) {
@@ -753,12 +809,14 @@ function affondo(e) {
   return sleep(350);
 }
 
-function scoppioScontro(e) {
+function scoppioScontro(e, ign) {
   const colpo = +e.fa >= +e.db;
   effimero(`<span class="vs"><span class="att">${e.fa}</span> ⚔ <span class="dif">${e.db}</span></span>
     <span class="esito ${colpo ? "colpo" : "parato"}">${colpo ? "A SEGNO!" : "RESPINTO"}</span>
-    ${e.carta ? `<span class="esito" style="font-size:16px">Reazione ${esc(e.carta)}</span>` : ""}`, "scontro-pop", 1400);
-  return sleep(900);
+    ${ign ? `<span class="esito perche">Nessuna Vita persa: ${esc(ign.perche)}</span>` : ""}
+    ${e.carta ? `<span class="esito" style="font-size:16px">Reazione ${esc(e.carta)}</span>` : ""}`,
+    ign ? "scontro-pop lungo" : "scontro-pop", ign ? 2600 : 1400);
+  return sleep(ign ? 1500 : 900);
 }
 
 function fineAnim(p) {
