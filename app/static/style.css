@@ -67,7 +67,12 @@ legend { color: var(--gold); }
 .carta .c-forza b, .unita .u-forza b { transform: rotate(-45deg); font: 800 16px Georgia, serif; text-shadow: 0 1px 2px #000; }
 .carta .c-rar { position: absolute; left: 50%; top: 74px; transform: translateX(-50%); width: 10px; height: 10px; border-radius: 50%;
   border: 1px solid #000; z-index: 2; }
-.c-rar.C { background: #ddd; } .c-rar.NC { background: #5aa9ff; } .c-rar.R { background: #f1c040; box-shadow: 0 0 6px #f1c040; }
+.c-rar.C { background: #ddd; } .c-rar.NC { background: #5aa9ff; }
+.c-rar.R { background: #3d8bff; box-shadow: 0 0 6px #3d8bff; } .c-rar.E { background: #b05cff; box-shadow: 0 0 7px #b05cff; }
+.c-rar.L { background: #ff9a1f; box-shadow: 0 0 9px #ff9a1f; }
+.rar-vecchie .c-rar.R { background: #f1c040; box-shadow: 0 0 6px #f1c040; }
+.r-NC, .r-R { color: #3d8bff; } .r-E { color: #b05cff; } .r-L { color: #ff9a1f; font-weight: 700; }
+.rar-vecchie .r-NC { color: #5aa9ff; } .rar-vecchie .r-R { color: #c99a1c; }
 .carta.illegale { filter: grayscale(.9) brightness(.55); }
 .carta.grande { width: 230px; height: 328px; }
 .carta.grande .c-arte { height: 110px; } .carta.grande .c-arte .icona { font-size: 52px; }

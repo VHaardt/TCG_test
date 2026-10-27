@@ -4,7 +4,7 @@ App web minimale per giocare a CICATRICI fra amici e testare il gioco. Carte sol
 
 - **Costruito**: ognuno sceglie un Leader e costruisce il suo mazzo (o parte da un mazzo di riferimento), poi si gioca.
 - **Mazzi pronti**: ognuno sceglie uno dei mazzi di riferimento del set (già legali) e si gioca subito.
-- **Draft (Arena)**: si sceglie il Leader fra 3 a caso, poi 40 volte una carta fra 3. Le carte offerte sono solo dei colori del Leader o Neutrali e mai oltre le 3 copie; le 3 carte di ogni scelta hanno la stessa rarità (C 60%, NC 30%, R 10%).
+- **Draft (Arena)**: si sceglie il Leader fra 3 a caso, poi 40 volte una carta fra 3. Le carte offerte sono solo dei colori del Leader o Neutrali e mai oltre il limite di copie delle regole; le 3 carte di ogni scelta hanno la stessa rarità (pesi in `DRAFT_RARITA`, solo per le rarità che il set usa).
 - **Avversario**: un amico, che entra col codice della stanza o col link d'invito, oppure l'IA semplice del simulatore.
 
 ## Avvio in locale
@@ -22,9 +22,9 @@ L'app non contiene regole: usa il motore `sim/v02` come libreria.
 | Cosa | Da dove (il primo che esiste) |
 |---|---|
 | Carte e Leader | `CICATRICI_SET`, poi `/mnt/project-files/tcg/set/finale/set_v02.json`, poi `app/dati/set_v02.json` |
-| Mazzi di riferimento | `CICATRICI_MAZZI`, poi la cartella condivisa, poi `app/dati/mazzi_v02.json` |
-| Regole | `CICATRICI_REGOLE` (nome di preset o file json di variante), poi il preset `V026`, poi `app/dati/regole_V026.json` |
-| Costruzione | `sim/v02/decks.py`: 40 carte, max 3 copie per ID, colori del Leader o Neutrali |
+| Mazzi di riferimento | `CICATRICI_MAZZI`, poi le liste B0c05 di Q-026 (cartella condivisa, poi `app/dati/mazzi_B0c05.json`), poi i mazzi del set: vale il primo file con mazzi legali per le regole in vigore |
+| Regole | `CICATRICI_REGOLE` (nome di preset o file json di variante), poi il preset `V027` (o `V026`), poi `app/dati/regole_V026.json` |
+| Costruzione | `sim/v02/decks.problems` con `decks.limits(regole)`: con V027 40 carte, max 2 copie per nome, 1 per le Leggendarie, colori del Leader o Neutrali (le multicolore vogliono tutti i colori nel Leader) |
 
 Il set viene letto all'avvio del server: quando il bilanciamento cambia le carte basta riavviarlo. L'app pubblicata fuori dal cloud del progetto non vede la cartella condivisa: `app/aggiorna_dati.sh` copia il set in vigore in `app/dati`, poi si fa commit e nuovo deploy.
 

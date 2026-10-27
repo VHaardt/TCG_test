@@ -3,7 +3,8 @@
 Il motore è sim/v02 usato come libreria: l'app non contiene regole del gioco.
 - Carte e Leader: il file del set (CICATRICI_SET, poi la cartella condivisa, poi app/dati).
 - Regole: un preset di sim/v02/config.py o un file json di variante (CICATRICI_REGOLE).
-- Costruzione: sim/v02/decks.problems (40 carte, 3 copie per ID, colori del Leader o Neutrali).
+- Costruzione: sim/v02/decks.problems con i limiti delle regole (decks.limits: carte, copie per nome,
+  copie per rarità, multicolore).
 Ogni azione mostrata al giocatore è un elemento di GameState.legal_actions()."""
 import copy
 import json
@@ -21,6 +22,7 @@ from sim.v02.engine import CARDS, LEADERS, G1, G2, COMBAT_CONDS
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 SHARED = "/mnt/project-files/tcg/set/finale"
+B0C05 = "/mnt/project-files/tcg/swarm/questioni/Q-026_feedback_playtest/liste_B0c05/mazzi.json"
 COLORI = {"R": "Rosso", "B": "Blu", "K": "Nero", "G": "Verde"}
 TIPI = {"unit": "Unità", "tactic": "Tattica", "reaction": "Reazione", "relic": "Reliquia"}
 FASI = {
@@ -35,7 +37,8 @@ FASI = {
 FINE = {"colpo_finale": "colpo finale", "crepuscolo": "Crepuscolo", "non_conclusa": "partita non conclusa",
         "mazzo_vuoto": "mazzo finito", "resa": "resa"}
 DRAFT_OFFERTA = 3
-DRAFT_RARITA = (("C", 0.6), ("NC", 0.3), ("R", 0.1))     # come l'Arena: le 3 carte di una scelta hanno la stessa rarità
+# come l'Arena: le 3 carte di una scelta hanno la stessa rarità; pesi per le rarità che il set usa davvero
+DRAFT_RARITA = (("C", 0.55), ("NC", 0.3), ("R", 0.3), ("E", 0.12), ("L", 0.03))
 
 
 def _first(*paths):
@@ -51,38 +54,60 @@ class Dati:
     def __init__(self):
         self.set_path = _first(os.environ.get("CICATRICI_SET"), os.path.join(SHARED, "set_v02.json"),
                                os.path.join(HERE, "dati", "set_v02.json"))
-        self.mazzi_path = _first(os.environ.get("CICATRICI_MAZZI"), os.path.join(SHARED, "mazzi_v02.json"),
-                                 os.path.join(HERE, "dati", "mazzi_v02.json"))
         spec = os.environ.get("CICATRICI_REGOLE")
         if not spec:
-            spec = "V026" if "V026" in PRESETS else os.path.join(HERE, "dati", "regole_V026.json")
+            spec = next((p for p in ("V027", "V026") if p in PRESETS), os.path.join(HERE, "dati", "regole_V026.json"))
         self.regole_spec = spec
         self.rules = rules_from(spec)
+        self.limiti = decks.limits(self.rules)
         engine.load_cards(self.set_path)
+        self.info = decks.card_info()
         with open(self.set_path, encoding="utf-8") as f:
             raw = json.load(f)
         self.set_info = {k: raw.get(k) for k in ("version", "rules", "data")}
         self.rarity = {c["id"]: c.get("rarity") for c in raw["cards"]}
-        self.riferimento = []
-        if self.mazzi_path:
-            with open(self.mazzi_path, encoding="utf-8") as f:
+        # mazzi di riferimento: il primo file che ne ha di legali con le regole in vigore
+        # (a 2 copie: le liste B0c05 di Q-026; a 3 copie: i mazzi del set)
+        self.riferimento, self.mazzi_path = [], None
+        for path in (os.environ.get("CICATRICI_MAZZI"), B0C05, os.path.join(HERE, "dati", "mazzi_B0c05.json"),
+                     os.path.join(SHARED, "mazzi_v02.json"), os.path.join(HERE, "dati", "mazzi_v02.json")):
+            if not path or not os.path.exists(path):
+                continue
+            with open(path, encoding="utf-8") as f:
                 for m in json.load(f).get("mazzi", []):
                     cards = {}
                     for cid in m["cards"]:
                         cards[cid] = cards.get(cid, 0) + 1
-                    if not decks.problems(m["leader"], cards):
+                    if not self.problemi(m["leader"], cards):
                         self.riferimento.append({"nome": m["name"], "leader": m["leader"], "carte": cards,
                                                  "note": m.get("note", "")})
+            if self.riferimento:
+                self.mazzi_path = path
+                break
+
+    def problemi(self, leader, carte):
+        return decks.problems(leader, carte, rules=self.rules, info=self.info)
+
+    def gruppo(self, cid):
+        """Chiave del limite di copie: il nome (le gemelle contano insieme) o l'ID."""
+        return self.info[cid][0] if self.limiti["copies_by_name"] else cid
+
+    def copie_max(self, cid):
+        return min(self.limiti["max_copies"], self.limiti["max_copies_rarity"].get(self.info[cid][1],
+                                                                                    self.limiti["max_copies"]))
 
     def catalogo(self):
         r = self.rules
         return {
             "set": self.set_info, "set_file": os.path.relpath(self.set_path, HERE) if self.set_path.startswith(HERE)
             else self.set_path, "regole": os.path.basename(str(self.regole_spec)),
-            "costruzione": {"carte": decks.DECK_SIZE, "copie": decks.MAX_COPIES},
+            "costruzione": {"carte": self.limiti["deck_size"], "copie": self.limiti["max_copies"],
+                            "per_nome": self.limiti["copies_by_name"], "copie_rarita": self.limiti["max_copies_rarity"],
+                            "multicolore_tutti": self.limiti["multicolor_all"], "rarita": self.limiti["rarity_scale"]},
             "colori": COLORI,
             "leader": [leader_dict(l) for l in LEADERS.values()],
-            "carte": [card_dict(c, self.rarity.get(c.id)) for c in sorted(CARDS.values(), key=sort_key)],
+            "carte": [dict(card_dict(c, self.rarity.get(c.id)), gruppo=self.gruppo(c.id), max=self.copie_max(c.id))
+                      for c in sorted(CARDS.values(), key=sort_key)],
             "mazzi": self.riferimento,
             "valori_leader": {"forza": r.leader_power, "forza_risvegliato": r.leader_power_awakened,
                               "tempra": r.tempra, "vite": r.life, "guardia_max": r.guard_max,
@@ -108,8 +133,8 @@ def leader_dict(l):
 
 
 def legale_per(leader, cid):
-    cols = CARDS[cid].colors
-    return not cols or bool(set(cols) & set(LEADERS[leader].colors))
+    cols, lc = set(CARDS[cid].colors), set(LEADERS[leader].colors)
+    return not cols or (cols <= lc if dati().limiti["multicolor_all"] else bool(cols & lc))
 
 
 # ---------------------------------------------------------------------------- draft
@@ -134,10 +159,15 @@ class Draft:
         if self.completo:
             self.offerta = []
             return
+        D = dati()
+        per_gruppo = {}
+        for cid, k in self.carte.items():
+            per_gruppo[D.gruppo(cid)] = per_gruppo.get(D.gruppo(cid), 0) + k
         pool = [cid for cid in sorted(CARDS) if legale_per(self.leader, cid)
-                and self.carte.get(cid, 0) < decks.MAX_COPIES]
-        rarities = [r for r, _ in DRAFT_RARITA]
-        rar = self.rng.choices(rarities, weights=[w for _, w in DRAFT_RARITA])[0]
+                and per_gruppo.get(D.gruppo(cid), 0) < D.copie_max(cid)]
+        usate = {D.rarity.get(cid) for cid in pool}
+        pesi = [(r, w) for r, w in DRAFT_RARITA if r in usate] or [(None, 1)]
+        rar = self.rng.choices([r for r, _ in pesi], weights=[w for _, w in pesi])[0]
         same = [cid for cid in pool if dati().rarity.get(cid) == rar]
         src = same if len(same) >= DRAFT_OFFERTA else pool
         self.offerta = self.rng.sample(src, min(DRAFT_OFFERTA, len(src)))
@@ -154,7 +184,7 @@ class Draft:
 
     @property
     def completo(self):
-        return self.scelte >= decks.DECK_SIZE
+        return self.scelte >= dati().limiti["deck_size"]
 
     def auto(self):
         """Draft dell'IA: scelte a caso."""
@@ -165,7 +195,7 @@ class Draft:
 
     def vista(self):
         return {"leader_offerta": self.leader_offerta, "leader": self.leader, "carte": self.carte,
-                "offerta": self.offerta, "scelte": self.scelte, "totale": decks.DECK_SIZE}
+                "offerta": self.offerta, "scelte": self.scelte, "totale": dati().limiti["deck_size"]}
 
 
 # ---------------------------------------------------------------------------- stanze
@@ -239,7 +269,7 @@ class Stanza:
         if self.modalita != "costruito":
             raise ValueError("in questa modalità non si costruisce il mazzo")
         carte = {cid: int(k) for cid, k in (carte or {}).items() if int(k) > 0}
-        pr = decks.problems(leader, carte)
+        pr = dati().problemi(leader, carte)
         if pr:
             raise ValueError("mazzo illegale: " + "; ".join(pr))
         p = self.posti[i]
