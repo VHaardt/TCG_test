@@ -136,3 +136,12 @@ P-rott forte:30 L3-L5 seed 3311 fatto
 P-rott forte:30 L4-L5 seed 3313 fatto
 P-rott forte:30 L5-L6 seed 3315 fatto
 2026-10-27T06:38:39Z fine P-rott forte:30 3300
+2026-10-27T06:38:42Z push P-rott forte, semi 3300 ok
+2026-10-27T06:38:45Z copia nella cartella condivisa ok (P-rott forte, semi 3300)
+2026-10-27T06:38:45Z inizio D05b-200 forte:30 200 3300 5
+D05b-200 forte:30 L1-L5 seed 3304 fatto
+D05b-200 forte:30 L2-L5 seed 3308 fatto
+D05b-200 forte:30 L3-L5 seed 3311 fatto
+D05b-200 forte:30 L4-L5 seed 3313 fatto
+D05b-200 forte:30 L5-L6 seed 3315 fatto
+2026-10-27T11:26:21Z fine D05b-200 forte:30 3300
