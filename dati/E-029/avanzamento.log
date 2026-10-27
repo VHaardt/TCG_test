@@ -145,3 +145,19 @@ D05b-200 forte:30 L3-L5 seed 3311 fatto
 D05b-200 forte:30 L4-L5 seed 3313 fatto
 D05b-200 forte:30 L5-L6 seed 3315 fatto
 2026-10-27T11:26:21Z fine D05b-200 forte:30 3300
+2026-10-27T11:26:23Z push D05b-200 forte, semi 3300 ok
+2026-10-27T11:26:27Z copia nella cartella condivisa ok (D05b-200 forte, semi 3300)
+2026-10-27T11:26:27Z inizio D-2M forte:30 200 3300 5
+D-2M forte:30 L1-L5 seed 3304 fatto
+2026-10-27T13:39:49Z E-029 (R-023, input 503d9bd), motore 4e13d90, V026, --riprendi
+2026-10-27T13:39:49Z inizio P semplice 400 2000 1,5
+P semplice L1-L2 gia' fatto, salto
+P semplice L1-L3 gia' fatto, salto
+P semplice L1-L4 gia' fatto, salto
+P semplice L1-L5 gia' fatto, salto
+P semplice L1-L6 gia' fatto, salto
+P semplice L2-L5 gia' fatto, salto
+P semplice L3-L5 gia' fatto, salto
+P semplice L4-L5 gia' fatto, salto
+P semplice L5-L6 gia' fatto, salto
+2026-10-27T13:39:49Z fine P semplice 2000
