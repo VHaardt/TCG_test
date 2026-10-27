@@ -43,7 +43,7 @@ def play_game(job):
     decks, agents_spec, spec, seed, keep_log = job[:5]
     use_cards(job[5] if len(job) > 5 else CARTE[0])
     rules = rules_from(spec)
-    (l1, d1), (l2, d2) = D.load(decks[0]), D.load(decks[1])
+    (l1, d1), (l2, d2) = D.load(decks[0], rules), D.load(decks[1], rules)
     agents = [make_agent(agents_spec[0], seed=seed * 2 + 1), make_agent(agents_spec[1], seed=seed * 2 + 2)]
     s = new_game(l1, d1, l2, d2, rules=rules, seed=seed, log=keep_log)
     steps = 0
@@ -62,15 +62,42 @@ def all_decks():
     return D.reference_decks()
 
 
-def run_jobs(jobs, workers=None):
+def run_jobs(jobs, workers=None, ckpt=None):
+    """ckpt: file where each finished game is appended, so a run cut short (container restart)
+    resumes with the games still missing; the results are the same as an uninterrupted run."""
     jobs = [j[:5] + (CARTE[0],) for j in jobs]
-    for ref in {d for j in jobs for d in j[0]}:          # errori chiari prima di partire
-        D.load(ref)
+    for ref, spec in {(d, j[2]) for j in jobs for d in j[0]}:     # errori chiari prima di partire
+        D.load(ref, rules_from(spec))
     workers = workers or os.cpu_count() or 2
-    if workers == 1 or len(jobs) < 8:
-        return [play_game(j) for j in jobs]
-    with Pool(workers) as pool:
-        return pool.map(play_game, jobs, chunksize=max(1, len(jobs) // (workers * 8)))
+    if ckpt is None:
+        if workers == 1 or len(jobs) < 8:
+            return [play_game(j) for j in jobs]
+        with Pool(workers) as pool:
+            return pool.map(play_game, jobs, chunksize=max(1, len(jobs) // (workers * 8)))
+    import pickle
+    done = {}
+    if os.path.exists(ckpt):
+        with open(ckpt, "r+b") as f:
+            good = 0
+            while True:
+                try:
+                    i, rec = pickle.load(f)
+                except Exception:                       # fine del file o ultima partita scritta a metà
+                    break
+                done[i] = rec
+                good = f.tell()
+            f.truncate(good)
+    todo = [(i, j) for i, j in enumerate(jobs) if i not in done]
+    with open(ckpt, "ab") as f, Pool(workers) as pool:
+        for i, rec in pool.imap_unordered(_play_indexed, todo):
+            pickle.dump((i, rec), f)
+            f.flush()
+            done[i] = rec
+    return [done[i] for i in range(len(jobs))]
+
+
+def _play_indexed(item):
+    return item[0], play_game(item[1])
 
 
 def mirror_jobs(spec, agent, games, decks=None, seed0=1, agent2=None):
@@ -462,7 +489,7 @@ def render_r012(recs, traccia=()):
         for q in (0, 1):
             x = per[r["decks"][q]]
             x["n"] += 1
-            for k in ("leader_attacks", "leader_on_attack", "furia_bonus_combats", "scudo_atk2", "solo_unit_turns", "caccia_leader_atk"):
+            for k in ("leader_attacks", "leader_on_attack", "furia_bonus_combats", "scudo_atk2", "solo_unit_turns", "caccia_leader_atk", "fa_alta_wins"):
                 x[k] = x.get(k, 0) + st[k][q]
             x["act_then_hit"] = x.get("act_then_hit", 0) + sum(st["act_then_hit"][q].values())
             x["lead_act"] = x.get("lead_act", 0) + sum(v for c, v in st["activations"][q].items() if c in LEADERS or c.startswith("LDR"))
@@ -474,7 +501,7 @@ def render_r012(recs, traccia=()):
                 for c in CARDS[cid].colors if cid in CARDS else ():
                     col = x.setdefault("col", {})
                     col[c] = col.get(c, 0) + v
-            for key, lab in (("cards_played", "g"), ("activations", "a"), ("hits_by", "h"), ("kills_by", "k")):
+            for key, lab in (("cards_played", "g"), ("activations", "a"), ("hits_by", "h"), ("kills_by", "k"), ("fa_alta_by", "f")):
                 for cid, v in st[key][q].items():
                     if cid in traccia:
                         t = x.setdefault("tr", {}).setdefault(cid, {})
@@ -498,7 +525,55 @@ def render_r012(recs, traccia=()):
             x = per[d]; n = max(x["n"], 1); tr = x.get("tr", {})
             L.append(f"| {D.label(d)} | " + " | ".join(
                 "/".join(f"{tr.get(c, {}).get(k, 0)/n:.2f}" for k in "gahk") for c in traccia) + " |")
-    return L + [""]
+    if recs and "fa_alta_wins" in recs[0]["stats"]:
+        L += ["", f"## R-017: scontri vinti con Forza d'attacco ≥ {engine.FA_ALTA} (per partita del mazzo; vinto = colpo a segno sul Leader o bersaglio sconfitto)", "",
+              "| Mazzo | Totale | " + " | ".join(traccia) + " |", "|---|---|" + "---|" * len(traccia)]
+        for d in decks:
+            x = per[d]; n = max(x["n"], 1); tr = x.get("tr", {})
+            L.append(f"| {D.label(d)} | {x.get('fa_alta_wins', 0)/n:.2f} | " + " | ".join(f"{tr.get(c, {}).get('f', 0)/n:.2f}" for c in traccia) + " |")
+    return L + render_m5(recs) + [""]
+
+
+def render_m5(recs):
+    """Q-026 M5: Rimarginare per Leader e per round, costi in Vita per round e costo scelto, vittorie per round finale."""
+    if not recs or "rim_round" not in recs[0]["stats"]:
+        return []
+    decks = sorted({d for r in recs for d in r["decks"]})
+    per = {d: {"n": 0, "rim": 0, "rr": {}, "life": 0, "lr": {}, "paid": {}} for d in decks}
+    fin = {}
+    for r in recs:
+        st = r["stats"]
+        fin.setdefault(r["rounds"], [0, 0, 0])
+        fin[r["rounds"]][2 if r["winner"] is None else r["winner"]] += 1
+        for q in (0, 1):
+            x = per[r["decks"][q]]
+            x["n"] += 1
+            x["rim"] += st["rim_used"][q]
+            x["life"] += st["life_costs"][q]
+            for key, k in (("rim_round", "rr"), ("life_costs_round", "lr"), ("cost_paid", "paid")):
+                for sub, v in st[key][q].items():
+                    x[k][sub] = x[k].get(sub, 0) + v
+    rounds = sorted({int(k) for x in per.values() for k in list(x["rr"]) + list(x["lr"])})
+    L = ["", "## Q-026 M5: Rimarginare e costi in Vita per round (per partita del mazzo)", "",
+         "| Mazzo | n | Rimarginare | " + " | ".join(f"R{k}" for k in rounds) + " | Costi in Vita | " + " | ".join(f"R{k}" for k in rounds) + " |",
+         "|---|---|---|" + "---|" * len(rounds) + "---|" + "---|" * len(rounds)]
+    for d in decks:
+        x = per[d]; n = max(x["n"], 1)
+        L.append(f"| {D.label(d)} | {x['n']} | {x['rim']/n:.2f} | " + " | ".join(f"{x['rr'].get(k, 0)/n:.2f}" for k in rounds)
+                 + f" | {x['life']/n:.2f} | " + " | ".join(f"{x['lr'].get(k, 0)/n:.2f}" for k in rounds) + " |")
+    paid = sorted({k for x in per.values() for k in x["paid"]})
+    if paid:
+        L += ["", "## Q-026 M5: costo scelto (pagamenti per partita del mazzo; «stanca» = una tua Unità Stancata)", "",
+              "| Mazzo | " + " | ".join(paid) + " |", "|---|" + "---|" * len(paid)]
+        for d in decks:
+            x = per[d]; n = max(x["n"], 1)
+            L.append(f"| {D.label(d)} | " + " | ".join(f"{x['paid'].get(k, 0)/n:.2f}" for k in paid) + " |")
+    L += ["", "## Q-026 M5: vittorie per round finale (partite)", "",
+          "| Round finale | G1 | G2 | patta | Totale |", "|---|---|---|---|---|"]
+    for k in sorted(fin):
+        g1, g2, pa = fin[k]
+        L.append(f"| {k} | {g1} | {g2} | {pa} | {g1 + g2 + pa} |")
+    return L
 
 
 def render_r005(m):
@@ -546,13 +621,13 @@ def save(name, text, recs, out_dir=None):
     return path
 
 
-def arm(spec, agent, games, decks=None, seed0=1, cross=0):
+def arm(spec, agent, games, decks=None, seed0=1, cross=0, ckpt=None):
     jobs = mirror_jobs(spec, agent, games, decks, seed0)
     if cross:
         jobs += cross_jobs(spec, agent, cross, decks, seed0)
     jobs[0] = jobs[0][:4] + (True,)
     t = time.time()
-    recs = run_jobs(jobs)
+    recs = run_jobs(jobs, ckpt=ckpt)
     return recs, time.time() - t
 
 
@@ -597,12 +672,18 @@ def cmd_ab(a):
 
 
 def cmd_torneo(a):
-    recs, el = arm(a.variante, a.ia, a.partite, a.mazzi, a.seed, a.incroci)
+    ckpt = None
+    if a.riprendi:
+        os.makedirs(a.out or REPORT_DIR, exist_ok=True)
+        ckpt = os.path.join(a.out or REPORT_DIR, ".partite_fatte.pkl")
+    recs, el = arm(a.variante, a.ia, a.partite, a.mazzi, a.seed, a.incroci, ckpt=ckpt)
     m = metrics(recs)
     text = render(f"Torneo v0.2 — {a.variante}", m, a.variante, a.ia, el)
     text += "\n".join(render_r012(recs, tuple(t for t in (a.traccia or "").split(",") if t))) + "\n"
     print(text)
     print("report:", save(f"torneo_{os.path.splitext(os.path.basename(a.variante))[0]}", text, recs, a.out))
+    if ckpt and os.path.exists(ckpt):
+        os.remove(ckpt)
 
 
 def head_to_head(spec, x, y, games, decks=None, seed0=7):
@@ -670,14 +751,23 @@ def cmd_valida(a):
     with open(a.file, encoding="utf-8") as f:
         raw = json.load(f)
     errors = validate(raw)
+    rules = rules_from(a.variante)
     colors = {c["id"]: tuple(c.get("colors") or ()) for c in raw.get("cards", [])}
     lcolors = {l["id"]: tuple(l.get("colors") or ()) for l in raw.get("leaders", [])}
+    info = {c["id"]: (c.get("name") or c["id"], c.get("rarity")) for c in raw.get("cards", [])}
     for ref in D.expand(a.mazzi or []):
         try:
             leader, cards = D.raw_deck(ref)
-            errors += [f"mazzo {ref}: {p}" for p in D.problems(leader, cards, colors, lcolors)]
+            errors += [f"mazzo {ref}: {p}" for p in D.problems(leader, cards, colors, lcolors, rules, info)]
         except (ValueError, KeyError) as e:
             errors.append(f"mazzo {ref}: {e}")
+    lim = D.limits(rules)
+    print(f"costruzione ({a.variante}): {lim['deck_size']} carte, {lim['max_copies']} copie per "
+          + ("nome" if lim["copies_by_name"] else "ID")
+          + "".join(f", {r} {k}" for r, k in lim["max_copies_rarity"].items())
+          + (", multicolore con tutti i colori nel Leader" if lim["multicolor_all"] else ""))
+    for w in D.rarity_warnings(rules, info):
+        print("avviso:", w)
     print("\n".join(errors) if errors else "nessun errore")
     print(f"{a.file}: {len(raw.get('cards', []))} carte, {len(raw.get('leaders', []))} Leader, {len(errors)} errori")
     sys.exit(1 if errors else 0)
@@ -694,7 +784,7 @@ def main(argv=None):
     sub = p.add_subparsers(dest="cmd", required=True)
 
     def common(x, partite=100):
-        x.add_argument("--variante", default="V024")
+        x.add_argument("--variante", default="V026")
         x.add_argument("--ia", default="semplice")
         x.add_argument("--partite", type=int, default=partite)
         x.add_argument("--mazzi", nargs="*", help="nomi in sim/decks, file .json o file.json#nome")
@@ -703,14 +793,17 @@ def main(argv=None):
         x.add_argument("--seed", type=int, default=1)
         x.add_argument("--out")
     t = sub.add_parser("torneo"); common(t)
+    t.add_argument("--riprendi", action="store_true",
+                   help="salva ogni partita finita in --out e, se la corsa si interrompe, al rilancio gioca solo quelle mancanti")
     t.add_argument("--traccia", help="R-012: ID di carte e Leader da tracciare, separati da virgola")
-    ab = sub.add_parser("ab"); common(ab); ab.add_argument("--base", default="V024")
+    ab = sub.add_parser("ab"); common(ab); ab.add_argument("--base", default="V026")
     lm = sub.add_parser("lambda"); common(lm, 200)
     co = sub.add_parser("collaudo"); common(co, 250)
     fo = sub.add_parser("forte"); common(fo, 25); fo.add_argument("--forte", default="forte:60")
     vi = sub.add_parser("vita"); common(vi, 100)
     pa = sub.add_parser("partita"); common(pa); pa.add_argument("mazzo1"); pa.add_argument("mazzo2")
     va = sub.add_parser("valida"); va.add_argument("file"); va.add_argument("--mazzi", nargs="*")
+    va.add_argument("--variante", default="V026", help="regole di costruzione (§2.3): V027 = 2 copie per nome, Leggendarie 1")
     a = p.parse_args(argv)
     if a.cmd == "valida":
         return cmd_valida(a)
@@ -720,7 +813,7 @@ def main(argv=None):
         if a.mazzi:
             a.mazzi = D.expand(a.mazzi)
         for ref in a.mazzi or [] if a.cmd != "partita" else (a.mazzo1, a.mazzo2):
-            D.load(ref)
+            D.load(ref, rules_from(a.variante))
     except ValueError as e:                             # carte o mazzi non validi: messaggio, niente traceback
         raise SystemExit(f"errore: {e}")
     {"torneo": cmd_torneo, "ab": cmd_ab, "lambda": cmd_lambda, "collaudo": cmd_collaudo,

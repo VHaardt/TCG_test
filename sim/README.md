@@ -89,7 +89,7 @@ Se una carta nuova ha bisogno di un'operazione o di un evento che non esiste, si
 
 ## Nucleo v0.2 (`sim/v02/`)
 
-Motore, IA e runner del nucleo v0.2 ratificato (Q-013, `docs/regolamento_v0.2.md`). Le regole sono un dataclass (`sim/v02/config.py`): ogni scelta aperta è un parametro, ogni variante un preset o un file JSON `{"base": preset, "set": {...}}`. Preset `V024` (default) = nucleo ratificato v0.2.4 (V02 + Q-019: Crepuscolo di round nel Ripristino di G1 per entrambi, spareggio meno Vite poi G1, G2 +1 gemma nei round 1, 3 e 5); `V02` = nucleo di Q-013, riferimento del ciclo carte 01 (E-020); `B0` = base dell'esperimento; `V1B_sequenziale`, `V2B_scoperto`, `V3B_opposizione_dopo`, `V4B_raddrizzo_fine`, `S_scudo_pareggi`.
+Motore, IA e runner del nucleo v0.2 ratificato (Q-013, `docs/regolamento_v0.2.md`). Le regole sono un dataclass (`sim/v02/config.py`): ogni scelta aperta è un parametro, ogni variante un preset o un file JSON `{"base": preset, "set": {...}}`. Preset `V027` = nucleo v0.2.7: le partite di `V026` più la costruzione del mazzo di Q-026 (2 copie per nome, Leggendarie in 1 copia, multicolore con tutti i colori nel Leader, scala di rarità C/R/E/L; parametri `deck_size`, `max_copies`, `copies_by_name`, `max_copies_rarity`, `multicolor_all`, `rarity_scale`). Preset `V026` (default, 3 copie per ID come prima) = nucleo v0.2.6 (V024 con P6 ritarata da Q-022 sull'IA forte: G2 +1 gemma nei soli round 1 e 3); `V024` = nucleo v0.2.4 (V02 + Q-019: Crepuscolo di round nel Ripristino di G1 per entrambi, spareggio meno Vite poi G1, G2 +1 gemma nei round 1, 3 e 5), riferimento di E-024; `V02` = nucleo di Q-013, riferimento del ciclo carte 01 (E-020); `B0` = base dell'esperimento; `V1B_sequenziale`, `V2B_scoperto`, `V3B_opposizione_dopo`, `V4B_raddrizzo_fine`, `S_scudo_pareggi`.
 
 ```bash
 python3 -m sim.v02.run torneo --partite 500            # metriche e fasce dei pilastri, mirror su tutti i mazzi
@@ -111,10 +111,13 @@ IA: `semplice` (euristiche + equilibrio del pugno con regret matching, prezzo-om
 - `"if"` su una singola op; condizioni `deck_nonempty`, `target_is_unit`, `opposing`, `attacker_has`; `pugno_ge` sul bersaglio legge solo la Parata (gemme dopo il costo della Reazione);
 - Reazioni: `draw` (in C4) e op su Unità (`raddrizza` l'Unità che si opponeva, dopo lo scontro); `guard_max` con `"cap"` applicato per ultimo.
 
+**R-025 (Q-026)**: costi aggiuntivi `{"stanca_own": N}` (Stanca N tue Unità Pronte) e `{"any": [costo, costo]}` (paghi uno dei due a scelta, es. `{"any": [{"lose_life": 1, "floor": 1}, {"stanca_own": 1}]}`). Ogni modo di pagare è un'azione legale a sé (quinto elemento per le ⟳, quarto per `play`), quindi nessuno viene provato prima degli altri; le carte con soli costi in Vita hanno le azioni di prima e ridanno le stesse partite. L'IA semplice, a parità, Stanca la sua Unità più debole prima di perdere Vita. Il limite di copie è una regola (`decks.limits(rules)`, `decks.problems(..., rules, info)`; `decks.load(ref, rules)`), il nome della carta (`name`) raggruppa le gemelle. Il report del torneo ha in più le tabelle di M5: Rimarginare e costi in Vita per mazzo e per round, costo scelto per carta (`<carta> vita` / `<carta> stanca`), vittorie per round finale.
+
 **R-006**: il caricamento delle carte è **stretto** (`sim/v02/validate.py`): chiave, condizione, evento, op o campo di selettore sconosciuti danno `ValueError` con l'id della carta (liberi i campi che iniziano con `_` e quelli descrittivi: `text`, `name`, `rarity`, `slot`, `tags`, `intent`, ...). Primitive in più: `"target"` nei trigger (bersaglio scelto dal motore: Forza più alta, poi costo), `"stack": false`, trigger delle Reliquie in `fire_global`, eventi `on_own_reaction` e `on_own_unit_attack_defeats_unit`, valore `{"n": 2, "plus": 1, "if": [...]}`, op con `"target": "attacker"` e `"sel"`, condizioni `react_from_scars` e `hunted_ready`, `opposing` nelle statiche `combat`, selettore `"kind": "unit"`.
 
 ```bash
 python3 -m sim.v02.run valida set.json --mazzi mazzi.json       # tutti gli errori di carte e mazzi
+python3 -m sim.v02.run valida set.json --mazzi mazzi.json --variante V027   # con la costruzione di Q-026
 python3 -m sim.v02.run torneo --carte set.json --mazzi mazzi.json --incroci 20
 ```
 `--mazzi` accetta nomi di `sim/decks`, file `.json` con un mazzo (`cards` come `{id: copie}` o lista di id) o con più mazzi (`{"mazzi": [...]}`, anche `file.json#nome`); i mazzi si controllano sul database v0.2 caricato.

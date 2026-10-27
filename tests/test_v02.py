@@ -741,6 +741,96 @@ def test_q019_v024_spareggio_vite_attivo():
     s._crepuscolo_both()
     assert s.over and s.winner == 1                     # a Vite pari perde l'attivo (G1)
 
+
+def test_q022_v026_p6_round_1_3():
+    """Q-022 (V026): V024 with G2's extra gem in rounds 1 and 3 only, nothing else changed."""
+    a, b = rules_from("V024"), rules_from("V026")
+    assert b.scintilla_extra_rounds == () and a.scintilla_extra_rounds == (5,)
+    assert b.with_(scintilla_extra_rounds=(5,)) == a
+    extra = [r for r in range(1, 16) if r == b.scintilla_extra_round or r in b.scintilla_extra_rounds]
+    assert b.scintilla_g2_gems == 1 and extra == [3]       # round 1 via scintilla_g2_gems, round 3 via extra_round
+
+
+def test_q026_stanca_own_cost_and_choice():
+    """Q-026 M1: "perdi 1 Vita oppure Stanca una tua Unità Pronta"; every way is its own action, none tried first."""
+    t = _card("_ner019", type="tactic", cost=1, colors=("K",), power=0,
+              play={"costs": [{"any": [{"lose_life": 1, "floor": 1}, {"stanca_own": 1}]}], "do": [{"op": "draw", "n": 1}]})
+    only = _card("_ner002", type="tactic", cost=1, colors=("K",), power=0,
+                 play={"costs": [{"stanca_own": 1}], "do": [{"op": "draw", "n": 1}]})
+    s = _arena()
+    s.p[0].brace = 2
+    s.p[0].hand = [t]
+    s.p[0].units = [Unit(900, "t_r6", True), Unit(901, "t_r6", False)]
+    plays = [x for x in s.legal_actions() if x[0] == "play"]
+    assert sorted(p[3] for p in plays) == [(("stanca", 900),), (("vita", 1, 1),)]
+    life, hand = len(s.p[0].life), len(s.p[0].hand)
+    s.step([p for p in plays if p[3][0][0] == "stanca"][0])
+    assert not s.unit(0, 900).ready and len(s.p[0].life) == life and len(s.p[0].hand) == hand   # giocata -1, pescata +1
+    assert s.stats["cost_paid"][0] == {f"{t} stanca": 1} and s.stats["life_costs"][0] == 0
+    s.p[0].hand, s.p[0].brace = [only], 2
+    assert not [x for x in s.legal_actions() if x[0] == "play"]       # nessuna Unità Pronta: non si paga
+    s.p[0].hand = [t]
+    plays = [x for x in s.legal_actions() if x[0] == "play"]
+    assert [p[3] for p in plays] == [(("vita", 1, 1),)]
+    s.step(plays[0])
+    assert len(s.p[0].life) == life - 1 and s.stats["cost_paid"][0][f"{t} vita"] == 1
+    assert s.stats["life_costs_round"][0] == {s.round: 1}
+
+
+def test_q026_stanca_own_on_abilities_and_without_life():
+    """A ⟳ with stanca_own never Stancas its own source; with Vita not payable only the Stanca ways remain."""
+    src = _card("_ab", power=3, abilities=[{"activated": True, "cost": 0, "costs": [{"stanca_own": 1}],
+                                            "do": [{"op": "draw", "n": 1}]}])
+    t = _card("_any", type="tactic", cost=1, colors=("K",), power=0,
+              play={"costs": [{"any": [{"lose_life": 1, "floor": 1}, {"stanca_own": 1}]}], "do": [{"op": "draw", "n": 1}]})
+    s = _arena()
+    s.p[0].brace = 1
+    s.p[0].units = [Unit(900, src, True), Unit(901, "t_r6", True)]
+    abil = [x for x in s.legal_actions() if x[0] == "ability" and x[1] == 900]
+    assert [x[4] for x in abil] == [(("stanca", 901),)]
+    s.step(abil[0])
+    assert not s.unit(0, 900).ready and not s.unit(0, 901).ready
+    assert not [x for x in s.legal_actions() if x[0] == "ability"]       # nessun'altra Unità Pronta
+    s = _arena()
+    s.p[0].brace, s.p[0].hand = 1, [t]
+    s.p[0].units = [Unit(900, "t_r6", True)]
+    s.p[0].life = s.p[0].life[:1]                                         # 1 Vita: floor 1, la Vita non si paga
+    assert [x[3] for x in s.legal_actions() if x[0] == "play"] == [(("stanca", 900),)]
+
+
+def test_q026_fixed_costs_keep_their_actions():
+    """Cards with only a Vita cost keep the actions of before (3 elements): old results replay identically."""
+    c = _card("_ros008", cost=1, colors=("R",), costs=[{"lose_life": 1, "floor": 1}])
+    s = _arena()
+    s.p[0].brace, s.p[0].hand = 2, [c]
+    assert [x for x in s.legal_actions() if x[0] == "play"] == [("play", c, None)]
+
+
+def test_q026_v027_deckbuilding():
+    from sim.v02 import decks as D
+    v26, v27 = rules_from("V026"), rules_from("V027")
+    fill = {f"F{i}": 2 for i in range(17)}
+    fill["F17"] = 1
+    colors = dict({"A": ("R",), "B": ("R",), "T": ("R",), "LEG": ("R",), "RK": ("R", "K")}, **{f: () for f in fill})
+    leaders = {"L": ("R", "G")}
+    info = dict({"A": ("Gemella", "C"), "B": ("Gemella", "C"), "T": ("T", "C"), "LEG": ("LEG", "L"), "RK": ("RK", "R")},
+                **{f: (f, "C") for f in fill})
+    ok = dict({"A": 1, "B": 1, "T": 2, "LEG": 1}, **fill)                                   # 40 carte
+    less = dict(ok, F17=0)
+
+    def pr(rules, **kw):
+        return D.problems("L", dict(less, **kw), colors, leaders, rules, info)
+    assert D.problems("L", ok, colors, leaders, v27, info) == [] and D.problems("L", ok, colors, leaders, v26, info) == []
+    assert pr(v27, B=2) == ["Gemella (A, B): 3 copie (massimo 2)"]
+    assert pr(v27, T=3) == ["T: 3 copie (massimo 2)"] and pr(v26, T=3) == []               # V026: 3 per ID
+    assert pr(v27, LEG=2) == ["LEG: 2 copie (massimo 1)"]
+    assert pr(v27, RK=1) == ["RK: carta multicolore, il Leader non ha tutti i suoi colori"]
+    assert pr(v26, RK=1) == []                                                              # V026: basta un colore
+    assert D.limits(v27)["max_copies"] == 2 and D.limits(None)["max_copies"] == D.MAX_COPIES == 3
+    assert D.rarity_warnings(v27, {"X": ("X", "NC")}) and not D.rarity_warnings(v26, {"X": ("X", "NC")})
+    assert {k: v for k, v in v27.as_dict().items() if k not in D.limits(v27)} \
+        == {k: v for k, v in v26.as_dict().items() if k not in D.limits(v26)}          # le partite sono quelle di V026
+
 if __name__ == "__main__":
     for k, f in list(globals().items()):
         if k.startswith("test_"):

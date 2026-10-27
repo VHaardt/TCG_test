@@ -316,14 +316,14 @@ class RuleAgent2:
             if c.type == "tactic":
                 if not self._tactic_ok(s, act):
                     continue
-            elif any("lose_life" in x for x in c.costs) and not self.pay_life and len(pl.life) < 4:
+            elif self._play_life(s, act) and not self.pay_life and len(pl.life) < 4:
                 continue                                       # costo in Vita su Unità/Reliquie: stesso freno delle ⟳
             if pl.brace - c.cost < reserve and c.cost > 1:
                 continue
-            plays.append((c.cost, self._target_score(s, act), act))
+            plays.append((c.cost, self._target_score(s, act), self._plan_score(s, act[3] if len(act) > 3 else None), act))
         if plays:
-            plays.sort(key=lambda t: (t[0], t[1]), reverse=True)
-            return plays[0][2]
+            plays.sort(key=lambda t: (t[0], t[1], t[2]), reverse=True)
+            return plays[0][3]
         # 3. attacks: units first, then the Leader
         attacks = by_kind.get("attack", [])
         hunt = self._hunt(s, [act for act in attacks if len(act) > 2])
@@ -355,7 +355,26 @@ class RuleAgent2:
             return rim[0]
         return ("end",)
 
+    @staticmethod
+    def _plan_life(plan):
+        return sum(x[1] for x in plan if x[0] == "vita")
+
+    def _plan_score(self, s, plan):
+        """Q-026 M1, costo a scelta: Stancare la tua Unità più debole prima di perdere Vita."""
+        if plan is None:
+            return 0
+        return -5 * self._plan_life(plan) - sum(s.unit_power(s.active, s.unit(s.active, x[1])) for x in plan if x[0] == "stanca")
+
+    def _play_life(self, s, act):
+        """The play pays Vita: the plan chosen, or the fixed costs of the card."""
+        if len(act) > 3:
+            return self._plan_life(act[3]) > 0
+        c = CARDS[act[1]]
+        return any("lose_life" in x for x in tuple((c.play or {}).get("costs") or ()) + tuple(c.costs))
+
     def _ability_life_cost(self, s, act):
+        if len(act) > 4:
+            return self._plan_life(act[4]) > 0
         src, i = act[1], act[2]
         ab = s.leader_abilities(s.active)[i] if src == "L" else CARDS[s.unit(s.active, src).cid].abilities[i]
         return any("lose_life" in x for x in ab.get("costs", ()) or ())
@@ -377,7 +396,7 @@ class RuleAgent2:
     def _tactic_ok(self, s, act):
         c = CARDS[act[1]]
         a = s.active
-        if any("lose_life" in x for x in tuple((c.play or {}).get("costs") or ()) + tuple(c.costs)):
+        if self._play_life(s, act):
             if self.pay_life:
                 return True
             return len(s.p[a].hand) <= 3 and len(s.p[a].life) >= 3
