@@ -44,6 +44,8 @@ function colVars(cs) {
   return `--c1:var(--${c[0]});--c2:var(--${c[1] || c[0]})`;
 }
 
+const RARITA = { C: "Comune", NC: "Non comune", R: "Rara", E: "Epica", L: "Leggendaria" };
+
 function cartaHTML(id, { classi = "", attr = "", stile = "" } = {}) {
   const c = CARTA[id];
   if (!c) return `<div class="carta ${classi}" ${attr}><div class="c-dentro">${esc(id)}</div></div>`;
@@ -53,10 +55,10 @@ function cartaHTML(id, { classi = "", attr = "", stile = "" } = {}) {
     <div class="c-dentro">
       <div class="c-arte"><span class="icona">${ICONA[c.tipo] || "✧"}</span><span class="num">${num}</span></div>
       <div class="c-nome">${esc(c.nome)}</div>
-      <div class="c-tipo">${esc(c.tipo)} · ${c.colori.length ? c.colori.map((x) => CAT.colori[x]).join("/") : "Neutrale"}</div>
+      <div class="c-tipo">${esc(c.tipo)} · ${c.colori.length ? c.colori.map((x) => CAT.colori[x]).join("/") : "Neutrale"}${c.rarita ? ` · <span class="r-${c.rarita}">${RARITA[c.rarita] || c.rarita}</span>` : ""}</div>
       <div class="c-testo">${mdish(c.testo) || "<em>Nessun effetto.</em>"}</div>
     </div>
-    ${c.rarita ? `<span class="c-rar ${c.rarita}" title="rarità ${c.rarita}"></span>` : ""}
+    ${c.rarita ? `<span class="c-rar ${c.rarita}" title="${RARITA[c.rarita] || c.rarita}"></span>` : ""}
     ${c.forza != null ? `<div class="c-forza"><b>${c.forza}</b></div>` : ""}</div>`;
 }
 
@@ -114,7 +116,8 @@ async function avvio() {
   CAT.carte.forEach((c) => (CARTA[c.id] = c));
   CAT.leader.forEach((l) => (LEAD[l.id] = l));
   $("#info-set").textContent = `Set ${CAT.set.version || ""} (${CAT.set.data || ""}), regole ${CAT.regole}. ` +
-    `Mazzo: ${CAT.costruzione.carte} carte, max ${CAT.costruzione.copie} copie per ID, solo colori del Leader o Neutrali.`;
+    `Mazzo: ${limitiTesto()}.`;
+  document.body.classList.toggle("rar-vecchie", CAT.carte.some((c) => c.rarita === "NC"));
   $("#nome").value = localStorage.getItem("cic_nome") || "";
   const qs = new URLSearchParams(location.search);
   if (qs.get("stanza")) $("#codice").value = qs.get("stanza").toUpperCase();
@@ -272,10 +275,31 @@ function listaMazzo(carte, conBottoni = false) {
 }
 
 // ------------------------------------------------------------------ costruito
+// i limiti arrivano dalle regole (catalogo): il server ricontrolla con sim/v02/decks.problems
+function limitiTesto() {
+  const k = CAT.costruzione, rar = Object.entries(k.copie_rarita || {});
+  return `${k.carte} carte, max ${k.copie} copie per ${k.per_nome ? "nome" : "ID"}` +
+    rar.map(([r, n]) => `, ${n} per le ${(RARITA[r] || r).replace(/a$/, "e")}`).join("") +
+    `, solo colori del Leader o Neutrali${k.multicolore_tutti ? " (le multicolore vogliono tutti i loro colori nel Leader)" : ""}`;
+}
+
 function legale(id) {
   const c = CARTA[id];
   if (!mazzo.leader) return true;
-  return !c.colori.length || c.colori.some((x) => LEAD[mazzo.leader].colori.includes(x));
+  const lc = LEAD[mazzo.leader].colori;
+  if (!c.colori.length) return true;
+  return CAT.costruzione.multicolore_tutti ? c.colori.every((x) => lc.includes(x)) : c.colori.some((x) => lc.includes(x));
+}
+
+// copie nel mazzo per gruppo (nome o ID) e massimo del gruppo
+function gruppi(carte) {
+  const g = {};
+  for (const [id, k] of Object.entries(carte)) {
+    const c = CARTA[id]; if (!c) continue;
+    const x = (g[c.gruppo] ||= { n: 0, max: c.max, ids: [] });
+    x.n += k; x.max = Math.min(x.max, c.max); x.ids.push(id);
+  }
+  return g;
 }
 
 function problemi() {
@@ -285,9 +309,10 @@ function problemi() {
   if (n !== CAT.costruzione.carte) out.push(`${n} carte su ${CAT.costruzione.carte}`);
   for (const [id, k] of Object.entries(mazzo.carte)) {
     if (!CARTA[id]) { out.push(`${id}: carta sconosciuta`); continue; }
-    if (k > CAT.costruzione.copie) out.push(`${id}: ${k} copie`);
     if (mazzo.leader && k > 0 && !legale(id)) out.push(`${id}: colore fuori dal Leader`);
   }
+  for (const [nome, x] of Object.entries(gruppi(mazzo.carte)))
+    if (x.n > x.max) out.push(`${x.ids.length > 1 ? `${nome} (${x.ids.join(", ")})` : x.ids[0]}: ${x.n} copie, massimo ${x.max}`);
   return out;
 }
 
@@ -347,7 +372,8 @@ function renderCostruttore() {
 
 function cambia(id, d) {
   const k = Math.max(0, (mazzo.carte[id] || 0) + d);
-  if (k > CAT.costruzione.copie) return;
+  const g = gruppi(mazzo.carte)[CARTA[id].gruppo];
+  if (d > 0 && (g ? g.n : 0) >= CARTA[id].max) return errore(`${id}: al massimo ${CARTA[id].max} copie`);
   if (k) mazzo.carte[id] = k; else delete mazzo.carte[id];
   salvaMazzo(); renderLista();
   const el = $(`[data-copie="${id}"]`); if (el) el.textContent = k;

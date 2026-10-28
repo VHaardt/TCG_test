@@ -42,10 +42,11 @@ def _play_out(code, tokens, limit=3000):
 
 def test_catalogo_and_reference_decks_are_legal():
     cat = _api("/api/catalogo", method="GET")
-    assert cat["costruzione"] == {"carte": decks.DECK_SIZE, "copie": decks.MAX_COPIES}
+    lim = decks.limits(core.dati().rules)
+    assert cat["costruzione"]["carte"] == lim["deck_size"] and cat["costruzione"]["copie"] == lim["max_copies"]
     assert len(cat["leader"]) >= 2 and len(cat["carte"]) >= 40 and cat["mazzi"]
     for m in cat["mazzi"]:
-        assert not decks.problems(m["leader"], m["carte"])
+        assert not core.dati().problemi(m["leader"], m["carte"])
 
 
 def test_constructed_room_two_humans():
@@ -71,6 +72,24 @@ def test_constructed_room_two_humans():
     assert v["fase"] == "preparazione"
 
 
+def test_v027_limits_two_copies_and_rarity():
+    D = core.dati()
+    assert D.limiti["max_copies"] == 2 and D.limiti["max_copies_rarity"].get("L") == 1
+    assert len(D.riferimento) == 6 and all(max(m["carte"].values()) <= 2 for m in D.riferimento)
+    m = D.riferimento[0]
+    tre = dict(m["carte"]); cid = next(iter(tre)); tre[cid] = 3
+    tre[next(c for c in tre if c != cid)] -= 1
+    a = _api("/api/stanza", {"nome": "A", "modalita": "costruito"})
+    code, out = server.api("POST", "/api/mazzo", {}, {**a, "leader": m["leader"], "carte": tre})
+    assert code == 400 and "massimo 2" in out["errore"]
+    # una Leggendaria vale 1 copia, anche nel draft
+    D.info[cid] = (D.info[cid][0], "L")
+    try:
+        assert D.copie_max(cid) == 1
+    finally:
+        D.info[cid] = (D.info[cid][0], D.rarity.get(cid))
+
+
 def test_draft_respects_leader_colours_and_copies():
     a = _api("/api/stanza", {"nome": "A", "modalita": "draft", "contro_ia": True})
     v = _api("/api/stato", a, "GET")
@@ -83,7 +102,8 @@ def test_draft_respects_leader_colours_and_copies():
         v = _api("/api/draft/scelta", {**a, "carta": offer[0]})
     st = server.REG.get(a["codice"])
     me = st.posti[0]
-    assert not decks.problems(me.leader, me.carte)
+    assert not core.dati().problemi(me.leader, me.carte)
+    assert max(me.carte.values()) <= core.dati().limiti["max_copies"]
     assert "partita" in v and v["giocatori"][1]["ia"]
 
 
