@@ -51,6 +51,14 @@ class Rules2:
     crepuscolo_spareggio: str = "primo_colpo"  # Q-019 B con entrambi Alle Corde: primo_colpo, attivo, vite_attivo, vite_difensore, mazzo, cicatrici; Q-022: vite_leader, vite_ruotato, vite_guardia
     guardia_stop_round: int = 0           # Q-019 C: da questo round non si forma la Guardia (0 = mai)
 
+    # deckbuilding (§2.3): Q-026 V1 rende il limite di copie una regola
+    deck_size: int = 40
+    max_copies: int = 3
+    copies_by_name: bool = False       # il limite conta le carte con lo stesso nome (gemelle), non solo lo stesso ID
+    max_copies_rarity: tuple = ()      # limiti per rarità, es. (("L", 1),): Leggendarie in 1 copia
+    multicolor_all: bool = False       # una carta multicolore richiede tutti i suoi colori nel Leader (False: ne basta uno)
+    rarity_scale: tuple = ()           # rarità ammesse; fuori scala è solo un avviso di `valida` (la rarità non cambia le partite)
+
     # limits
     max_units: int = 5
     max_relics: int = 2
@@ -89,6 +97,13 @@ PRESETS = {
     "V026": {"tempra": 4, "pugno": "sequenziale", "scudo": "vince_pareggi",
              "scintilla_extra_gems": 1, "scintilla_extra_round": 3, "scintilla_extra_rounds": (),
              "crepuscolo_simultaneo": True, "crepuscolo_spareggio": "vite_attivo"},
+    # v0.2.7: V026 + deckbuilding di Q-026 (V1 e V2, 8/8): 2 copie per nome, Leggendarie in 1 copia,
+    # multicolore con tutti i colori nel Leader, scala delle rarità C/R/E/L. Le partite sono quelle di V026.
+    "V027": {"tempra": 4, "pugno": "sequenziale", "scudo": "vince_pareggi",
+             "scintilla_extra_gems": 1, "scintilla_extra_round": 3, "scintilla_extra_rounds": (),
+             "crepuscolo_simultaneo": True, "crepuscolo_spareggio": "vite_attivo",
+             "max_copies": 2, "copies_by_name": True, "max_copies_rarity": (("L", 1),),
+             "multicolor_all": True, "rarity_scale": ("C", "R", "E", "L")},
 }
 
 

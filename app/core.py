@@ -1,0 +1,893 @@
+"""Logica dell'app online di CICATRICI: dati, costruzione del mazzo, draft, stanze e viste.
+
+Il motore è sim/v02 usato come libreria: l'app non contiene regole del gioco.
+- Carte e Leader: il file del set (CICATRICI_SET, poi la cartella condivisa, poi app/dati).
+- Regole: un preset di sim/v02/config.py o un file json di variante (CICATRICI_REGOLE).
+- Costruzione: sim/v02/decks.problems con i limiti delle regole (decks.limits: carte, copie per nome,
+  copie per rarità, multicolore).
+Ogni azione mostrata al giocatore è un elemento di GameState.legal_actions()."""
+import copy
+import json
+import os
+import random
+import re
+import secrets
+import string
+import threading
+import time
+
+from sim.v02 import engine, decks
+from sim.v02.config import PRESETS, rules_from
+from sim.v02.engine import CARDS, LEADERS, G1, G2, COMBAT_CONDS
+
+HERE = os.path.dirname(os.path.abspath(__file__))
+SHARED = "/mnt/project-files/tcg/set/finale"
+B0C05 = "/mnt/project-files/tcg/swarm/questioni/Q-026_feedback_playtest/liste_B0c05/mazzi.json"
+COLORI = {"R": "Rosso", "B": "Blu", "K": "Nero", "G": "Verde"}
+TIPI = {"unit": "Unità", "tactic": "Tattica", "reaction": "Reazione", "relic": "Reliquia"}
+FASI = {
+    "main": "Fase principale",
+    "impeto": "L'attaccante impegna le gemme a vista",
+    "risposta": "Il difensore risponde",
+    "oppose": "Il difensore può opporre un'Unità Pronta",
+    "pugno_att": "L'attaccante impegna le gemme (Brace)",
+    "pugno_def": "Il difensore impegna la Guardia (Parata e Reazione)",
+    "oppose_after": "Il difensore può opporre un'Unità",
+}
+FINE = {"colpo_finale": "colpo finale", "crepuscolo": "Crepuscolo", "non_conclusa": "partita non conclusa",
+        "mazzo_vuoto": "mazzo finito", "resa": "resa"}
+DRAFT_OFFERTA = 3
+# come l'Arena: le 3 carte di una scelta hanno la stessa rarità; pesi per le rarità che il set usa davvero
+DRAFT_RARITA = (("C", 0.55), ("NC", 0.3), ("R", 0.3), ("E", 0.12), ("L", 0.03))
+
+
+def _first(*paths):
+    for p in paths:
+        if p and os.path.exists(p):
+            return p
+    return None
+
+
+class Dati:
+    """Set, regole e mazzi di riferimento caricati all'avvio del server."""
+
+    def __init__(self):
+        self.set_path = _first(os.environ.get("CICATRICI_SET"), os.path.join(SHARED, "set_v02.json"),
+                               os.path.join(HERE, "dati", "set_v02.json"))
+        spec = os.environ.get("CICATRICI_REGOLE")
+        if not spec:
+            spec = next((p for p in ("V027", "V026") if p in PRESETS), os.path.join(HERE, "dati", "regole_V026.json"))
+        self.regole_spec = spec
+        self.rules = rules_from(spec)
+        self.limiti = decks.limits(self.rules)
+        engine.load_cards(self.set_path)
+        self.info = decks.card_info()
+        with open(self.set_path, encoding="utf-8") as f:
+            raw = json.load(f)
+        self.set_info = {k: raw.get(k) for k in ("version", "rules", "data")}
+        self.rarity = {c["id"]: c.get("rarity") for c in raw["cards"]}
+        # mazzi di riferimento: il primo file che ne ha di legali con le regole in vigore
+        # (a 2 copie: le liste B0c05 di Q-026; a 3 copie: i mazzi del set)
+        self.riferimento, self.mazzi_path = [], None
+        for path in (os.environ.get("CICATRICI_MAZZI"), B0C05, os.path.join(HERE, "dati", "mazzi_B0c05.json"),
+                     os.path.join(SHARED, "mazzi_v02.json"), os.path.join(HERE, "dati", "mazzi_v02.json")):
+            if not path or not os.path.exists(path):
+                continue
+            with open(path, encoding="utf-8") as f:
+                for m in json.load(f).get("mazzi", []):
+                    cards = {}
+                    for cid in m["cards"]:
+                        cards[cid] = cards.get(cid, 0) + 1
+                    if not self.problemi(m["leader"], cards):
+                        self.riferimento.append({"nome": m["name"], "leader": m["leader"], "carte": cards,
+                                                 "note": m.get("note", "")})
+            if self.riferimento:
+                self.mazzi_path = path
+                break
+
+    def problemi(self, leader, carte):
+        return decks.problems(leader, carte, rules=self.rules, info=self.info)
+
+    def gruppo(self, cid):
+        """Chiave del limite di copie: il nome (le gemelle contano insieme) o l'ID."""
+        return self.info[cid][0] if self.limiti["copies_by_name"] else cid
+
+    def copie_max(self, cid):
+        return min(self.limiti["max_copies"], self.limiti["max_copies_rarity"].get(self.info[cid][1],
+                                                                                    self.limiti["max_copies"]))
+
+    def catalogo(self):
+        r = self.rules
+        return {
+            "set": self.set_info, "set_file": os.path.relpath(self.set_path, HERE) if self.set_path.startswith(HERE)
+            else self.set_path, "regole": os.path.basename(str(self.regole_spec)),
+            "costruzione": {"carte": self.limiti["deck_size"], "copie": self.limiti["max_copies"],
+                            "per_nome": self.limiti["copies_by_name"], "copie_rarita": self.limiti["max_copies_rarity"],
+                            "multicolore_tutti": self.limiti["multicolor_all"], "rarita": self.limiti["rarity_scale"]},
+            "colori": COLORI,
+            "leader": [leader_dict(l) for l in LEADERS.values()],
+            "carte": [dict(card_dict(c, self.rarity.get(c.id)), gruppo=self.gruppo(c.id), max=self.copie_max(c.id))
+                      for c in sorted(CARDS.values(), key=sort_key)],
+            "mazzi": self.riferimento,
+            "valori_leader": {"forza": r.leader_power, "forza_risvegliato": r.leader_power_awakened,
+                              "tempra": r.tempra, "vite": r.life, "guardia_max": r.guard_max,
+                              "guardia_max_risvegliato": r.guard_max_awakened, "risveglio_a_vite": r.awaken_at_life},
+        }
+
+
+def sort_key(c):
+    return (c.colors[0] if c.colors else "Z", c.id)
+
+
+def card_dict(c, rarity=None):
+    return {"id": c.id, "nome": c.name, "tipo": TIPI.get(c.type, c.type), "costo": c.cost,
+            "colori": list(c.colors), "forza": c.power if c.type == "unit" else None,
+            "parole": sorted(c.keywords), "testo": c.text, "rarita": rarity}
+
+
+def leader_dict(l):
+    def texts(side):
+        return [ab.get("text", "") for ab in side if ab.get("text")]
+    return {"id": l.id, "nome": l.name, "colori": list(l.colors), "base": texts(l.base),
+            "risvegliato": texts(l.awakened)}
+
+
+def legale_per(leader, cid):
+    cols, lc = set(CARDS[cid].colors), set(LEADERS[leader].colors)
+    return not cols or (cols <= lc if dati().limiti["multicolor_all"] else bool(cols & lc))
+
+
+# ---------------------------------------------------------------------------- draft
+class Draft:
+    """Arena: 3 Leader fra cui sceglierne uno, poi 40 scelte di 1 carta su 3 fra le carte legali."""
+
+    def __init__(self, rng):
+        self.rng = rng
+        ids = sorted(LEADERS)
+        self.leader_offerta = rng.sample(ids, min(DRAFT_OFFERTA, len(ids)))
+        self.leader = None
+        self.carte = {}
+        self.offerta = []
+
+    def scegli_leader(self, lid):
+        if self.leader or lid not in self.leader_offerta:
+            raise ValueError("Leader non offerto")
+        self.leader = lid
+        self._nuova_offerta()
+
+    def _nuova_offerta(self):
+        if self.completo:
+            self.offerta = []
+            return
+        D = dati()
+        per_gruppo = {}
+        for cid, k in self.carte.items():
+            per_gruppo[D.gruppo(cid)] = per_gruppo.get(D.gruppo(cid), 0) + k
+        pool = [cid for cid in sorted(CARDS) if legale_per(self.leader, cid)
+                and per_gruppo.get(D.gruppo(cid), 0) < D.copie_max(cid)]
+        usate = {D.rarity.get(cid) for cid in pool}
+        pesi = [(r, w) for r, w in DRAFT_RARITA if r in usate] or [(None, 1)]
+        rar = self.rng.choices([r for r, _ in pesi], weights=[w for _, w in pesi])[0]
+        same = [cid for cid in pool if dati().rarity.get(cid) == rar]
+        src = same if len(same) >= DRAFT_OFFERTA else pool
+        self.offerta = self.rng.sample(src, min(DRAFT_OFFERTA, len(src)))
+
+    def scegli(self, cid):
+        if cid not in self.offerta:
+            raise ValueError("carta non offerta")
+        self.carte[cid] = self.carte.get(cid, 0) + 1
+        self._nuova_offerta()
+
+    @property
+    def scelte(self):
+        return sum(self.carte.values())
+
+    @property
+    def completo(self):
+        return self.scelte >= dati().limiti["deck_size"]
+
+    def auto(self):
+        """Draft dell'IA: scelte a caso."""
+        if not self.leader:
+            self.scegli_leader(self.rng.choice(self.leader_offerta))
+        while not self.completo:
+            self.scegli(self.rng.choice(self.offerta))
+
+    def vista(self):
+        return {"leader_offerta": self.leader_offerta, "leader": self.leader, "carte": self.carte,
+                "offerta": self.offerta, "scelte": self.scelte, "totale": dati().limiti["deck_size"]}
+
+
+# ---------------------------------------------------------------------------- stanze
+class Posto:
+    def __init__(self, nome, ia=False):
+        self.nome = nome
+        self.token = secrets.token_urlsafe(16)
+        self.ia = ia
+        self.leader = None
+        self.carte = None
+        self.pronto = False
+        self.draft = None
+
+
+class Stanza:
+    def __init__(self, modalita, nome, contro_ia=False):
+        if modalita not in ("costruito", "pronti", "draft"):
+            raise ValueError("modalità sconosciuta")
+        dati()
+        self.codice = None
+        self.modalita = modalita
+        self.lock = threading.RLock()
+        self.rng = random.Random(secrets.randbits(64))
+        self.posti = [Posto(nome)]
+        self.partita = None
+        self.agente = None
+        self.n_partita = 0
+        self.ultimo = time.time()
+        if contro_ia:
+            ia = Posto("IA", ia=True)
+            self.posti.append(ia)
+        self._prepara()
+
+    # preparation -------------------------------------------------------
+    def _prepara(self):
+        for p in self.posti:
+            p.pronto = False
+            if self.modalita == "draft":
+                p.draft = Draft(random.Random(self.rng.random()))
+                p.leader, p.carte = None, None
+            if p.ia:
+                self._prepara_ia(p)
+
+    def _prepara_ia(self, p):
+        if self.modalita == "draft":
+            p.draft.auto()
+            p.leader, p.carte = p.draft.leader, dict(p.draft.carte)
+        else:
+            m = self.rng.choice(dati().riferimento)
+            p.leader, p.carte = m["leader"], dict(m["carte"])
+        p.pronto = True
+
+    def entra(self, nome):
+        if len(self.posti) >= 2:
+            raise ValueError("la stanza è piena")
+        p = Posto(nome)
+        if self.modalita == "draft":
+            p.draft = Draft(random.Random(self.rng.random()))
+        self.posti.append(p)
+        return p
+
+    def posto(self, token):
+        for i, p in enumerate(self.posti):
+            if p.token == token:
+                return i, p
+        raise PermissionError("giocatore sconosciuto in questa stanza")
+
+    def imposta_mazzo(self, i, leader, carte):
+        if self.partita:
+            raise ValueError("partita in corso")
+        if self.modalita != "costruito":
+            raise ValueError("in questa modalità non si costruisce il mazzo")
+        carte = {cid: int(k) for cid, k in (carte or {}).items() if int(k) > 0}
+        pr = dati().problemi(leader, carte)
+        if pr:
+            raise ValueError("mazzo illegale: " + "; ".join(pr))
+        p = self.posti[i]
+        p.leader, p.carte, p.pronto = leader, carte, True
+        self._forse_inizia()
+
+    def scegli_pronto(self, i, nome):
+        """Modalità "pronti": il mazzo è uno dei mazzi di riferimento, scelto per nome."""
+        if self.partita:
+            raise ValueError("partita in corso")
+        if self.modalita != "pronti":
+            raise ValueError("questa stanza non usa i mazzi pronti")
+        m = next((m for m in dati().riferimento if m["nome"] == nome), None)
+        if m is None:
+            raise ValueError("mazzo sconosciuto")
+        p = self.posti[i]
+        p.leader, p.carte, p.pronto = m["leader"], dict(m["carte"]), True
+        self._forse_inizia()
+
+    def annulla_pronto(self, i):
+        if not self.partita and self.modalita in ("costruito", "pronti"):
+            self.posti[i].pronto = False
+
+    def draft_leader(self, i, lid):
+        self.posti[i].draft.scegli_leader(lid)
+
+    def draft_scelta(self, i, cid):
+        p = self.posti[i]
+        p.draft.scegli(cid)
+        if p.draft.completo:
+            p.leader, p.carte, p.pronto = p.draft.leader, dict(p.draft.carte), True
+            self._forse_inizia()
+
+    def _forse_inizia(self):
+        if len(self.posti) == 2 and all(p.pronto for p in self.posti) and not self.partita:
+            self.inizia()
+
+    def inizia(self):
+        """Sorteggio di G1, poi il mulligan (§4.4): le mani si mostrano e ognuno sceglie da 0 a 3 carte.
+        La partita vera nasce con lo stesso seme, applicando le scelte dentro setup()."""
+        first = self.rng.randrange(2)                       # chi è G1 si tira a sorte
+        seats = [first, 1 - first]                          # seats[q] = indice del posto che gioca come q
+        mazzi = [(self.posti[i].leader, [cid for cid, k in self.posti[i].carte.items() for _ in range(k)])
+                 for i in seats]
+        seed = self.rng.randrange(1 << 30)
+        mani = [None, None]
+
+        def guarda(s, q):
+            mani[q] = list(s.p[q].hand)
+        engine.new_game(mazzi[0][0], mazzi[0][1], mazzi[1][0], mazzi[1][1], rules=dati().rules, seed=seed,
+                        mulligan=guarda)
+        self.partita = {"s": None, "seats": seats, "versione": 0, "mazzi": mazzi, "seed": seed, "mani": mani,
+                        "mulligan": [None, None], "attesa": None, "storia": []}
+        self.n_partita += 1
+        if any(p.ia for p in self.posti):
+            from sim.v02.agents import RuleAgent2
+            self.agente = RuleAgent2(seed=self.rng.randrange(1 << 30))
+        for q in (G1, G2):
+            if self.posti[seats[q]].ia:                     # l'IA rimette in fondo le carte di costo ≥5, come nel simulatore
+                self.partita["mulligan"][q] = [c for c in mani[q] if CARDS[c].cost >= 5][:dati().rules.mulligan_max]
+        self._forse_parti()
+
+    def q_di(self, i):
+        return self.partita["seats"].index(i)
+
+    def mulligan(self, i, carte):
+        m = self.partita
+        if not m or m["s"] is not None:
+            raise ValueError("il mulligan si fa solo prima della partita")
+        q = self.q_di(i)
+        if m["mulligan"][q] is not None:
+            raise ValueError("hai già fatto il mulligan")
+        carte = list(carte or [])
+        if len(carte) > dati().rules.mulligan_max:
+            raise ValueError(f"al massimo {dati().rules.mulligan_max} carte")
+        resto = list(m["mani"][q])
+        for c in carte:
+            if c not in resto:
+                raise ValueError(f"{c} non è nella tua mano")
+            resto.remove(c)
+        m["mulligan"][q] = carte
+        m["versione"] += 1
+        self._forse_parti()
+
+    def _forse_parti(self):
+        m = self.partita
+        if any(x is None for x in m["mulligan"]):
+            return
+        scelte = m["mulligan"]
+
+        def applica(s, q):                                  # §4.4: in fondo al mazzo, poi si pesca dalla cima
+            pl = s.p[q]
+            for c in scelte[q]:
+                pl.hand.remove(c)
+                pl.deck.insert(0, c)
+            s.draw(q, len(scelte[q]))
+        mz = m["mazzi"]
+        m["s"] = engine.new_game(mz[0][0], mz[0][1], mz[1][0], mz[1][1], rules=dati().rules, seed=m["seed"],
+                                 log=True, mulligan=applica)
+        for q in (G1, G2):
+            if scelte[q]:
+                m["s"].say(f"  P{q+1} fa il mulligan di {len(scelte[q])} carte")
+        m["versione"] += 1
+        self._turni_ia()
+
+    def _seat_ia(self, q):
+        return self.posti[self.partita["seats"][q]].ia
+
+    def azione(self, i, versione, indice):
+        m = self.partita
+        if not m or m["s"] is None:
+            raise ValueError("nessuna partita in corso")
+        if versione != m["versione"]:
+            raise ValueError("stato cambiato, aggiorna")
+        s = m["s"]
+        if s.over or m["attesa"] or s.decider() != self.q_di(i):
+            raise ValueError("non è il tuo turno di decidere")
+        acts = s.legal_actions()
+        if not 0 <= indice < len(acts):
+            raise ValueError("azione non valida")
+        q = self.q_di(i)
+        # si torna indietro solo sulle proprie scelte fatte dopo l'ultima scelta dell'avversario
+        m["storia"] = [h for h in m["storia"] if h["i"] == i][-STORIA_MAX + 1:]
+        m["storia"].append({"i": i, "s": istantanea(s), "segreti": segreti(s, q)})
+        m["attesa"] = {"act": acts[indice], "scelte": [], "domanda": None}
+        if self._esegui():
+            self._turni_ia()
+
+    def annullabile(self, i):
+        """Si può tornare a prima dell'ultima scelta di i finché l'avversario umano non ha scelto
+        nulla e non si è scoperta nessuna carta nascosta (pescate, Vite girate, carte dalla mano
+        dell'avversario): tornare indietro non deve far vedere niente di nuovo."""
+        m = self.partita
+        if not m or m["s"] is None or m["s"].over or not m["storia"] or m["storia"][-1]["i"] != i:
+            return False
+        att = m["attesa"]
+        if att and att["domanda"] and self.q_di(i) != att["domanda"]["q"]:
+            return False
+        return segreti(m["s"], self.q_di(i)) == m["storia"][-1]["segreti"]
+
+    def annulla(self, i):
+        m = self.partita
+        if not self.annullabile(i):
+            raise ValueError("non puoi più tornare indietro su questa scelta")
+        h = m["storia"].pop()
+        m["s"] = h["s"]
+        m["attesa"] = None
+        m["s"].say(f"  P{self.q_di(i) + 1} torna indietro sull'ultima scelta")
+        m["versione"] += 1
+
+    def bersaglio(self, i, versione, uid):
+        """Risposta alla domanda aperta da un trigger con più bersagli possibili."""
+        m = self.partita
+        if not m or not m["attesa"] or not m["attesa"]["domanda"]:
+            raise ValueError("nessun bersaglio da scegliere")
+        if versione != m["versione"]:
+            raise ValueError("stato cambiato, aggiorna")
+        d = m["attesa"]["domanda"]
+        if self.q_di(i) != d["q"]:
+            raise ValueError("il bersaglio lo sceglie l'avversario")
+        if uid not in d["cands"]:
+            raise ValueError("bersaglio non valido")
+        m["storia"] = [h for h in m["storia"] if h["i"] == i]
+        m["attesa"]["scelte"].append(uid)
+        m["attesa"]["domanda"] = None
+        if self._esegui():
+            self._turni_ia()
+
+    def _esegui(self):
+        """Esegue l'azione in attesa. Ogni trigger con più bersagli possibili diventa una domanda al
+        giocatore che lo controlla (o la scelta del motore per l'IA): l'azione si prova su un clone
+        finché tutte le scelte sono note, poi si esegue sulla partita vera. False = serve una risposta."""
+        m = self.partita
+        s, att = m["s"], m["attesa"]
+        while True:
+            extra, need = prova(s, att["act"], att["scelte"])
+            att["scelte"] += extra
+            if not need:
+                break
+            if self._seat_ia(need["q"]):
+                att["scelte"].append(need["default"])
+                continue
+            att["domanda"] = need
+            m["versione"] += 1
+            return False
+        scelte = list(att["scelte"])
+        s.trigger_target = lambda q, sel, cands: (scelte.pop(0) if scelte else
+                                                  engine.GameState.trigger_target(s, q, sel, cands))
+        try:
+            passo(s, att["act"])
+        finally:
+            del s.trigger_target
+        m["attesa"] = None
+        m["versione"] += 1
+        return True
+
+    def _turni_ia(self):
+        m = self.partita
+        s = m["s"]
+        for _ in range(2000):
+            if s.over or m["attesa"]:
+                return
+            q = s.decider()
+            if not self._seat_ia(q):
+                return
+            m["attesa"] = {"act": self.agente.act(s), "scelte": [], "domanda": None}
+            if not self._esegui():
+                return
+
+    def resa(self, i):
+        m = self.partita
+        if m and m["s"] is not None and not m["s"].over:
+            m["s"].lose(self.q_di(i), "resa")
+            m["attesa"] = None
+            m["versione"] += 1
+
+    def rivincita(self):
+        if self.partita and (self.partita["s"] is None or not self.partita["s"].over):
+            raise ValueError("la partita non è finita")
+        self.partita = None
+        self._prepara()
+
+    # views -------------------------------------------------------------
+    def vista(self, i):
+        self.ultimo = time.time()
+        me = self.posti[i]
+        out = {"codice": self.codice, "modalita": self.modalita, "io": i,
+               "giocatori": [{"nome": p.nome, "ia": p.ia, "pronto": p.pronto} for p in self.posti],
+               "fase": "partita" if self.partita else "preparazione", "n_partita": self.n_partita}
+        if me.draft and not self.partita:
+            out["draft"] = me.draft.vista()
+        if not self.partita and self.modalita in ("costruito", "pronti") and me.carte:
+            out["mio_mazzo"] = {"leader": me.leader, "carte": me.carte}
+        if self.partita:
+            out["partita"] = vista_partita(self, i)
+        return out
+
+
+def _nomi(stanza):
+    seats = stanza.partita["seats"]
+    return [stanza.posti[seats[q]].nome for q in (G1, G2)]
+
+
+def vista_partita(stanza, i):
+    m = stanza.partita
+    s = m["s"]
+    q = stanza.q_di(i)
+    nomi = _nomi(stanza)
+    if s is None:
+        return {"versione": m["versione"], "sei": "G1" if q == G1 else "G2", "nomi": {"io": nomi[q], "avversario": nomi[1 - q]},
+                "mulligan": {"mano": m["mani"][q], "max": dati().rules.mulligan_max, "fatto": m["mulligan"][q] is not None,
+                             "avversario_fatto": m["mulligan"][1 - q] is not None,
+                             "leader": m["mazzi"][q][0], "leader_avv": m["mazzi"][1 - q][0]}}
+    domanda = m["attesa"]["domanda"] if m["attesa"] else None
+    dec = domanda["q"] if domanda else s.decider()
+    out = {
+        "versione": m["versione"], "round": s.round, "fase": s.phase, "fase_testo": FASI.get(s.phase, s.phase),
+        "sei": "G1" if q == G1 else "G2", "attivo_sei_tu": s.active == q, "tocca_a_te": dec == q,
+        "decide": nomi[dec] if dec is not None else None,
+        "io": vista_giocatore(s, q, True), "avversario": vista_giocatore(s, 1 - q, False),
+        "nomi": {"io": nomi[q], "avversario": nomi[1 - q]},
+        "combattimento": vista_scontro(s, q), "azioni": [], "log": tradotto(s.log[-80:], nomi), "log_n": len(s.log),
+        "eventi": eventi(s.log, q, max(0, len(s.log) - 80)),
+        "regole": {"saldo": s.saldo_cap(), "crepuscolo": s.r.crepuscolo_round, "round_max": s.r.max_rounds,
+                   "corde_a_1": s.r.corde_one_life_round},
+        "puoi_annullare": stanza.annullabile(i),
+    }
+    if s.over:
+        out["fine"] = {"vincitore": None if s.winner is None else nomi[s.winner],
+                       "hai_vinto": s.winner == q, "motivo": FINE.get(s.end_reason, s.end_reason)}
+    elif domanda:
+        side = domanda["side"]
+        out["bersaglio"] = {"tuo": dec == q, "fonte": domanda["fonte"], "testo": domanda["testo"],
+                            "cands": [{"lato": "io" if side == q else "avv", "uid": u} for u in domanda["cands"]]}
+    elif dec == q:
+        out["azioni"] = [{"i": k, **etichetta(s, q, a)} for k, a in enumerate(s.legal_actions())]
+    return out
+
+
+STORIA_MAX = 30
+
+
+def istantanea(s):
+    """Copia completa della partita (registro e statistiche compresi); le regole restano condivise."""
+    return copy.deepcopy(s, {id(s.r): s.r})
+
+
+def segreti(s, q):
+    """Ciò che, se cambia, ha mostrato a q qualcosa di nascosto: carte pescate, Vite girate,
+    carte uscite dalla mano dell'avversario."""
+    return (tuple(len(p.deck) for p in s.p), tuple(len(p.life) for p in s.p), tuple(s.p[1 - q].hand))
+
+
+def passo(s, act):
+    """s.step(act). Se un attacco va a segno sul Leader e non toglie Vite, il motore lo tace: l'app
+    aggiunge al registro una riga che dice perché (Saldo raggiunto, §9.3, o 0 Vite con una Cicatrice
+    fresca, §9.2 e §9.5), così al tavolo si capisce che è la regola e non un errore."""
+    pre = [(len(p.life), p.fresh()) for p in s.p]
+    cap, k = s.saldo_cap(), len(s.log)
+    s.step(act)
+    if s.over:
+        return
+    log = s.log
+    for n in range(len(log) - 1, k - 1, -1):
+        m = EVENTI_RX["scontro"].search(log[n])
+        if not m or int(m["fa"]) < int(m["db"]) or "oppone" in log[n - 1] or "(Caccia" in log[n - 1]:
+            continue
+        att = next(int(x[3]) - 1 for x in reversed(log[:n]) if " attacca con" in x)
+        d = 1 - att
+        dopo = log[n + 1:]
+        if any(x.startswith(f"    P{d + 1} perde 1 Vita") for x in dopo):
+            continue
+        vite, fresche = pre[d]
+        if fresche >= cap:
+            perche = f"Saldo raggiunto ({fresche} Cicatrici fresche in questo turno, il massimo è {cap})"
+        elif vite == 0:
+            perche = "è già a 0 Vite e ha una Cicatrice fresca, quindi niente colpo finale in questo turno"
+        else:
+            continue
+        log.insert(n + 1, f"    P{d + 1} non perde Vite: {perche}")
+
+
+def prova(s, act, scelte):
+    """Esegue act su un clone di s con le scelte di bersaglio già note (in ordine di chiamata).
+    Ritorna (scelte forzate in più, domanda): le chiamate con un solo candidato si aggiungono da sole;
+    la domanda è il primo trigger con più candidati ancora senza risposta (None se non ce ne sono)."""
+    c = s.clone()
+    calls = [0]
+    extra, need, fonti = [], [], []
+    base_fire = c.fire
+
+    def fire(q, abilities, event, ctx, src=None, once=None):
+        fonti.append(src or (c.unit(q, ctx.get("self")).cid if isinstance(ctx.get("self"), int) and c.unit(q, ctx.get("self")) else None))
+        try:
+            return base_fire(q, abilities, event, ctx, src, once)
+        finally:
+            fonti.pop()
+
+    def tt(q, sel, cands):
+        k = calls[0]
+        calls[0] += 1
+        default = engine.GameState.trigger_target(c, q, sel, cands)
+        if k < len(scelte):
+            return scelte[k] if scelte[k] in cands else default
+        if need:
+            return default
+        if len(cands) == 1:
+            extra.append(cands[0])
+            return cands[0]
+        fonte = fonti[-1] if fonti else None
+        testo = CARDS[fonte].text if fonte in CARDS else ""
+        if fonte in LEADERS:
+            testo = " ".join(ab.get("text", "") for ab in c.leader_abilities(q))
+        need.append({"q": q, "side": q if sel.get("side", "own") == "own" else 1 - q, "cands": list(cands),
+                     "default": default, "fonte": fonte, "testo": testo})
+        return default
+    c.fire = fire
+    c.trigger_target = tt
+    c.step(act)
+    return extra, (need[0] if need else None)
+
+
+EVENTI = [
+    ("turno", re.compile(r"^--- Round (?P<round>\d+), P(?P<p>[12])")),
+    ("gioca", re.compile(r"^  P(?P<p>[12]) gioca (?P<carta>\S+)$")),
+    ("rimargina", re.compile(r"^  P(?P<p>[12]) Rimargina (?P<carta>\S+)$")),
+    ("abilita", re.compile(r"^  P(?P<p>[12]) usa ⟳")),
+    ("attacco", re.compile(r"^  P(?P<p>[12]) attacca con")),
+    ("oppone", re.compile(r"^    P(?P<p>[12]) oppone (?P<carta>\S+)")),
+    ("scontro", re.compile(r"pugni: attaccante (?P<a>\d+), difensore (?P<d>\d+)(?: \+ (?P<carta>\S+))? -> (?P<fa>-?\d+) contro (?P<db>-?\d+)")),
+    ("vita", re.compile(r"^    P(?P<p>[12]) perde 1 Vita")),
+    ("sconfitta", re.compile(r"^    (?P<carta>\S+) di P(?P<p>[12]) è sconfitta")),
+    ("risveglio", re.compile(r"^    P(?P<p>[12]): il Leader si Risveglia")),
+    ("ignorata", re.compile(r"^    P(?P<p>[12]) non perde Vite: (?P<perche>.+)$")),
+]
+EVENTI_RX = dict(EVENTI)
+
+
+def eventi(log, q, start):
+    """Eventi strutturati delle righe del registro da start in poi, per le animazioni del client;
+    "chi" è "io" o "avv" visto dal giocatore q."""
+    out = []
+    for n in range(start, len(log)):
+        for tipo, rx in EVENTI:
+            m = rx.search(log[n])
+            if m:
+                e = {"n": n, "t": tipo, **{k: v for k, v in m.groupdict().items() if v is not None and k != "p"}}
+                if m.groupdict().get("p"):
+                    e["chi"] = "io" if int(m["p"]) - 1 == q else "avv"
+                out.append(e)
+                break
+    return out
+
+
+def tradotto(lines, nomi):
+    return [re.sub(r"\bP([12])\b", lambda mm: nomi[int(mm.group(1)) - 1], ln) for ln in lines]
+
+
+def vista_giocatore(s, q, mio):
+    pl = s.p[q]
+    lid = pl.leader
+    out = {
+        "leader": {"id": lid, "colori": list(LEADERS[lid].colors), "risvegliato": pl.awakened,
+                   "pronto": pl.l_ready, "forza": s.leader_power(q), "tempra": s.tempra(q)},
+        "vite": len(pl.life), "alle_corde": s.alle_corde(q), "brace": pl.brace, "guardia": pl.guard,
+        "guardia_max": s.guard_max(q), "mazzo": len(pl.deck), "mano_n": len(pl.hand),
+        "cicatrici": [{"id": sc[0], "fresca": bool(sc[1])} for sc in pl.scars],
+        "unita": [{"uid": u.uid, "id": u.cid, "pronta": u.ready, "forza": s.unit_power(q, u, outside=True),
+                   "forza_stampata": CARDS[u.cid].power, "mod": modificatori(s, q, u)} for u in pl.units],
+        "reliquie": list(pl.relics), "scarti": list(pl.discard),
+    }
+    if mio:
+        out["mano"] = list(pl.hand)
+    return out
+
+
+def modificatori(s, q, u):
+    """Da dove viene la Forza attuale di un'Unità: [{"fonte", "v"}], più i bonus "in scontro" già attivi
+    adesso (Furia, Cicatrici, Risveglio) con "scontro": True. Ricalca unit_power(outside=True); se un
+    giorno non torna, la differenza compare come "altro" invece di sparire."""
+    c = CARDS[u.cid]
+    out = []
+    for ab in c.abilities:
+        if ab.get("static") != "power" or "applies_to" in ab:
+            continue
+        conds = ab.get("if") or []
+        if not conds:
+            out.append({"fonte": u.cid, "v": s.num(ab["value"], q)})
+        elif not any(set(k) & COMBAT_CONDS for k in conds) and s.cond_ok(q, conds, {"self": u.uid}):
+            out.append({"fonte": u.cid, "v": s.num(ab["value"], q), "scontro": True})
+    for sid, ab in s.sources(q, "aura"):
+        if ab.get("static") != "power" or "applies_to" not in ab:
+            continue
+        sel = ab["applies_to"]
+        if sel.get("attacker") or any(set(k) & COMBAT_CONDS for k in ab.get("if") or []):
+            continue
+        if sel.get("side", "own") == "own" and s.matches(q, u, sel, {"self": u.uid}) \
+                and s.cond_ok(q, ab.get("if"), {"self": u.uid}):
+            out.append({"fonte": sid, "v": s.num(ab["value"], q)})
+    resto = s.unit_power(q, u, outside=True) - c.power - sum(x["v"] for x in out if not x.get("scontro"))
+    if resto:
+        out.append({"fonte": "altro", "v": resto})
+    return [x for x in out if x["v"]]
+
+
+def conto_scontro(s, cb, a_gems, d_gems):
+    """Fa e Db dal vivo con le gemme già impegnate, divisi in parti: base, gemme, Parata, Reazione,
+    abilità ed effetti (con le carte che li danno, dalla traccia del motore)."""
+    a, d = s.active, 1 - s.active
+    react = cb.react if d_gems else None
+    trace = {"src": []}
+    try:
+        fa, db, _ = s.compute(a_gems, d_gems, react, cb.opposer, trace=trace)
+    except Exception:
+        return None
+    pa = s.p[a]
+    tgt = cb.target()
+    if cb.att == "L":
+        base_a, nome_a = (s.r.leader_power_awakened if pa.awakened else s.r.leader_power), "Forza del Leader"
+    else:
+        u = s.unit(a, cb.att)
+        base_a, nome_a = (CARDS[u.cid].power if u else 0), "Forza stampata"
+    if tgt is None:
+        base_d, nome_d = s.tempra(d), "Tempra del Leader"
+    else:
+        tu = s.unit(d, tgt)
+        base_d, nome_d = (CARDS[tu.cid].power if tu else 0), "Forza stampata"
+    costo = max(CARDS[react[0]].cost, 1) if react and d_gems >= max(CARDS[react[0]].cost, 1) else 0
+    parata = (d_gems - costo) * s.parata_per_gemma(d)
+    gem_a = a_gems * s.r.forza_per_gemma
+    fonti = lambda side: sorted({cid for qq, cid in trace["src"] if qq == side and (not react or cid != react[0])})
+    att = [{"t": nome_a, "v": base_a}, {"t": f"{a_gems} gemme di Brace", "v": gem_a}]
+    dif = [{"t": nome_d, "v": base_d}, {"t": f"Parata ({d_gems - costo} gemme)", "v": parata}]
+    ra, rd = fa - base_a - gem_a, db - base_d - parata
+    if costo:
+        dif.append({"t": f"Reazione {react[0]}", "v": None})
+    if ra:
+        att.append({"t": "abilità ed effetti" + (": " + ", ".join(fonti(a)) if fonti(a) else ""), "v": ra})
+    if rd:
+        dif.append({"t": "abilità ed effetti" + (": " + ", ".join(fonti(d)) if fonti(d) else ""), "v": rd})
+    return {"fa": fa, "db": db, "att": [x for x in att if x["v"] != 0], "dif": [x for x in dif if x["v"] != 0]}
+
+
+def vista_scontro(s, q):
+    cb = s.combat
+    if cb is None or s.phase == "main":
+        return None
+    a = s.active
+    tgt = cb.target()
+    visibile = cb.a is not None and (cb.a_visible or q == a)
+    return {"attaccante": s.describe(a, cb.att), "attacca_tu": q == a, "att_ref": cb.att, "bersaglio_ref": tgt,
+            "opposta_ref": cb.opposer,
+            "bersaglio": s.describe(1 - a, tgt) if tgt is not None else "Leader",
+            "opposta_da": s.describe(1 - a, cb.opposer) if cb.opposer is not None else None,
+            "gemme_attacco": cb.a if visibile else None,
+            "conto": conto_scontro(s, cb, cb.a if visibile else 0, cb.d or 0)}
+
+
+def _forza_su(s, a_gems, d_gems=0, react=None):
+    try:
+        fa, db, _ = s.compute(a_gems, d_gems, react, "current")
+        return fa, db
+    except Exception:           # anteprima: mai bloccare l'azione
+        return None, None
+
+
+def _ref(q, spec, t):
+    """Bersaglio scelto di una carta o abilità: {"lato": "io"|"avv", "uid": ...} o None."""
+    if t is None:
+        return None
+    sel = (spec or {}).get("target") or {}
+    return {"lato": "io" if sel.get("side", "own") == "own" else "avv", "uid": t}
+
+
+def etichetta(s, q, act):
+    """Testo leggibile di un'azione legale, con il gruppo per l'interfaccia."""
+    k = act[0]
+    a = s.active
+    if k == "end":
+        return {"gruppo": "turno", "testo": "Fine del turno"}
+    if k == "play":
+        c = CARDS[act[1]]
+        t = ""
+        if act[2] is not None:
+            sel = (c.play or {}).get("target") or {}
+            owner = q if sel.get("side", "own") == "own" else 1 - q
+            t = f" → {'tua' if owner == q else 'avversaria'} {s.describe(owner, act[2])}"
+        return {"gruppo": "gioca", "testo": f"Gioca {c.name} ({c.cost} Brace){t}", "carta": c.id,
+                "bersaglio": _ref(q, c.play, act[2])}
+    if k == "rim":
+        return {"gruppo": "rimargina", "testo": f"Rimargina {act[1]}: ruota il Leader, {s.modifier(q, 'rim_cost', 1)} Brace, la carta torna in mano",
+                "carta": act[1]}
+    if k == "ability":
+        src, idx, t = act[1], act[2], act[3]
+        if src == "L":
+            ab = s.leader_abilities(q)[idx]
+            who = "Leader"
+        else:
+            u = s.unit(q, src)
+            ab = CARDS[u.cid].abilities[idx]
+            who = s.describe(q, src)
+        tt = ""
+        if t is not None:
+            sel = ab.get("target") or {}
+            owner = q if sel.get("side", "own") == "own" else 1 - q
+            tt = f" → {'tua' if owner == q else 'avversaria'} {s.describe(owner, t)}"
+        return {"gruppo": "abilita", "testo": f"⟳ {who} ({ab.get('cost', 0)} Brace){tt}"
+                + (f": {ab['text']}" if ab.get("text") else ""), "sorgente": src, "bersaglio": _ref(q, ab, t)}
+    if k == "attack":
+        t = f" (Caccia: {s.describe(1 - q, act[2])})" if len(act) > 2 else " il Leader avversario"
+        return {"gruppo": "attacca", "testo": f"Attacca con {s.describe(q, act[1])}{t}", "sorgente": act[1],
+                "bersaglio": {"lato": "avv", "uid": act[2]} if len(act) > 2 else {"lato": "avv", "uid": "L"}}
+    if k == "gems":
+        fa, db = _forza_su(s, act[1])
+        extra = f" → Forza d'attacco {fa} contro difesa {db} senza Parata" if fa is not None else ""
+        return {"gruppo": "gemme", "testo": f"Impegna {act[1]} gemme{extra}", "n": act[1], "fa": fa, "db": db}
+    if k == "no_oppose":
+        return {"gruppo": "opposizione", "testo": "Non opporti"}
+    if k == "oppose":
+        u = s.unit(q, act[1])
+        return {"gruppo": "opposizione",
+                "testo": f"Opponi {s.describe(q, act[1])} (Forza {s.unit_power(q, u, outside=True)})", "sorgente": act[1]}
+    if k == "parry":
+        gems, react = act[1], act[2]
+        txt = f"Impegna {gems} gemme di Guardia"
+        if react:
+            cid, src = react
+            txt += f" con la Reazione {cid} {'dalla mano' if src == 'hand' else 'dalle Cicatrici'} (costo {max(CARDS[cid].cost, 1)})"
+        cb = s.combat
+        if cb.a is not None and (cb.a_visible or q == a):
+            fa, db = _forza_su(s, cb.a, gems, react)
+            if fa is not None:
+                txt += f" → attacco {fa} contro difesa {db}"
+        out = {"gruppo": "parata", "testo": txt, "carta": react[0] if react else None, "n": gems,
+               "da": react[1] if react else None}
+        if cb.a is not None and (cb.a_visible or q == a):
+            out["fa"], out["db"] = _forza_su(s, cb.a, gems, react)
+        return out
+    return {"gruppo": "altro", "testo": str(act)}
+
+
+# ---------------------------------------------------------------------------- registry
+class Registro:
+    DURATA = 6 * 3600
+
+    def __init__(self):
+        self.stanze = {}
+        self.lock = threading.Lock()
+
+    def crea(self, modalita, nome, contro_ia=False):
+        st = Stanza(modalita, nome, contro_ia)
+        with self.lock:
+            self._pulisci()
+            while True:
+                code = "".join(random.choice(string.ascii_uppercase) for _ in range(5))
+                if code not in self.stanze:
+                    break
+            st.codice = code
+            self.stanze[code] = st
+        return st
+
+    def get(self, code):
+        st = self.stanze.get((code or "").strip().upper())
+        if not st:
+            raise KeyError("stanza inesistente o scaduta")
+        return st
+
+    def _pulisci(self):
+        now = time.time()
+        for c in [c for c, st in self.stanze.items() if now - st.ultimo > self.DURATA]:
+            del self.stanze[c]
+
+
+_DATI = []
+
+
+def dati():
+    """Set, regole e mazzi, caricati alla prima chiamata (carica le carte nel motore)."""
+    if not _DATI:
+        _DATI.append(Dati())
+    return _DATI[0]

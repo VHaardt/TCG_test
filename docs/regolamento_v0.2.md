@@ -2,7 +2,7 @@
 
 | Campo | Valore |
 |---|---|
-| Versione | v0.2.6 (nucleo; ultima modifica Q-022, P6 scelta da Vittorio; correzioni di testo 2026-10-22) |
+| Versione | v0.2.7 (nucleo di v0.2.6; costruzione del mazzo da Q-026) |
 | Data | 2026-10-13 |
 | Stato | **ratificato dallo swarm (Q-013, 8/8 APPROVO); pilastri 2–3–4–6 in revisione, vedi pilastri** (`pilastri_design_v0.2.md`) |
 | Fonte normativa | `swarm/questioni/Q-013_rework_nucleo_v0.2/esito.md`, sezione A "Specifica consolidata". Dati: `swarm/esperimenti/E-014/sintesi_r3.md` |
@@ -71,9 +71,11 @@ Valori standard per tutti i Leader del set base [`leader_power`, `leader_power_a
 - **Tempra**: il valore che un attacco deve eguagliare o superare per andare a segno sul Leader.
 - Il Risveglio dà +1 Forza e +1 al massimo di Guardia; la Tempra resta 4.
 
-### 2.3 Regole di costruzione (invariate da v0.1)
-- Esattamente 40 carte, al massimo **3 copie per nome**. Le carte del primo set non hanno nome: il limite vale per **ID** (es. ROS-007). Due ID con lo stesso testo sono carte diverse, ognuna con le sue 3 copie; se differenziarle lo decide chi scrive le carte (R-007 T-3).
-- Ogni carta deve condividere almeno un colore col Leader oppure essere **Neutrale**.
+### 2.3 Regole di costruzione (Q-026, v0.2.7)
+- Esattamente 40 carte [`deck_size` 40], al massimo **2 copie per nome** [`max_copies` 2, `copies_by_name`]. Il nome è quello stampato sulla carta: le carte che hanno lo stesso nome (le **gemelle**, con tipo, costo, Forza e testo identici) contano insieme. Una carta senza un nome proprio è identificata dal suo ID (es. ROS-007). Due carte con lo stesso testo ma costo diverso hanno nomi diversi.
+- Una carta **Leggendaria** è al massimo in **1 copia** [`max_copies_rarity` L 1].
+- Ogni carta deve avere **tutti i suoi colori** fra quelli del Leader oppure essere **Neutrale** [`multicolor_all`]. Per una carta di un solo colore non cambia nulla: basta quel colore. Una carta multicolore (es. Nero/Verde) richiede un Leader con entrambi i colori.
+- **Rarità.** Ogni carta ha una rarità: **Comune**, **Rara**, **Epica** o **Leggendaria** [`rarity_scale`]. La rarità dice quanto la carta è complessa o unica, non quanto è forte. Leggendarie sono solo le Unità boss. Fuori dal limite di copie, la rarità non cambia le partite.
 - Colori del set base: Rosso, Blu, Nero, Verde (§12). Leader bicolori consigliati.
 - Il mazzo non contiene carte-risorsa: la risorsa sono le gemme.
 - Un mazzo che viola queste regole è illegale e non può essere usato.
@@ -503,6 +505,7 @@ Il costo di una Reazione si paga con le gemme di Guardia impegnate in C4. Le car
 | **Bonus al bersaglio** | "Il bersaglio ha +N": si somma al suo valore di difesa (Forza dell'Unità o Tempra del Leader). |
 | **Bracconiere X** | +X in questo scontro quando attacca e il suo bersaglio è un'Unità. |
 | **Caccia** | Attaccando, sceglie come bersaglio un'Unità avversaria, anche Ruotata, invece del Leader (§12.2). |
+| **Costo aggiuntivo** | Costo stampato oltre alle gemme, pagato quando giochi la carta: "il tuo Leader perde N Vite" (rispetta il Saldo) o "Stanca una tua Unità Pronta". Se la carta dice "oppure", scegli tu quale pagare. |
 | **Cicatrice** | Carta Vita persa, a faccia in su, pubblica. È **dritta** oppure **fresca**. |
 | **Cicatrice fresca** | Cicatrice nata in questo turno, tenuta ruotata. Non si gioca come Reazione, non si Rimargina, conta per il Saldo e impedisce il colpo finale. Si raddrizza nella Fine. |
 | **Colpo finale** | Attacco a segno su un Leader Alle Corde senza Cicatrici fresche: vittoria. |
@@ -517,15 +520,18 @@ Il costo di una Reazione si paga con le gemme di Guardia impegnate in C4. Le car
 | **Forza attuale** (fuori dallo scontro) | Forza stampata + bonus sempre attivi (aure); è quella che leggono i filtri "con Forza ≤N" (Q-015 S-4). |
 | **Furia N** | +X al Confronto con almeno N Cicatrici, contandole tutte. |
 | **Gemma** | L'unico segnalino del gioco. Sta nella scorta, in Brace, in Guardia o nell'impegno. |
+| **Gemelle** | Carte con lo stesso nome stampato (stesso tipo, costo, Forza e testo): per il limite di copie sono una carta sola (§2.3). |
 | **Giocatore attivo** | Il giocatore di cui è il turno. |
 | **Guardia** | Gemme sul Leader, formate nella tua Fine; si impegnano solo nel turno avversario. |
 | **Impegno** ("pugno") | Gemme messe scoperte in uno scontro: dall'attaccante in C3, dal difensore in C4 (anche quella che paga la Reazione). |
 | **Impeto N: +X** | Se nell'impegno hai almeno N gemme, +X in questo scontro; quando è il bersaglio contano solo le gemme di Parata. |
+| **Leggendaria** | La rarità delle Unità boss: al massimo 1 copia per mazzo (§2.3). |
 | **Massimo di Guardia** | 2, 3 da Risvegliato, +1 se il tuo Leader è Alle Corde, più gli aumenti stampati sulle carte (NEU-002). |
 | **Opposizione** | In C2 il difensore ruota una sua Unità Pronta, che diventa il bersaglio. |
 | **Parata** | Ogni gemma di Guardia impegnata che non paga una Reazione: +2 al valore di difesa. |
 | **Personaggio** | Unità o Leader. |
 | **Pronto** | Carta dritta: può attaccare, opporsi e usare ⟳. |
+| **Rarità** | Comune, Rara, Epica o Leggendaria: complessità e unicità della carta, non potenza (§2.3). |
 | **Raddrizzare** | Riportare dritta una carta Ruotata o una Cicatrice fresca. |
 | **Reazione** | Carta giocata dal difensore in C4, dalla mano o da una Cicatrice dritta, pagata con le gemme impegnate; al massimo una per scontro. |
 | **Rimarginare** | ⟳ del Leader + 1 Brace: prendi in mano una Cicatrice dritta. |
@@ -538,7 +544,7 @@ Il costo di una Reazione si paga con le gemme di Guardia impegnate in C4. Le car
 | **Sconfiggere** | Mandare un'Unità negli Scarti per esito di scontro o per effetto. |
 | **Scorta** | Riserva comune delle gemme. Spendere = rimettere nella scorta. |
 | **Scudo** | L'Unità che è il bersaglio (si oppone o è cacciata) vince i pareggi [aperto: P7]. |
-| **Stanca** | Ruota un'Unità avversaria Pronta; solo nel tuo turno, mai il Leader. |
+| **Stanca** | Ruota un'Unità avversaria Pronta; solo nel tuo turno, mai il Leader. Come costo aggiuntivo, "Stanca una tua Unità Pronta" ruota invece una tua Unità. |
 | **Tempra** | Valore di difesa del Leader: 4. |
 | **Tracciato del round** | Carta con il segnalino del round e le soglie stampate. |
 | **Trigger** | Abilità "quando…" o "a fine turno"; ordine del §7.5. Quelli "quando il tuo Leader attacca" si risolvono in C1, prima dell'opposizione (§10.4). |
@@ -551,11 +557,11 @@ Il costo di una Reazione si paga con le gemme di Guardia impegnate in C4. Le car
 
 ## 16. Parametri numerici v0.2
 
-Nomi dei parametri da `sim/v02/config.py`; preset del simulatore: `V02` (nucleo ratificato), `V024` (con Q-019), `V026` (con Q-022, default).
+Nomi dei parametri da `sim/v02/config.py`; preset del simulatore: `V02` (nucleo ratificato), `V024` (con Q-019), `V026` (con Q-022, default), `V027` (V026 più la costruzione di Q-026; partite identiche a V026).
 
 | Regola | Valore | Parametro del simulatore | Note |
 |---|---|---|---|
-| Carte nel mazzo | 40, max 3 copie per ID | — | |
+| Carte nel mazzo | 40, max 2 copie per nome, Leggendarie 1 | `deck_size` 40, `max_copies` 2, `copies_by_name`, `max_copies_rarity` L 1, `multicolor_all` | Q-026 (V027); V026 e precedenti: 3 copie per ID, un colore in comune |
 | Mano iniziale | 5 / 5 | `hand` 5, `g2_hand_extra` 0 | G2 a 6 carte non sposta G1 (55.9%) |
 | Mulligan | fino a 3 carte | `mulligan_max` 3 | |
 | Vita iniziale | 5 | `life` 5 | |
@@ -704,3 +710,4 @@ I moduli di v0.1 §17 (campo di battaglia, zone contese, round condiviso, Fulcro
 | v0.2.5 | 2026-10-13 | R-014 (esito di Q-020, 8/8): nuovo §10.4 sulle abilità "quando il tuo Leader attacca" (trigger in C1, prima dell'opposizione; controllo del pilastro 9); Base di Thorn (LDR-04) "Quando il tuo Leader attacca, Stanca un'Unità avversaria Pronta con costo ≤3" al posto di "⟳, 1 Brace: …" (nota del §13, glossario). Nessuna regola del nucleo cambia. |
 | v0.2.6 | 2026-10-18 | Q-022 (livello 3, ratificata 8/8; P6 scelta da Vittorio: opzione B, taratura sull'IA forte): compensazione di G2 nei soli round 1 e 3 (§2, §6, §11, §16, §17.1); al §11 la dichiarazione che a Vite pari allo spareggio perde G1 come parte del vantaggio di posto; spareggio `vite_attivo` invariato. Preset del simulatore V026. |
 | v0.2.6 (testo) | 2026-10-22 | Solo testo, nessuna regola cambiata: §10.1 chiude il rimando a Q-017; §12.3 Esposto "salvo Caccia"; Scudo "quando è il bersaglio" in §12.2, §12.3 e glossario, come già nel motore e nei testi del set. |
+| v0.2.7 | 2026-10-26 | Q-026 (V1 e V2 8/8, vincoli di Vittorio): §2.3 con 2 copie per nome (le gemelle contano insieme), Leggendarie in 1 copia, carta multicolore con tutti i suoi colori nel Leader, rarità Comune/Rara/Epica/Leggendaria; costo aggiuntivo "Stanca una tua Unità Pronta", anche in alternativa a un costo in Vita (M1). Glossario: Costo aggiuntivo, Gemelle, Leggendaria, Rarità, Stanca. Il gioco non cambia: preset V027 = V026 più la costruzione. |

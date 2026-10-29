@@ -1,0 +1,2 @@
+# App online di CICATRICI (app/): il server usa solo la libreria standard, numpy serve all'IA del simulatore.
+numpy>=1.26
