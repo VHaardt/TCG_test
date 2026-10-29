@@ -1,0 +1,1369 @@
+<title>Regolamento di CICATRICI</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@600;800;900&family=Source+Sans+3:ital,wght@0,400;0,600;0,700;1,400&display=swap">
+<style>
+/* Layout: manuale da tavolo. Colonna di lettura stretta, indice fisso a sinistra su schermo largo,
+   riquadri per tipo (esempio, ricorda, attenzione, in prova), figure SVG a tutta colonna.
+   Colori di ruolo: brace = attaccante e gemme, guardia = difensore, cicatrice = Vite e ferite. */
+:root {
+  --carta: #f3f4f6;
+  --superficie: #ffffff;
+  --inchiostro: #1a1d29;
+  --tenue: #565d70;
+  --linea: #d6d9e1;
+  --brace: #d9701a;
+  --brace-chiaro: #fbe7d3;
+  --guardia: #2b66a8;
+  --guardia-chiaro: #dde8f5;
+  --cicatrice: #ad2338;
+  --cicatrice-chiaro: #f6dde1;
+  --verde-ok: #2f7d4f;
+  --verde-ok-chiaro: #dcefe3;
+  --c-rosso: #c0392b;
+  --c-blu: #2b66a8;
+  --c-nero: #3a3a46;
+  --c-verde: #2f7d4f;
+  --ombra: 0 1px 2px rgba(26, 29, 41, .06), 0 4px 16px rgba(26, 29, 41, .06);
+  --f-titolo: "Big Shoulders Display", "Arial Narrow", "Roboto Condensed", Impact, sans-serif;
+  --f-testo: "Source Sans 3", "Source Sans Pro", "Segoe UI", system-ui, -apple-system, sans-serif;
+  --misura: 68ch;
+  --testata: #1a1d29;
+  --testata-testo: #f3f4f6;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --carta: #13151d; --superficie: #1b1e29; --inchiostro: #e8eaf1; --tenue: #a3a9ba; --linea: #2e3242;
+    --brace: #f0913a; --brace-chiaro: #3a2614; --guardia: #72a6e2; --guardia-chiaro: #18263a;
+    --cicatrice: #e65c71; --cicatrice-chiaro: #3a1a20; --verde-ok: #5cbf86; --verde-ok-chiaro: #15291e;
+    --c-rosso: #e2604f; --c-blu: #72a6e2; --c-nero: #b9bccb; --c-verde: #5cbf86;
+    --ombra: 0 1px 2px rgba(0, 0, 0, .3), 0 4px 16px rgba(0, 0, 0, .25);
+    --testata: #0a0b10;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --carta: #13151d; --superficie: #1b1e29; --inchiostro: #e8eaf1; --tenue: #a3a9ba; --linea: #2e3242;
+  --brace: #f0913a; --brace-chiaro: #3a2614; --guardia: #72a6e2; --guardia-chiaro: #18263a;
+  --cicatrice: #e65c71; --cicatrice-chiaro: #3a1a20; --verde-ok: #5cbf86; --verde-ok-chiaro: #15291e;
+  --c-rosso: #e2604f; --c-blu: #72a6e2; --c-nero: #b9bccb; --c-verde: #5cbf86;
+  --ombra: 0 1px 2px rgba(0, 0, 0, .3), 0 4px 16px rgba(0, 0, 0, .25);
+  --testata: #0a0b10;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+body {
+  margin: 0; background: var(--carta); color: var(--inchiostro);
+  font: 400 1.0625rem/1.6 var(--f-testo);
+  -webkit-font-smoothing: antialiased;
+}
+a { color: var(--guardia); text-underline-offset: 2px; }
+a:focus-visible, summary:focus-visible { outline: 2px solid var(--brace); outline-offset: 2px; border-radius: 3px; }
+code { font: .9em ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace; background: var(--superficie); border: 1px solid var(--linea); border-radius: 4px; padding: 0 .25em; }
+strong { font-weight: 700; }
+
+/* testata */
+.testata { background: var(--testata); color: var(--testata-testo); }
+.testata-in {
+  max-width: 1180px; margin: 0 auto;
+  padding-block: 3.2rem 2.4rem;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+.occhiello { margin: 0; font-size: .8rem; letter-spacing: .14em; text-transform: uppercase; opacity: .75; }
+.marchio {
+  position: relative; display: inline-block; margin: .2rem 0 .3rem;
+  font: 900 clamp(3.2rem, 12vw, 7.5rem)/.9 var(--f-titolo); letter-spacing: .02em;
+}
+.cucitura {
+  position: absolute; left: 4%; right: 6%; top: 52%; height: 0;
+  border-top: 3px solid var(--cicatrice); transform: rotate(-4deg);
+}
+.cucitura::before {
+  content: ""; position: absolute; inset: -9px 0 auto; height: 18px;
+  background: repeating-linear-gradient(90deg, transparent 0 18px, var(--cicatrice) 18px 21px);
+}
+.sottotitolo { margin: .4rem 0 0; font-size: 1.25rem; }
+.meta { margin: 1rem 0 0; font-size: .85rem; opacity: .75; font-variant-numeric: tabular-nums; }
+
+/* corpo */
+.corpo {
+  max-width: 1180px; margin: 0 auto;
+  display: grid; grid-template-columns: minmax(0, 1fr); gap: 0 3rem;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 1.5rem 4rem;
+}
+@media (min-width: 1040px) { .corpo { grid-template-columns: 230px minmax(0, 1fr); } }
+.testo { min-width: 0; max-width: 820px; }
+.testo > p, .testo > ul, .testo > ol, .testo > h3, .testo > h4 { max-width: var(--misura); }
+
+.indice { font-size: .92rem; }
+.indice details { border-bottom: 1px solid var(--linea); padding-bottom: .5rem; }
+.indice summary { cursor: pointer; font: 800 1.1rem var(--f-titolo); letter-spacing: .06em; text-transform: uppercase; padding: .4rem 0; }
+.indice ol { margin: .3rem 0 0; padding-left: 1.6rem; display: grid; gap: .15rem; }
+.indice li::marker { color: var(--tenue); font-variant-numeric: tabular-nums; }
+.indice a { color: var(--inchiostro); text-decoration: none; }
+.indice a:hover { color: var(--brace); }
+@media (min-width: 1040px) {
+  .indice { position: sticky; top: calc(env(safe-area-inset-top, 0px) + 1rem); align-self: start; max-height: calc(100vh - 2rem); overflow: auto; padding-top: 1rem; }
+  .indice details { border: 0; }
+}
+
+/* titoli */
+h2, h3, h4 { text-wrap: balance; }
+h2 {
+  counter-increment: cap;
+  margin: 3.2rem 0 1rem; padding-top: 1.2rem; border-top: 2px solid var(--inchiostro);
+  font: 800 clamp(2rem, 5vw, 2.7rem)/1 var(--f-titolo); letter-spacing: .01em; text-transform: uppercase;
+  display: flex; gap: .6rem; align-items: baseline;
+}
+.testo { counter-reset: cap; }
+h2::before { content: counter(cap); font-weight: 600; color: var(--brace); font-variant-numeric: tabular-nums; }
+h3 { margin: 2rem 0 .5rem; font: 800 1.45rem/1.15 var(--f-titolo); letter-spacing: .02em; }
+h4 { margin: 1.4rem 0 .3rem; font-size: 1.05rem; font-weight: 700; }
+p { margin: .6rem 0; }
+ul, ol { padding-left: 1.4rem; }
+li { margin: .2rem 0; }
+li::marker { color: var(--tenue); }
+.testo > p:first-of-type { font-size: 1.15rem; }
+
+/* tabelle */
+.testo table { border-collapse: collapse; width: 100%; margin: 1rem 0; font-size: .97rem; font-variant-numeric: tabular-nums; background: var(--superficie); }
+.testo th, .testo td { text-align: left; vertical-align: top; padding: .5rem .7rem; border-bottom: 1px solid var(--linea); }
+.testo th { font-size: .78rem; letter-spacing: .08em; text-transform: uppercase; color: var(--tenue); font-weight: 700; border-bottom: 2px solid var(--inchiostro); background: transparent; }
+.tab-scroll { overflow-x: auto; }
+
+/* riquadri */
+.box { margin: 1.3rem 0; padding: .9rem 1.1rem; border-radius: 10px; background: var(--superficie); border: 1px solid var(--linea); max-width: var(--misura); }
+.box > :first-child { margin-top: 0; }
+.box > :last-child { margin-bottom: 0; }
+.box-tit { margin: 0 0 .35rem; font: 800 .82rem var(--f-testo); letter-spacing: .1em; text-transform: uppercase; display: flex; align-items: center; gap: .45rem; }
+.box-tit::before { font: 900 .95rem var(--f-titolo); padding: .05rem .45rem; border-radius: 4px; color: var(--superficie); }
+.box-esempio { border-left: 5px solid var(--guardia); }
+.box-esempio .box-tit { color: var(--guardia); }
+.box-esempio .box-tit::before { content: "ESEMPIO"; background: var(--guardia); }
+.box-ricorda { background: var(--brace-chiaro); border-color: transparent; }
+.box-ricorda .box-tit { color: var(--brace); }
+.box-ricorda .box-tit::before { content: "!"; background: var(--brace); }
+.box-attenzione { background: var(--cicatrice-chiaro); border-color: transparent; }
+.box-attenzione .box-tit { color: var(--cicatrice); }
+.box-attenzione .box-tit::before { content: "×"; background: var(--cicatrice); }
+.box-prova { border-style: dashed; }
+.box-prova .box-tit { color: var(--tenue); }
+.box-prova .box-tit::before { content: "IN PROVA"; background: var(--tenue); }
+.box-riepilogo { background: var(--testata); color: var(--testata-testo); border: 0; }
+.box-riepilogo .box-tit { color: var(--brace); }
+.box-riepilogo code { background: transparent; color: inherit; }
+
+/* griglie */
+.griglia { display: grid; grid-template-columns: repeat(auto-fit, minmax(175px, 1fr)); gap: .9rem; margin: 1.2rem 0; }
+.griglia > div { min-width: 0; background: var(--superficie); border: 1px solid var(--linea); border-radius: 10px; padding: .9rem 1rem; }
+.griglia h4 { margin: 0 0 .3rem; font: 800 1.25rem var(--f-titolo); letter-spacing: .03em; text-transform: uppercase; color: var(--brace); }
+.griglia p { margin: .2rem 0; font-size: .97rem; }
+
+/* riepilogo rapido */
+.rapido { display: grid; grid-template-columns: minmax(0, 1fr); gap: .9rem; margin: 1.2rem 0; }
+.rapido > div { min-width: 0; border: 2px solid var(--inchiostro); border-radius: 10px; padding: .8rem 1rem; background: var(--superficie); }
+.rapido h4 { margin: 0 0 .4rem; font: 800 1.2rem var(--f-titolo); text-transform: uppercase; letter-spacing: .04em; }
+.rapido ol, .rapido ul { margin: 0; padding-left: 1.2rem; font-size: .95rem; }
+.rapido p { font-size: .95rem; margin: .2rem 0; }
+
+@media (min-width: 640px) { .rapido { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+blockquote { margin: 1rem 0; padding: .7rem 1rem; border: 2px solid var(--inchiostro); border-radius: 10px; background: var(--superficie); font-weight: 600; max-width: var(--misura); }
+blockquote p { margin: 0; }
+
+/* parole chiave */
+dl.chiavi { margin: 1rem 0; display: grid; gap: .1rem; max-width: var(--misura); }
+dl.chiavi dt { font: 800 1.15rem var(--f-titolo); letter-spacing: .03em; margin-top: .7rem; }
+dl.chiavi dd { margin: 0; }
+.colore { display: inline-block; width: .8em; height: .8em; border-radius: 50%; vertical-align: -.05em; margin-right: .3em; }
+.colore.rosso { background: var(--c-rosso); } .colore.blu { background: var(--c-blu); }
+.colore.nero { background: var(--c-nero); } .colore.verde { background: var(--c-verde); }
+.colore.neutro { background: transparent; border: 2px solid var(--tenue); }
+
+/* icone */
+.ic-gemma { display: inline-block; width: .78em; height: .78em; border-radius: 50%; background: var(--brace); box-shadow: inset -2px -2px 0 rgba(0,0,0,.18); vertical-align: -.06em; }
+.ic-ruota { font-weight: 700; color: var(--brace); }
+.att { color: var(--brace); font-weight: 700; }
+.dif { color: var(--guardia); font-weight: 700; }
+.cic { color: var(--cicatrice); font-weight: 700; }
+
+/* figure */
+.fig { margin: 1.6rem 0; }
+.fig-scroll { overflow-x: auto; background: var(--superficie); border: 1px solid var(--linea); border-radius: 12px; padding: 1rem; box-shadow: var(--ombra); }
+.fig-svg { display: block; width: 100%; height: auto; min-width: 520px; font-family: var(--f-testo); }
+.fig-svg.stretta { min-width: 0; max-width: 560px; margin: 0 auto; }
+figcaption { margin-top: .5rem; font-size: .88rem; color: var(--tenue); max-width: var(--misura); }
+
+/* elementi SVG condivisi */
+.fig-svg text { fill: var(--inchiostro); font-size: 13px; }
+.fig-svg .t-tenue { fill: var(--tenue); font-size: 12px; }
+.fig-svg .t-tit { font: 800 17px var(--f-titolo); letter-spacing: .04em; text-transform: uppercase; }
+.fig-svg .t-gr { font: 900 30px var(--f-titolo); }
+.fig-svg .t-b { font-weight: 700; }
+.fig-svg .t-chiaro { fill: var(--superficie); }
+.fig-svg .t-att { fill: var(--brace); font-weight: 700; }
+.fig-svg .t-dif { fill: var(--guardia); font-weight: 700; }
+.fig-svg .t-cic { fill: var(--cicatrice); font-weight: 700; }
+.fig-svg .zona { fill: var(--carta); stroke: var(--linea); stroke-width: 1.5; }
+.fig-svg .zona-tratt { fill: none; stroke: var(--tenue); stroke-width: 1.5; stroke-dasharray: 5 4; }
+.fig-svg .carta-f { fill: var(--superficie); stroke: var(--inchiostro); stroke-width: 2; }
+.fig-svg .carta-dorso { fill: var(--inchiostro); stroke: var(--inchiostro); stroke-width: 2; }
+.fig-svg .carta-cic { fill: var(--cicatrice-chiaro); stroke: var(--cicatrice); stroke-width: 2; }
+.fig-svg .gemma { fill: var(--brace); stroke: var(--inchiostro); stroke-width: 1; }
+.fig-svg .gemma-g { fill: var(--guardia); stroke: var(--inchiostro); stroke-width: 1; }
+.fig-svg .riq-att { fill: var(--brace-chiaro); stroke: var(--brace); stroke-width: 1.5; }
+.fig-svg .riq-dif { fill: var(--guardia-chiaro); stroke: var(--guardia); stroke-width: 1.5; }
+.fig-svg .riq-cic { fill: var(--cicatrice-chiaro); stroke: var(--cicatrice); stroke-width: 1.5; }
+.fig-svg .riq-ok { fill: var(--verde-ok-chiaro); stroke: var(--verde-ok); stroke-width: 1.5; }
+.fig-svg .riq-neutro { fill: var(--superficie); stroke: var(--inchiostro); stroke-width: 1.5; }
+.fig-svg .riq-scuro { fill: var(--inchiostro); }
+.fig-svg .freccia { fill: none; stroke: var(--tenue); stroke-width: 2; }
+.fig-svg .freccia-att { fill: none; stroke: var(--brace); stroke-width: 2.2; }
+.fig-svg .freccia-dif { fill: none; stroke: var(--guardia); stroke-width: 2.2; }
+.fig-svg .punta { fill: var(--tenue); }
+.fig-svg .divisore { stroke: var(--inchiostro); stroke-width: 2; stroke-dasharray: 2 6; stroke-linecap: round; }
+/* tracciato */
+.fig-svg .trk-cella { fill: var(--carta); stroke: var(--inchiostro); stroke-width: 1.5; }
+.fig-svg .trk-ev { fill: var(--cicatrice-chiaro); stroke: var(--cicatrice); }
+.fig-svg .trk-num { font: 900 22px var(--f-titolo); text-anchor: middle; }
+.fig-svg .trk-brace { font-size: 13px; font-weight: 700; }
+.fig-svg .trk-g2 { fill: var(--guardia-chiaro); stroke: var(--guardia); }
+.fig-svg .trk-g2t { fill: var(--guardia); font-size: 11px; font-weight: 700; text-anchor: middle; }
+.fig-svg .trk-nota { fill: var(--tenue); font-size: 11px; text-anchor: middle; }
+.fig-svg .trk-linea { stroke: var(--cicatrice); stroke-width: 2; }
+.fig-svg .trk-ev-t { fill: var(--cicatrice); font-size: 12px; font-weight: 700; }
+.fig-svg .trk-leg { fill: var(--tenue); font-size: 12px; }
+.fig-svg .trk-leg-b { font-weight: 700; fill: var(--inchiostro); }
+
+.piede { margin-top: 4rem; padding-top: 1rem; border-top: 1px solid var(--linea); color: var(--tenue); font-size: .88rem; max-width: var(--misura); }
+
+/* stampa (PDF): sempre chiaro, niente indice laterale */
+@page { size: A4; margin: 14mm 14mm 16mm; }
+@media print {
+  :root, :root[data-theme="dark"] {
+    --carta: #ffffff; --superficie: #ffffff; --inchiostro: #1a1d29; --tenue: #565d70; --linea: #d6d9e1;
+    --brace: #d9701a; --brace-chiaro: #fbe7d3; --guardia: #2b66a8; --guardia-chiaro: #dde8f5;
+    --cicatrice: #ad2338; --cicatrice-chiaro: #f6dde1; --verde-ok: #2f7d4f; --verde-ok-chiaro: #dcefe3;
+    --c-rosso: #c0392b; --c-blu: #2b66a8; --c-nero: #3a3a46; --c-verde: #2f7d4f; --ombra: none;
+    color-scheme: light;
+  }
+  body { font-size: 10.5pt; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  .indice { display: none; }
+  .corpo { display: block; padding: 0; }
+  .testo { max-width: none; }
+  .testata { background: #1a1d29; }
+  .testata-in { padding-block: 2rem 1.6rem; }
+  h2 { break-after: avoid; margin-top: 1.6rem; }
+  #riepilogo-rapido, #glossario { break-before: page; }
+  .griglia { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  h3, h4, .box-tit { break-after: avoid; }
+  .box, .fig, .griglia > div, .rapido > div, tr { break-inside: avoid; }
+  .fig-scroll { box-shadow: none; overflow: visible; }
+  .fig-svg { min-width: 0; }
+  a { color: inherit; text-decoration: none; }
+}
+
+</style>
+
+<div class="pagina">
+  <header class="testata">
+    <div class="testata-in">
+      <p class="occhiello">Gioco di carte 1 contro 1 · regolamento per giocatori</p>
+      <h1 class="marchio">CICATRICI<span class="cucitura" aria-hidden="true"></span></h1>
+      <p class="sottotitolo">Ogni ferita resta sul tavolo. Usala.</p>
+      <p class="meta">Manuale 1.0 · regole <strong>v0.2.6</strong> · numeri dal preset V026 · generato il 2026-10-22</p>
+    </div>
+  </header>
+  <div class="corpo">
+    <nav class="indice" aria-label="Indice">
+      <details open>
+        <summary>Indice</summary>
+        <ol>
+<li><a href="#la-partita-in-un-minuto">La partita in un minuto</a></li>
+<li><a href="#cosa-serve">Cosa serve</a></li>
+<li><a href="#il-tavolo">Il tavolo</a></li>
+<li><a href="#preparazione">Preparazione</a></li>
+<li><a href="#il-turno">Il turno</a></li>
+<li><a href="#le-gemme">Le gemme</a></li>
+<li><a href="#dritto-e-ruotato">Dritto e ruotato</a></li>
+<li><a href="#lattacco">L'attacco</a></li>
+<li><a href="#vite-e-cicatrici">Vite e Cicatrici</a></li>
+<li><a href="#come-si-vince_1">Come si vince</a></li>
+<li><a href="#la-fine-della-partita">La fine della partita</a></li>
+<li><a href="#il-leader">Il Leader</a></li>
+<li><a href="#costruire-il-mazzo">Costruire il mazzo</a></li>
+<li><a href="#parole-chiave">Parole chiave</a></li>
+<li><a href="#casi-particolari">Casi particolari</a></li>
+<li><a href="#riepilogo-rapido">Riepilogo rapido</a></li>
+<li><a href="#glossario">Glossario</a></li>
+        </ol>
+      </details>
+    </nav>
+    <main class="testo">
+<h2 id="la-partita-in-un-minuto">La partita in un minuto</h2>
+<p>Due giocatori, un <strong>Leader</strong> a testa e un mazzo di 40 carte. Il Leader resta sempre in gioco: è lui che devi abbattere. Ogni volta che lo colpisci, una delle sue Vite si gira a faccia in su e diventa una <strong>Cicatrice</strong>. Le Cicatrici non spariscono: restano sul tavolo e il giocatore ferito può usarle.</p>
+<div class="griglia">
+<div>
+<h4 id="come-si-vince">Come si vince</h4>
+<p>Togli all'avversario tutte le 5 Vite: il suo Leader è <strong>Alle Corde</strong>. Poi colpiscilo ancora quando non ha ferite fresche (prese in questo turno): è il <strong>colpo finale</strong>.</p>
+</div>
+<div>
+<h4 id="la-risorsa">La risorsa</h4>
+<p>Le <strong>gemme</strong> <span class="ic-gemma" aria-label="gemma"></span>, tutte uguali. Ogni turno ne prendi dalla scorta tante quante dice il round (fino a 8). Le spendi per giocare carte o le metti in un attacco.</p>
+</div>
+<div>
+<h4 id="la-difesa">La difesa</h4>
+<p>Le gemme che non usi, a fine turno, vanno sul tuo Leader come <strong>Guardia</strong>: nel turno avversario le usi per parare i colpi (+2 ciascuna).</p>
+</div>
+<div>
+<h4 id="agire-costa">Agire costa</h4>
+<p>Chi attacca o usa un'abilità <span class="ic-ruota" aria-label="ruota">⟳</span> si <strong>ruota</strong> e resta ruotato fino al tuo turno successivo. Un personaggio ruotato non può difenderti.</p>
+</div>
+</div>
+<div class="box box-ricorda">
+<p class="box-tit">Il ritmo</p>
+<p>I turni sono <strong>chiusi</strong>: gioca solo il giocatore attivo. L'avversario interviene in due momenti fissi di ogni attacco: può <strong>opporsi</strong> con una sua Unità e può <strong>rispondere</strong> con la Guardia e una carta Reazione. Non esiste una pila di effetti da risolvere al contrario.</p>
+</div>
+<h2 id="cosa-serve">Cosa serve</h2>
+<ul>
+<li><strong>1 Leader</strong> a testa, fuori dal mazzo. È una carta a due facce: lato <strong>Base</strong> e lato <strong>Risvegliato</strong>.</li>
+<li><strong>1 mazzo di 40 carte</strong> a testa.</li>
+<li><strong>Gemme</strong> tutte uguali in una <strong>scorta comune</strong> al centro del tavolo: circa 12 per giocatore, quindi circa 24 in tutto.</li>
+<li><strong>1 carta-tracciato del round</strong> con <strong>1 segnalino</strong>, in comune.</li>
+</ul>
+<p>Niente dadi, contatori o altri segnalini. Tutti gli stati si mostrano <strong>ruotando le carte</strong>.</p>
+<figure class="fig fig-carta_leader"><div class="fig-scroll"><svg viewBox="0 0 660 300" role="img" aria-label="Carta Leader, lato Base e lato Risvegliato" class="fig-svg">
+  <defs><marker id="punta-ldr" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" class="punta"/></marker></defs>
+  <!-- lato Base -->
+  <g transform="translate(30,14)">
+    <rect width="230" height="272" rx="14" class="carta-f"/>
+    <rect x="0" y="0" width="230" height="44" rx="14" class="riq-scuro"/>
+    <rect x="0" y="30" width="230" height="14" class="riq-scuro"/>
+    <text x="16" y="28" class="t-tit t-chiaro">Leader · Base</text>
+    <circle cx="190" cy="22" r="7" style="fill:var(--c-rosso)"/><circle cx="208" cy="22" r="7" style="fill:var(--c-verde)"/>
+    <text x="16" y="66" class="t-tenue">LDR-01</text>
+    <g transform="translate(16,82)">
+      <rect width="62" height="62" rx="8" class="riq-att"/><text x="31" y="38" text-anchor="middle" class="t-gr">3</text><text x="31" y="56" text-anchor="middle" class="t-tenue">Forza</text>
+      <rect x="68" width="62" height="62" rx="8" class="riq-dif"/><text x="99" y="38" text-anchor="middle" class="t-gr">4</text><text x="99" y="56" text-anchor="middle" class="t-tenue">Tempra</text>
+      <rect x="136" width="62" height="62" rx="8" class="riq-cic"/><text x="167" y="38" text-anchor="middle" class="t-gr">5</text><text x="167" y="56" text-anchor="middle" class="t-tenue">Vite</text>
+    </g>
+    <text x="16" y="170" class="t-b">Guardia massima 2</text>
+    <circle cx="190" cy="165" r="7" class="gemma"/><circle cx="208" cy="165" r="7" class="gemma"/>
+    <line x1="16" y1="186" x2="214" y2="186" class="divisore"/>
+    <text x="16" y="208" class="t-tenue">Abilità del lato Base</text>
+    <text x="16" y="230">+ Rimarginare (tutti i Leader)</text>
+    <text x="16" y="252" class="t-tenue">Si attacca sempre il Leader</text>
+  </g>
+  <!-- freccia -->
+  <path d="M276,150 C300,130 340,130 364,150" class="freccia" marker-end="url(#punta-ldr)"/>
+  <text x="320" y="112" text-anchor="middle" class="t-cic">si gira</text>
+  <text x="320" y="178" text-anchor="middle" class="t-tenue">a 2 Vite</text>
+  <text x="320" y="194" text-anchor="middle" class="t-tenue">o meno</text>
+  <!-- lato Risvegliato -->
+  <g transform="translate(380,14)">
+    <rect width="230" height="272" rx="14" class="carta-f"/>
+    <rect x="0" y="0" width="230" height="44" rx="14" style="fill:var(--cicatrice)"/>
+    <rect x="0" y="30" width="230" height="14" style="fill:var(--cicatrice)"/>
+    <text x="16" y="28" class="t-tit t-chiaro">Leader · Risvegliato</text>
+    <text x="16" y="66" class="t-tenue">LDR-01</text>
+    <g transform="translate(16,82)">
+      <rect width="62" height="62" rx="8" class="riq-att"/><text x="31" y="38" text-anchor="middle" class="t-gr">4</text><text x="31" y="56" text-anchor="middle" class="t-tenue">Forza</text>
+      <rect x="68" width="62" height="62" rx="8" class="riq-dif"/><text x="99" y="38" text-anchor="middle" class="t-gr">4</text><text x="99" y="56" text-anchor="middle" class="t-tenue">Tempra</text>
+      <rect x="136" width="62" height="62" rx="8" class="riq-neutro"/><text x="167" y="38" text-anchor="middle" class="t-gr">—</text><text x="167" y="56" text-anchor="middle" class="t-tenue">Vite</text>
+    </g>
+    <text x="16" y="170" class="t-b">Guardia massima 3</text>
+    <circle cx="172" cy="165" r="7" class="gemma"/><circle cx="190" cy="165" r="7" class="gemma"/><circle cx="208" cy="165" r="7" class="gemma"/>
+    <line x1="16" y1="186" x2="214" y2="186" class="divisore"/>
+    <text x="16" y="208" class="t-tenue">Abilità del lato Risvegliato</text>
+    <text x="16" y="230">+ Rimarginare</text>
+    <text x="16" y="252" class="t-tenue">Una volta sola, per sempre</text>
+  </g>
+</svg></div><figcaption>Il Leader nei due lati. Il lato Risvegliato si usa dopo che il Leader ha perso 3 Vite.</figcaption></figure>
+
+<h3 id="come-si-legge-una-carta">Come si legge una carta</h3>
+<p>Le carte del primo set non hanno nome né illustrazione: si riconoscono dall'<strong>ID</strong> (per esempio ROS-001). Il prefisso indica il colore: ROS Rosso, BLU Blu, NER Nero, VER Verde, NEU Neutrale.</p>
+<figure class="fig fig-anatomia_carta"><div class="fig-scroll"><svg viewBox="0 0 660 350" role="img" aria-label="Come si legge una carta Unità" class="fig-svg">
+  <defs><marker id="punta-ana" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0,0 L10,5 L0,10 z" class="punta"/></marker></defs>
+  <g transform="translate(215,14)">
+    <rect width="230" height="320" rx="14" class="carta-f"/>
+    <circle cx="30" cy="30" r="20" class="gemma"/><text x="30" y="37" text-anchor="middle" class="t-tit" style="font-size:20px">1</text>
+    <text x="60" y="26" class="t-b">ROS-001</text>
+    <text x="60" y="44" class="t-tenue">Unità · Rosso</text>
+    <circle cx="206" cy="30" r="8" style="fill:var(--c-rosso)"/>
+    <rect x="16" y="64" width="198" height="110" rx="8" class="zona"/>
+    <text x="115" y="124" text-anchor="middle" class="t-tenue">nessuna illustrazione</text>
+    <text x="16" y="200" class="t-b">Assalto.</text>
+    <text x="16" y="220" class="t-b">Impeto 1: +2</text>
+    <text x="16" y="240" class="t-tenue">con almeno 1 gemma impegnata,</text>
+    <text x="16" y="256" class="t-tenue">+2 in questo scontro</text>
+    <rect x="160" y="268" width="56" height="40" rx="8" class="riq-att"/>
+    <text x="188" y="298" text-anchor="middle" class="t-gr" style="font-size:26px">1</text>
+  </g>
+  <!-- richiami -->
+  <text x="20" y="40" class="t-b">Costo</text><text x="20" y="58" class="t-tenue">in gemme di Brace</text>
+  <path d="M120,44 L222,44" class="freccia" marker-end="url(#punta-ana)"/>
+  <text x="470" y="34" class="t-b">ID, tipo e colore</text><text x="470" y="52" class="t-tenue">massimo 3 copie per ID</text>
+  <path d="M466,40 L388,40" class="freccia" marker-end="url(#punta-ana)"/>
+  <text x="20" y="206" class="t-b">Parole chiave e testo</text><text x="20" y="224" class="t-tenue">il corsivo ricorda la regola</text>
+  <path d="M168,212 L224,212" class="freccia" marker-end="url(#punta-ana)"/>
+  <text x="470" y="282" class="t-b">Forza</text><text x="470" y="300" class="t-tenue">attacco e difesa</text>
+  <path d="M466,288 L436,288" class="freccia" marker-end="url(#punta-ana)"/>
+</svg></div><figcaption>Una Unità del set. Il costo si paga in gemme; la Forza serve per attaccare e per difendere.</figcaption></figure>
+
+<p>Ci sono quattro tipi di carta nel mazzo:</p>
+<div class="tab-scroll"><table>
+<thead>
+<tr>
+<th>Tipo</th>
+<th>Quando la giochi</th>
+<th>Cosa fa</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Unità</strong></td>
+<td>Nel tuo turno, pagando il costo</td>
+<td>Resta in campo, attacca e difende. Entra <strong>ruotata</strong>. Massimo 5</td>
+</tr>
+<tr>
+<td><strong>Tattica</strong></td>
+<td>Nel tuo turno, fuori da un attacco</td>
+<td>Ha effetto subito, poi va negli Scarti</td>
+</tr>
+<tr>
+<td><strong>Reliquia</strong></td>
+<td>Nel tuo turno, pagando il costo</td>
+<td>Resta in campo con un effetto permanente. Non ha Forza e non si può attaccare. Massimo 2</td>
+</tr>
+<tr>
+<td><strong>Reazione</strong></td>
+<td>Solo nel turno avversario, quando difendi</td>
+<td>Modifica l'attacco in corso, poi va negli Scarti</td>
+</tr>
+</tbody>
+</table></div>
+<p>Unità e Leader insieme si chiamano <strong>personaggi</strong>.</p>
+<h3 id="il-tracciato-del-round">Il tracciato del round</h3>
+<p>Un <strong>round</strong> è un turno di G1 seguito da un turno di G2. Il tracciato dice a entrambi quante gemme prendere e quando la partita accelera.</p>
+<figure class="fig fig-tracciato"><div class="fig-scroll"><svg viewBox="0 0 800 176" role="img" aria-label="Tracciato del round" class="fig-svg">
+<rect x="10" y="44" width="48" height="56" rx="6" class="trk-cella"/>
+<text x="34.0" y="68" class="trk-num">1</text>
+<circle cx="24" cy="85" r="6" class="gemma"/><text x="34" y="90" class="trk-brace">1</text>
+<text x="10" y="164" class="trk-nota" style="text-anchor:start">niente attacchi</text>
+<rect x="12" y="108" width="44" height="22" rx="11" class="trk-g2"/><text x="34.0" y="123" class="trk-g2t">G2 +1</text>
+<rect x="62" y="44" width="48" height="56" rx="6" class="trk-cella"/>
+<text x="86.0" y="68" class="trk-num">2</text>
+<circle cx="76" cy="85" r="6" class="gemma"/><text x="86" y="90" class="trk-brace">2</text>
+<rect x="114" y="44" width="48" height="56" rx="6" class="trk-cella"/>
+<text x="138.0" y="68" class="trk-num">3</text>
+<circle cx="128" cy="85" r="6" class="gemma"/><text x="138" y="90" class="trk-brace">3</text>
+<rect x="116" y="108" width="44" height="22" rx="11" class="trk-g2"/><text x="138.0" y="123" class="trk-g2t">G2 +1</text>
+<rect x="166" y="44" width="48" height="56" rx="6" class="trk-cella"/>
+<text x="190.0" y="68" class="trk-num">4</text>
+<circle cx="180" cy="85" r="6" class="gemma"/><text x="190" y="90" class="trk-brace">4</text>
+<rect x="218" y="44" width="48" height="56" rx="6" class="trk-cella"/>
+<text x="242.0" y="68" class="trk-num">5</text>
+<circle cx="232" cy="85" r="6" class="gemma"/><text x="242" y="90" class="trk-brace">5</text>
+<rect x="270" y="44" width="48" height="56" rx="6" class="trk-cella"/>
+<text x="294.0" y="68" class="trk-num">6</text>
+<circle cx="284" cy="85" r="6" class="gemma"/><text x="294" y="90" class="trk-brace">6</text>
+<rect x="322" y="44" width="48" height="56" rx="6" class="trk-cella"/>
+<text x="346.0" y="68" class="trk-num">7</text>
+<circle cx="336" cy="85" r="6" class="gemma"/><text x="346" y="90" class="trk-brace">7</text>
+<rect x="374" y="44" width="48" height="56" rx="6" class="trk-cella"/>
+<text x="398.0" y="68" class="trk-num">8</text>
+<circle cx="388" cy="85" r="6" class="gemma"/><text x="398" y="90" class="trk-brace">8</text>
+<rect x="426" y="44" width="48" height="56" rx="6" class="trk-cella"/>
+<text x="450.0" y="68" class="trk-num">9</text>
+<circle cx="440" cy="85" r="6" class="gemma"/><text x="450" y="90" class="trk-brace">8</text>
+<rect x="478" y="44" width="48" height="56" rx="6" class="trk-cella trk-ev"/>
+<text x="502.0" y="68" class="trk-num">10</text>
+<circle cx="492" cy="85" r="6" class="gemma"/><text x="502" y="90" class="trk-brace">8</text>
+<line x1="502.0" y1="134" x2="502.0" y2="148" class="trk-linea"/><text x="526" y="164" class="trk-ev-t" text-anchor="end">Saldo 3</text>
+<rect x="530" y="44" width="48" height="56" rx="6" class="trk-cella"/>
+<text x="554.0" y="68" class="trk-num">11</text>
+<circle cx="544" cy="85" r="6" class="gemma"/><text x="554" y="90" class="trk-brace">8</text>
+<rect x="582" y="44" width="48" height="56" rx="6" class="trk-cella"/>
+<text x="606.0" y="68" class="trk-num">12</text>
+<circle cx="596" cy="85" r="6" class="gemma"/><text x="606" y="90" class="trk-brace">8</text>
+<rect x="634" y="44" width="48" height="56" rx="6" class="trk-cella trk-ev"/>
+<text x="658.0" y="68" class="trk-num">13</text>
+<circle cx="648" cy="85" r="6" class="gemma"/><text x="658" y="90" class="trk-brace">8</text>
+<line x1="658.0" y1="134" x2="658.0" y2="148" class="trk-linea"/><text x="682" y="164" class="trk-ev-t" text-anchor="end">Alle Corde a 1 Vita</text>
+<rect x="686" y="44" width="48" height="56" rx="6" class="trk-cella"/>
+<text x="710.0" y="68" class="trk-num">14</text>
+<circle cx="700" cy="85" r="6" class="gemma"/><text x="710" y="90" class="trk-brace">8</text>
+<rect x="738" y="44" width="48" height="56" rx="6" class="trk-cella trk-ev"/>
+<text x="762.0" y="68" class="trk-num">15</text>
+<circle cx="752" cy="85" r="6" class="gemma"/><text x="762" y="90" class="trk-brace">8</text>
+<line x1="762.0" y1="134" x2="762.0" y2="148" class="trk-linea"/><text x="786" y="164" class="trk-ev-t" text-anchor="end">Crepuscolo</text>
+<text x="10" y="20" class="trk-leg">Il segnalino avanza all'inizio di ogni turno di G1. <tspan class="trk-leg-b">Numero</tspan> = round · gemma = Brace del round</text>
+</svg></div><figcaption>Le soglie stampate sul tracciato valgono per entrambi i giocatori.</figcaption></figure>
+
+<h2 id="il-tavolo">Il tavolo</h2>
+<figure class="fig fig-tavolo"><div class="fig-scroll"><svg viewBox="0 0 780 470" role="img" aria-label="Schema del tavolo di un giocatore" class="fig-svg">
+  <!-- centro del tavolo -->
+  <rect x="10" y="10" width="760" height="64" rx="10" class="zona-tratt"/>
+  <text x="26" y="34" class="t-tit">Centro del tavolo · in comune</text>
+  <text x="26" y="56" class="t-tenue">scorta di gemme · tracciato del round · impegno durante gli attacchi</text>
+  <g transform="translate(470,26)">
+    <circle cx="10" cy="16" r="8" class="gemma"/><circle cx="28" cy="16" r="8" class="gemma"/><circle cx="46" cy="16" r="8" class="gemma"/><circle cx="19" cy="2" r="8" class="gemma"/><circle cx="37" cy="2" r="8" class="gemma"/>
+    <text x="64" y="22" class="t-tenue">scorta</text>
+    <rect x="120" y="-6" width="160" height="30" rx="5" class="riq-neutro"/>
+    <text x="134" y="15" class="t-b">1 2 3 4 … 15</text><circle cx="234" cy="9" r="6" class="gemma-g"/>
+    <text x="246" y="15" class="t-tenue">round</text>
+  </g>
+  <!-- Campo -->
+  <text x="20" y="104" class="t-tit">Campo</text>
+  <text x="90" y="104" class="t-tenue">Unità, massimo 5</text>
+  <g transform="translate(20,114)">
+    <rect x="0" y="0" width="70" height="96" rx="7" class="carta-f"/><text x="35" y="44" text-anchor="middle" class="t-b">Unità</text><text x="35" y="62" text-anchor="middle" class="t-tenue">dritta</text>
+    <g transform="translate(80,13)"><rect width="96" height="70" rx="7" class="carta-f"/><text x="48" y="32" text-anchor="middle" class="t-b">Unità</text><text x="48" y="50" text-anchor="middle" class="t-tenue">ruotata</text></g>
+    <rect x="186" y="0" width="70" height="96" rx="7" class="zona-tratt"/>
+    <rect x="266" y="0" width="70" height="96" rx="7" class="zona-tratt"/>
+    <rect x="346" y="0" width="70" height="96" rx="7" class="zona-tratt"/>
+  </g>
+  <text x="560" y="104" class="t-tenue">Reliquie, massimo 2</text>
+  <g transform="translate(560,114)">
+    <rect x="0" y="0" width="70" height="96" rx="7" class="carta-f"/><text x="35" y="52" text-anchor="middle" class="t-b">Reliquia</text>
+    <rect x="80" y="0" width="70" height="96" rx="7" class="zona-tratt"/>
+  </g>
+  <!-- Cicatrici -->
+  <text x="20" y="252" class="t-tit t-cic">Cicatrici</text>
+  <text x="20" y="270" class="t-tenue">pubbliche, a faccia in su</text>
+  <g transform="translate(20,282)">
+    <rect x="0" y="0" width="62" height="86" rx="6" class="carta-cic"/><text x="31" y="48" text-anchor="middle" class="t-tenue">dritta</text>
+    <rect x="70" y="0" width="62" height="86" rx="6" class="carta-cic"/><text x="101" y="48" text-anchor="middle" class="t-tenue">dritta</text>
+    <g transform="translate(142,12)"><rect width="86" height="62" rx="6" class="carta-cic"/><text x="43" y="36" text-anchor="middle" class="t-cic">fresca</text></g>
+  </g>
+  <!-- Leader + Vita -->
+  <g transform="translate(300,236)">
+    <rect x="10" y="22" width="110" height="150" rx="9" class="carta-dorso"/>
+    <rect x="6" y="16" width="110" height="150" rx="9" class="carta-dorso"/>
+    <rect x="2" y="10" width="110" height="150" rx="9" class="carta-dorso"/>
+    <rect x="0" y="0" width="110" height="150" rx="9" class="carta-f"/>
+    <text x="55" y="34" text-anchor="middle" class="t-tit">Leader</text>
+    <text x="55" y="54" text-anchor="middle" class="t-tenue">sempre in gioco</text>
+    <circle cx="38" cy="92" r="10" class="gemma"/><circle cx="72" cy="92" r="10" class="gemma"/>
+    <text x="55" y="124" text-anchor="middle" class="t-dif">Guardia</text>
+    <text x="55" y="140" text-anchor="middle" class="t-tenue">sul Leader</text>
+  </g>
+  <text x="434" y="388" class="t-tenue">Vita: 5 carte coperte</text>
+  <text x="434" y="404" class="t-tenue">sotto il Leader</text>
+  <!-- Mazzo e Scarti -->
+  <g transform="translate(560,250)">
+    <rect x="6" y="6" width="70" height="96" rx="7" class="carta-dorso"/><rect x="3" y="3" width="70" height="96" rx="7" class="carta-dorso"/><rect width="70" height="96" rx="7" class="carta-dorso"/>
+    <text x="35" y="122" text-anchor="middle" class="t-b">Mazzo</text>
+    <rect x="96" y="0" width="70" height="96" rx="7" class="carta-f"/>
+    <text x="131" y="122" text-anchor="middle" class="t-b">Scarti</text>
+  </g>
+  <!-- Brace -->
+  <g transform="translate(560,396)">
+    <circle cx="12" cy="12" r="10" class="gemma"/><circle cx="36" cy="12" r="10" class="gemma"/><circle cx="60" cy="12" r="10" class="gemma"/>
+    <text x="80" y="10" class="t-att">Brace</text>
+    <text x="80" y="26" class="t-tenue">davanti a te, nel tuo turno</text>
+  </g>
+  <!-- Mano -->
+  <g transform="translate(150,404)">
+    <rect x="0" y="0" width="40" height="56" rx="5" class="carta-dorso" transform="rotate(-12 20 56)"/>
+    <rect x="24" y="0" width="40" height="56" rx="5" class="carta-dorso" transform="rotate(-4 44 56)"/>
+    <rect x="48" y="0" width="40" height="56" rx="5" class="carta-dorso" transform="rotate(4 68 56)"/>
+    <rect x="72" y="0" width="40" height="56" rx="5" class="carta-dorso" transform="rotate(12 92 56)"/>
+  </g>
+  <text x="20" y="430" class="t-b">Mano</text>
+  <text x="20" y="448" class="t-tenue">solo tu la vedi</text>
+  <text x="300" y="455" class="t-tenue">↓ il tuo lato del tavolo</text>
+</svg></div><figcaption>Il tavolo di un giocatore. L&#x27;avversario ha lo stesso schema, specchiato, dall&#x27;altra parte.</figcaption></figure>
+
+<div class="tab-scroll"><table>
+<thead>
+<tr>
+<th>Zona</th>
+<th>Chi la vede</th>
+<th>Cosa contiene</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Mazzo</strong></td>
+<td>Nessuno</td>
+<td>Si pesca dalla cima</td>
+</tr>
+<tr>
+<td><strong>Mano</strong></td>
+<td>Solo tu</td>
+<td>Al massimo 8 carte alla fine del tuo turno</td>
+</tr>
+<tr>
+<td><strong>Vita</strong></td>
+<td><strong>Nessuno, neanche tu</strong></td>
+<td>5 carte coperte sotto il Leader; si prende sempre quella in cima</td>
+</tr>
+<tr>
+<td><strong>Cicatrici</strong></td>
+<td>Tutti</td>
+<td>Le Vite perse, a faccia in su</td>
+</tr>
+<tr>
+<td><strong>Campo</strong></td>
+<td>Tutti</td>
+<td>Il Leader, fino a 5 Unità e fino a 2 Reliquie</td>
+</tr>
+<tr>
+<td><strong>Scarti</strong></td>
+<td>Tutti</td>
+<td>Unità sconfitte, Tattiche e Reazioni usate, carte scartate</td>
+</tr>
+</tbody>
+</table></div>
+<p>Le gemme sono sempre visibili. Possono stare in quattro posti: nella <strong>scorta</strong> comune, nella tua <strong>Brace</strong> (davanti a te, nel tuo turno), nella tua <strong>Guardia</strong> (sopra il Leader, nel turno avversario) o nell'<strong>impegno</strong> (al centro, durante un attacco). <strong>Spendere</strong> una gemma vuol dire rimetterla nella scorta. Le gemme non vanno mai sulle Unità.</p>
+<div class="box box-attenzione">
+<p class="box-tit">Niente sostituzioni</p>
+<p>Se hai già 5 Unità non puoi giocarne una sesta, e con 2 Reliquie non puoi giocarne una terza. Non puoi sacrificarne una per fare posto.</p>
+</div>
+<h2 id="preparazione">Preparazione</h2>
+<ol>
+<li>Scegliete <strong>a caso</strong> chi inizia: è <strong>G1</strong>. L'altro è <strong>G2</strong>.</li>
+<li>Mettete il Leader in campo sul lato <strong>Base</strong>, dritto.</li>
+<li>Mescolate il mazzo e pescate <strong>5 carte</strong>.</li>
+<li><strong>Mulligan</strong>, una volta sola, prima G1 e poi G2: puoi mettere in fondo al mazzo da 0 a 3 carte della mano, nell'ordine che vuoi, e pescarne altrettante. Il mazzo non si rimescola.</li>
+<li>Mettete le prime <strong>5 carte</strong> del mazzo coperte sotto il Leader, senza guardarle: sono le vostre <strong>Vite</strong>.</li>
+<li>Il segnalino del round va prima della casella 1. Tutte le gemme sono nella scorta.</li>
+<li>Comincia G1.</li>
+</ol>
+<div class="box box-ricorda">
+<p class="box-tit">Vantaggio di chi inizia</p>
+<p>Partire per primi è un vantaggio, quindi: <strong>nessuno attacca nel round 1</strong>, <strong>G1 non pesca nel round 1</strong> e <strong>G2 prende 1 gemma in più nei round 1 e 3</strong> (è stampato sul tracciato).</p>
+</div>
+<div class="box box-prova">
+<p class="box-tit">Compensazione di G2</p>
+<p>La gemma in più di G2 nei round 1 e 3 è la regola in vigore, ma i suoi valori sono ancora in prova: potrebbero cambiare dopo nuovi test.</p>
+</div>
+<h2 id="il-turno">Il turno</h2>
+<p>Ogni turno ha quattro fasi, sempre in quest'ordine. Il <strong>giocatore attivo</strong> è quello di turno; l'altro è il <strong>difensore</strong>.</p>
+<figure class="fig fig-turno"><div class="fig-scroll"><svg viewBox="0 0 892 250" role="img" aria-label="Le quattro fasi del turno" class="fig-svg">
+<defs><marker id="punta-tur" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" class="punta"/></marker></defs>
+<rect x="10" y="10" width="200" height="230" rx="12" class="riq-neutro"/>
+<text x="26" y="42" class="t-tit">1 · Ripristino</text>
+<line x1="26" y1="56" x2="194" y2="56" class="divisore"/>
+<text x="26" y="86" style="font-size:17px">G1: round +1</text>
+<text x="26" y="116" style="font-size:17px">Crepuscolo (G1, dal 15)</text>
+<text x="26" y="146" style="font-size:17px">Guardia → scorta</text>
+<text x="26" y="176" style="font-size:17px">Raddrizza i tuoi</text>
+<text x="26" y="206" style="font-size:17px">Prendi la Brace</text>
+<path d="M213,125 L231,125" class="freccia" marker-end="url(#punta-tur)"/>
+<rect x="234" y="10" width="200" height="230" rx="12" class="riq-neutro"/>
+<text x="250" y="42" class="t-tit">2 · Pesca</text>
+<line x1="250" y1="56" x2="418" y2="56" class="divisore"/>
+<text x="250" y="86" style="font-size:17px">Pesca 1 carta</text>
+<text x="250" y="116" style="font-size:17px">G1 salta il round 1</text>
+<text x="250" y="146" style="font-size:17px">Mazzo vuoto: −1 Vita</text>
+<path d="M437,125 L455,125" class="freccia" marker-end="url(#punta-tur)"/>
+<rect x="458" y="10" width="200" height="230" rx="12" class="riq-att"/>
+<text x="474" y="42" class="t-tit">3 · Principale</text>
+<line x1="474" y1="56" x2="642" y2="56" class="divisore"/>
+<text x="474" y="86" style="font-size:17px">Gioca carte</text>
+<text x="474" y="116" style="font-size:17px">Usa abilità ⟳</text>
+<text x="474" y="146" style="font-size:17px">Rimargina</text>
+<text x="474" y="176" style="font-size:17px">Attacca (sei passi)</text>
+<text x="474" y="206" style="font-size:17px">Ordine libero</text>
+<path d="M661,125 L679,125" class="freccia" marker-end="url(#punta-tur)"/>
+<rect x="682" y="10" width="200" height="230" rx="12" class="riq-dif"/>
+<text x="698" y="42" class="t-tit">4 · Fine</text>
+<line x1="698" y1="56" x2="866" y2="56" class="divisore"/>
+<text x="698" y="86" style="font-size:17px">Brace avanzata</text>
+<text x="698" y="116" style="font-size:17px">→ Guardia (max 2)</text>
+<text x="698" y="146" style="font-size:17px">Cicatrici fresche</text>
+<text x="698" y="176" style="font-size:17px">→ dritte (di tutti)</text>
+<text x="698" y="206" style="font-size:17px">Mano: max 8</text>
+</svg></div><figcaption>Le quattro fasi del turno, con i passi in ordine.</figcaption></figure>
+
+<h3 id="1-ripristino">1. Ripristino</h3>
+<ol>
+<li>Se sei G1, <strong>avanza il segnalino</strong> del round di una casella.</li>
+<li><strong>Crepuscolo</strong>: dal round 15, solo nel turno di G1 (vedi <a href="#la-fine-della-partita">La fine della partita</a>).</li>
+<li>Rimetti nella scorta le gemme di <strong>Guardia</strong> rimaste sul tuo Leader.</li>
+<li><strong>Raddrizza</strong> il tuo Leader e le tue Unità.</li>
+<li>Prendi dalla scorta la tua <strong>Brace</strong>: tante gemme quanto il numero del round, fino a un massimo di 8. Se sei G2, nei round 1 e 3 prendine una in più.</li>
+</ol>
+<h3 id="2-pesca">2. Pesca</h3>
+<p>Pesca 1 carta. G1 non pesca nel round 1. Se devi pescare e il mazzo è vuoto, perdi invece 1 Vita (vedi <a href="#casi-particolari">Casi particolari</a>).</p>
+<h3 id="3-fase-principale">3. Fase principale</h3>
+<p>Fai quante azioni vuoi, una alla volta e in qualsiasi ordine. Ogni azione si risolve per intero prima della successiva.</p>
+<div class="tab-scroll"><table>
+<thead>
+<tr>
+<th>Azione</th>
+<th>Costo</th>
+<th>Note</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Giocare un'Unità</td>
+<td>gemme di Brace</td>
+<td>Entra <strong>ruotata</strong>: non può attaccare né opporsi fino al tuo prossimo Ripristino (salvo Assalto)</td>
+</tr>
+<tr>
+<td>Giocare una Reliquia</td>
+<td>gemme di Brace</td>
+<td>Massimo 2</td>
+</tr>
+<tr>
+<td>Giocare una Tattica</td>
+<td>gemme di Brace</td>
+<td>Si risolve e va negli Scarti</td>
+</tr>
+<tr>
+<td>Usare un'abilità <span class="ic-ruota" aria-label="ruota">⟳</span></td>
+<td>ruotare la carta, più quanto stampato</td>
+<td>Solo se la carta è dritta</td>
+</tr>
+<tr>
+<td><strong>Rimarginare</strong></td>
+<td><span class="ic-ruota" aria-label="ruota">⟳</span> del Leader + 1 gemma di Brace</td>
+<td>Riprendi in mano una tua Cicatrice dritta</td>
+</tr>
+<tr>
+<td><strong>Attaccare</strong></td>
+<td>ruotare l'attaccante</td>
+<td>Con un tuo personaggio dritto. Mai nel round 1</td>
+</tr>
+</tbody>
+</table></div>
+<p>Dopo un attacco torni alla fase principale: puoi giocare altre carte e attaccare ancora con un altro personaggio dritto.</p>
+<div class="box box-attenzione">
+<p class="box-tit">Costi da pagare per intero</p>
+<p>Un'azione che non puoi pagare tutta non si può fare. Vale anche per i costi in Vita.</p>
+</div>
+<h3 id="4-fine">4. Fine</h3>
+<ol>
+<li>Si risolvono gli effetti "a fine turno".</li>
+<li><strong>Forma la Guardia</strong>: sposta sul tuo Leader le gemme di Brace che non hai usato, fino al tuo <strong>massimo di Guardia</strong> (2 sul lato Base). Le altre tornano nella scorta.</li>
+<li><strong>Tutte le Cicatrici fresche</strong> di entrambi i giocatori si raddrizzano.</li>
+<li>Se hai più di 8 carte in mano, scarta fino ad averne 8.</li>
+</ol>
+<p>Poi tocca all'avversario.</p>
+<h2 id="le-gemme">Le gemme</h2>
+<p>Le gemme sono una sola risorsa con due usi: nel tuo turno sono <strong>Brace</strong> (attacco e carte), nel turno avversario sono <strong>Guardia</strong> (difesa). Quello che spendi per attaccare non ti protegge dopo.</p>
+<figure class="fig fig-gemme"><div class="fig-scroll"><svg viewBox="0 0 860 330" role="img" aria-label="Il giro delle gemme" class="fig-svg">
+  <defs><marker id="punta-gem" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" class="punta"/></marker></defs>
+  <rect x="0" y="0" width="860" height="150" rx="12" class="riq-att" style="fill-opacity:.4;stroke:none"/>
+  <rect x="0" y="164" width="860" height="150" rx="12" class="riq-dif" style="fill-opacity:.4;stroke:none"/>
+  <text x="16" y="28" class="t-tit t-att">Il tuo turno</text>
+  <text x="16" y="244" class="t-tit t-dif">Turno</text><text x="16" y="266" class="t-tit t-dif">avversario</text>
+
+  <!-- riga 1 -->
+  <rect x="16" y="44" width="130" height="90" rx="10" class="riq-scuro"/>
+  <text x="81" y="84" text-anchor="middle" class="t-tit t-chiaro">Scorta</text>
+  <text x="81" y="106" text-anchor="middle" class="t-chiaro" style="font-size:13px">comune</text>
+  <path d="M148,89 L186,89" class="freccia" marker-end="url(#punta-gem)"/>
+  <rect x="190" y="44" width="160" height="90" rx="10" class="riq-neutro"/>
+  <circle cx="212" cy="66" r="9" class="gemma"/><circle cx="234" cy="66" r="9" class="gemma"/><circle cx="256" cy="66" r="9" class="gemma"/>
+  <text x="206" y="100" class="t-tit t-att">Brace</text>
+  <text x="206" y="122" class="t-tenue" style="font-size:13px">round, massimo 8</text>
+  <path d="M352,89 L386,89" class="freccia" marker-end="url(#punta-gem)"/>
+  <rect x="390" y="44" width="215" height="90" rx="10" class="riq-neutro"/>
+  <text x="406" y="74" class="t-b" style="font-size:15px">Spendi</text>
+  <text x="406" y="96" style="font-size:14px">carte e abilità</text>
+  <text x="406" y="120" class="t-tenue" style="font-size:13px">↩ torna nella scorta</text>
+  <rect x="625" y="44" width="215" height="90" rx="10" class="riq-neutro"/>
+  <text x="641" y="74" class="t-b" style="font-size:15px">Impegna in attacco</text>
+  <text x="641" y="96" style="font-size:14px">+1 Forza ciascuna</text>
+  <text x="641" y="120" class="t-tenue" style="font-size:13px">↩ nella scorta dopo l'attacco</text>
+
+  <!-- passaggio -->
+  <path d="M270,136 L270,206" class="freccia" marker-end="url(#punta-gem)"/>
+  <text x="258" y="166" text-anchor="end" class="t-b" style="font-size:14px">Fine del turno:</text>
+  <text x="258" y="184" text-anchor="end" style="font-size:13px">la Brace avanzata va sul Leader</text>
+  <text x="282" y="166" class="t-tenue" style="font-size:13px">fino al massimo di Guardia,</text>
+  <text x="282" y="184" class="t-tenue" style="font-size:13px">il resto ↩ nella scorta</text>
+
+  <!-- riga 2 -->
+  <rect x="190" y="210" width="160" height="90" rx="10" class="riq-neutro"/>
+  <circle cx="212" cy="232" r="9" class="gemma"/><circle cx="234" cy="232" r="9" class="gemma"/>
+  <text x="206" y="266" class="t-tit t-dif">Guardia</text>
+  <text x="206" y="288" class="t-tenue" style="font-size:13px">sul Leader</text>
+  <path d="M352,255 L386,255" class="freccia" marker-end="url(#punta-gem)"/>
+  <rect x="390" y="210" width="215" height="90" rx="10" class="riq-neutro"/>
+  <text x="406" y="240" class="t-b" style="font-size:15px">Impegna in difesa</text>
+  <text x="406" y="262" style="font-size:14px">Parata +2 o paga una Reazione</text>
+  <text x="406" y="286" class="t-tenue" style="font-size:13px">↩ nella scorta dopo l'attacco</text>
+  <rect x="625" y="210" width="215" height="90" rx="10" class="riq-neutro"/>
+  <text x="641" y="240" class="t-b" style="font-size:15px">Non usata</text>
+  <text x="641" y="262" style="font-size:14px">resta per gli attacchi dopo</text>
+  <text x="641" y="286" class="t-tenue" style="font-size:13px">↩ nella scorta al tuo Ripristino</text>
+</svg></div><figcaption>Il giro delle gemme. Ogni gemma finisce sempre nella scorta comune.</figcaption></figure>
+
+<ul>
+<li><strong>Spendere</strong>: paghi carte e abilità con la Brace. Le abilità e le carte si pagano <strong>sempre con la Brace</strong>, mai con la Guardia.</li>
+<li><strong>Impegnare in attacco</strong>: ogni gemma di Brace che metti in un tuo attacco dà <strong>+1</strong> alla Forza dell'attaccante. Dopo l'attacco torna nella scorta.</li>
+<li><strong>Guardia</strong>: nella tua Fine sposti sul Leader la Brace avanzata, fino al massimo di Guardia. Nel turno avversario ogni gemma di Guardia che impegni dà <strong>+2</strong> alla difesa (è la <strong>Parata</strong>) oppure paga il costo di una Reazione.</li>
+</ul>
+<h3 id="massimo-di-guardia">Massimo di Guardia</h3>
+<div class="tab-scroll"><table>
+<thead>
+<tr>
+<th>Leader</th>
+<th>Massimo di Guardia</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Lato Base</td>
+<td>2</td>
+</tr>
+<tr>
+<td>Lato Risvegliato</td>
+<td>3</td>
+</tr>
+<tr>
+<td>Alle Corde</td>
+<td>+1 (quindi 3 sul Base, 4 sul Risvegliato)</td>
+</tr>
+<tr>
+<td>Carte che lo aumentano</td>
+<td>quanto stampato sulla carta</td>
+</tr>
+</tbody>
+</table></div>
+<p>Se il massimo scende (per esempio lascia il gioco una carta che lo aumentava), le gemme in eccesso tornano subito nella scorta. Se sale nel turno avversario (per esempio perché il Leader si Risveglia), si alza solo il tetto: non ricevi gemme nuove.</p>
+<div class="box box-esempio">
+<p class="box-tit">Brace e Guardia in un turno</p>
+<p>Round 4: G1 prende 4 gemme. Ne spende 2 per un'Unità e ne impegna 1 in un attacco. Gliene resta 1: nella Fine la mette sul Leader come Guardia. Nel turno di G2 potrà usarla per parare (+2) o per pagare una Reazione da 1.</p>
+</div>
+<h2 id="dritto-e-ruotato">Dritto e ruotato</h2>
+<p>Ogni carta in campo è <strong>dritta</strong> (pronta) o <strong>ruotata</strong> di 90°. Ruotata vuol dire solo <strong>"ha già agito"</strong>.</p>
+<figure class="fig fig-pronto_ruotato"><div class="fig-scroll"><svg viewBox="0 0 660 200" role="img" aria-label="Carta dritta e carta ruotata" class="fig-svg">
+  <g transform="translate(30,20)">
+    <rect width="96" height="134" rx="9" class="carta-f"/>
+    <text x="48" y="72" text-anchor="middle" class="t-tit">Dritta</text>
+    <text x="120" y="40" class="t-b">Pronta</text>
+    <text x="120" y="62">può attaccare</text>
+    <text x="120" y="82">può opporsi</text>
+    <text x="120" y="102">può usare ⟳</text>
+  </g>
+  <g transform="translate(340,40)">
+    <rect width="134" height="96" rx="9" class="carta-f" style="fill:var(--carta)"/>
+    <text x="67" y="54" text-anchor="middle" class="t-tit">Ruotata</text>
+    <text x="154" y="20" class="t-b">Ha già agito</text>
+    <text x="154" y="42">non attacca</text>
+    <text x="154" y="62">non si oppone</text>
+    <text x="154" y="82">non usa ⟳</text>
+  </g>
+  <text x="30" y="186" class="t-tenue">Si raddrizza nel Ripristino del suo controllore. Ruotata non vuol dire attaccabile.</text>
+</svg></div><figcaption>Lo stato di una carta si vede a colpo d&#x27;occhio.</figcaption></figure>
+
+<ul>
+<li>Una carta si ruota quando <strong>attacca</strong>, quando <strong>si oppone</strong>, quando usa un'abilità <span class="ic-ruota" aria-label="ruota">⟳</span> (anche Rimarginare) o quando un effetto la <strong>Stanca</strong>.</li>
+<li>Un personaggio ruotato non può attaccare, opporsi né usare abilità <span class="ic-ruota" aria-label="ruota">⟳</span>.</li>
+<li>Le Unità <strong>entrano ruotate</strong>. Con <strong>Assalto</strong> entrano dritte.</li>
+<li>I tuoi personaggi si raddrizzano <strong>solo nel tuo Ripristino</strong>, salvo effetti che dicono altro.</li>
+<li>Essere ruotata <strong>non</strong> rende una carta attaccabile. Si attacca sempre il Leader (salvo la parola chiave Caccia).</li>
+</ul>
+<div class="box box-ricorda">
+<p class="box-tit">Agire costa la difesa</p>
+<p>Se attacchi con un'Unità, resta ruotata per tutto il turno dell'avversario e non potrà opporsi ai suoi attacchi. Anche un'Unità appena giocata non può difenderti nel turno avversario, perché è entrata ruotata. Scegli ogni turno chi colpisce e chi resta di guardia.</p>
+</div>
+<h2 id="lattacco">L'attacco</h2>
+<p>Un attacco è un'azione della fase principale e si risolve in <strong>sei passi</strong>. Il bersaglio è <strong>sempre il Leader avversario</strong>, salvo che il difensore si opponga con un'Unità.</p>
+<figure class="fig fig-scontro"><div class="fig-scroll"><svg viewBox="0 0 880 512" role="img" aria-label="I sei passi di un attacco" class="fig-svg">
+<defs><marker id="punta-sco" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" class="punta"/></marker></defs>
+<text x="20" y="24" class="t-tit t-att">Attaccante</text>
+<text x="860" y="24" class="t-tit t-dif" text-anchor="end">Difensore</text>
+<rect x="20" y="40" width="540" height="58" rx="10" class="riq-att"/>
+<text x="36" y="64" class="t-b" style="font-size:17px">1 · Dichiara</text>
+<text x="36" y="86" style="font-size:15px">ruota un tuo personaggio dritto</text>
+<path d="M440.0,100 L440.0,115" class="freccia" marker-end="url(#punta-sco)"/>
+<rect x="320" y="118" width="540" height="58" rx="10" class="riq-dif"/>
+<text x="336" y="142" class="t-b" style="font-size:17px">2 · Opposizione</text>
+<text x="336" y="164" style="font-size:15px">facoltativa: ruota una tua Unità dritta, diventa lei il bersaglio</text>
+<path d="M440.0,178 L440.0,193" class="freccia" marker-end="url(#punta-sco)"/>
+<rect x="20" y="196" width="540" height="58" rx="10" class="riq-att"/>
+<text x="36" y="220" class="t-b" style="font-size:17px">3 · Impegno</text>
+<text x="36" y="242" style="font-size:15px">gemme di Brace scoperte: +1 ciascuna</text>
+<path d="M440.0,256 L440.0,271" class="freccia" marker-end="url(#punta-sco)"/>
+<rect x="320" y="274" width="540" height="58" rx="10" class="riq-dif"/>
+<text x="336" y="298" class="t-b" style="font-size:17px">4 · Risposta</text>
+<text x="336" y="320" style="font-size:15px">gemme di Guardia: Parata +2 · al massimo 1 Reazione</text>
+<path d="M440.0,334 L440.0,349" class="freccia" marker-end="url(#punta-sco)"/>
+<rect x="110" y="352" width="660" height="58" rx="10" class="riq-neutro"/>
+<text x="126" y="376" class="t-b" style="font-size:17px">5 · Confronto</text>
+<text x="126" y="398" style="font-size:15px">attacco ≥ difesa? Sul Leader va a segno; tra Unità perde la più bassa</text>
+<path d="M440.0,412 L440.0,427" class="freccia" marker-end="url(#punta-sco)"/>
+<rect x="110" y="430" width="660" height="58" rx="10" class="riq-neutro"/>
+<text x="126" y="454" class="t-b" style="font-size:17px">6 · Esiti</text>
+<text x="126" y="476" style="font-size:15px">Unità sconfitte negli Scarti · Vita → Cicatrice fresca · gemme nella scorta</text>
+</svg></div><figcaption>I sei passi di un attacco: in arancio decide l&#x27;attaccante, in blu il difensore.</figcaption></figure>
+
+<h3 id="i-passi">I passi</h3>
+<ol>
+<li><strong>Dichiarazione.</strong> Scegli un tuo personaggio dritto e <strong>ruotalo</strong>. Si risolvono gli effetti "quando attacca".</li>
+<li><strong>Opposizione (difensore).</strong> Il difensore può ruotare <strong>una</strong> sua Unità dritta: diventa lei il bersaglio al posto del Leader. Il Leader non può opporsi.</li>
+<li><strong>Impegno dell'attaccante.</strong> Metti al centro da 0 a tutte le tue gemme di Brace, <strong>scoperte</strong>. Ognuna vale +1.</li>
+<li><strong>Risposta del difensore.</strong> Dopo aver visto le tue gemme, il difensore mette al centro da 0 a tutte le sue gemme di Guardia e può giocare <strong>al massimo una Reazione</strong>, dalla mano o da una sua Cicatrice dritta. Le sue gemme pagano prima il costo della Reazione; ognuna delle restanti vale +2 (<strong>Parata</strong>).</li>
+<li><strong>Confronto.</strong> Si confrontano la Forza dell'attaccante e il valore di difesa del bersaglio.</li>
+<li><strong>Esiti.</strong> Le Unità sconfitte vanno negli Scarti, il Leader colpito perde una Vita, tutte le gemme impegnate tornano nella scorta e si risolvono gli effetti "quando sconfigge" e "dopo lo scontro".</li>
+</ol>
+<h3 id="il-conto">Il conto</h3>
+<div class="griglia">
+<div>
+<h4 id="attacco"><span class="att">Attacco</span></h4>
+<ul>
+<li>Forza dell'attaccante</li>
+<li>+ 1 per ogni gemma impegnata</li>
+<li>+ bonus delle carte</li>
+</ul>
+</div>
+<div>
+<h4 id="difesa"><span class="dif">Difesa</span></h4>
+<ul>
+<li><strong>Tempra</strong> del Leader (4) oppure Forza dell'Unità bersaglio</li>
+<li>+ 2 per ogni gemma di Parata</li>
+<li>+ Reazione e bonus delle carte</li>
+</ul>
+</div>
+</div>
+<div class="tab-scroll"><table>
+<thead>
+<tr>
+<th>Chi attacca</th>
+<th>Chi difende</th>
+<th>Risultato</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Unità o Leader</td>
+<td><strong>Leader</strong></td>
+<td>Se l'attacco è <strong>pari o superiore</strong> alla difesa, va <strong>a segno</strong>: il Leader perde 1 Vita. Altrimenti non succede nulla. Chi attacca non viene mai sconfitto</td>
+</tr>
+<tr>
+<td>Unità</td>
+<td><strong>Unità</strong></td>
+<td>È sconfitta l'Unità con il valore più basso. A pari sono sconfitte <strong>entrambe</strong></td>
+</tr>
+<tr>
+<td>Leader</td>
+<td><strong>Unità</strong></td>
+<td>Se l'attacco è pari o superiore, l'Unità è sconfitta. Altrimenti non succede nulla. Il Leader non viene mai sconfitto</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Scudo</strong>: un'Unità con Scudo vince i pareggi quando è il bersaglio. Contro un'Unità a pari è sconfitto solo l'attaccante; contro un Leader l'Unità con Scudo è sconfitta solo se l'attacco è <strong>superiore</strong>.</p>
+<div class="box box-prova">
+<p class="box-tit">Scudo</p>
+<p>"Lo Scudo vince i pareggi" è la regola in vigore, ma è ancora in prova.</p>
+</div>
+<div class="box box-esempio">
+<p class="box-tit">Un attacco al Leader</p>
+<p>Round 5. G1 attacca con un'Unità di Forza 3 e il difensore non si oppone: il bersaglio è il Leader di G2, Tempra 4. G1 impegna 2 gemme: attacco 3 + 2 = <strong>5</strong>.</p>
+<p>G2 ha 2 gemme di Guardia. Se ne impegna 1, la difesa è 4 + 2 = <strong>6</strong>: l'attacco è fermato. Se non impegna nulla, 5 contro 4: l'attacco va a segno e G2 perde una Vita.</p>
+</div>
+<div class="box box-esempio">
+<p class="box-tit">Una Reazione</p>
+<p>G1 attacca il Leader con attacco <strong>6</strong>. G2 impegna 2 gemme di Guardia e gioca una Reazione da 1 ("L'attaccante ha −3 in questo scontro"): la prima gemma paga la Reazione, la seconda è Parata. Attacco 6 − 3 = <strong>3</strong>, difesa 4 + 2 = <strong>6</strong>. Fermato.</p>
+</div>
+<div class="box box-esempio">
+<p class="box-tit">Opporsi con un&#x27;Unità</p>
+<p>G1 attacca con un'Unità di Forza 4. G2 oppone un'Unità di Forza 2 e la ruota. G1 impegna 1 gemma: 5. G2 impegna 1 gemma di Parata: 2 + 2 = 4. Perde il valore più basso: l'Unità di G2 è sconfitta, e il Leader di G2 non ha perso Vite.</p>
+</div>
+<h3 id="chi-decide-cosa">Chi decide cosa</h3>
+<ul>
+<li><strong>Attaccante</strong>: chi attacca (passo 1) e quante gemme impegnare (passo 3).</li>
+<li><strong>Difensore</strong>: se e con quale Unità opporsi (passo 2); quante gemme di Guardia impegnare e se giocare una Reazione (passo 4).</li>
+</ul>
+<p>Le gemme sono sempre scoperte e le scelte sono in sequenza: l'attaccante non risponde mai alla risposta del difensore.</p>
+<div class="box box-ricorda">
+<p class="box-tit">Nessun bonus dura oltre l&#x27;attacco</p>
+<p>Tutti i bonus "in questo scontro" finiscono quando l'attacco è risolto. Non esistono bonus "fino a fine turno".</p>
+</div>
+<h2 id="vite-e-cicatrici">Vite e Cicatrici</h2>
+<p>Quando il tuo Leader perde una Vita, la carta in cima alla pila delle Vite si gira <strong>a faccia in su</strong> e va tra le tue <strong>Cicatrici</strong>, <strong>fresca</strong> (cioè ruotata).</p>
+<figure class="fig fig-cicatrici"><div class="fig-scroll"><svg viewBox="0 0 880 270" role="img" aria-label="Da Vita a Cicatrice" class="fig-svg">
+  <defs><marker id="punta-cic" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" class="punta"/></marker></defs>
+  <!-- Vita -->
+  <g transform="translate(30,40)">
+    <rect x="8" y="8" width="80" height="112" rx="8" class="carta-dorso"/><rect x="4" y="4" width="80" height="112" rx="8" class="carta-dorso"/><rect width="80" height="112" rx="8" class="carta-dorso"/>
+    <text x="44" y="146" text-anchor="middle" class="t-tit">Vita</text>
+    <text x="44" y="164" text-anchor="middle" class="t-tenue">coperta, segreta</text>
+  </g>
+  <path d="M128,96 L208,96" class="freccia" marker-end="url(#punta-cic)"/>
+  <text x="168" y="84" text-anchor="middle" class="t-b">a segno</text>
+  <!-- fresca -->
+  <g transform="translate(220,56)">
+    <rect width="112" height="80" rx="8" class="carta-cic"/>
+    <text x="56" y="46" text-anchor="middle" class="t-cic">fresca</text>
+    <text x="56" y="110" text-anchor="middle" class="t-tit t-cic">Cicatrice fresca</text>
+    <text x="56" y="130" text-anchor="middle" class="t-tenue">ruotata · conta per il Saldo</text>
+    <text x="56" y="148" text-anchor="middle" class="t-tenue">blocca il colpo finale</text>
+  </g>
+  <path d="M342,96 L428,96" class="freccia" marker-end="url(#punta-cic)"/>
+  <text x="386" y="84" text-anchor="middle" class="t-b">Fine del turno</text>
+  <!-- dritta -->
+  <g transform="translate(440,40)">
+    <rect width="80" height="112" rx="8" class="carta-cic"/>
+    <text x="40" y="62" text-anchor="middle" class="t-cic">dritta</text>
+    <text x="40" y="146" text-anchor="middle" class="t-tit t-cic">Dritta</text>
+    <text x="40" y="164" text-anchor="middle" class="t-tenue">pubblica, usabile</text>
+  </g>
+  <!-- usi -->
+  <path d="M530,70 L608,46" class="freccia" marker-end="url(#punta-cic)"/>
+  <path d="M530,96 L608,112" class="freccia" marker-end="url(#punta-cic)"/>
+  <path d="M530,122 L608,180" class="freccia" marker-end="url(#punta-cic)"/>
+  <rect x="612" y="18" width="250" height="56" rx="10" class="riq-neutro"/>
+  <text x="626" y="40" class="t-b">Rimarginare → in mano</text><text x="626" y="60" class="t-tenue">⟳ del Leader + 1 gemma di Brace</text>
+  <rect x="612" y="86" width="250" height="56" rx="10" class="riq-dif"/>
+  <text x="626" y="108" class="t-b">Reazione → poi Scarti</text><text x="626" y="128" class="t-tenue">se è una carta Reazione, quando difendi</text>
+  <rect x="612" y="154" width="250" height="56" rx="10" class="riq-att"/>
+  <text x="626" y="176" class="t-b">Furia la conta</text><text x="626" y="196" class="t-tenue">come tutte le Cicatrici, anche fresche</text>
+  <text x="30" y="254" class="t-tenue">Saldo: al massimo 2 Cicatrici fresche per Leader (3 dal round 10); le ferite in più si ignorano. Il Crepuscolo crea Cicatrici già dritte.</text>
+</svg></div><figcaption>Il percorso di una Vita persa.</figcaption></figure>
+
+<h3 id="cicatrici-fresche-e-dritte">Cicatrici fresche e dritte</h3>
+<ul>
+<li>Una Cicatrice <strong>fresca</strong> è nata in questo turno. Si tiene ruotata e si raddrizza nella <strong>Fine</strong> del turno.</li>
+<li>Una Cicatrice <strong>dritta</strong> si può usare: puoi giocarla come <strong>Reazione</strong> (se è una carta Reazione) o riprenderla in mano con <strong>Rimarginare</strong>.</li>
+<li>Le Cicatrici fresche non si usano, ma proteggono: finché il Leader ne ha almeno una, l'avversario non può dargli il colpo finale.</li>
+</ul>
+<h3 id="il-saldo-quante-ferite-per-turno">Il Saldo: quante ferite per turno</h3>
+<p>Un Leader può avere al massimo <strong>2 Cicatrici fresche</strong> (dal round 10: <strong>3</strong>). È il <strong>Saldo</strong>. Se le ha già, ogni altra perdita di Vita in quel turno <strong>si ignora</strong>. Non serve un contatore: basta contare le Cicatrici ruotate.</p>
+<div class="box box-esempio">
+<p class="box-tit">Il Saldo</p>
+<p>Round 6. G1 colpisce tre volte il Leader di G2. Il primo e il secondo colpo creano due Cicatrici fresche. Il terzo va a segno, ma G2 ha già 2 fresche: la perdita si ignora. Nella Fine di G1 le due Cicatrici si raddrizzano.</p>
+</div>
+<h3 id="rimarginare">Rimarginare</h3>
+<blockquote>
+<p><span class="ic-ruota" aria-label="ruota">⟳</span> del Leader + 1 gemma di Brace: riprendi in mano una tua Cicatrice <strong>dritta</strong>.</p>
+</blockquote>
+<p>Ogni Leader ha questa abilità. Siccome ruota il Leader, in un turno il tuo Leader <strong>o attacca o Rimargina</strong>. Rimarginare non ti restituisce la Vita: recuperi la carta. Puoi farlo anche con 8 o più carte in mano (l'eccesso si scarta nella Fine).</p>
+<h3 id="il-risveglio">Il Risveglio</h3>
+<p>Quando il tuo Leader scende a <strong>2 Vite o meno</strong> (ne ha perse almeno 3), si gira sul lato <strong>Risvegliato</strong>: Forza 4, Tempra 4, massimo di Guardia 3 e la sua abilità del lato Risvegliato. Succede una volta sola, è permanente e può accadere anche nel turno avversario. Se era ruotato resta ruotato.</p>
+<h2 id="come-si-vince_1">Come si vince</h2>
+<h3 id="alle-corde">Alle Corde</h3>
+<p>Un Leader è <strong>Alle Corde</strong> quando ha <strong>0 Vite</strong>. Dal round 13 lo è anche con <strong>1 Vita</strong>. Non serve segnarlo: si vede dalla Vita e dal tracciato.</p>
+<h3 id="il-colpo-finale">Il colpo finale</h3>
+<p><strong>Vinci</strong> quando un tuo attacco va a segno sul Leader avversario mentre è <strong>Alle Corde e non ha Cicatrici fresche</strong>.</p>
+<p>Siccome le Cicatrici fresche si raddrizzano solo alla fine del turno, chi va Alle Corde ha sempre <strong>un turno intero</strong> per reagire prima del colpo finale.</p>
+<div class="box box-esempio">
+<p class="box-tit">Il colpo finale</p>
+<p>Round 7. Il Leader di G2 ha 1 Vita. G1 lo colpisce: la Vita diventa una Cicatrice fresca e il Leader è a 0, <strong>Alle Corde</strong>. Un secondo colpo nello stesso turno non vince, perché c'è una Cicatrice fresca.</p>
+<p>Nella Fine di G1 la Cicatrice si raddrizza. G2 gioca il suo turno e nella sua Fine può mettere sul Leader 1 gemma di Guardia in più, perché è Alle Corde.</p>
+<p>Round 8: il primo attacco di G1 che va a segno è il <strong>colpo finale</strong>.</p>
+</div>
+<h3 id="tutti-i-modi-di-vincere">Tutti i modi di vincere</h3>
+<ol>
+<li>Il <strong>colpo finale</strong>.</li>
+<li>L'avversario deve pescare da un mazzo vuoto quando ha già 0 Vite.</li>
+<li>Il <strong>Crepuscolo</strong> (dal round 15): se il Leader avversario è Alle Corde nel controllo del Crepuscolo, perde.</li>
+</ol>
+<p>Non esistono patte né vittorie ai punti. Se due condizioni capitano nello stesso momento, <strong>perde il giocatore attivo</strong>.</p>
+<h2 id="la-fine-della-partita">La fine della partita</h2>
+<p>Il tracciato garantisce che la partita finisca. Più si va avanti, più si rischia:</p>
+<div class="tab-scroll"><table>
+<thead>
+<tr>
+<th>Dal round</th>
+<th>Cosa cambia</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>10</td>
+<td>Il Saldo sale a 3 Cicatrici fresche</td>
+</tr>
+<tr>
+<td>13</td>
+<td>Un Leader con 1 Vita è già Alle Corde</td>
+</tr>
+<tr>
+<td>15</td>
+<td><strong>Crepuscolo</strong> a ogni Ripristino di G1</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="il-crepuscolo">Il Crepuscolo</h3>
+<p>Dal round 15, all'inizio di ogni turno di G1 (passo 2 del Ripristino), si controllano <strong>entrambi i Leader insieme</strong>:</p>
+<ul>
+<li>se <strong>un solo</strong> Leader è Alle Corde, il suo giocatore <strong>perde</strong>;</li>
+<li>se lo sono <strong>tutti e due</strong>, perde chi ha meno Vite; a Vite pari perde G1;</li>
+<li>se <strong>nessuno</strong> è Alle Corde, ognuno perde <strong>2 Vite</strong>. Queste Cicatrici entrano già <strong>dritte</strong> e non contano per il Saldo.</li>
+</ul>
+<p>Nel turno di G2 il Crepuscolo non fa nulla.</p>
+<div class="box box-esempio">
+<p class="box-tit">Fine garantita</p>
+<p>Al più tardi, un giocatore perde nel Ripristino di G1 di questi round, a seconda delle Vite che ha all'inizio del round 15:</p>
+<div class="tab-scroll"><table>
+<thead>
+<tr>
+<th>Perde al più tardi nel</th>
+<th>Vite all'inizio del round 15</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Ripristino di G1 del round 15</td>
+<td>0 o 1</td>
+</tr>
+<tr>
+<td>Ripristino di G1 del round 16</td>
+<td>2 o 3</td>
+</tr>
+<tr>
+<td>Ripristino di G1 del round 17</td>
+<td>4 o 5</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<h2 id="il-leader">Il Leader</h2>
+<div class="tab-scroll"><table>
+<thead>
+<tr>
+<th></th>
+<th>Forza</th>
+<th>Tempra</th>
+<th>Vite iniziali</th>
+<th>Massimo di Guardia</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Lato Base</td>
+<td>3</td>
+<td>4</td>
+<td>5</td>
+<td>2</td>
+</tr>
+<tr>
+<td>Lato Risvegliato</td>
+<td>4</td>
+<td>4</td>
+<td>—</td>
+<td>3</td>
+</tr>
+</tbody>
+</table></div>
+<ul>
+<li>Il Leader è sempre in gioco: non può essere sconfitto, rimosso né Stancato. Non può opporsi.</li>
+<li><strong>Attacca</strong> come un'Unità, con la sua Forza. Attaccare lo ruota, quindi attacca al massimo una volta per turno.</li>
+<li>Contro un Leader che non si difende (Tempra 4, niente Parata), il Leader Base deve impegnare almeno 1 gemma per andare a segno; il Leader Risvegliato va a segno anche senza gemme.</li>
+<li>Ogni Leader ha <strong>Rimarginare</strong> e un'abilità propria per lato. Le abilità di difesa del Leader sono <strong>sempre attive</strong>: non lo ruotano e non costano gemme.</li>
+<li>Le abilità "<strong>Quando il tuo Leader attacca</strong>" si risolvono subito dopo la dichiarazione, <strong>prima</strong> che il difensore scelga se opporsi.</li>
+</ul>
+<h2 id="costruire-il-mazzo">Costruire il mazzo</h2>
+<ul>
+<li>Esattamente <strong>40 carte</strong>, al massimo <strong>3 copie per ID</strong> (ROS-007 e ROS-008 sono carte diverse, anche se avessero lo stesso testo).</li>
+<li>Ogni carta deve avere <strong>almeno un colore in comune col Leader</strong>, oppure essere <strong>Neutrale</strong>.</li>
+<li>I Leader hanno 1 o 2 colori. Nel mazzo non ci sono carte-risorsa: la risorsa sono le gemme.</li>
+</ul>
+<div class="tab-scroll"><table>
+<thead>
+<tr>
+<th>Colore</th>
+<th>Stile di gioco</th>
+<th>Parole chiave tipiche</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><span class="colore rosso"></span><strong>Rosso</strong></td>
+<td>Pressione: tutte le gemme in Forza</td>
+<td>Assalto, Impeto, Rinnovo</td>
+</tr>
+<tr>
+<td><span class="colore blu"></span><strong>Blu</strong></td>
+<td>Difesa, Guardia, contrattacco</td>
+<td>Scudo, Reazioni</td>
+</tr>
+<tr>
+<td><span class="colore nero"></span><strong>Nero</strong></td>
+<td>Le ferite diventano potere</td>
+<td>Furia, Cicatrici, costi in Vita</td>
+</tr>
+<tr>
+<td><span class="colore verde"></span><strong>Verde</strong></td>
+<td>Caccia alle Unità</td>
+<td>Bracconiere, Stanca, Caccia, <span class="ic-ruota" aria-label="ruota">⟳</span></td>
+</tr>
+<tr>
+<td><span class="colore neutro"></span><strong>Neutrale</strong></td>
+<td>Collante tra i colori</td>
+<td>qualsiasi</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="parole-chiave">Parole chiave</h2>
+<dl class="chiavi">
+<dt>Assalto</dt>
+<dd>L'Unità entra <strong>dritta</strong> e può attaccare nel turno in cui la giochi (mai nel round 1).</dd>
+<dt>Scudo</dt>
+<dd>Quando è il bersaglio, vince i pareggi: contro un'Unità a pari è sconfitto solo l'attaccante; contro un Leader è sconfitta solo se l'attacco è superiore. Si ruota quando si oppone, come le altre.</dd>
+<dt>Impeto N: +X</dt>
+<dd>Se nell'impegno hai almeno N gemme, +X in questo scontro. Quando l'Unità è il bersaglio contano solo le tue gemme di Parata (non quella che paga la Reazione).</dd>
+<dt>Caccia</dt>
+<dd>Quando attacca, puoi scegliere come bersaglio un'Unità avversaria, <strong>anche ruotata</strong>, invece del Leader. L'avversario può ancora opporsi con un'altra Unità, che diventa il bersaglio. L'Unità cacciata si difende con la sua Forza, la Parata, una Reazione e lo Scudo, ma non "si oppone": i suoi effetti "quando si oppone" non scattano.</dd>
+<dt>Furia N: +X</dt>
+<dd>+X nel Confronto se hai almeno N Cicatrici, contando <strong>tutte</strong> le Cicatrici, dritte e fresche. Rimarginare ne abbassa il numero.</dd>
+<dt>Bracconiere X</dt>
+<dd>Quando attacca e il suo bersaglio è un'Unità (che si oppone o cacciata), +X in questo scontro. Non vale quando è lei a opporsi.</dd>
+<dt>Rinnovo</dt>
+<dd>Quando attacca e sconfigge un'Unità, si raddrizza: può attaccare ancora.</dd>
+<dt>Stanca</dt>
+<dd>Ruota un'Unità avversaria dritta. Solo nel tuo turno e mai sul Leader.</dd>
+<dt>⟳</dt>
+<dd>Simbolo di costo: ruota la carta. Si può pagare solo se la carta è dritta.</dd>
+</dl>
+<h2 id="casi-particolari">Casi particolari</h2>
+<p><strong>Più effetti nello stesso momento.</strong> Prima quelli del giocatore attivo, nell'ordine che sceglie, poi quelli del difensore. Un effetto che dice "puoi" è facoltativo.</p>
+<p><strong>"Quando sconfigge" e "dopo lo scontro".</strong> Scattano alla fine dell'attacco anche se la carta che li ha è stata sconfitta in quello stesso attacco (anche se sono state sconfitte entrambe le Unità), salvo che il testo chieda che resti in gioco.</p>
+<p><strong>Controlli automatici.</strong> Dopo ogni azione e alla fine di ogni attacco si controlla, in ordine: se la partita è finita; se un Leader deve Risvegliarsi (prima quello del giocatore attivo); se c'è Guardia oltre il massimo (torna nella scorta).</p>
+<p><strong>Mazzo vuoto.</strong> Se devi pescare e il mazzo è vuoto, invece di pescare perdi 1 Vita (rispettando il Saldo). Se il tuo Leader ha già 0 Vite, perdi la partita.</p>
+<p><strong>Costi in Vita.</strong> Se una carta ti chiede di perdere Vita come costo e non puoi perderla tutta (Saldo pieno, 0 Vite o una soglia scritta sulla carta), non puoi giocarla.</p>
+<p><strong>Una Reazione a partita?</strong> No: al massimo <strong>una per attacco</strong>. Puoi usarne una in ogni attacco avversario, se hai le gemme di Guardia per pagarle.</p>
+<p><strong>Reazione dalle Cicatrici.</strong> Una Reazione tra le tue Cicatrici dritte si gioca come se fosse in mano. Dopo l'uso va negli Scarti.</p>
+<p><strong>Stanca nel turno avversario.</strong> Un effetto Stanca che si risolverebbe nel turno avversario non ha effetto.</p>
+<h3 id="cosa-non-troverai-mai-su-una-carta">Cosa non troverai mai su una carta</h3>
+<ul>
+<li>Carte che annullano altre carte o vietano di giocarne: le Reazioni modificano un attacco, non lo cancellano.</li>
+<li>Scarto forzato dalla mano dell'avversario.</li>
+<li>Effetti sul tracciato del round o sulla Brace che riceve l'avversario.</li>
+<li>Blocchi che impediscono a un personaggio di raddrizzarsi per più di un turno.</li>
+<li>Dadi o monete: il caso sta solo nella pescata.</li>
+</ul>
+<h2 id="riepilogo-rapido">Riepilogo rapido</h2>
+<div class="rapido">
+<div>
+<h4 id="turno">Turno</h4>
+<ol>
+<li><strong>Ripristino</strong>: (G1) round +1 · Crepuscolo dal 15 · Guardia nella scorta · raddrizza · prendi la Brace</li>
+<li><strong>Pesca</strong> 1 (G1 non pesca nel round 1)</li>
+<li><strong>Fase principale</strong>: carte, abilità, Rimarginare, attacchi</li>
+<li><strong>Fine</strong>: Guardia (max 2/3, +1 Alle Corde) · Cicatrici fresche dritte · mano max 8</li>
+</ol>
+</div>
+<div>
+<h4 id="attacco_1">Attacco</h4>
+<ol>
+<li>Dichiara e ruota</li>
+<li><span class="dif">Il difensore</span> può opporre un'Unità dritta</li>
+<li><span class="att">Attaccante</span>: gemme a vista, +1</li>
+<li><span class="dif">Difensore</span>: Guardia, +2 · max 1 Reazione</li>
+<li>Confronto: attacco ≥ difesa va a segno</li>
+<li>Esiti, gemme nella scorta</li>
+</ol>
+</div>
+<div>
+<h4 id="numeri">Numeri</h4>
+<p>Vite 5 · Tempra 4 · Forza Leader 3/4</p>
+<p>Brace = round, max 8 · G2 +1 nei round 1 e 3</p>
+<p>Saldo 2 fresche (3 dal round 10)</p>
+<p>Risveglio a 2 Vite · Unità max 5 · Reliquie max 2</p>
+</div>
+<div>
+<h4 id="vittoria">Vittoria</h4>
+<p><strong>Alle Corde</strong>: 0 Vite (1 Vita dal round 13)</p>
+<p><strong>Colpo finale</strong>: a segno su un Leader Alle Corde senza Cicatrici fresche</p>
+<p><strong>Crepuscolo</strong> dal round 15: chi è Alle Corde perde, altrimenti −2 Vite a testa</p>
+<p>Pareggio di condizioni: perde il giocatore attivo</p>
+</div>
+</div>
+<h2 id="glossario">Glossario</h2>
+<div class="tab-scroll"><table>
+<thead>
+<tr>
+<th>Termine</th>
+<th>Significato</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Alle Corde</strong></td>
+<td>Leader con 0 Vite; dal round 13 anche con 1 Vita</td>
+</tr>
+<tr>
+<td><strong>A segno</strong></td>
+<td>Attacco al Leader pari o superiore alla sua difesa</td>
+</tr>
+<tr>
+<td><strong>Brace</strong></td>
+<td>Le gemme che prendi nel tuo turno per giocare carte e attaccare</td>
+</tr>
+<tr>
+<td><strong>Cicatrice</strong></td>
+<td>Una Vita persa, a faccia in su. <strong>Fresca</strong> (ruotata) nel turno in cui nasce, poi <strong>dritta</strong></td>
+</tr>
+<tr>
+<td><strong>Colpo finale</strong></td>
+<td>Attacco a segno su un Leader Alle Corde senza Cicatrici fresche: vittoria</td>
+</tr>
+<tr>
+<td><strong>Crepuscolo</strong></td>
+<td>Dal round 15, nel Ripristino di G1: chi è Alle Corde perde, altrimenti −2 Vite a testa</td>
+</tr>
+<tr>
+<td><strong>Difensore</strong></td>
+<td>Il giocatore che non è di turno</td>
+</tr>
+<tr>
+<td><strong>Guardia</strong></td>
+<td>Gemme sul Leader, formate nella tua Fine e usate nel turno avversario</td>
+</tr>
+<tr>
+<td><strong>Impegno</strong></td>
+<td>Gemme messe scoperte in un attacco, da attaccante e difensore</td>
+</tr>
+<tr>
+<td><strong>Opposizione</strong></td>
+<td>Il difensore ruota una sua Unità dritta, che diventa il bersaglio</td>
+</tr>
+<tr>
+<td><strong>Parata</strong></td>
+<td>Ogni gemma di Guardia impegnata che non paga una Reazione: +2 alla difesa</td>
+</tr>
+<tr>
+<td><strong>Personaggio</strong></td>
+<td>Un'Unità o un Leader</td>
+</tr>
+<tr>
+<td><strong>Rimarginare</strong></td>
+<td><span class="ic-ruota" aria-label="ruota">⟳</span> del Leader + 1 Brace: riprendi in mano una Cicatrice dritta</td>
+</tr>
+<tr>
+<td><strong>Risveglio</strong></td>
+<td>Il Leader passa al lato Risvegliato quando ha 2 Vite o meno</td>
+</tr>
+<tr>
+<td><strong>Round</strong></td>
+<td>Un turno di G1 più un turno di G2</td>
+</tr>
+<tr>
+<td><strong>Ruotato</strong></td>
+<td>Ha già agito: non può attaccare, opporsi né usare <span class="ic-ruota" aria-label="ruota">⟳</span></td>
+</tr>
+<tr>
+<td><strong>Saldo</strong></td>
+<td>Massimo di Cicatrici fresche: 2, 3 dal round 10</td>
+</tr>
+<tr>
+<td><strong>Scorta</strong></td>
+<td>La riserva comune di gemme. Spendere = rimettere nella scorta</td>
+</tr>
+<tr>
+<td><strong>Tempra</strong></td>
+<td>La difesa del Leader: 4</td>
+</tr>
+</tbody>
+</table></div>
+      <footer class="piede">
+        <p>Questo manuale presenta le regole del <strong>regolamento v0.2.6</strong> (docs/regolamento_v0.2.md), che resta il testo di riferimento: se i due non dicono la stessa cosa, vale il regolamento. Si rigenera da <code>docs/manuale/</code> con <code>tools/manuale/build.py</code>.</p>
+      </footer>
+    </main>
+  </div>
+</div>

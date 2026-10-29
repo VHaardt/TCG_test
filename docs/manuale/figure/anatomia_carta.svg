@@ -1,0 +1,27 @@
+<svg viewBox="0 0 660 350" role="img" aria-label="Come si legge una carta Unità" class="fig-svg">
+  <defs><marker id="punta-ana" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0,0 L10,5 L0,10 z" class="punta"/></marker></defs>
+  <g transform="translate(215,14)">
+    <rect width="230" height="320" rx="14" class="carta-f"/>
+    <circle cx="30" cy="30" r="20" class="gemma"/><text x="30" y="37" text-anchor="middle" class="t-tit" style="font-size:20px">1</text>
+    <text x="60" y="26" class="t-b">ROS-001</text>
+    <text x="60" y="44" class="t-tenue">Unità · Rosso</text>
+    <circle cx="206" cy="30" r="8" style="fill:var(--c-rosso)"/>
+    <rect x="16" y="64" width="198" height="110" rx="8" class="zona"/>
+    <text x="115" y="124" text-anchor="middle" class="t-tenue">nessuna illustrazione</text>
+    <text x="16" y="200" class="t-b">Assalto.</text>
+    <text x="16" y="220" class="t-b">Impeto 1: +2</text>
+    <text x="16" y="240" class="t-tenue">con almeno 1 gemma impegnata,</text>
+    <text x="16" y="256" class="t-tenue">+2 in questo scontro</text>
+    <rect x="160" y="268" width="56" height="40" rx="8" class="riq-att"/>
+    <text x="188" y="298" text-anchor="middle" class="t-gr" style="font-size:26px">1</text>
+  </g>
+  <!-- richiami -->
+  <text x="20" y="40" class="t-b">Costo</text><text x="20" y="58" class="t-tenue">in gemme di Brace</text>
+  <path d="M120,44 L222,44" class="freccia" marker-end="url(#punta-ana)"/>
+  <text x="470" y="34" class="t-b">ID, tipo e colore</text><text x="470" y="52" class="t-tenue">massimo 3 copie per ID</text>
+  <path d="M466,40 L388,40" class="freccia" marker-end="url(#punta-ana)"/>
+  <text x="20" y="206" class="t-b">Parole chiave e testo</text><text x="20" y="224" class="t-tenue">il corsivo ricorda la regola</text>
+  <path d="M168,212 L224,212" class="freccia" marker-end="url(#punta-ana)"/>
+  <text x="470" y="282" class="t-b">Forza</text><text x="470" y="300" class="t-tenue">attacco e difesa</text>
+  <path d="M466,288 L436,288" class="freccia" marker-end="url(#punta-ana)"/>
+</svg>

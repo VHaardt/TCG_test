@@ -1,0 +1,35 @@
+<title>Regolamento di CICATRICI</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@600;800;900&family=Source+Sans+3:ital,wght@0,400;0,600;0,700;1,400&display=swap">
+<style>
+%%CSS%%
+</style>
+<!--CORPO-->
+<div class="pagina">
+  <header class="testata">
+    <div class="testata-in">
+      <p class="occhiello">Gioco di carte 1 contro 1 · regolamento per giocatori</p>
+      <h1 class="marchio">CICATRICI<span class="cucitura" aria-hidden="true"></span></h1>
+      <p class="sottotitolo">Ogni ferita resta sul tavolo. Usala.</p>
+      <p class="meta">Manuale %%VERSIONE%% · regole <strong>%%REGOLAMENTO%%</strong> · numeri dal preset %%PRESET%% · generato il %%DATA%%</p>
+    </div>
+  </header>
+  <div class="corpo">
+    <nav class="indice" aria-label="Indice">
+      <details open>
+        <summary>Indice</summary>
+        <ol>
+%%INDICE%%
+        </ol>
+      </details>
+    </nav>
+    <main class="testo">
+%%CORPO%%
+      <footer class="piede">
+        <p>Questo manuale presenta le regole del <strong>regolamento %%REGOLAMENTO%%</strong> (docs/regolamento_v0.2.md), che resta il testo di riferimento: se i due non dicono la stessa cosa, vale il regolamento. Si rigenera da <code>docs/manuale/</code> con <code>tools/manuale/build.py</code>.</p>
+      </footer>
+    </main>
+  </div>
+</div>

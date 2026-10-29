@@ -1,0 +1,36 @@
+<svg viewBox="0 0 892 250" role="img" aria-label="Le quattro fasi del turno" class="fig-svg">
+<defs><marker id="punta-tur" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" class="punta"/></marker></defs>
+<rect x="10" y="10" width="200" height="230" rx="12" class="riq-neutro"/>
+<text x="26" y="42" class="t-tit">1 · Ripristino</text>
+<line x1="26" y1="56" x2="194" y2="56" class="divisore"/>
+<text x="26" y="86" style="font-size:17px">G1: round +1</text>
+<text x="26" y="116" style="font-size:17px">Crepuscolo (G1, dal {{crepuscolo_round}})</text>
+<text x="26" y="146" style="font-size:17px">Guardia → scorta</text>
+<text x="26" y="176" style="font-size:17px">Raddrizza i tuoi</text>
+<text x="26" y="206" style="font-size:17px">Prendi la Brace</text>
+<path d="M213,125 L231,125" class="freccia" marker-end="url(#punta-tur)"/>
+<rect x="234" y="10" width="200" height="230" rx="12" class="riq-neutro"/>
+<text x="250" y="42" class="t-tit">2 · Pesca</text>
+<line x1="250" y1="56" x2="418" y2="56" class="divisore"/>
+<text x="250" y="86" style="font-size:17px">Pesca 1 carta</text>
+<text x="250" y="116" style="font-size:17px">G1 salta il round 1</text>
+<text x="250" y="146" style="font-size:17px">Mazzo vuoto: −1 Vita</text>
+<path d="M437,125 L455,125" class="freccia" marker-end="url(#punta-tur)"/>
+<rect x="458" y="10" width="200" height="230" rx="12" class="riq-att"/>
+<text x="474" y="42" class="t-tit">3 · Principale</text>
+<line x1="474" y1="56" x2="642" y2="56" class="divisore"/>
+<text x="474" y="86" style="font-size:17px">Gioca carte</text>
+<text x="474" y="116" style="font-size:17px">Usa abilità ⟳</text>
+<text x="474" y="146" style="font-size:17px">Rimargina</text>
+<text x="474" y="176" style="font-size:17px">Attacca (sei passi)</text>
+<text x="474" y="206" style="font-size:17px">Ordine libero</text>
+<path d="M661,125 L679,125" class="freccia" marker-end="url(#punta-tur)"/>
+<rect x="682" y="10" width="200" height="230" rx="12" class="riq-dif"/>
+<text x="698" y="42" class="t-tit">4 · Fine</text>
+<line x1="698" y1="56" x2="866" y2="56" class="divisore"/>
+<text x="698" y="86" style="font-size:17px">Brace avanzata</text>
+<text x="698" y="116" style="font-size:17px">→ Guardia (max {{guard_max}})</text>
+<text x="698" y="146" style="font-size:17px">Cicatrici fresche</text>
+<text x="698" y="176" style="font-size:17px">→ dritte (di tutti)</text>
+<text x="698" y="206" style="font-size:17px">Mano: max {{hand_limit}}</text>
+</svg>
