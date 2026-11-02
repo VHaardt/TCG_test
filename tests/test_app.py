@@ -291,6 +291,81 @@ def test_live_modifiers_add_up():
     assert seen > 0 and combats > 0
 
 
+# ---------------------------------------------------------------- R-026 (Q-027) nell'app
+def _r026():
+    """Carte di prova di Q-027 sul set del motore di test (l'app lo ricarica dopo, vedi _set_app)."""
+    from tests import test_v02 as T
+    E.load_cards()
+    return T, T._q027_cards()
+
+
+def _set_app():
+    core._DATI.clear()
+    core.dati()
+
+
+def test_r026_each_way_to_pay_is_its_own_labelled_action():
+    T, k = _r026()
+    try:
+        s = T._arena()
+        s.p[0].brace, s.p[0].hand = 3, [k["I03"], k["I02"]]
+        s.p[0].units = [E.Unit(900, "t_r6", True), E.Unit(901, "t_r6", True)]
+        s.p[1].units = [E.Unit(910, T._card("_u2", cost=2, power=2), True)]
+        lab = [core.etichetta(s, 0, a) for a in s.legal_actions() if a[0] == "play"]
+        assert sorted(x["pagamento"] for x in lab if x["carta"] == k["I03"]) == \
+            sorted(f"Stanca {s.describe(0, u)}" for u in (900, 901))
+        sac = [x for x in lab if x["carta"] == k["I02"]]
+        assert len(sac) == 2 and all(x["pagamento"].startswith("sacrifica ") for x in sac)
+        assert all(x["paga"][0]["come"] == "sacrifica" and "paghi: sacrifica" in x["testo"] for x in sac)
+        assert all(x["bersaglio"] == {"lato": "avv", "uid": 910} for x in lab)
+    finally:
+        _set_app()
+
+
+def test_r026_recover_is_a_question_when_more_cards_qualify():
+    T, k = _r026()
+    try:
+        a2, b2 = T._card("_a2", cost=2, power=2), T._card("_b2", cost=2, power=1)
+        s = T._arena()
+        s.log = []
+        pl = s.p[0]
+        pl.brace, pl.hand = 3, [k["I08"]]
+        pl.discard = [a2, b2, T._card("_big5", cost=5, power=5)]
+        pl.scars = [[c, False, "test"] for c in pl.life[:2]]
+        act = ("play", k["I08"], None)
+        extra, need = core.prova(s, act, [])
+        assert need["tipo"] == "recupero" and sorted(need["cands"]) == sorted([a2, b2]) and need["default"] == a2
+        assert need["fonte"] == k["I08"] and need["q"] == 0
+        assert core.prova(s, act, [b2]) == ([], None)
+        core.esegui_con_scelte(s, act, [b2])                    # non la scelta del motore: decide il giocatore
+        assert pl.hand == [b2] and a2 in pl.discard and "riprende _b2" in " ".join(s.log)
+        assert "trigger_target" not in vars(s) and "recover_choice" not in vars(s)
+        assert any(e["t"] == "riprende" and e["carta"] == b2 and e["chi"] == "io" for e in core.eventi(s.log, 0, 0))
+        pl.brace, pl.hand, pl.discard = 3, [k["I08"]], [a2, T._card("_big5", cost=5, power=5)]
+        assert core.prova(s, act, []) == ([a2], None)            # una sola carta valida: niente domanda
+    finally:
+        _set_app()
+
+
+def test_r026_free_reaction_shows_cost_0_and_counts():
+    T, k = _r026()
+    try:
+        s = T._arena()
+        s.p[0].units = [E.Unit(900, "t_r6", True)]
+        s.p[1].units = [E.Unit(901, "t_r6", True)]
+        s.p[1].guard, s.p[1].hand = 2, [k["I04"]]
+        for a in (("attack", 900), ("oppose", 901), ("gems", 0)):
+            s.step(a)
+        lab = [core.etichetta(s, 1, a) for a in s.legal_actions() if a[2]]
+        assert len(lab) == 1 and "(costo 0)" in lab[0]["testo"] and lab[0]["db"] == 9
+        s.combat.d, s.combat.react = 0, (k["I04"], "hand")
+        conto = core.conto_scontro(s, s.combat, 0, 0)
+        assert conto["db"] == 9 and any(x["t"] == f"Reazione {k['I04']} (gratis)" for x in conto["dif"])
+        assert sum(x["v"] for x in conto["dif"] if x["v"]) == conto["db"]
+    finally:
+        _set_app()
+
+
 def teardown_module():
     E.load_cards()          # the app loads the set into the engine: restore the default for the other tests
 

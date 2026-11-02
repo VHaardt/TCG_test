@@ -455,13 +455,7 @@ class Stanza:
             att["domanda"] = need
             m["versione"] += 1
             return False
-        scelte = list(att["scelte"])
-        s.trigger_target = lambda q, sel, cands: (scelte.pop(0) if scelte else
-                                                  engine.GameState.trigger_target(s, q, sel, cands))
-        try:
-            passo(s, att["act"])
-        finally:
-            del s.trigger_target
+        esegui_con_scelte(s, att["act"], att["scelte"])
         m["attesa"] = None
         m["versione"] += 1
         return True
@@ -543,7 +537,10 @@ def vista_partita(stanza, i):
     elif domanda:
         side = domanda["side"]
         out["bersaglio"] = {"tuo": dec == q, "fonte": domanda["fonte"], "testo": domanda["testo"],
+                            "tipo": domanda.get("tipo", "bersaglio"),
                             "cands": [{"lato": "io" if side == q else "avv", "uid": u} for u in domanda["cands"]]}
+        if domanda.get("tipo") == "recupero":
+            out["bersaglio"]["carte"] = list(domanda["cands"])
     elif dec == q:
         out["azioni"] = [{"i": k, **etichetta(s, q, a)} for k, a in enumerate(s.legal_actions())]
     return out
@@ -592,10 +589,25 @@ def passo(s, act):
         log.insert(n + 1, f"    P{d + 1} non perde Vite: {perche}")
 
 
+def candidati_recupero(s, q, flt):
+    """Carte diverse degli Scarti di q che un recupero (R-026) può prendere: stessi filtri del motore,
+    provati carta per carta."""
+    pl = s.p[q]
+    orig, out = pl.discard, []
+    try:
+        for cid in dict.fromkeys(orig):
+            pl.discard = [cid]
+            if engine.GameState.recover_choice(s, q, flt) == cid:
+                out.append(cid)
+    finally:
+        pl.discard = orig
+    return out
+
+
 def prova(s, act, scelte):
-    """Esegue act su un clone di s con le scelte di bersaglio già note (in ordine di chiamata).
-    Ritorna (scelte forzate in più, domanda): le chiamate con un solo candidato si aggiungono da sole;
-    la domanda è il primo trigger con più candidati ancora senza risposta (None se non ce ne sono)."""
+    """Esegue act su un clone di s con le scelte già note (in ordine di chiamata): bersagli dei trigger
+    e carte da riprendere dagli Scarti. Ritorna (scelte forzate in più, domanda): le domande con un solo
+    candidato si risolvono da sole; la domanda è la prima con più candidati ancora senza risposta."""
     c = s.clone()
     calls = [0]
     extra, need, fonti = [], [], []
@@ -608,10 +620,9 @@ def prova(s, act, scelte):
         finally:
             fonti.pop()
 
-    def tt(q, sel, cands):
+    def chiedi(q, cands, default, tipo, side):
         k = calls[0]
         calls[0] += 1
-        default = engine.GameState.trigger_target(c, q, sel, cands)
         if k < len(scelte):
             return scelte[k] if scelte[k] in cands else default
         if need:
@@ -619,18 +630,44 @@ def prova(s, act, scelte):
         if len(cands) == 1:
             extra.append(cands[0])
             return cands[0]
-        fonte = fonti[-1] if fonti else None
+        fonte = fonti[-1] if fonti else (act[1] if act[0] in ("play", "rim") else None)
         testo = CARDS[fonte].text if fonte in CARDS else ""
         if fonte in LEADERS:
             testo = " ".join(ab.get("text", "") for ab in c.leader_abilities(q))
-        need.append({"q": q, "side": q if sel.get("side", "own") == "own" else 1 - q, "cands": list(cands),
-                     "default": default, "fonte": fonte, "testo": testo})
+        need.append({"q": q, "side": side, "cands": list(cands), "default": default, "fonte": fonte,
+                     "testo": testo, "tipo": tipo})
         return default
+
+    def tt(q, sel, cands):
+        return chiedi(q, cands, engine.GameState.trigger_target(c, q, sel, cands), "bersaglio",
+                      q if sel.get("side", "own") == "own" else 1 - q)
+
+    def rc(q, flt):
+        cands = candidati_recupero(c, q, flt)
+        return chiedi(q, cands, engine.GameState.recover_choice(c, q, flt), "recupero", q) if cands else None
     c.fire = fire
     c.trigger_target = tt
+    c.recover_choice = rc
     c.step(act)
     return extra, (need[0] if need else None)
 
+
+def esegui_con_scelte(s, act, scelte):
+    """Esegue act sulla partita vera con le scelte trovate da prova, nello stesso ordine."""
+    scelte = list(scelte)
+    s.trigger_target = lambda q, sel, cands: (scelte.pop(0) if scelte else
+                                              engine.GameState.trigger_target(s, q, sel, cands))
+
+    def rc(q, flt):
+        if not candidati_recupero(s, q, flt):
+            return None
+        return scelte.pop(0) if scelte else engine.GameState.recover_choice(s, q, flt)
+    s.recover_choice = rc
+    try:
+        passo(s, act)
+    finally:
+        del s.trigger_target
+        del s.recover_choice
 
 EVENTI = [
     ("turno", re.compile(r"^--- Round (?P<round>\d+), P(?P<p>[12])")),
@@ -644,6 +681,9 @@ EVENTI = [
     ("sconfitta", re.compile(r"^    (?P<carta>\S+) di P(?P<p>[12]) è sconfitta")),
     ("risveglio", re.compile(r"^    P(?P<p>[12]): il Leader si Risveglia")),
     ("ignorata", re.compile(r"^    P(?P<p>[12]) non perde Vite: (?P<perche>.+)$")),
+    ("rimbalzo", re.compile(r"^    (?P<carta>\S+) di P(?P<p>[12]): torna in mano")),
+    ("sacrifica", re.compile(r"^    P(?P<p>[12]) sacrifica (?P<carta>\S+) per pagare")),
+    ("riprende", re.compile(r"^    P(?P<p>[12]) riprende (?P<carta>\S+) dagli Scarti")),
 ]
 EVENTI_RX = dict(EVENTI)
 
@@ -719,7 +759,7 @@ def conto_scontro(s, cb, a_gems, d_gems):
     """Fa e Db dal vivo con le gemme già impegnate, divisi in parti: base, gemme, Parata, Reazione,
     abilità ed effetti (con le carte che li danno, dalla traccia del motore)."""
     a, d = s.active, 1 - s.active
-    react = cb.react if d_gems else None
+    react = cb.react if cb.d is not None else None
     trace = {"src": []}
     try:
         fa, db, _ = s.compute(a_gems, d_gems, react, cb.opposer, trace=trace)
@@ -737,15 +777,16 @@ def conto_scontro(s, cb, a_gems, d_gems):
     else:
         tu = s.unit(d, tgt)
         base_d, nome_d = (CARDS[tu.cid].power if tu else 0), "Forza stampata"
-    costo = max(CARDS[react[0]].cost, 1) if react and d_gems >= max(CARDS[react[0]].cost, 1) else 0
+    costo = s.react_cost(react[0]) if react and s.react_paid(react, d_gems, cb.opposer, cb) else 0
+    giocata = bool(react) and s.react_paid(react, d_gems, cb.opposer, cb)
     parata = (d_gems - costo) * s.parata_per_gemma(d)
     gem_a = a_gems * s.r.forza_per_gemma
     fonti = lambda side: sorted({cid for qq, cid in trace["src"] if qq == side and (not react or cid != react[0])})
     att = [{"t": nome_a, "v": base_a}, {"t": f"{a_gems} gemme di Brace", "v": gem_a}]
     dif = [{"t": nome_d, "v": base_d}, {"t": f"Parata ({d_gems - costo} gemme)", "v": parata}]
     ra, rd = fa - base_a - gem_a, db - base_d - parata
-    if costo:
-        dif.append({"t": f"Reazione {react[0]}", "v": None})
+    if giocata:
+        dif.append({"t": f"Reazione {react[0]}" + (" (gratis)" if not costo else ""), "v": None})
     if ra:
         att.append({"t": "abilità ed effetti" + (": " + ", ".join(fonti(a)) if fonti(a) else ""), "v": ra})
     if rd:
@@ -784,8 +825,33 @@ def _ref(q, spec, t):
     return {"lato": "io" if sel.get("side", "own") == "own" else "avv", "uid": t}
 
 
+def pagamento(s, q, plan):
+    """Testo e Unità coinvolte di un modo di pagare un costo (R-025/R-026): perdi Vita, Stanca o sacrifica."""
+    parti, unita = [], []
+    for x in plan or ():
+        if x[0] == "vita":
+            parti.append(f"perdi {x[1]} Vita")
+        elif x[0] in ("stanca", "sacrifica"):
+            parti.append(f"{'Stanca' if x[0] == 'stanca' else 'sacrifica'} {s.describe(q, x[1])}")
+            unita.append({"lato": "io", "uid": x[1], "come": x[0]})
+    return (", ".join(parti) or None), unita
+
+
 def etichetta(s, q, act):
-    """Testo leggibile di un'azione legale, con il gruppo per l'interfaccia."""
+    """Testo leggibile di un'azione legale, con il gruppo per l'interfaccia. Un'azione con più modi di
+    pagare il costo porta "pagamento": ogni modo è un'azione a parte."""
+    out = _etichetta(s, q, act)
+    plan = act[3] if act[0] == "play" and len(act) > 3 else act[4] if act[0] == "ability" and len(act) > 4 else None
+    if plan is not None:
+        testo, unita = pagamento(s, q, plan)
+        if testo:
+            out["pagamento"] = testo
+            out["paga"] = unita
+            out["testo"] += f" · paghi: {testo}"
+    return out
+
+
+def _etichetta(s, q, act):
     k = act[0]
     a = s.active
     if k == "end":
@@ -837,7 +903,7 @@ def etichetta(s, q, act):
         txt = f"Impegna {gems} gemme di Guardia"
         if react:
             cid, src = react
-            txt += f" con la Reazione {cid} {'dalla mano' if src == 'hand' else 'dalle Cicatrici'} (costo {max(CARDS[cid].cost, 1)})"
+            txt += f" con la Reazione {cid} {'dalla mano' if src == 'hand' else 'dalle Cicatrici'} (costo {s.react_cost(cid)})"
         cb = s.combat
         if cb.a is not None and (cb.a_visible or q == a):
             fa, db = _forza_su(s, cb.a, gems, react)

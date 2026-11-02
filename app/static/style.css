@@ -214,8 +214,8 @@ table.lista .pallino { display: inline-block; width: 10px; height: 10px; border-
 .registro .r-io { color: #ffd9a8; } .registro .r-avv { color: #b8d4ff; } .registro .r-turno { color: var(--gold); font-weight: 700; margin-top: 4px; }
 
 /* menu, anteprima, overlay */
-#menu { position: fixed; z-index: 60; background: #1d1611f2; border: 1px solid var(--gold2); border-radius: 10px; padding: 6px;
-  display: flex; flex-direction: column; gap: 2px; box-shadow: 0 10px 30px #000; max-width: 360px; }
+#menu { position: fixed; z-index: 75; background: #1d1611f2; border: 1px solid var(--gold2); border-radius: 10px; padding: 6px;
+  display: flex; flex-direction: column; gap: 2px; box-shadow: 0 10px 30px #000; max-width: 440px; }
 #menu button { text-align: left; }
 #anteprima { position: fixed; z-index: 70; pointer-events: none; transition: opacity .12s; }
 #strato { position: fixed; inset: 0; pointer-events: none; z-index: 50; overflow: hidden; }
@@ -284,3 +284,11 @@ table.lista .pallino { display: inline-block; width: 10px; height: 10px; border-
 .conto { display: flex; flex-direction: column; gap: 2px; font-size: 13px; margin: 4px 0; }
 .conto .att b { color: #ff8a6a; } .conto .dif b { color: #8cc4ff; } .conto small { opacity: .75; }
 #indietro { width: 100%; margin-bottom: 8px; background: #3a2d1c; color: #f3e2bd; border: 1px solid #a07c3e; }
+#recupero { position: fixed; inset: 0; z-index: 70; background: #000b; display: flex; align-items: center; justify-content: center; }
+#recupero .pannello { max-width: 92vw; text-align: center; }
+.recupero-carte { display: flex; flex-wrap: wrap; gap: 12px; justify-content: center; margin-top: 10px; }
+.recupero-carte .carta { cursor: pointer; transition: transform .15s; }
+.recupero-carte .carta:hover { transform: translateY(-8px) scale(1.05); box-shadow: 0 0 18px var(--gold); }
+.pila.cliccabile { cursor: pointer; text-decoration: underline dotted; }
+#recupero.solo-vista .carta { cursor: default; }
+#recupero.solo-vista .carta:hover { transform: none; box-shadow: none; }
