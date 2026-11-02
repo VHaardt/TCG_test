@@ -1,0 +1,298 @@
+{
+ "set": "carte nuove di Q-027 per E-031 (si aggiungono a B0c03)",
+ "autore": "programmatore (swarm)",
+ "data": "2026-11-02",
+ "nota": "cards: scritte nel DSL del motore ab6f2dd e validate con V027. bozze: forma JSON proposta con i nomi di primitiva di R-026, da validare quando c'è la primitiva. NEW-I07 è fuori (4/8, in riserva).",
+ "cards": [
+  {
+   "id": "NEW-I01",
+   "name": "NEW-I01",
+   "type": "tactic",
+   "cost": 3,
+   "colors": [
+    "K"
+   ],
+   "rarity": "R",
+   "play": {
+    "costs": [
+     {
+      "stanca_own": 1
+     }
+    ],
+    "target": {
+     "side": "opp",
+     "ready": true,
+     "cost_le": 3
+    },
+    "do": [
+     {
+      "op": "defeat",
+      "target": "chosen"
+     }
+    ]
+   },
+   "text": "Costo aggiuntivo: Stanca una tua Unità Pronta. Sconfiggi un'Unità avversaria Pronta con costo ≤3.",
+   "_stato": "finale: DSL esistente (stanca_own di R-025)",
+   "_note": "Q-027 (esito_passata2.md, round1/proposta_unificata.md), 8/8."
+  },
+  {
+   "id": "NEW-I05",
+   "name": "NEW-I05",
+   "type": "reaction",
+   "cost": 1,
+   "colors": [],
+   "rarity": "R",
+   "react": {
+    "do": [
+     {
+      "op": "att_mod",
+      "n": -2
+     }
+    ],
+    "do_from_scars": [
+     {
+      "op": "att_mod",
+      "n": -2
+     },
+     {
+      "op": "draw",
+      "n": 1,
+      "if": [
+       {
+        "deck_nonempty": true
+       }
+      ]
+     }
+    ]
+   },
+   "text": "L'attaccante ha −2 in questo scontro. Se la giochi da una tua Cicatrice, pesca 1.",
+   "_stato": "finale: DSL esistente (do_from_scars)",
+   "_note": "Q-027 (esito_passata2.md, round1/proposta_unificata.md), 6/8. 'Pesca 1 se il mazzo non è vuoto' è la regola generale della pesca: nel JSON come in NER-025."
+  },
+  {
+   "id": "NEW-I06",
+   "name": "NEW-I06",
+   "type": "reaction",
+   "cost": 1,
+   "colors": [
+    "K"
+   ],
+   "rarity": "R",
+   "react": {
+    "do": [
+     {
+      "op": "att_mod",
+      "n": -2
+     }
+    ],
+    "do_from_scars": [
+     {
+      "op": "att_mod",
+      "n": -2
+     },
+     {
+      "op": "defeat",
+      "target": "attacker",
+      "sel": {
+       "cost_le": 2
+      }
+     }
+    ]
+   },
+   "text": "L'attaccante ha −2 in questo scontro. Se la giochi da una tua Cicatrice, dopo lo scontro sconfiggi l'attaccante, se è un'Unità con costo ≤2.",
+   "_stato": "finale: DSL esistente (do_from_scars; defeat sull'attaccante dopo lo scontro come BLU-025)",
+   "_note": "Q-027 (esito_passata2.md, round1/proposta_unificata.md), 8/8."
+  }
+ ],
+ "bozze": [
+  {
+   "id": "NEW-I02",
+   "name": "NEW-I02",
+   "type": "tactic",
+   "cost": 2,
+   "colors": [
+    "K"
+   ],
+   "rarity": "R",
+   "play": {
+    "costs": [
+     {
+      "sacrifice": 1
+     }
+    ],
+    "target": {
+     "side": "opp",
+     "cost_le": 4
+    },
+    "do": [
+     {
+      "op": "defeat",
+      "target": "chosen"
+     }
+    ]
+   },
+   "text": "Costo aggiuntivo: sacrifica una tua Unità Pronta senza Assalto. Sconfiggi un'Unità avversaria, anche Pronta, con costo ≤4.",
+   "_stato": "bozza: da validare quando c'è la primitiva (R-026)",
+   "_primitiva": "costo `sacrifice` (R-026 n.3, regola G1: Unità Pronta senza Assalto, solo nelle Tattiche)",
+   "_note": "Q-027 (esito_passata2.md, round1/proposta_unificata.md), 6/8."
+  },
+  {
+   "id": "NEW-I03",
+   "name": "NEW-I03",
+   "type": "tactic",
+   "cost": 3,
+   "colors": [
+    "B"
+   ],
+   "rarity": "R",
+   "play": {
+    "costs": [
+     {
+      "stanca_own": 1
+     }
+    ],
+    "target": {
+     "side": "opp",
+     "ready": true,
+     "cost_le": 4
+    },
+    "do": [
+     {
+      "op": "bounce",
+      "target": "chosen"
+     }
+    ]
+   },
+   "text": "Costo aggiuntivo: Stanca una tua Unità Pronta. Riporta in mano al suo proprietario un'Unità avversaria Pronta con costo ≤4.",
+   "_stato": "bozza: da validare quando c'è la primitiva (R-026)",
+   "_primitiva": "op `bounce` (R-026 n.1)",
+   "_note": "Q-027 (esito_passata2.md, round1/proposta_unificata.md), 7/8 con l'emendamento 'Pronta'."
+  },
+  {
+   "id": "NEW-I04",
+   "name": "NEW-I04",
+   "type": "reaction",
+   "cost": 0,
+   "colors": [],
+   "rarity": "R",
+   "react": {
+    "play_if": [
+     {
+      "target_is_unit": true
+     },
+     {
+      "no_own_gems": true
+     }
+    ],
+    "do": [
+     {
+      "op": "def_mod",
+      "n": 2
+     }
+    ]
+   },
+   "text": "Giocala solo se il bersaglio è una tua Unità e nel tuo impegno non hai gemme. Il bersaglio ha +2 in questo scontro.",
+   "_stato": "bozza: da validare quando c'è la primitiva (R-026)",
+   "_primitiva": "condizione di gioco `react.play_if` e condizione `no_own_gems` (R-026 n.5–6); Reazione a costo 0 da verificare",
+   "_note": "Q-027 (esito_passata2.md, round1/proposta_unificata.md), 6/8, Neutrale."
+  },
+  {
+   "id": "NEW-I08",
+   "name": "NEW-I08",
+   "type": "unit",
+   "cost": 3,
+   "colors": [
+    "K"
+   ],
+   "rarity": "R",
+   "power": 2,
+   "abilities": [
+    {
+     "trigger": "on_enter",
+     "if": [
+      {
+       "scars_ge": 2
+      }
+     ],
+     "do": [
+      {
+       "op": "recover",
+       "from": "discard",
+       "sel": {
+        "kind": "unit",
+        "cost_le": 2,
+        "without_trigger": "on_enter"
+       }
+      }
+     ]
+    }
+   ],
+   "text": "Quando entra, se hai almeno 2 Cicatrici, riprendi in mano dai tuoi Scarti un'Unità con costo ≤2 che non ha \"Quando entra\".",
+   "_stato": "bozza: da validare quando c'è la primitiva (R-026)",
+   "_primitiva": "op `recover` dagli Scarti (R-026 n.4, regola G2) e campo di selettore `without_trigger`",
+   "_note": "Q-027 (esito_passata2.md, round1/proposta_unificata.md), 8/8."
+  },
+  {
+   "id": "NEW-I09",
+   "name": "NEW-I09",
+   "type": "unit",
+   "cost": 3,
+   "colors": [
+    "K"
+   ],
+   "rarity": "R",
+   "power": 2,
+   "abilities": [
+    {
+     "trigger": "on_rim",
+     "target": {
+      "side": "opp",
+      "ready": true,
+      "power_le": {
+       "scars": "own"
+      }
+     },
+     "do": [
+      {
+       "op": "stanca",
+       "target": "chosen"
+      }
+     ]
+    }
+   ],
+   "text": "Quando il tuo Leader Rimargina, Stanca un'Unità avversaria Pronta con Forza attuale pari o inferiore alle tue Cicatrici.",
+   "_stato": "bozza: da validare quando c'è la primitiva (R-026)",
+   "_primitiva": "evento `on_rim` (R-026 n.2); Cicatrici contate al momento dell'evento",
+   "_note": "Q-027 (esito_passata2.md, round1/proposta_unificata.md), 8/8."
+  },
+  {
+   "id": "NEW-I10",
+   "name": "NEW-I10",
+   "type": "unit",
+   "cost": 2,
+   "colors": [
+    "G"
+   ],
+   "rarity": "C",
+   "power": 2,
+   "abilities": [
+    {
+     "trigger": "on_rim",
+     "do": [
+      {
+       "op": "raddrizza",
+       "target": "self",
+       "sel": {
+        "ready": false
+       }
+      }
+     ]
+    }
+   ],
+   "text": "Quando il tuo Leader Rimargina, se questa Unità è Ruotata, raddrizzala.",
+   "_stato": "bozza: da validare quando c'è la primitiva (R-026)",
+   "_primitiva": "evento `on_rim` (R-026 n.2); raddrizza su sé stessa esiste già",
+   "_note": "Q-027 (esito_passata2.md, round1/proposta_unificata.md), 8/8."
+  }
+ ]
+}
