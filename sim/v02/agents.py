@@ -104,7 +104,7 @@ class PugnoGame:
         st = self.base
         fa, db, _ = st.compute(a_gems, d_gems, react, opposer)
         hit, ad, od = st.outcome(fa, db, opposer, a_gems=a_gems)
-        used = react if (react is not None and d_gems >= max(CARDS[react[0]].cost, 1)) else None
+        used = react if st.react_paid(react, d_gems, opposer) else None
         key = (hit, ad, od, used, opposer)
         v = self.cache.get(key)
         if v is None:
@@ -360,10 +360,18 @@ class RuleAgent2:
         return sum(x[1] for x in plan if x[0] == "vita")
 
     def _plan_score(self, s, plan):
-        """Q-026 M1, costo a scelta: Stancare la tua Unità più debole prima di perdere Vita."""
+        """Q-026 M1, costo a scelta: Stancare la tua Unità più debole prima di perdere Vita.
+        R-026: sacrificare costa l'Unità intera (Forza + costo)."""
         if plan is None:
             return 0
-        return -5 * self._plan_life(plan) - sum(s.unit_power(s.active, s.unit(s.active, x[1])) for x in plan if x[0] == "stanca")
+        a = s.active
+        return (-5 * self._plan_life(plan) - sum(s.unit_power(a, s.unit(a, x[1])) for x in plan if x[0] == "stanca")
+                - sum(self._unit_value(s, a, x[1]) for x in plan if x[0] == "sacrifica"))
+
+    @staticmethod
+    def _unit_value(s, q, uid):
+        u = s.unit(q, uid)
+        return s.unit_power(q, u) + CARDS[u.cid].cost if u else 0
 
     def _play_life(self, s, act):
         """The play pays Vita: the plan chosen, or the fixed costs of the card."""
@@ -404,7 +412,11 @@ class RuleAgent2:
             return True
         side = a if (c.play or {}).get("target", {}).get("side", "own") == "own" else 1 - a
         u = s.unit(side, act[2])
-        return u is not None and s.unit_power(side, u) >= 2
+        if u is None or s.unit_power(side, u) < 2:
+            return False
+        plan = act[3] if len(act) > 3 else None                # R-026: sacrifica solo per un bersaglio che vale di più
+        victims = [x[1] for x in plan or () if x[0] == "sacrifica"]
+        return side == a or not victims or self._unit_value(s, side, act[2]) > sum(self._unit_value(s, a, v) for v in victims)
 
     def _target_score(self, s, act):
         if act[2] is None:

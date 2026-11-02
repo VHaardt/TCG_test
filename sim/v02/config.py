@@ -58,6 +58,9 @@ class Rules2:
     max_copies_rarity: tuple = ()      # limiti per rarità, es. (("L", 1),): Leggendarie in 1 copia
     multicolor_all: bool = False       # una carta multicolore richiede tutti i suoi colori nel Leader (False: ne basta uno)
     rarity_scale: tuple = ()           # rarità ammesse; fuori scala è solo un avviso di `valida` (la rarità non cambia le partite)
+    # R-026 (Q-027)
+    react_min_cost: int = 0            # costo minimo di una Reazione in gemme; §8 C4 (a) non ne fissa uno (prima il motore usava 1)
+    g2_recupero: bool = True           # G2: un effetto che prende carte dagli Scarti non prende una carta che prende dagli Scarti
 
     # limits
     max_units: int = 5
