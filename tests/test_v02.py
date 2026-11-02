@@ -831,6 +831,130 @@ def test_q026_v027_deckbuilding():
     assert {k: v for k, v in v27.as_dict().items() if k not in D.limits(v27)} \
         == {k: v for k, v in v26.as_dict().items() if k not in D.limits(v26)}          # le partite sono quelle di V026
 
+
+# ---------------------------------------------------------------- R-026 (Q-027): primitive
+def _q027_cards():
+    return {
+        "I03": _card("_i03", type="tactic", cost=3, colors=("B",), power=0,
+                     play={"costs": [{"stanca_own": 1}], "target": {"side": "opp", "ready": True, "cost_le": 4},
+                           "do": [{"op": "bounce"}]}),
+        "I02": _card("_i02", type="tactic", cost=2, colors=("K",), power=0,
+                     play={"costs": [{"sacrifice": 1}], "target": {"side": "opp", "cost_le": 4}, "do": [{"op": "defeat"}]}),
+        "I09": _card("_i09", cost=3, colors=("K",), power=2, abilities=[
+            {"trigger": "on_rim", "target": {"side": "opp", "ready": True, "power_le": {"scars": "own"}}, "do": [{"op": "stanca"}]}]),
+        "I10": _card("_i10", cost=2, colors=("G",), power=2, abilities=[
+            {"trigger": "on_rim", "do": [{"op": "raddrizza", "target": "self", "sel": {"ready": False}}]}]),
+        "I08": _card("_i08", cost=3, colors=("K",), power=2, abilities=[
+            {"trigger": "on_enter", "if": [{"scars_ge": 2}],
+             "do": [{"op": "recover", "from": "discard", "sel": {"kind": "unit", "cost_le": 2, "without_trigger": "on_enter"}}]}]),
+        "I04": _card("_i04", type="reaction", cost=0, colors=(), power=0,
+                     react={"play_if": [{"target_is_unit": True}, {"no_own_gems": True}], "do": [{"op": "def_mod", "n": 2}]}),
+    }
+
+
+def test_r026_bounce_ready_units_cost_le_4():
+    k = _q027_cards()
+    big = _card("_big5", cost=5, power=5)
+    s = _arena()
+    s.p[0].brace, s.p[0].hand = 3, [k["I03"]]
+    s.p[0].units = [Unit(900, "t_r6", True)]
+    u2 = _card("_u2", cost=2, power=2)
+    s.p[1].units = [Unit(901, u2, True), Unit(902, u2, False), Unit(903, big, True)]
+    plays = [x for x in s.legal_actions() if x[0] == "play"]
+    assert [(x[2], x[3]) for x in plays] == [(901, (("stanca", 900),))]     # solo Pronta con costo ≤4
+    s.step(plays[0])
+    assert s.unit(1, 901) is None and s.p[1].hand[-1] == u2 and u2 not in s.p[1].discard
+    assert s.stats["removals_src"][0] == {"rimbalzo": 1} and s.stats["removals"][0] == 1
+
+
+def test_r026_on_rim_triggers_after_the_scar_returns():
+    k = _q027_cards()
+    weak, mid = _card("_w2", power=2), _card("_m3", power=3)
+    s = _arena()
+    pl = s.p[0]
+    pl.brace, pl.l_ready = 1, True
+    pl.scars = [[c, False, "test"] for c in pl.life[:3]]
+    pl.life = pl.life[3:]
+    pl.units = [Unit(900, k["I09"], True), Unit(901, k["I10"], False)]
+    s.p[1].units = [Unit(910, mid, True), Unit(911, weak, True)]
+    s.step([x for x in s.legal_actions() if x[0] == "rim"][0])
+    assert len(pl.scars) == 2                                              # la soglia è letta dopo il Rimarginare
+    assert s.unit(1, 911).ready is False and s.unit(1, 910).ready is True
+    assert s.unit(0, 901).ready is True                                    # I10 raddrizza sé stessa
+    assert ("attack", 901) in s.legal_actions()
+
+
+def test_r026_sacrifice_g1():
+    k = _q027_cards()
+    rush = _card("_rush", power=3, keywords=["assalto"])
+    s = _arena()
+    s.p[0].brace, s.p[0].hand = 2, [k["I02"]]
+    s.p[0].units = [Unit(900, "t_r6", True), Unit(901, rush, True), Unit(902, "t_r6", False)]
+    s.p[1].units = [Unit(910, _card("_u2", cost=2, power=2), False)]
+    plays = [x for x in s.legal_actions() if x[0] == "play"]
+    assert [x[3] for x in plays] == [(("sacrifica", 900),)]               # Pronta e senza Assalto
+    s.step(plays[0])
+    assert s.unit(0, 900) is None and "t_r6" in s.p[0].discard and s.unit(1, 910) is None
+    assert s.stats["sacrifices"][0] == 1 and s.stats["removals_src"][0] == {"sacrificio": 1, "sconfiggi": 1}
+    s.p[0].hand, s.p[0].brace = [k["I02"]], 2
+    s.p[1].units = [Unit(911, "t_r6", True)]
+    s.p[0].units = [Unit(901, rush, True)]
+    assert not [x for x in s.legal_actions() if x[0] == "play"]           # niente da sacrificare
+    from sim.v02.validate import validate
+    base = {"id": "X", "cost": 1, "colors": [], "power": 1}
+    errs = validate({"cards": [dict(base, type="unit", costs=[{"sacrifice": 1}]),
+                               dict(base, id="Y", type="unit", abilities=[{"activated": True, "costs": [{"sacrifice": 1}], "do": []}]),
+                               dict(base, id="Z", type="tactic", play={"costs": [{"sacrifice": 1}], "do": [{"op": "draw", "n": 1}]}),
+                               dict(base, id="W", type="tactic", play={"costs": [{"sacrifice": 1}], "do": []})]})
+    assert [e.split(":")[0] for e in errs] == ["X.costs[0]", "Y.abilities[0].costs[0]", "Z"], errs
+
+
+def test_r026_recover_and_g2():
+    k = _q027_cards()
+    cheap = _card("_c2", cost=2, power=2)
+    enter = _card("_e2", cost=2, power=3, abilities=[{"trigger": "on_enter", "do": [{"op": "draw", "n": 1}]}])
+    taker = _card("_t2", cost=2, power=4, abilities=[{"trigger": "on_attack", "do": [
+        {"op": "recover", "sel": {"kind": "unit"}}]}])
+    s = _arena()
+    pl = s.p[0]
+    pl.brace, pl.hand = 3, [k["I08"]]
+    pl.discard = [cheap, enter, taker, "_big5", k["I03"]]
+    pl.scars = [[c, False, "test"] for c in pl.life[:1]]
+    s.step(("play", k["I08"], None))
+    assert pl.hand == [] and s.stats["recovers"][0] == 0                   # 1 Cicatrice: niente
+    pl.scars.append([pl.life[1], False, "test"])
+    pl.brace, pl.hand = 3, [k["I08"]]
+    s.step(("play", k["I08"], None))
+    assert pl.hand == [cheap] and cheap not in pl.discard and s.stats["recovers"][0] == 1   # né "Quando entra" né G2
+    s.r = s.r.with_(g2_recupero=False)
+    pl.brace, pl.hand, pl.discard = 3, [k["I08"]], [cheap, taker]
+    pl.units = []
+    s.step(("play", k["I08"], None))
+    assert pl.hand == [taker]
+
+
+def test_r026_reaction_cost_0_with_play_if():
+    k = _q027_cards()
+    s = _arena()
+    s.p[0].units = [Unit(900, "t_r6", True)]
+    s.p[1].units = [Unit(901, "t_r6", True)]
+    s.p[1].guard, s.p[1].hand = 2, [k["I04"]]
+    s.step(("attack", 900))
+    s.step(("no_oppose",))
+    s.step(("gems", 0))
+    assert not [x for x in s.legal_actions() if x[2]]                      # bersaglio il Leader: non si gioca
+    s = _arena()
+    s.p[0].units = [Unit(900, "t_r6", True)]
+    s.p[1].units = [Unit(901, "t_r6", True)]
+    s.p[1].guard, s.p[1].hand = 2, [k["I04"]]
+    s.step(("attack", 900))
+    s.step(("oppose", 901))
+    s.step(("gems", 0))
+    assert [x[1] for x in s.legal_actions() if x[2]] == [0]                # costo 0, e nessuna gemma nell'impegno
+    assert s.compute(0, 0, (k["I04"], "hand"), 901)[:2] == (7, 9)
+    s.step(("parry", 0, (k["I04"], "hand")))
+    assert s.unit(0, 900) is None and k["I04"] in s.p[1].discard and s.stats["reactions"][1] == 1
+
 if __name__ == "__main__":
     for k, f in list(globals().items()):
         if k.startswith("test_"):

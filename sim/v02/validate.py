@@ -12,7 +12,7 @@ TYPES = {"unit", "tactic", "reaction", "relic"}
 KEYWORDS = {"assalto", "scudo", "bracconiere", "caccia", "impeto", "infuso", "furia", "rinnovo"}
 KW_PARAMS = {"bracconiere"}
 EVENTS = {"on_enter", "on_attack", "on_oppose", "on_defeats_attacker", "on_own_unit_defeats_unit",
-          "on_attack_defeats_unit", "on_own_unit_attack_defeats_unit", "on_own_reaction"}
+          "on_attack_defeats_unit", "on_own_unit_attack_defeats_unit", "on_own_reaction", "on_rim"}
 COMBAT_EVENTS = {"on_attack", "on_oppose"}           # where att_mod / def_mod are read
 STATICS = {"power": {"value", "if", "applies_to", "stack"},
            "guard_max": {"value", "cap", "if", "stack"},
@@ -21,12 +21,16 @@ STATICS = {"power": {"value", "if", "applies_to", "stack"},
            "parata_per_gemma": {"value"}}
 MODIFIERS = {"rim_cost"}
 # condition -> type of its value
-CONDITIONS = {"furia": int, "scars_ge": int, "awakened": bool, "attacking": bool, "pugno_ge": int,
+CONDITIONS = {"furia": int, "scars_ge": int, "awakened": bool, "attacking": bool, "pugno_ge": int, "no_own_gems": bool,
               "deck_nonempty": bool, "target_is_unit": bool, "opposing": bool, "attacker_has": str,
               "react_from_scars": bool, "hunted_ready": bool, "survived": bool}
 SELECTOR = {"side", "cost_le", "ready", "power_le", "keyword", "attacker", "kind", "any", "if"}
 OPS = {"draw": {"n"}, "att_mod": {"n"}, "def_mod": {"n"},
-       "stanca": {"target", "sel"}, "defeat": {"target", "sel"}, "raddrizza": {"target", "sel"}}
+       "stanca": {"target", "sel"}, "defeat": {"target", "sel"}, "raddrizza": {"target", "sel"},
+       "bounce": {"target", "sel"},                  # R-026: l'Unità torna in mano al suo proprietario
+       "recover": {"from", "sel", "n"}}              # R-026: riprendi in mano dai tuoi Scarti una carta che soddisfa "sel"
+RECOVER_SEL = {"kind", "cost_le", "without_trigger"}
+G1_NO_REWARD = {"draw", "recover"}                    # G1: un sacrificio non dà mai come premio pescare o riprendere carte
 OP_TARGETS = {"chosen", "self", "opposer", "attacker"}
 
 
@@ -130,6 +134,17 @@ class _V:
                 self.num(w + ".n", o.get("n", 0), dyn=False)
             if o["op"] in ("att_mod", "def_mod") and not mods_ok:
                 self.err(w, f"'{o['op']}' vale solo in Reazioni e trigger on_attack/on_oppose")
+            if o["op"] == "recover":
+                if o.get("from", "discard") != "discard":
+                    self.err(w, f"from '{o['from']}' (solo \"discard\")")
+                f = o.get("sel", {})
+                if self.keys(w + ".sel", f, RECOVER_SEL):
+                    if "kind" in f and f["kind"] not in TYPES:
+                        self.err(w + ".sel", f"kind '{f['kind']}'")
+                    if "cost_le" in f:
+                        self.num(w + ".sel.cost_le", f["cost_le"])
+                    if "without_trigger" in f and f["without_trigger"] not in EVENTS:
+                        self.err(w + ".sel", f"evento sconosciuto '{f['without_trigger']}'")
             if "target" in allowed:
                 t = o.get("target", "chosen")
                 if t not in OP_TARGETS:
@@ -139,17 +154,18 @@ class _V:
                 if "sel" in o:
                     self.selector(w + ".sel", o["sel"])
 
-    def costs(self, where, costs):
+    def costs(self, where, costs, tactic=False):
         if costs is None:
             return
         if not isinstance(costs, list):
             self.err(where, "'costs' deve essere una lista")
             return
         for i, c in enumerate(costs):
-            self.cost(f"{where}[{i}]", c, nested=False)
+            self.cost(f"{where}[{i}]", c, nested=False, tactic=tactic)
 
-    def cost(self, where, c, nested):
-        """One cost: {"lose_life": N, "floor": F}, {"stanca_own": N} (Stanca N tue Unità Pronte) or
+    def cost(self, where, c, nested, tactic=False):
+        """One cost: {"lose_life": N, "floor": F}, {"stanca_own": N} (Stanca N tue Unità Pronte),
+        {"sacrifice": N} (G1: N tue Unità Pronte senza Assalto negli Scarti; solo nelle Tattiche) or
         {"any": [cost, ...]} (paghi uno dei costi a scelta; Q-026 M1)."""
         if not isinstance(c, dict):
             self.err(where, "un costo è un oggetto")
@@ -160,7 +176,12 @@ class _V:
                     self.err(where, "'any' vuole una lista di almeno 2 costi")
                     return
                 for j, x in enumerate(c["any"]):
-                    self.cost(f"{where}.any[{j}]", x, nested=True)
+                    self.cost(f"{where}.any[{j}]", x, nested=True, tactic=tactic)
+        elif "sacrifice" in c:
+            if self.keys(where, c, {"sacrifice"}) and (not isinstance(c["sacrifice"], int) or c["sacrifice"] < 1):
+                self.err(where, "'sacrifice' vuole un intero ≥ 1")
+            if not tactic:
+                self.err(where, "G1: si sacrifica solo come costo aggiuntivo di una Tattica")
         elif "stanca_own" in c:
             if self.keys(where, c, {"stanca_own"}) and (not isinstance(c["stanca_own"], int) or c["stanca_own"] < 1):
                 self.err(where, "'stanca_own' vuole un intero ≥ 1")
@@ -231,20 +252,28 @@ class _V:
             self.num(f"{cid}.kw_params.{k}", v, dyn=False)
         for i, ab in enumerate(c.get("abilities") or []):
             self.ability(f"{cid}.abilities[{i}]", ab)
-        self.costs(cid + ".costs", c.get("costs"))
+        tactic = c.get("type") == "tactic"
+        self.costs(cid + ".costs", c.get("costs"), tactic)
         if c.get("play") is not None:
             p = c["play"]
             if self.keys(cid + ".play", p, {"target", "do", "costs"}):
                 if "target" in p:
                     self.selector(cid + ".play.target", p["target"])
-                self.costs(cid + ".play.costs", p.get("costs"))
+                self.costs(cid + ".play.costs", p.get("costs"), tactic)
                 self.ops(cid + ".play.do", p.get("do", []), "target" in p, False)
+        all_costs = list(c.get("costs") or []) + list((c.get("play") or {}).get("costs") or [])
+        if tactic and any("sacrifice" in x or any("sacrifice" in y for y in x.get("any", [])) for x in all_costs
+                          if isinstance(x, dict)):
+            bad = sorted({o.get("op") for o in (c.get("play") or {}).get("do", []) if isinstance(o, dict)} & G1_NO_REWARD)
+            if bad:
+                self.err(cid, f"G1: una Tattica con sacrificio non pesca né riprende carte ({', '.join(bad)})")
         if c.get("react") is not None:
             r = c["react"]
-            if self.keys(cid + ".react", r, {"do", "do_from_scars"}):
+            if self.keys(cid + ".react", r, {"do", "do_from_scars", "play_if"}):
                 for k in ("do", "do_from_scars"):
                     if k in r:
                         self.ops(f"{cid}.react.{k}", r[k], False, True)
+                self.conds(cid + ".react.play_if", r.get("play_if"))
         if c.get("type") == "reaction" and not c.get("react"):
             self.err(cid, "Reazione senza 'react'")
 

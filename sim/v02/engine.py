@@ -180,6 +180,9 @@ def new_stats():
         # Q-026 M5: Rimarginare e costi per round, costo scelto
         "rim_round": [{}, {}], "life_costs_round": [{}, {}],
         "cost_paid": [{}, {}],                                           # "<carta> vita" / "<carta> stanca": costo pagato, per carta
+        # R-026 (Q-027): rimozioni per fonte, sacrifici, recuperi
+        "removals_src": [{}, {}],                                        # "sconfiggi" / "caccia" / "rimbalzo" su Unità avversarie, "sacrificio" delle tue
+        "sacrifices": [0, 0], "recovers": [0, 0],
     }
 
 
@@ -351,6 +354,8 @@ class GameState:
             if k == "attacking" and ctx.get("attacker_uid") != ctx.get("self"):
                 return False
             if k == "pugno_ge" and ctx.get("pugno", -1) < v:
+                return False
+            if k == "no_own_gems" and (ctx.get("impegno") == 0) != v:  # R-026: nessuna gemma nel tuo impegno in C4
                 return False
             if k == "deck_nonempty" and bool(self.p[q].deck) != v:
                 return False
@@ -692,10 +697,24 @@ class GameState:
         g = self.p[d].guard
         acts = [("parry", k, None) for k in range(g + 1)]
         for r in self.reaction_options(d):
-            c = max(CARDS[r[0]].cost, 1)
-            for k in range(c, g + 1):
-                acts.append(("parry", k, r))
+            for k in range(self.react_cost(r[0]), g + 1):
+                if self.react_paid(r, k, self.combat.opposer if self.combat else None):
+                    acts.append(("parry", k, r))
         return acts
+
+    def react_cost(self, cid):
+        return max(CARDS[cid].cost, self.r.react_min_cost)
+
+    def react_paid(self, react, d_gems, opposer, cb=None):
+        """The Reaction is played: the committed gems pay its cost (C4 a) and its "play_if" holds (R-026)."""
+        if react is None or d_gems < self.react_cost(react[0]):
+            return False
+        cond = CARDS[react[0]].react.get("play_if")
+        if not cond:
+            return True
+        cb = cb or self.combat
+        ctx = self.combat_ctx(cb, opposer, pugno=d_gems - self.react_cost(react[0]), react_src=react[1])
+        return self.cond_ok(1 - self.active, cond, dict(ctx, impegno=d_gems))
 
     def can_attack(self, q):
         return self.round > self.r.no_attack_round
@@ -722,7 +741,8 @@ class GameState:
                 acts += [("play", cid, None) + _plan(pp) for pp in plans]
             elif c.type == "tactic":
                 for t in self._targets(a, spec.get("target")):
-                    acts += [("play", cid, t) + _plan(pp) for pp in plans]
+                    acts += [("play", cid, t) + _plan(pp) for pp in plans
+                             if t is None or pp is None or ("sacrifica", t) not in pp]
         rim_cost = self.modifier(a, "rim_cost", 1)
         if pl.l_ready and pl.brace >= rim_cost:
             for cid in sorted({sc[0] for sc in pl.scars if not sc[1]}):
@@ -774,22 +794,25 @@ class GameState:
         With stanca_own or any (Q-026 M1) every way is its own plan, a tuple of ("vita", n, floor)
         and ("stanca", uid), offered as a separate legal action: no way is tried before another."""
         costs = tuple(costs or ())
-        if not any("stanca_own" in c or "any" in c for c in costs):
+        if not any("stanca_own" in c or "any" in c or "sacrifice" in c for c in costs):
             return [None] if self.pay_costs(q, costs, check_only=True) else []
         ready = [u.uid for u in self.p[q].units if u.ready and u.uid != exclude]
+        victims = [u.uid for u in self.p[q].units if u.ready and u.uid != exclude and not CARDS[u.cid].has("assalto")]
 
         def ways(c):
             if "any" in c:
                 return [w for x in c["any"] for w in ways(x)]
             if "stanca_own" in c:
                 return [tuple(("stanca", uid) for uid in comb) for comb in itertools.combinations(ready, c["stanca_own"])]
+            if "sacrifice" in c:                            # G1: una tua Unità Pronta senza Assalto
+                return [tuple(("sacrifica", uid) for uid in comb) for comb in itertools.combinations(victims, c["sacrifice"])]
             return [(("vita", c["lose_life"], c.get("floor", 0)),)]
         plans = [()]
         for c in costs:
             plans = [p + w for p in plans for w in ways(c)]
         out = []
         for p in plans:
-            uids = [x[1] for x in p if x[0] == "stanca"]
+            uids = [x[1] for x in p if x[0] in ("stanca", "sacrifica")]
             life = sum(x[1] for x in p if x[0] == "vita")
             floor = max([x[2] for x in p if x[0] == "vita"] or [0])
             if len(uids) == len(set(uids)) and (not life or self.can_pay_life(q, life, floor)) and p not in out:
@@ -804,6 +827,13 @@ class GameState:
                     self.lose_life(q, "costo")
                     self.stat_add("life_costs", q)
                     self.stat_add("life_costs_round", q, self.round)
+            elif x[0] == "sacrifica":
+                u = self.unit(q, x[1])
+                self.p[q].units.remove(u)
+                self.p[q].discard.append(u.cid)
+                self.stat_add("sacrifices", q)
+                self.stat_add("removals_src", q, "sacrificio")
+                self.say(f"    P{q+1} sacrifica {CARDS[u.cid].name} per pagare il costo")
             else:
                 u = self.unit(q, x[1])
                 u.ready = False
@@ -874,6 +904,7 @@ class GameState:
             self.stat_add("rim_used", a)
             self.stat_add("rim_round", a, self.round)
             self.say(f"  P{a+1} Rimargina {CARDS[act[1]].name}")
+            self.fire_global(a, "on_rim", {})              # R-026: "Quando il tuo Leader Rimargina", a Cicatrice già ripresa
         elif k == "ability":
             src, i, t = act[1], act[2], act[3]
             if src == "L":
@@ -1010,31 +1041,62 @@ class GameState:
             n = self.num(op.get("n", 0), q)
             if k == "draw":
                 self.draw(q, n)
-            elif k in ("stanca", "defeat", "raddrizza"):
+            elif k in ("stanca", "defeat", "raddrizza", "bounce"):
                 if k == "stanca" and q != self.active:      # Q-016: Stanca solo nel tuo turno
                     continue
                 owner, u = self.op_target(q, op, ctx)
                 if u is None:
                     continue
-                self.say(f"    {CARDS[u.cid].name} di P{owner+1}: " + {"stanca": "Stancata", "raddrizza": "raddrizzata", "defeat": "sconfitta da un effetto"}[k])
+                self.say(f"    {CARDS[u.cid].name} di P{owner+1}: " + {"stanca": "Stancata", "raddrizza": "raddrizzata", "defeat": "sconfitta da un effetto",
+                                                                        "bounce": "torna in mano"}[k])
                 if k == "stanca":
                     if self.track is not None and u.ready:
                         self.track["stancate"].add((owner, u.uid))  # R-009 #5
                     u.ready = False
                 elif k == "raddrizza":
                     u.ready = True
-                else:
+                else:                                       # defeat: negli Scarti; bounce: in mano al proprietario
                     self.p[owner].units.remove(u)
-                    self.p[owner].discard.append(u.cid)
+                    (self.p[owner].hand if k == "bounce" else self.p[owner].discard).append(u.cid)
                     if owner != q:
                         self.stat_add("removals", q)
+                        self.stat_add("removals_src", q, "rimbalzo" if k == "bounce" else "sconfiggi")
                         self._stancata_rimossa(q, owner, u)
+            elif k == "recover":
+                for _ in range(max(n, 1)):
+                    cid = self.recover_choice(q, op.get("sel", {}))
+                    if cid is None:
+                        break
+                    self.p[q].discard.remove(cid)
+                    self.p[q].hand.append(cid)
+                    self.stat_add("recovers", q)
+                    self.say(f"    P{q+1} riprende {CARDS[cid].name} dagli Scarti")
             elif k == "att_mod" and self.combat:
                 self.combat.att_mod += n
             elif k == "def_mod" and self.combat:
                 self.combat.def_mod += n
             else:
                 raise ValueError(f"operazione sconosciuta in v0.2: {k}")
+
+    def recover_choice(self, q, flt):
+        """R-026 recover: card of q's Scarti matching flt ("kind" = card type, "cost_le", "without_trigger" = an
+        event it must not have); with g2_recupero, never a card that takes from the Scarti. Deterministic, like the
+        triggers' targets: the highest (cost, Forza), then the latest to arrive."""
+        best = None
+        for i, cid in enumerate(self.p[q].discard):
+            c = CARDS[cid]
+            if "kind" in flt and c.type != flt["kind"]:
+                continue
+            if "cost_le" in flt and c.cost > self.num(flt["cost_le"], q):
+                continue
+            if "without_trigger" in flt and any(ab.get("trigger") == flt["without_trigger"] for ab in c.abilities):
+                continue
+            if self.r.g2_recupero and takes_from_scarti(c):
+                continue
+            key = (c.cost, c.power or 0, i)
+            if best is None or key > best[0]:
+                best = (key, cid)
+        return best[1] if best else None
 
     def trigger_mods(self, q, abilities, event, ctx):
         """att_mod / def_mod written in triggers are read as fixed combat modifiers."""
@@ -1133,7 +1195,8 @@ class GameState:
         tgt = cb.target(opposer)
         src = trace["src"] if trace is not None else None
         mods = 0
-        rs = react[1] if react is not None and d_gems >= max(CARDS[react[0]].cost, 1) else None
+        played = self.react_paid(react, d_gems, opposer, cb)
+        rs = react[1] if played else None
         ctx_a = self.combat_ctx(cb, opposer, pugno=a_gems, react_src=rs)
         if cb.att == "L":
             base_a = self.r.leader_power_awakened if self.p[a].awakened else self.r.leader_power
@@ -1160,23 +1223,22 @@ class GameState:
         mods += a_gems > 0
         parry = d_gems
         r_att = r_def = 0
-        if react is not None:
+        if played:
             cid, rsrc = react
             c = CARDS[cid]
-            cost = max(c.cost, 1)
-            if d_gems >= cost:
-                parry -= cost
-                ops = c.react.get("do_from_scars", c.react["do"]) if rsrc == "scar" else c.react["do"]
-                rctx = self.combat_ctx(cb, opposer, pugno=parry, react_src=rs)
-                for o in ops:
-                    if o["op"] in ("att_mod", "def_mod") and self.cond_ok(d, o.get("if"), rctx):
-                        if o["op"] == "att_mod":
-                            r_att += self.num(o["n"], d)
-                        else:
-                            r_def += self.num(o["n"], d)
-                mods += 1
-                if src is not None:
-                    src.append((d, cid))
+            cost = self.react_cost(cid)
+            parry -= cost
+            ops = c.react.get("do_from_scars", c.react["do"]) if rsrc == "scar" else c.react["do"]
+            rctx = self.combat_ctx(cb, opposer, pugno=parry, react_src=rs)
+            for o in ops:
+                if o["op"] in ("att_mod", "def_mod") and self.cond_ok(d, o.get("if"), rctx):
+                    if o["op"] == "att_mod":
+                        r_att += self.num(o["n"], d)
+                    else:
+                        r_def += self.num(o["n"], d)
+            mods += 1
+            if src is not None:
+                src.append((d, cid))
         ctx_d = dict(self.combat_ctx(cb, opposer, pugno=parry, react_src=rs), role="defense")   # Q-015 S-2: solo Parata
         if tgt is None:
             db = self.tempra(d)
@@ -1264,8 +1326,8 @@ class GameState:
         fa, db, mods = self.compute(cb.a, cb.d, cb.react, cb.opposer, trace=trace)
         hit, att_dead, tgt_dead = self.outcome(fa, db, cb.opposer)
         tgt = cb.target()
-        r_cost = max(CARDS[cb.react[0]].cost, 1) if cb.react else 0
-        paid = cb.react is not None and cb.d >= r_cost
+        r_cost = self.react_cost(cb.react[0]) if cb.react else 0
+        paid = self.react_paid(cb.react, cb.d, cb.opposer)
         if self.stats is not None:
             st_all = self.stats
             for side, key, gems, avail in ((a, "pugno_att", cb.a, pa.brace), (d, "pugno_def", cb.d, pd.guard)):
@@ -1300,7 +1362,7 @@ class GameState:
                 self.stat_add("fa_alta_by", a, acid)
             if cb.react:
                 st_all["reactions"][d] += 1
-            if any(max(CARDS[c].cost, 1) <= pd.guard for c, _ in self.reaction_options(d)):
+            if any(self.react_cost(c) <= pd.guard for c, _ in self.reaction_options(d)):
                 st_all["react_avail"][d] += 1                          # M1
             if paid:                                                    # M2: stesse gemme di Parata, senza Reazione
                 fa2, db2, _ = self.compute(cb.a, cb.d - r_cost, None, cb.opposer)
@@ -1348,6 +1410,7 @@ class GameState:
             self._stancata_rimossa(a, d, tgt_unit)
             if cb.opposer is None:
                 self.stat_add("removals", a)                             # M12: sconfitta da Caccia
+                self.stat_add("removals_src", a, "caccia")
         if att_dead:
             pa.units.remove(att_unit)
             pa.discard.append(att_unit.cid)
@@ -1393,6 +1456,13 @@ class GameState:
             self.run_ops(d, late_ops, rctx)                             # es. raddrizza l'Unità che si opponeva
         if paid and not self.over:
             self.fire_global(d, "on_own_reaction", {})                  # N4: dopo lo scontro
+
+
+def takes_from_scarti(c):
+    """The card has an op that takes cards from the Scarti (G2)."""
+    blocks = [ab.get("do", []) for ab in c.abilities] + [(c.play or {}).get("do", [])]
+    blocks += [(c.react or {}).get(k, []) for k in ("do", "do_from_scars")]
+    return any(o.get("op") == "recover" for ops in blocks for o in ops)
 
 
 def default_mulligan(s, q):
