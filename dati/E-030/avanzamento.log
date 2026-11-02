@@ -16,3 +16,26 @@
 00_B0c05 semplice L4-L6 seed 2014 fatto
 00_B0c05 semplice L5-L6 seed 2015 fatto
 2026-11-02T14:27:09Z fine 00_B0c05 semplice 2000
+2026-11-02T14:27:12Z push 00_B0c05 IA semplice ok
+2026-11-02T14:27:14Z copia nella cartella condivisa ok (00_B0c05 IA semplice)
+2026-11-02T14:27:14Z inizio 00_B0c05 forte:30 200 3400 tutti
+00_B0c05 forte:30 L1-L2 seed 3401 fatto
+00_B0c05 forte:30 L1-L3 seed 3402 fatto
+2026-11-02T18:32:42Z E-030 (R-024, input 57b6d48), motore ab6f2dd, V026, --riprendi, P-2c=1
+2026-11-02T18:32:42Z inizio 00_B0c05 semplice 400 2000 tutti
+00_B0c05 semplice L1-L2 gia' fatto, salto
+00_B0c05 semplice L1-L3 gia' fatto, salto
+00_B0c05 semplice L1-L4 gia' fatto, salto
+00_B0c05 semplice L1-L5 gia' fatto, salto
+00_B0c05 semplice L1-L6 gia' fatto, salto
+00_B0c05 semplice L2-L3 gia' fatto, salto
+00_B0c05 semplice L2-L4 gia' fatto, salto
+00_B0c05 semplice L2-L5 gia' fatto, salto
+00_B0c05 semplice L2-L6 gia' fatto, salto
+00_B0c05 semplice L3-L4 gia' fatto, salto
+00_B0c05 semplice L3-L5 gia' fatto, salto
+00_B0c05 semplice L3-L6 gia' fatto, salto
+00_B0c05 semplice L4-L5 gia' fatto, salto
+00_B0c05 semplice L4-L6 gia' fatto, salto
+00_B0c05 semplice L5-L6 gia' fatto, salto
+2026-11-02T18:32:42Z fine 00_B0c05 semplice 2000
