@@ -50,4 +50,9 @@ Serve un servizio che esegua un container. Il repo ha `Dockerfile` e `render.yam
 - **Modificatori dal vivo**: ogni Unità mostra i bonus alla Forza e da dove vengono (passandoci sopra), più i
   bonus da scontro già attivi (Furia); durante uno scontro Attacco e Difesa sono scomposti in base, gemme,
   Parata, Reazione e abilità.
+- **Nuove meccaniche di R-026 (Q-027)**: ogni modo di pagare un costo (perdi Vita, Stanca o sacrifica una tua
+  Unità) è una voce a parte nel menu della carta; quando un effetto fa riprendere una carta dagli Scarti e più
+  carte vanno bene, il giocatore la sceglie (stesso meccanismo dei bersagli dei trigger, con i filtri del
+  motore); le Reazioni a costo 0 e il loro `play_if` sono mostrati come li conta il motore; Unità che tornano
+  in mano, sacrifici e carte riprese hanno un'animazione. Le pile degli Scarti si aprono con un clic.
 - Il client interroga il server ogni secondo, niente websocket.

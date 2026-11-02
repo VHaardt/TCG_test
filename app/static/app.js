@@ -415,10 +415,12 @@ function intenzioni(azioni) {
   for (const a of azioni) {
     const k = chiaveAzione(a);
     if (!k) continue;
-    const sub = a.gruppo === "abilita" ? `abilita:${a.testo.split("→")[0]}` : a.gruppo;
+    // ogni modo di pagare il costo (perdi Vita, Stanca o sacrifica un'Unità) è una voce a parte del menu
+    const sub = (a.gruppo === "abilita" ? `abilita:${a.testo.split("→")[0].split(" · paghi")[0]}` : a.gruppo)
+      + (a.pagamento ? `|${a.pagamento}` : "");
     out[k] = out[k] || {};
-    const titolo = { gioca: "Gioca", attacca: "Attacca", rimargina: "Rimargina (torna in mano)", opposizione: "Opponi questa Unità" }[a.gruppo]
-      || a.testo.split("→")[0].trim();
+    const titolo = ({ gioca: "Gioca", attacca: "Attacca", rimargina: "Rimargina (torna in mano)", opposizione: "Opponi questa Unità" }[a.gruppo]
+      || a.testo.split("→")[0].split(" · paghi")[0].trim()) + (a.pagamento ? ` · paghi: ${a.pagamento}` : "");
     (out[k][sub] = out[k][sub] || { titolo, opts: [] }).opts.push(a);
   }
   return out;
@@ -532,7 +534,7 @@ function plancia(g, nome, lato) {
     </div>
     <div class="risorse">
       <div class="pile"><span class="pila" title="Mazzo">🂠 ${g.mazzo}</span><span class="pila" title="Carte in mano">✋ ${g.mano_n}</span>
-        <span class="pila" title="${esc(g.scarti.join(", "))}">🗑 ${g.scarti.length}</span></div>
+        <span class="pila cliccabile" data-scarti="${lato}" title="Scarti: clicca per vederli">🗑 ${g.scarti.length}</span></div>
       <div class="cicatrici"><span class="nota">Cicatrici:</span> ${cic || '<span class="nota">nessuna</span>'}</div>
     </div></div>`;
 }
@@ -576,6 +578,8 @@ function centroHTML(p) {
     <button class="oro" id="rivincita-c">Nuova partita</button>`;
   if (p.bersaglio) {
     const b = p.bersaglio;
+    if (b.tipo === "recupero")
+      return `${s}<span class="fase"><b>Effetto di ${esc(b.fonte || "una carta")}</b>: ${b.tuo ? "scegli la carta da riprendere dagli Scarti" : `${esc(p.decide)} sceglie una carta dagli Scarti…`}</span>`;
     return `${s}<span class="fase"><b>Effetto di ${esc(b.fonte || "una carta")}</b>: ${b.tuo ? "scegli il bersaglio fra quelli illuminati di rosso" : `${esc(p.decide)} sceglie il bersaglio…`}</span>`;
   }
   if (!p.tocca_a_te) return `${s}<span class="fase" style="opacity:.7">… decide ${esc(p.decide)}</span>`;
@@ -684,7 +688,8 @@ function renderGioco() {
         <p class="nota">Tu sei ${p.sei} · Saldo ${p.regole.saldo} · Crepuscolo al round ${p.regole.crepuscolo}. Clicca le carte illuminate di verde; passa sopra una carta per ingrandirla.</p></div>
     </div></div>`;
   collega(p);
-  if (p.bersaglio && p.bersaglio.tuo) {
+  if (p.bersaglio && p.bersaglio.tuo && p.bersaglio.tipo === "recupero") sceltaRecupero(p.bersaglio);
+  else if (p.bersaglio && p.bersaglio.tuo) {
     mira = { titolo: `Effetto di ${p.bersaglio.fonte || "una carta"}`, obbligo: true,
       opts: p.bersaglio.cands.map((c) => ({ bersaglio: c, trigger: true })) };
     disegnaMira();
@@ -696,6 +701,33 @@ function renderGioco() {
   prec = p;
 }
 
+// gli Scarti sono pubblici: un clic sulla pila li mostra tutti, dal più vecchio al più recente
+function mostraScarti(lato) {
+  const p = stato.partita, g = lato === "io" ? p.io : p.avversario;
+  const el = document.createElement("div");
+  el.id = "recupero";
+  el.className = "solo-vista";
+  el.innerHTML = `<div class="pannello"><h3>${lato === "io" ? "I tuoi Scarti" : `Scarti di ${esc(p.nomi.avversario)}`} (${g.scarti.length})</h3>
+    <div class="recupero-carte">${g.scarti.map((id) => cartaHTML(id)).join("") || '<p class="nota">vuoti</p>'}</div>
+    <button class="piccolo" style="margin-top:14px">Chiudi</button></div>`;
+  el.onclick = () => el.remove();
+  $("#gioco").appendChild(el);
+}
+
+// R-026: un effetto ti fa riprendere una carta dagli Scarti e più carte sono valide: scegli quale
+function sceltaRecupero(b) {
+  const el = document.createElement("div");
+  el.id = "recupero";
+  el.innerHTML = `<div class="pannello"><h3>Effetto di ${esc(b.fonte || "una carta")}: riprendi una carta dagli Scarti</h3>
+    ${b.testo ? `<p class="nota">${esc(b.testo)}</p>` : ""}
+    <div class="recupero-carte">${b.carte.map((id) => cartaHTML(id, { attr: `data-riprendi="${esc(id)}"` })).join("")}</div></div>`;
+  $("#gioco").appendChild(el);
+  $$("[data-riprendi]", el).forEach((c) => (c.onclick = (e) => {
+    e.stopPropagation();
+    act("/api/bersaglio", { versione: stato.partita.versione, uid: c.dataset.riprendi });
+  }));
+}
+
 function collega(p) {
   const tutte = p.azioni;
   const fine = tutte.find((a) => a.gruppo === "turno");
@@ -704,6 +736,7 @@ function collega(p) {
   if ($("#indietro")) $("#indietro").onclick = () => act("/api/annulla");
   if ($("#resa")) $("#resa").onclick = () => { if (confirm("Vuoi davvero arrenderti?")) act("/api/resa"); };
   $("#annulla-mira").onclick = annullaMira;
+  $$("[data-scarti]").forEach((x) => (x.onclick = (e) => { e.stopPropagation(); mostraScarti(x.dataset.scarti); }));
   if ($("#rivincita-c")) $("#rivincita-c").onclick = () => { const f = $("#fine-partita"); if (f) f.remove(); act("/api/rivincita"); };
   const int = intenzioni(tutte);
   for (const el of $$("[data-ent],[data-mano],[data-scar]")) {
@@ -801,6 +834,7 @@ function anima(v, p, rects) {
   for (const e of ev) {
     if (e.t === "gioca" || (e.t === "rimargina" && e.chi === "avv")) passi.push(() => volaCarta(e, p));
     else if (e.t === "attacco") passi.push(() => affondo(e, p));
+    else if (e.t === "rimbalzo" || (e.chi === "avv" && (e.t === "riprende" || e.t === "sacrifica"))) passi.push(() => mostraEffetto(e, p));
     else if (e.t === "scontro") {
       const dopo = ev.slice(ev.indexOf(e) + 1);
       const fine = dopo.findIndex((x) => x.t === "scontro" || x.t === "attacco" || x.t === "turno");
@@ -824,6 +858,15 @@ function volaCarta(e, p) {
   effimero(`<div class="chi">${e.t === "rimargina" ? `${esc(p.nomi.avversario)} Rimargina` : chi}</div>${cartaHTML(e.carta, { classi: "grande" })}`,
     "volante", 1500);
   return sleep(e.chi === "io" ? 500 : 1100);
+}
+
+// R-026: Unità che torna in mano, sacrificata per un costo, carta ripresa dagli Scarti
+function mostraEffetto(e, p) {
+  const chi = e.chi === "io" ? "tua" : `di ${esc(p.nomi.avversario)}`;
+  const t = { rimbalzo: `Unità ${chi}: torna in mano`, sacrifica: `${esc(p.nomi.avversario)} sacrifica per pagare`,
+    riprende: `${esc(p.nomi.avversario)} riprende dagli Scarti` }[e.t];
+  effimero(`<div class="chi">${t}</div>${cartaHTML(e.carta, { classi: "grande" })}`, "volante", 1300);
+  return sleep(900);
 }
 
 function affondo(e) {
