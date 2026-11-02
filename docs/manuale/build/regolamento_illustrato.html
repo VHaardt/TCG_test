@@ -283,7 +283,7 @@ figcaption { margin-top: .5rem; font-size: .88rem; color: var(--tenue); max-widt
       <p class="occhiello">Gioco di carte 1 contro 1 · regolamento per giocatori</p>
       <h1 class="marchio">CICATRICI<span class="cucitura" aria-hidden="true"></span></h1>
       <p class="sottotitolo">Ogni ferita resta sul tavolo. Usala.</p>
-      <p class="meta">Manuale 1.0 · regole <strong>v0.2.6</strong> · numeri dal preset V026 · generato il 2026-10-22</p>
+      <p class="meta">Manuale 1.1 · regole <strong>v0.2.7</strong> · numeri dal preset V027 · generato il 2026-11-02</p>
     </div>
   </header>
   <div class="corpo">
@@ -393,7 +393,7 @@ figcaption { margin-top: .5rem; font-size: .88rem; color: var(--tenue); max-widt
 </svg></div><figcaption>Il Leader nei due lati. Il lato Risvegliato si usa dopo che il Leader ha perso 3 Vite.</figcaption></figure>
 
 <h3 id="come-si-legge-una-carta">Come si legge una carta</h3>
-<p>Le carte del primo set non hanno nome né illustrazione: si riconoscono dall'<strong>ID</strong> (per esempio ROS-001). Il prefisso indica il colore: ROS Rosso, BLU Blu, NER Nero, VER Verde, NEU Neutrale.</p>
+<p>Le carte del primo set non hanno illustrazione, e quelle senza un nome proprio si riconoscono dall'<strong>ID</strong> (per esempio ROS-001). Il prefisso indica il colore: ROS Rosso, BLU Blu, NER Nero, VER Verde, NEU Neutrale. Ogni carta ha anche una <strong>rarità</strong>: Comune, Rara, Epica o Leggendaria.</p>
 <figure class="fig fig-anatomia_carta"><div class="fig-scroll"><svg viewBox="0 0 660 350" role="img" aria-label="Come si legge una carta Unità" class="fig-svg">
   <defs><marker id="punta-ana" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0,0 L10,5 L0,10 z" class="punta"/></marker></defs>
   <g transform="translate(215,14)">
@@ -414,7 +414,7 @@ figcaption { margin-top: .5rem; font-size: .88rem; color: var(--tenue); max-widt
   <!-- richiami -->
   <text x="20" y="40" class="t-b">Costo</text><text x="20" y="58" class="t-tenue">in gemme di Brace</text>
   <path d="M120,44 L222,44" class="freccia" marker-end="url(#punta-ana)"/>
-  <text x="470" y="34" class="t-b">ID, tipo e colore</text><text x="470" y="52" class="t-tenue">massimo 3 copie per ID</text>
+  <text x="470" y="34" class="t-b">ID, tipo e colore</text><text x="470" y="52" class="t-tenue">massimo 2 copie per nome</text>
   <path d="M466,40 L388,40" class="freccia" marker-end="url(#punta-ana)"/>
   <text x="20" y="206" class="t-b">Parole chiave e testo</text><text x="20" y="224" class="t-tenue">il corsivo ricorda la regola</text>
   <path d="M168,212 L224,212" class="freccia" marker-end="url(#punta-ana)"/>
@@ -1165,8 +1165,11 @@ figcaption { margin-top: .5rem; font-size: .88rem; color: var(--tenue); max-widt
 </ul>
 <h2 id="costruire-il-mazzo">Costruire il mazzo</h2>
 <ul>
-<li>Esattamente <strong>40 carte</strong>, al massimo <strong>3 copie per ID</strong> (ROS-007 e ROS-008 sono carte diverse, anche se avessero lo stesso testo).</li>
-<li>Ogni carta deve avere <strong>almeno un colore in comune col Leader</strong>, oppure essere <strong>Neutrale</strong>.</li>
+<li>Esattamente <strong>40 carte</strong>.</li>
+<li>Al massimo <strong>2 copie per nome</strong>. Le carte con lo stesso nome stampato (le <strong>gemelle</strong>: stesso tipo, costo, Forza e testo) contano insieme. Una carta senza nome proprio si conta per ID; due carte con lo stesso testo ma costo diverso hanno nomi diversi.</li>
+<li>Una carta <strong>Leggendaria</strong> (sono solo le Unità boss) va al massimo in <strong>1 copia</strong>.</li>
+<li>Ogni carta deve avere <strong>tutti i suoi colori fra quelli del Leader</strong>, oppure essere <strong>Neutrale</strong>. Per una carta di un solo colore basta quel colore; una carta Nero/Verde vuole un Leader Nero/Verde.</li>
+<li>La <strong>rarità</strong> (Comune, Rara, Epica, Leggendaria) dice quanto una carta è complessa o unica, non quanto è forte. Oltre al limite delle Leggendarie non cambia nulla in partita.</li>
 <li>I Leader hanno 1 o 2 colori. Nel mazzo non ci sono carte-risorsa: la risorsa sono le gemme.</li>
 </ul>
 <div class="tab-scroll"><table>
@@ -1222,7 +1225,7 @@ figcaption { margin-top: .5rem; font-size: .88rem; color: var(--tenue); max-widt
 <dt>Rinnovo</dt>
 <dd>Quando attacca e sconfigge un'Unità, si raddrizza: può attaccare ancora.</dd>
 <dt>Stanca</dt>
-<dd>Ruota un'Unità avversaria dritta. Solo nel tuo turno e mai sul Leader.</dd>
+<dd>Ruota un'Unità avversaria dritta. Solo nel tuo turno e mai sul Leader. Come costo aggiuntivo, "Stanca una tua Unità Pronta" ruota invece una tua Unità.</dd>
 <dt>⟳</dt>
 <dd>Simbolo di costo: ruota la carta. Si può pagare solo se la carta è dritta.</dd>
 </dl>
@@ -1231,6 +1234,7 @@ figcaption { margin-top: .5rem; font-size: .88rem; color: var(--tenue); max-widt
 <p><strong>"Quando sconfigge" e "dopo lo scontro".</strong> Scattano alla fine dell'attacco anche se la carta che li ha è stata sconfitta in quello stesso attacco (anche se sono state sconfitte entrambe le Unità), salvo che il testo chieda che resti in gioco.</p>
 <p><strong>Controlli automatici.</strong> Dopo ogni azione e alla fine di ogni attacco si controlla, in ordine: se la partita è finita; se un Leader deve Risvegliarsi (prima quello del giocatore attivo); se c'è Guardia oltre il massimo (torna nella scorta).</p>
 <p><strong>Mazzo vuoto.</strong> Se devi pescare e il mazzo è vuoto, invece di pescare perdi 1 Vita (rispettando il Saldo). Se il tuo Leader ha già 0 Vite, perdi la partita.</p>
+<p><strong>Costi aggiuntivi.</strong> Alcune carte chiedono, oltre alle gemme, di pagare un costo quando le giochi: "il tuo Leader perde N Vite" oppure "Stanca una tua Unità Pronta" (la ruoti tu). Se la carta dice "oppure", scegli tu quale pagare.</p>
 <p><strong>Costi in Vita.</strong> Se una carta ti chiede di perdere Vita come costo e non puoi perderla tutta (Saldo pieno, 0 Vite o una soglia scritta sulla carta), non puoi giocarla.</p>
 <p><strong>Una Reazione a partita?</strong> No: al massimo <strong>una per attacco</strong>. Puoi usarne una in ogni attacco avversario, se hai le gemme di Guardia per pagarle.</p>
 <p><strong>Reazione dalle Cicatrici.</strong> Una Reazione tra le tue Cicatrici dritte si gioca come se fosse in mano. Dopo l'uso va negli Scarti.</p>
@@ -1368,7 +1372,7 @@ figcaption { margin-top: .5rem; font-size: .88rem; color: var(--tenue); max-widt
 </tbody>
 </table></div>
       <footer class="piede">
-        <p>Questo manuale presenta le regole del <strong>regolamento v0.2.6</strong> (docs/regolamento_v0.2.md), che resta il testo di riferimento: se i due non dicono la stessa cosa, vale il regolamento. Si rigenera da <code>docs/manuale/</code> con <code>tools/manuale/build.py</code>.</p>
+        <p>Questo manuale presenta le regole del <strong>regolamento v0.2.7</strong> (docs/regolamento_v0.2.md), che resta il testo di riferimento: se i due non dicono la stessa cosa, vale il regolamento. Si rigenera da <code>docs/manuale/</code> con <code>tools/manuale/build.py</code>.</p>
       </footer>
     </main>
   </div>

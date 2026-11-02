@@ -18,7 +18,7 @@
   <!-- richiami -->
   <text x="20" y="40" class="t-b">Costo</text><text x="20" y="58" class="t-tenue">in gemme di Brace</text>
   <path d="M120,44 L222,44" class="freccia" marker-end="url(#punta-ana)"/>
-  <text x="470" y="34" class="t-b">ID, tipo e colore</text><text x="470" y="52" class="t-tenue">massimo 3 copie per ID</text>
+  <text x="470" y="34" class="t-b">ID, tipo e colore</text><text x="470" y="52" class="t-tenue">massimo {{copie}} copie per {{copie_per}}</text>
   <path d="M466,40 L388,40" class="freccia" marker-end="url(#punta-ana)"/>
   <text x="20" y="206" class="t-b">Parole chiave e testo</text><text x="20" y="224" class="t-tenue">il corsivo ricorda la regola</text>
   <path d="M168,212 L224,212" class="freccia" marker-end="url(#punta-ana)"/>

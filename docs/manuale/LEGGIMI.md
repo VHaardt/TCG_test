@@ -14,7 +14,7 @@ Presentazione per giocatori del regolamento di CICATRICI: testo semplice, esempi
 
 ## Sintassi in `manuale.md`
 
-- `{{nome}}`: un numero di regola, letto dal preset del simulatore (`sim/v02/config.py`) e da `sim/v02/decks.py`. Elenco completo: `python3 tools/manuale/build.py --parametri`. Un nome sconosciuto ferma la generazione. Funziona anche dentro le figure SVG.
+- `{{nome}}`: un numero di regola, letto dal preset del simulatore (`sim/v02/config.py`) (compresi i limiti di costruzione del mazzo). Elenco completo: `python3 tools/manuale/build.py --parametri`. Un nome sconosciuto ferma la generazione. Funziona anche dentro le figure SVG.
 - `[[figura:nome|didascalia]]` su una riga: inserisce `figure/nome.svg`. `tracciato` è disegnato dallo script a partire dai parametri.
 - Riquadri: `::: esempio Titolo` … `:::` (tipi: `esempio`, `ricorda`, `attenzione`, `prova` per le regole in vigore ma ancora in test).
 - `:gemma:` e `:ruota:` diventano icone. Il resto è Markdown normale (tabelle, liste, HTML con `markdown="1"`).
