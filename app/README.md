@@ -55,4 +55,6 @@ Serve un servizio che esegua un container. Il repo ha `Dockerfile` e `render.yam
   carte vanno bene, il giocatore la sceglie (stesso meccanismo dei bersagli dei trigger, con i filtri del
   motore); le Reazioni a costo 0 e il loro `play_if` sono mostrati come li conta il motore; Unità che tornano
   in mano, sacrifici e carte riprese hanno un'animazione. Le pile degli Scarti si aprono con un clic.
+- **Parole chiave**: sulle carte resta solo la parola chiave sottolineata; la spiegazione in corsivo del set
+  (`*(…)*`) si legge passandoci sopra col cursore, o sotto l'anteprima ingrandita.
 - Il client interroga il server ogni secondo, niente websocket.

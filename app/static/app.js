@@ -7,6 +7,31 @@ const $ = (s, el = document) => el.querySelector(s);
 const $$ = (s, el = document) => [...el.querySelectorAll(s)];
 const esc = (t) => String(t ?? "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
 const mdish = (t) => esc(t).replace(/\*([^*]+)\*/g, "<em>$1</em>");
+// Testo di una carta senza le spiegazioni in corsivo "*(…)*": la parola chiave che precede resta sottolineata
+// e la spiegazione si legge passandoci sopra (o sotto l'anteprima ingrandita).
+const RX_SPIEGA = /([^.;,]*?)(\s*)\*\(([^*]+)\)\*/g;
+// dove inizia la parola chiave in "Costo: parola": dopo i due punti, salvo "Impeto 1: +2" (numeri dopo i due punti)
+function taglioFrase(f) {
+  const k = f.lastIndexOf(":") + 1;
+  return k && !/^\s*[+\-]?\d/.test(f.slice(k)) ? k : 0;
+}
+function testoCarta(t) {
+  return mdish(String(t ?? "").replace(RX_SPIEGA, (_, frase, _sp, spiega) => {
+    let pre = "", f = frase;
+    const k = taglioFrase(f);
+    if (k) { pre = f.slice(0, k); f = f.slice(k); }
+    const lead = f.match(/^\s*/)[0];
+    return `${pre}${lead}\u0001${f.trim()}\u0002${spiega}\u0003`;
+  })).replace(/\u0001([^\u0002]*)\u0002([^\u0003]*)\u0003/g, (_, f, sp) => `<span class="kw" data-spiega="${sp}">${f}</span>`);
+}
+function spiegazioni(t) {
+  const out = [];
+  for (const m of String(t ?? "").matchAll(RX_SPIEGA)) {
+    const f = m[1].slice(taglioFrase(m[1]));
+    if (!out.some((x) => x[1] === m[3])) out.push([f.trim(), m[3]]);
+  }
+  return out;
+}
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
 let CAT = null, CARTA = {}, LEAD = {};
@@ -56,7 +81,7 @@ function cartaHTML(id, { classi = "", attr = "", stile = "" } = {}) {
       <div class="c-arte"><span class="icona">${ICONA[c.tipo] || "✧"}</span><span class="num">${num}</span></div>
       <div class="c-nome">${esc(c.nome)}</div>
       <div class="c-tipo">${esc(c.tipo)} · ${c.colori.length ? c.colori.map((x) => CAT.colori[x]).join("/") : "Neutrale"}${c.rarita ? ` · <span class="r-${c.rarita}">${RARITA[c.rarita] || c.rarita}</span>` : ""}</div>
-      <div class="c-testo">${mdish(c.testo) || "<em>Nessun effetto.</em>"}</div>
+      <div class="c-testo">${testoCarta(c.testo) || "<em>Nessun effetto.</em>"}</div>
     </div>
     ${c.rarita ? `<span class="c-rar ${c.rarita}" title="${RARITA[c.rarita] || c.rarita}"></span>` : ""}
     ${c.forza != null ? `<div class="c-forza"><b>${c.forza}</b></div>` : ""}</div>`;
@@ -84,8 +109,8 @@ function eroeHTML(id, L, ent) {
 
 function leaderTesti(id, risv = null) {
   const l = LEAD[id];
-  return `<div class="testi"><div style="${risv === true ? "opacity:.45" : ""}"><b>Base.</b> ${l.base.map(mdish).join(" ")}</div>
-    <div style="${risv === false ? "opacity:.45" : ""}"><b>Risvegliato.</b> ${l.risvegliato.map(mdish).join(" ")}</div></div>`;
+  return `<div class="testi"><div style="${risv === true ? "opacity:.45" : ""}"><b>Base.</b> ${l.base.map(testoCarta).join(" ")}</div>
+    <div style="${risv === false ? "opacity:.45" : ""}"><b>Risvegliato.</b> ${l.risvegliato.map(testoCarta).join(" ")}</div></div>`;
 }
 
 // modificatori dal vivo di un'Unità in campo, sotto l'anteprima
@@ -96,15 +121,36 @@ function modHTML(el) {
     `<div class="${m.scontro ? "cond" : m.v > 0 ? "su" : "giu"}">${m.v > 0 ? "+" : ""}${m.v} ${m.fonte === "altro" ? "altri effetti" : m.fonte === el.dataset.card ? "propria abilità" : `da ${esc(m.fonte)}`}${m.scontro ? " (solo negli scontri, già attivo)" : ""}</div>`).join("")}</div>`;
 }
 
+// spiegazioni delle parole chiave sotto l'anteprima ingrandita
+function spiegaHTML(t) {
+  const sp = spiegazioni(t);
+  return sp.length ? `<div class="pannello spiega-box">${sp.map(([k, v]) => `<div><b>${esc(k)}</b>: ${esc(v)}</div>`).join("")}</div>` : "";
+}
+
+// spiegazione di una parola chiave al passaggio del mouse, fuori dalla carta (che taglia il testo)
+function suggerimento(e) {
+  const kw = e.target.closest && e.target.closest(".kw[data-spiega]");
+  let tip = $("#spiega");
+  if (!kw || kw.closest("#anteprima")) { if (tip) tip.style.opacity = 0; return; }
+  if (!tip) { tip = document.createElement("div"); tip.id = "spiega"; document.body.appendChild(tip); }
+  tip.textContent = kw.dataset.spiega;
+  const r = kw.getBoundingClientRect();
+  tip.style.opacity = 1;
+  tip.style.left = Math.max(8, Math.min(innerWidth - tip.offsetWidth - 8, r.left)) + "px";
+  tip.style.top = (r.top - tip.offsetHeight - 6 < 8 ? r.bottom + 6 : r.top - tip.offsetHeight - 6) + "px";
+}
+
 // anteprima ingrandita al passaggio del mouse
 function anteprima(e) {
   const el = e.target.closest("[data-card],[data-leader]");
   const box = $("#anteprima");
   if (!el || el.closest("#anteprima") || el.closest(".offerta")) { box.style.opacity = 0; return; }
-  if (el.dataset.card) box.innerHTML = cartaHTML(el.dataset.card, { classi: "grande" }) + modHTML(el);
-  else box.innerHTML = `<div class="pannello" style="width:280px">${eroeHTML(el.dataset.leader)}<h3>${esc(el.dataset.leader)}</h3>${leaderTesti(el.dataset.leader)}</div>`;
+  if (el.dataset.card) box.innerHTML = cartaHTML(el.dataset.card, { classi: "grande" }) + modHTML(el)
+    + spiegaHTML(CARTA[el.dataset.card] && CARTA[el.dataset.card].testo);
+  else box.innerHTML = `<div class="pannello" style="width:280px">${eroeHTML(el.dataset.leader)}<h3>${esc(el.dataset.leader)}</h3>${leaderTesti(el.dataset.leader)}</div>`
+    + spiegaHTML([...LEAD[el.dataset.leader].base, ...LEAD[el.dataset.leader].risvegliato].join(" "));
   const r = el.getBoundingClientRect();
-  const w = 240, h = 340;
+  const w = 240, h = Math.max(340, box.offsetHeight);
   let x = r.right + 14; if (x + w > innerWidth) x = r.left - w - 14;
   let y = Math.min(Math.max(8, r.top + r.height / 2 - h / 2), innerHeight - h - 8);
   box.style.left = Math.max(8, x) + "px"; box.style.top = y + "px"; box.style.opacity = 1;
@@ -130,6 +176,7 @@ async function avvio() {
   $("#crea").onclick = crea;
   $("#entra").onclick = entra;
   document.addEventListener("mouseover", anteprima);
+  document.addEventListener("mouseover", suggerimento);
   document.addEventListener("keydown", (e) => { if (e.key === "Escape") { chiudiMenu(); annullaMira(); } });
   document.addEventListener("click", (e) => { if (!e.target.closest("#menu") && !e.target.closest("[data-ent],[data-mano],[data-scar]")) chiudiMenu(); });
   addEventListener("resize", disegnaFreccia);

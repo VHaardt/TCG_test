@@ -292,3 +292,11 @@ table.lista .pallino { display: inline-block; width: 10px; height: 10px; border-
 .pila.cliccabile { cursor: pointer; text-decoration: underline dotted; }
 #recupero.solo-vista .carta { cursor: default; }
 #recupero.solo-vista .carta:hover { transform: none; box-shadow: none; }
+/* parole chiave: la spiegazione si vede solo passandoci sopra */
+.kw[data-spiega] { text-decoration: underline dotted #c9b89699; text-underline-offset: 2px; cursor: help; }
+#spiega { position: fixed; z-index: 85; max-width: 280px; padding: 6px 9px; background: #1d1611f5; border: 1px solid var(--gold2);
+  border-radius: 8px; color: var(--fg); font-size: 13px; line-height: 1.3; pointer-events: none; opacity: 0; transition: opacity .1s;
+  box-shadow: 0 6px 18px #000; }
+.spiega-box { width: 240px; margin-top: 6px; padding: 8px 10px; font-size: 12.5px; line-height: 1.3; }
+.spiega-box div + div { margin-top: 4px; }
+.spiega-box b { color: var(--gold); }
