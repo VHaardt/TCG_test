@@ -954,6 +954,24 @@ def test_r026_reaction_cost_0_with_play_if():
     assert s.compute(0, 0, (k["I04"], "hand"), 901)[:2] == (7, 9)
     s.step(("parry", 0, (k["I04"], "hand")))
     assert s.unit(0, 900) is None and k["I04"] in s.p[1].discard and s.stats["reactions"][1] == 1
+    assert s.stats["react_legal"][1] == 1 and s.stats["react_avail"][1] == 1
+
+
+def test_r027_reazione_da_cicatrice_costo():
+    """P9b: con −1 una Reazione da 1 gemma giocata da una Cicatrice dritta costa 0; dalla mano costa sempre 1."""
+    r = _card("_r027", type="reaction", cost=1, colors=(), power=0, react={"do": [{"op": "def_mod", "n": 3}]})
+    for delta, from_scar, from_hand in ((0, 1, 1), (-1, 0, 1)):
+        s = _arena()
+        s.r = s.r.with_(reazione_da_cicatrice_costo=delta)
+        s.p[0].units = [Unit(900, "t_r6", True)]
+        s.p[1].guard, s.p[1].hand = 1, [r]
+        s.p[1].scars = [[r, False, "test"]]
+        s.step(("attack", 900))
+        s.step(("gems", 0))
+        acts = [x for x in s.legal_actions() if x[2]]
+        assert min(x[1] for x in acts if x[2][1] == "scar") == from_scar
+        assert min(x[1] for x in acts if x[2][1] == "hand") == from_hand
+        assert s.react_cost(r, "scar") == from_scar
 
 if __name__ == "__main__":
     for k, f in list(globals().items()):

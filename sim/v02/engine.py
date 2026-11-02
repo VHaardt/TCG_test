@@ -183,6 +183,7 @@ def new_stats():
         # R-026 (Q-027): rimozioni per fonte, sacrifici, recuperi
         "removals_src": [{}, {}],                                        # "sconfiggi" / "caccia" / "rimbalzo" su Unità avversarie, "sacrificio" delle tue
         "sacrifices": [0, 0], "recovers": [0, 0],
+        "react_legal": [0, 0],                                           # R-027 P9b: scontri difesi con una Reazione giocabile (costo e play_if)
     }
 
 
@@ -697,23 +698,24 @@ class GameState:
         g = self.p[d].guard
         acts = [("parry", k, None) for k in range(g + 1)]
         for r in self.reaction_options(d):
-            for k in range(self.react_cost(r[0]), g + 1):
+            for k in range(self.react_cost(*r), g + 1):
                 if self.react_paid(r, k, self.combat.opposer if self.combat else None):
                     acts.append(("parry", k, r))
         return acts
 
-    def react_cost(self, cid):
-        return max(CARDS[cid].cost, self.r.react_min_cost)
+    def react_cost(self, cid, src="hand"):
+        """Gems the Reaction costs; from a Scar, reazione_da_cicatrice_costo more (R-027 P9b: -1), never under react_min_cost."""
+        return max(CARDS[cid].cost + (self.r.reazione_da_cicatrice_costo if src == "scar" else 0), self.r.react_min_cost)
 
     def react_paid(self, react, d_gems, opposer, cb=None):
         """The Reaction is played: the committed gems pay its cost (C4 a) and its "play_if" holds (R-026)."""
-        if react is None or d_gems < self.react_cost(react[0]):
+        if react is None or d_gems < self.react_cost(*react):
             return False
         cond = CARDS[react[0]].react.get("play_if")
         if not cond:
             return True
         cb = cb or self.combat
-        ctx = self.combat_ctx(cb, opposer, pugno=d_gems - self.react_cost(react[0]), react_src=react[1])
+        ctx = self.combat_ctx(cb, opposer, pugno=d_gems - self.react_cost(*react), react_src=react[1])
         return self.cond_ok(1 - self.active, cond, dict(ctx, impegno=d_gems))
 
     def can_attack(self, q):
@@ -1226,7 +1228,7 @@ class GameState:
         if played:
             cid, rsrc = react
             c = CARDS[cid]
-            cost = self.react_cost(cid)
+            cost = self.react_cost(cid, rsrc)
             parry -= cost
             ops = c.react.get("do_from_scars", c.react["do"]) if rsrc == "scar" else c.react["do"]
             rctx = self.combat_ctx(cb, opposer, pugno=parry, react_src=rs)
@@ -1326,7 +1328,7 @@ class GameState:
         fa, db, mods = self.compute(cb.a, cb.d, cb.react, cb.opposer, trace=trace)
         hit, att_dead, tgt_dead = self.outcome(fa, db, cb.opposer)
         tgt = cb.target()
-        r_cost = self.react_cost(cb.react[0]) if cb.react else 0
+        r_cost = self.react_cost(*cb.react) if cb.react else 0
         paid = self.react_paid(cb.react, cb.d, cb.opposer)
         if self.stats is not None:
             st_all = self.stats
@@ -1362,8 +1364,10 @@ class GameState:
                 self.stat_add("fa_alta_by", a, acid)
             if cb.react:
                 st_all["reactions"][d] += 1
-            if any(self.react_cost(c) <= pd.guard for c, _ in self.reaction_options(d)):
+            if any(self.react_cost(c, src) <= pd.guard for c, src in self.reaction_options(d)):
                 st_all["react_avail"][d] += 1                          # M1
+            if any(x[2] for x in self._parry_options(d)):
+                st_all["react_legal"][d] += 1                          # R-027 P9b
             if paid:                                                    # M2: stesse gemme di Parata, senza Reazione
                 fa2, db2, _ = self.compute(cb.a, cb.d - r_cost, None, cb.opposer)
                 st_all["react_decisive"][d] += self.outcome(fa2, db2, cb.opposer) != (hit, att_dead, tgt_dead)

@@ -582,7 +582,7 @@ def render_q027(recs):
         return []
     decks = sorted({d for r in recs for d in r["decks"]})
     srcs = ("sconfiggi", "caccia", "rimbalzo", "sacrificio")
-    per = {d: {"n": 0, "idle": 0, "ut": 0, "react": 0, "def": 0, "comb": 0, "sac": 0, "rec": 0, "src": {}} for d in decks}
+    per = {d: {"n": 0, "idle": 0, "ut": 0, "react": 0, "legal": 0, "def": 0, "comb": 0, "sac": 0, "rec": 0, "src": {}} for d in decks}
     for r in recs:
         st = r["stats"]
         for q in (0, 1):
@@ -590,19 +590,20 @@ def render_q027(recs):
             x["n"] += 1
             x["idle"] += st["unit_idle"][q]; x["ut"] += st["unit_turns"][q]
             x["react"] += st["reactions"][q]; x["def"] += st["attacks"][1 - q]
+            x["legal"] += st.get("react_legal", [0, 0])[q]
             x["comb"] += st["units_defeated_in_combat"][q]
             x["sac"] += st["sacrifices"][q]; x["rec"] += st["recovers"][q]
             for k, v in st["removals_src"][q].items():
                 x["src"][k] = x["src"].get(k, 0) + v
     L = ["", "## R-026 (Q-027): interattività per Leader (per partita del mazzo)", "",
          "| Mazzo | n | Unità ferme (M6) | Reazioni per scontro difeso | Rimozioni: sconfiggi | caccia | rimbalzo | sacrificio (tue) "
-         "| Unità avversarie sconfitte in scontro | Sacrifici | Recuperi |",
-         "|---|---|---|---|---|---|---|---|---|---|---|"]
+         "| Unità avversarie sconfitte in scontro | Sacrifici | Recuperi | Scontri difesi con una Reazione giocabile |",
+         "|---|---|---|---|---|---|---|---|---|---|---|---|"]
     for d in decks:
         x = per[d]; n = max(x["n"], 1)
         L.append(f"| {D.label(d)} | {x['n']} | {100 * x['idle'] / max(x['ut'], 1):.1f}% | {x['react'] / max(x['def'], 1):.3f} | "
                  + " | ".join(f"{x['src'].get(k, 0) / n:.2f}" for k in srcs)
-                 + f" | {x['comb'] / n:.2f} | {x['sac'] / n:.2f} | {x['rec'] / n:.2f} |")
+                 + f" | {x['comb'] / n:.2f} | {x['sac'] / n:.2f} | {x['rec'] / n:.2f} | {x['legal'] / max(x['def'], 1):.3f} |")
     return L
 
 
