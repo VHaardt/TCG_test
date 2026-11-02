@@ -3,7 +3,7 @@
 Sorgente: docs/manuale/ (manuale.md, figure/*.svg, stile.css, modello.html).
 I numeri delle regole non sono scritti a mano: {{nome}} nel testo e nelle figure
 si legge dal preset del simulatore indicato nel front matter di manuale.md
-(sim/v02/config.py), più poche costanti del mazzo (sim/v02/decks.py).
+(sim/v02/config.py), compresi i limiti di costruzione del mazzo.
 
 Uso (dalla radice del repo):
     python3 tools/manuale/build.py                 # HTML + versione artifact
@@ -27,7 +27,6 @@ RADICE = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file_
 sys.path.insert(0, RADICE)
 
 from sim.v02.config import rules_from  # noqa: E402
-from sim.v02.decks import DECK_SIZE, MAX_COPIES  # noqa: E402
 
 SORGENTE = os.path.join(RADICE, "docs", "manuale")
 USCITA = os.path.join(SORGENTE, "build")
@@ -61,8 +60,10 @@ def parametri(preset):
     r = rules_from(preset)
     p = {k: v for k, v in r.as_dict().items() if not isinstance(v, (tuple, list))}
     p["preset"] = preset
-    p["mazzo"] = DECK_SIZE
-    p["copie"] = MAX_COPIES
+    p["mazzo"] = r.deck_size
+    p["copie"] = r.max_copies
+    p["copie_per"] = "nome" if r.copies_by_name else "ID"
+    p["copie_leggendarie"] = dict(r.max_copies_rarity).get("L", r.max_copies)
     p["tempra_risv"] = r.tempra_awakened or r.tempra
     p["gemme_leader_base"] = max(0, -(-(r.tempra - r.leader_power) // r.forza_per_gemma))
     p["gemme_leader_risv"] = max(0, -(-(p["tempra_risv"] - r.leader_power_awakened) // r.forza_per_gemma))

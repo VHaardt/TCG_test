@@ -1,7 +1,7 @@
 ---
-versione: 1.0
-basato_su: v0.2.6
-preset: V026
+versione: 1.1
+basato_su: v0.2.7
+preset: V027
 ---
 
 ## La partita in un minuto
@@ -44,7 +44,7 @@ Niente dadi, contatori o altri segnalini. Tutti gli stati si mostrano **ruotando
 
 ### Come si legge una carta
 
-Le carte del primo set non hanno nome né illustrazione: si riconoscono dall'**ID** (per esempio ROS-001). Il prefisso indica il colore: ROS Rosso, BLU Blu, NER Nero, VER Verde, NEU Neutrale.
+Le carte del primo set non hanno illustrazione, e quelle senza un nome proprio si riconoscono dall'**ID** (per esempio ROS-001). Il prefisso indica il colore: ROS Rosso, BLU Blu, NER Nero, VER Verde, NEU Neutrale. Ogni carta ha anche una **rarità**: Comune, Rara, Epica o Leggendaria.
 
 [[figura:anatomia_carta|Una Unità del set. Il costo si paga in gemme; la Forza serve per attaccare e per difendere.]]
 
@@ -359,8 +359,11 @@ Al più tardi, un giocatore perde nel Ripristino di G1 di questi round, a second
 
 ## Costruire il mazzo
 
-- Esattamente **{{mazzo}} carte**, al massimo **{{copie}} copie per ID** (ROS-007 e ROS-008 sono carte diverse, anche se avessero lo stesso testo).
-- Ogni carta deve avere **almeno un colore in comune col Leader**, oppure essere **Neutrale**.
+- Esattamente **{{mazzo}} carte**.
+- Al massimo **{{copie}} copie per {{copie_per}}**. Le carte con lo stesso nome stampato (le **gemelle**: stesso tipo, costo, Forza e testo) contano insieme. Una carta senza nome proprio si conta per ID; due carte con lo stesso testo ma costo diverso hanno nomi diversi.
+- Una carta **Leggendaria** (sono solo le Unità boss) va al massimo in **{{copie_leggendarie}} copia**.
+- Ogni carta deve avere **tutti i suoi colori fra quelli del Leader**, oppure essere **Neutrale**. Per una carta di un solo colore basta quel colore; una carta Nero/Verde vuole un Leader Nero/Verde.
+- La **rarità** (Comune, Rara, Epica, Leggendaria) dice quanto una carta è complessa o unica, non quanto è forte. Oltre al limite delle Leggendarie non cambia nulla in partita.
 - I Leader hanno 1 o 2 colori. Nel mazzo non ci sono carte-risorsa: la risorsa sono le gemme.
 
 | Colore | Stile di gioco | Parole chiave tipiche |
@@ -389,7 +392,7 @@ Al più tardi, un giocatore perde nel Ripristino di G1 di questi round, a second
 <dt>Rinnovo</dt>
 <dd>Quando attacca e sconfigge un'Unità, si raddrizza: può attaccare ancora.</dd>
 <dt>Stanca</dt>
-<dd>Ruota un'Unità avversaria dritta. Solo nel tuo turno e mai sul Leader.</dd>
+<dd>Ruota un'Unità avversaria dritta. Solo nel tuo turno e mai sul Leader. Come costo aggiuntivo, "Stanca una tua Unità Pronta" ruota invece una tua Unità.</dd>
 <dt>⟳</dt>
 <dd>Simbolo di costo: ruota la carta. Si può pagare solo se la carta è dritta.</dd>
 </dl>
@@ -403,6 +406,8 @@ Al più tardi, un giocatore perde nel Ripristino di G1 di questi round, a second
 **Controlli automatici.** Dopo ogni azione e alla fine di ogni attacco si controlla, in ordine: se la partita è finita; se un Leader deve Risvegliarsi (prima quello del giocatore attivo); se c'è Guardia oltre il massimo (torna nella scorta).
 
 **Mazzo vuoto.** Se devi pescare e il mazzo è vuoto, invece di pescare perdi 1 Vita (rispettando il Saldo). Se il tuo Leader ha già 0 Vite, perdi la partita.
+
+**Costi aggiuntivi.** Alcune carte chiedono, oltre alle gemme, di pagare un costo quando le giochi: "il tuo Leader perde N Vite" oppure "Stanca una tua Unità Pronta" (la ruoti tu). Se la carta dice "oppure", scegli tu quale pagare.
 
 **Costi in Vita.** Se una carta ti chiede di perdere Vita come costo e non puoi perderla tutta (Saldo pieno, 0 Vite o una soglia scritta sulla carta), non puoi giocarla.
 
