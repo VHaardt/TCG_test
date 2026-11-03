@@ -102,3 +102,55 @@ Le Reazioni sono escluse: si giocano in difesa e `cards_played` non le conta.
 - "Mano piena" = almeno 6 carte (il limite di mano è 8). "Nessuna carta giocabile" = nessuna azione «gioca» legale alla prima scelta (gemme insufficienti, nessun bersaglio, costo non pagabile).
 - Minacce senza risposta: non si ricava dai log senza una definizione di minaccia; non misurata.
 
+
+## Misure aggiuntive per l'analista (dagli stessi 300 log, nessuna partita nuova)
+
+**Come sono calcolate:** script `script/metriche_f_extra.py`; definizioni e approssimazioni sono in testa allo script.
+
+### 1. Scontri senza possibilità
+Un attacco è senza possibilità quando l'attaccante, mettendo tutte le gemme che gli restano, non arriva nemmeno a pareggiare la difesa con 0 gemme di Parata.
+Gli scontri con una Reazione restano fuori dal conto.
+
+| Leader (difende) | Scontri difesi | Senza possibilità | Reazioni per scontro difeso | … senza quelli | Unità ferme (M6) | … contando ferme le Unità che attaccano senza possibilità |
+|---|---|---|---|---|---|---|
+| LDR01 | 1290 | 58 (4.5%) | 0.062 | 0.065 | 52.5% | 54.3% |
+| LDR02 | 1541 | 92 (6.0%) | 0.066 | 0.070 | 47.4% | 47.7% |
+| LDR03 | 1043 | 72 (6.9%) | 0.078 | 0.083 | 51.7% | 52.2% |
+| LDR04 | 1339 | 26 (1.9%) | 0.081 | 0.083 | 53.4% | 54.9% |
+| LDR05 | 1289 | 48 (3.7%) | 0.114 | 0.118 | 54.6% | 55.4% |
+| LDR06 | 1161 | 62 (5.3%) | 0.065 | 0.069 | 46.9% | 50.4% |
+| Totale | 7663 | 358 (4.7%) | 0.078 | 0.081 | 51.5% | 52.9% |
+
+Le ultime due colonne sono le Unità ferme dell'attaccante: la riga di un Leader conta le sue Unità e i suoi attacchi senza possibilità. Nell'ultima colonna un'Unità che attacca senza possibilità conta come ferma (limite superiore).
+Attacchi senza possibilità per Leader attaccante: LDR01 50 (di Unità 47), LDR02 7 (di Unità 5), LDR03 17 (di Unità 14), LDR04 169 (di Unità 40), LDR05 32 (di Unità 24), LDR06 83 (di Unità 79).
+
+### 2. Round in cui la partita è decisa
+Il motore non dà una stima di vittoria. Uso la regola di riserva: il round da cui il vincitore resta avanti nelle Vite (strettamente) fino alla fine, misurato a ogni inizio di turno.
+
+- Media **10.0**, mediana 10.0, su 300 partite con un vincitore.
+- Decise entro il round 6: 23.7%. Dal round 10 in poi: 56.3%.
+- Distribuzione: R2: 3, R3: 21, R4: 18, R5: 9, R6: 20, R7: 23, R8: 18, R9: 19, R10: 23, R11: 24, R12: 20, R13: 20, R14: 24, R15: 37, R16: 18, R17: 3.
+
+### 3. Turni vuoti nei round 1–3 (nessuna carta, attacco, Rimarginare o ⟳)
+
+| Leader | Turni R1–3 | Vuoti |
+|---|---|---|
+| LDR01 | 300 | 16.3% |
+| LDR02 | 300 | 36.3% |
+| LDR03 | 300 | 17.7% |
+| LDR04 | 300 | 24.0% |
+| LDR05 | 300 | 21.3% |
+| LDR06 | 300 | 28.3% |
+| Totale | 1800 | 24.0% |
+
+### 4. A 0 Vite senza esito
+Caso contato: un giocatore inizia un turno con 0 Vite mentre l'altro ne ha almeno 1. Si conta la prima volta in cui succede.
+
+- Partite con questo caso: **244 su 300** (81.3%).
+- Round che restano dopo: media **1.6**, mediana 1.0; distribuzione 0: 78, 1: 89, 2: 27, 3: 14, 4: 8, 5: 10, 6: 9, 7: 4, 8: 5.
+- Il giocatore a 0 Vite ribalta e vince: **42** (17.2%).
+
+**Note:**
+- **Controllo delle gemme:** le gemme ricostruite dal log non vanno mai sotto zero nei 7.663 scontri, quindi le spese della fase principale sono tutte contate.
+- **Round 16–17:** il valore "R16–R17" del punto 2 vuol dire che il vincitore non era mai avanti all'inizio dell'ultimo turno. Sono le partite decise all'ultimo colpo o al Crepuscolo.
+- **Vite a 0:** "0 Vite" non è ancora la sconfitta: perde chi a 0 Vite subisce un colpo finale. Il 26% dei casi (78) si chiude nello stesso round.
