@@ -3646,7 +3646,7 @@
      }
     ]
    },
-   "text": "L'attaccante ha −2 in questo scontro. Se la giochi da una tua Cicatrice, pesca 1.",
+   "text": "L'attaccante ha −2 in questo scontro. Se la giochi da una tua Cicatrice e il tuo mazzo non è vuoto, pesca 1.",
    "_stato": "finale: DSL esistente (do_from_scars)",
    "_note": "Q-027 (esito_passata2.md, round1/proposta_unificata.md), 6/8. 'Pesca 1 se il mazzo non è vuoto' è la regola generale della pesca: nel JSON come in NER-025."
   },
