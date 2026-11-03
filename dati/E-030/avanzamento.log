@@ -104,3 +104,22 @@
 00_B0c05 semplice L4-L6 gia' fatto, salto
 00_B0c05 semplice L5-L6 gia' fatto, salto
 2026-11-03T09:33:21Z fine 00_B0c05 semplice 2000
+2026-11-03T09:33:27Z push 00_B0c05 IA semplice ok
+2026-11-03T09:33:29Z copia nella cartella condivisa ok (00_B0c05 IA semplice)
+2026-11-03T09:33:29Z inizio 00_B0c05 forte:30 200 3400 tutti
+00_B0c05 forte:30 L1-L2 gia' fatto, salto
+00_B0c05 forte:30 L1-L3 gia' fatto, salto
+00_B0c05 forte:30 L1-L4 gia' fatto, salto
+00_B0c05 forte:30 L1-L5 gia' fatto, salto
+00_B0c05 forte:30 L1-L6 gia' fatto, salto
+00_B0c05 forte:30 L2-L3 gia' fatto, salto
+00_B0c05 forte:30 L2-L4 gia' fatto, salto
+00_B0c05 forte:30 L2-L5 gia' fatto, salto
+00_B0c05 forte:30 L2-L6 gia' fatto, salto
+00_B0c05 forte:30 L3-L4 gia' fatto, salto
+00_B0c05 forte:30 L3-L5 gia' fatto, salto
+00_B0c05 forte:30 L3-L6 gia' fatto, salto
+00_B0c05 forte:30 L4-L5 gia' fatto, salto
+00_B0c05 forte:30 L4-L6 seed 3414 fatto
+00_B0c05 forte:30 L5-L6 seed 3415 fatto
+2026-11-03T10:40:51Z fine 00_B0c05 forte:30 3400
