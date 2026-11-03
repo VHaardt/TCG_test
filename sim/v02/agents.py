@@ -268,7 +268,16 @@ class RuleAgent2:
             return ("gems", self._impeto(s))
         if ph == "risposta":
             return self._risposta(s, acts)
+        if ph == "brucia":
+            return self._burn_choice(s, acts)
         return self._main(s, acts)
+
+    @staticmethod
+    def _burn_choice(s, acts):
+        """R-028: brucia una carta che non sia una Reazione; fino al round 5 la più cara (lontana dalla Brace), poi la meno cara."""
+        late = s.round >= 6
+        return min(acts, key=lambda act: (CARDS[act[1]].type == "reaction",
+                                          CARDS[act[1]].cost if late else -CARDS[act[1]].cost, act[1]))
 
     # ------------------------------------------------ V2 control: face-up single answer
     def _risposta_values(self, s, a_gems):
@@ -318,12 +327,17 @@ class RuleAgent2:
                     continue
             elif self._play_life(s, act) and not self.pay_life and len(pl.life) < 4:
                 continue                                       # costo in Vita su Unità/Reliquie: stesso freno delle ⟳
-            if pl.brace - c.cost < reserve and c.cost > 1:
+            burn = len(act) > 4 and act[4] == "brucia"       # R-028: Bruciare se serve per pagare o con la mano piena
+            eff = c.cost - burn
+            if pl.brace - eff < reserve and eff > 1:
                 continue
-            plays.append((c.cost, self._target_score(s, act), self._plan_score(s, act[3] if len(act) > 3 else None), act))
+            if burn and not (pl.brace - c.cost < reserve or len(pl.hand) >= 6):
+                continue
+            plays.append((c.cost, self._target_score(s, act), self._plan_score(s, act[3] if len(act) > 3 else None),
+                          int(burn and len(pl.hand) >= 6), act))
         if plays:
-            plays.sort(key=lambda t: (t[0], t[1], t[2]), reverse=True)
-            return plays[0][3]
+            plays.sort(key=lambda t: (t[0], t[1], t[2], t[3]), reverse=True)
+            return plays[0][4]
         # 3. attacks: units first, then the Leader
         attacks = by_kind.get("attack", [])
         hunt = self._hunt(s, [act for act in attacks if len(act) > 2])
@@ -375,7 +389,7 @@ class RuleAgent2:
 
     def _play_life(self, s, act):
         """The play pays Vita: the plan chosen, or the fixed costs of the card."""
-        if len(act) > 3:
+        if len(act) > 3 and act[3] is not None:
             return self._plan_life(act[3]) > 0
         c = CARDS[act[1]]
         return any("lose_life" in x for x in tuple((c.play or {}).get("costs") or ()) + tuple(c.costs))

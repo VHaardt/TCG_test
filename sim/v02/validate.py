@@ -9,7 +9,7 @@ DESCRIPTIVE = {"text", "name", "rarity", "slot", "tags", "intent", "vanilla_delt
 CARD_KEYS = {"id", "type", "cost", "colors", "power", "keywords", "kw_params", "abilities", "play", "react", "costs"}
 LEADER_KEYS = {"id", "colors", "base", "awakened"}
 TYPES = {"unit", "tactic", "reaction", "relic"}
-KEYWORDS = {"assalto", "scudo", "bracconiere", "caccia", "impeto", "infuso", "furia", "rinnovo"}
+KEYWORDS = {"assalto", "scudo", "bracconiere", "caccia", "impeto", "infuso", "furia", "rinnovo", "breccia"}
 KW_PARAMS = {"bracconiere"}
 EVENTS = {"on_enter", "on_attack", "on_oppose", "on_defeats_attacker", "on_own_unit_defeats_unit",
           "on_attack_defeats_unit", "on_own_unit_attack_defeats_unit", "on_own_reaction", "on_rim"}

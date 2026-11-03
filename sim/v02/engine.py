@@ -184,7 +184,14 @@ def new_stats():
         "removals_src": [{}, {}],                                        # "sconfiggi" / "caccia" / "rimbalzo" su Unità avversarie, "sacrificio" delle tue
         "sacrifices": [0, 0], "recovers": [0, 0],
         "react_legal": [0, 0],                                           # R-027 P9b: scontri difesi con una Reazione giocabile (costo e play_if)
-        "react_diag": [{}, {}],                                          # R-027 P9b: "<fonte>|<livello>|<gemme|zero>" per scontro difeso
+        "react_diag": [{}, {}],
+        # R-028 (Q-028): contatori di ritmo (solo lettura, non cambiano le partite)
+        "ritmo": [{}, {}],              # per turno del giocatore attivo: turni, blocc, piena, piena_blocc, giocata, r13, r13_attivo, bruciate
+        "vite_round": [],               # (Vite G1, Vite G2) all'inizio di ogni round
+        "zero_round": [None, None],     # round in cui il Leader arriva a 0 Vite la prima volta
+        "unit_noatk": [0, 0], "unit_noatk_opp": [0, 0],   # Unità Pronte che non attaccano; di queste, quelle che poi si oppongono
+        "breccia": [0, 0],              # Vite tolte da Breccia
+        "fa_alta_r6": [0, 0],           # R-017 entro il round 6                                          # R-027 P9b: "<fonte>|<livello>|<gemme|zero>" per scontro difeso
     }
 
 
@@ -204,6 +211,9 @@ class GameState:
         self.log = None
         self.crep = {}
         self.track = None           # stato delle metriche M6/M7 (solo la partita vera, non i cloni)
+        self.burned = False         # R-028: Bruciare già usato in questo turno
+        self.pending = None         # R-028: carta in gioco in attesa della carta da bruciare (cid, bersaglio, piano)
+        self._turn = None           # R-028: contatori del turno in corso (solo la partita vera)
 
     # ------------------------------------------------------------------ basics
     def clone(self):
@@ -213,6 +223,7 @@ class GameState:
         s.active, s.phase, s.round = self.active, self.phase, self.round
         s.combat = self.combat.clone() if self.combat else None
         s.winner, s.end_reason, s.next_uid = self.winner, self.end_reason, self.next_uid
+        s.burned, s.pending, s._turn = self.burned, self.pending, None
         s.rng = random.Random(self.rng.random())
         s.stats = None
         s.log = None
@@ -240,7 +251,7 @@ class GameState:
     def decider(self):
         if self.over:
             return None
-        if self.phase in ("main", "impeto", "pugno_att"):
+        if self.phase in ("main", "impeto", "pugno_att", "brucia"):
             return self.active
         return 1 - self.active
 
@@ -456,6 +467,8 @@ class GameState:
             return False
         pl.scars.append([pl.life.pop(), not ignore_saldo, source])
         self.stat_add("lives_lost", q, source)
+        if not pl.life and self.stats is not None and self.stats["zero_round"][q] is None:
+            self.stats["zero_round"][q] = self.round                       # R-028
         self.say(f"    P{q+1} perde 1 Vita ({source}): restano {len(pl.life)}")
         return True
 
@@ -515,6 +528,8 @@ class GameState:
                 return
             if self.round == 7 and self.stats is not None:
                 self.stats["life_at_round6"] = (len(self.p[0].life), len(self.p[1].life))
+            if self.stats is not None:
+                self.stats["vite_round"].append((len(self.p[0].life), len(self.p[1].life)))   # R-028
         self.say(f"--- Round {self.round}, P{a+1} | Vite {len(self.p[0].life)}-{len(self.p[1].life)}")
         if a == G1 and self.round == self.r.crepuscolo_round:   # Q-019: diagnostica al primo controllo
             lv = (len(self.p[G1].life), len(self.p[G2].life))
@@ -535,6 +550,7 @@ class GameState:
                 for _ in range(self.r.crepuscolo_loss):
                     self.lose_life(a, "crepuscolo", ignore_saldo=True)
         pl.guard = 0                                        # 7c
+        self.burned = False                                 # R-028: Bruciare, una volta per turno
         if self.r.raddrizzo == "ripristino":                # 7d
             self._straighten(a)
         pl.brace = min(self.round, self.r.brace_max)        # 7e
@@ -630,6 +646,8 @@ class GameState:
         if self.track is not None:                          # M6: ferma = Pronta, non attacca e non si oppone
             tr = self.track
             self.stats["unit_idle"][1 - a] += len(tr["cand"][1 - a] - tr["opposed"])
+            self.stats["unit_noatk"][1 - a] += len(tr["cand"][1 - a])                   # R-028: non ha attaccato ...
+            self.stats["unit_noatk_opp"][1 - a] += len(tr["cand"][1 - a] & tr["opposed"])   # ... e poi si è opposta
             tr["cand"][1 - a] = set()
             if self.round > self.r.no_attack_round:
                 self.stats["unit_turns"][a] += len(tr["seen"])
@@ -670,6 +688,10 @@ class GameState:
         a, d = self.active, 1 - self.active
         if ph == "main":
             return self._main_actions()
+        if ph == "brucia":                                  # R-028: quale carta brucia (ogni carta è un'azione a sé)
+            rest = list(self.p[a].hand)
+            rest.remove(self.pending[0])
+            return [("brucia", cid) for cid in sorted(set(rest))]
         if ph in ("impeto", "pugno_att"):
             return [("gems", k) for k in range(self.p[a].brace + 1)]
         if ph in ("oppose", "oppose_after"):
@@ -732,20 +754,29 @@ class GameState:
                 continue
             seen.add(cid)
             c = CARDS[cid]
-            if c.cost > pl.brace or c.type == "reaction":
+            if c.type == "reaction":
+                continue
+            normal = c.cost <= pl.brace
+            burn = self.can_burn(a, c)                      # R-028: la stessa giocata, con 1 gemma pagata da una carta bruciata
+            if not (normal or burn):
                 continue
             spec = (c.play or {}) if c.type == "tactic" else {}
             plans = self.cost_plans(a, tuple(c.costs or ()) + tuple(spec.get("costs") or ()))
             if not plans:
                 continue
+            plays = []
             if c.type == "unit" and len(pl.units) < self.r.max_units:
-                acts += [("play", cid, None) + _plan(pp) for pp in plans]
+                plays = [("play", cid, None) + _plan(pp) for pp in plans]
             elif c.type == "relic" and len(pl.relics) < self.r.max_relics:
-                acts += [("play", cid, None) + _plan(pp) for pp in plans]
+                plays = [("play", cid, None) + _plan(pp) for pp in plans]
             elif c.type == "tactic":
                 for t in self._targets(a, spec.get("target")):
-                    acts += [("play", cid, t) + _plan(pp) for pp in plans
-                             if t is None or pp is None or ("sacrifica", t) not in pp]
+                    plays += [("play", cid, t) + _plan(pp) for pp in plans
+                              if t is None or pp is None or ("sacrifica", t) not in pp]
+            if normal:
+                acts += plays
+            if burn:
+                acts += [(x if len(x) > 3 else x + (None,)) + ("brucia",) for x in plays]
         rim_cost = self.modifier(a, "rim_cost", 1)
         if pl.l_ready and pl.brace >= rim_cost:
             for cid in sorted({sc[0] for sc in pl.scars if not sc[1]}):
@@ -773,6 +804,13 @@ class GameState:
                     if CARDS[u.cid].has("caccia"):          # Caccia: bersaglio un'Unità, Pronta o Ruotata
                         acts += [("attack", u.uid, t) for t in foes]
         return acts
+
+    def can_burn(self, a, c):
+        """R-028 V1, Bruciare: una volta per turno, una carta con costo ≥1 si gioca con 1 gemma in meno
+        scartando un'altra carta dalla mano (con bruciare_min_mano: solo con almeno N carte in mano)."""
+        pl = self.p[a]
+        return (self.r.bruciare and not self.burned and c.cost >= 1 and c.cost - 1 <= pl.brace
+                and len(pl.hand) >= max(2, self.r.bruciare_min_mano))
 
     def _targets(self, a, sel):
         if sel is None:
@@ -848,12 +886,17 @@ class GameState:
         if self.stats is not None:
             q = self.decider()
             self.stats["decisions"][q] += 1
-            self.stats["legal_actions"][q] += len(self.legal_actions())
+            legal = self.legal_actions()
+            self.stats["legal_actions"][q] += len(legal)
             if self.phase == "main" and self.track is not None and self.can_attack(q):
                 self.track["seen"].update(u.uid for u in self.p[q].units if u.ready)
+            if self.phase == "main":
+                self._ritmo(legal, act)
         ph = self.phase
         if ph == "main":
             self._main_step(act)
+        elif ph == "brucia":
+            self._burn_step(act)
         elif ph == "impeto":
             self.combat.a = act[1]
             self.combat.a_visible = True
@@ -894,7 +937,11 @@ class GameState:
         if k == "end":
             self.end_turn()
         elif k == "play":
-            self._play(a, act[1], act[2], act[3] if len(act) > 3 else None)
+            if len(act) > 4 and act[4] == "brucia":         # R-028: prima si sceglie la carta da bruciare
+                self.pending = (act[1], act[2], act[3])
+                self.phase = "brucia"
+            else:
+                self._play(a, act[1], act[2], act[3] if len(act) > 3 else None)
         elif k == "rim":
             pl.l_ready = False
             self._lrot(a, "rim")
@@ -940,11 +987,46 @@ class GameState:
         owner = a if (sel or {}).get("side", "own") == "own" else 1 - a
         return {"chosen": t, "chosen_owner": owner}
 
-    def _play(self, a, cid, target, plan=None):
+    def _ritmo(self, legal, act):
+        """R-028 (Q-028): per turno del giocatore attivo, alla prima scelta della fase principale: nessuna carta
+        giocabile, mano ≥6; poi se gioca una carta e, nei round 1–3, se fa qualcosa (carta, attacco, Rimarginare, ⟳)."""
+        a = self.active
+        R = self.stats["ritmo"][a]
+        key = (self.round, a)
+        t = self._turn
+        if t is None or t[0] != key:
+            canplay = any(x[0] == "play" for x in legal)
+            full = len(self.p[a].hand) >= 6
+            for k, ok in (("turni", True), ("blocc", not canplay), ("piena", full), ("piena_blocc", full and not canplay),
+                          ("r13", self.round <= 3)):
+                if ok:
+                    R[k] = R.get(k, 0) + 1
+            t = self._turn = [key, False, False]
+        if act[0] == "play" and not t[1]:
+            t[1] = True
+            R["giocata"] = R.get("giocata", 0) + 1
+        if act[0] in ("play", "attack", "rim", "ability") and not t[2]:
+            t[2] = True
+            if self.round <= 3:
+                R["r13_attivo"] = R.get("r13_attivo", 0) + 1
+
+    def _burn_step(self, act):
+        """R-028: the chosen card goes to the Scarti and pays 1 gem of the pending play."""
+        a = self.active
+        pl = self.p[a]
+        cid, target, plan = self.pending
+        self.pending, self.phase, self.burned = None, "main", True
+        pl.hand.remove(act[1])
+        pl.discard.append(act[1])
+        self.stat_add("ritmo", a, "bruciate")
+        self.say(f"  P{a+1} brucia {CARDS[act[1]].name}")
+        self._play(a, cid, target, plan, burn=1)
+
+    def _play(self, a, cid, target, plan=None, burn=0):
         pl = self.p[a]
         c = CARDS[cid]
         pl.hand.remove(cid)
-        pl.brace -= c.cost
+        pl.brace -= c.cost - burn
         self.stat_add("cards_played", a, cid)
         self.say(f"  P{a+1} gioca {c.name}")
         if plan is not None:
@@ -977,7 +1059,12 @@ class GameState:
 
     def tempra(self, q):
         """Tempra of q's Leader (tempra_awakened when set and q is Awakened)."""
-        return self.r.tempra_awakened if self.p[q].awakened and self.r.tempra_awakened else self.r.tempra
+        t = self.r.tempra_awakened if self.p[q].awakened and self.r.tempra_awakened else self.r.tempra
+        if self.r.tempra_tardo and self.round >= self.r.tempra_tardo:      # R-028 V2 A
+            t -= 1
+        if self.r.allo_scoperto and not self.p[q].life:                     # R-028 V2 B
+            t -= 1
+        return t
 
     def fire(self, q, abilities, event, ctx, src=None, once=None):
         """once: set shared by one fire_global call; a trigger with "stack": false fires once
@@ -1362,6 +1449,8 @@ class GameState:
                 self.stat_add("kills_by", a, acid)
             if (hit or tgt_dead) and fa >= FA_ALTA:                     # R-017: scontro vinto (colpo a segno o bersaglio sconfitto)
                 self.stat_add("fa_alta_wins", a)
+                if self.round <= 6:
+                    self.stat_add("fa_alta_r6", a)                      # R-028
                 self.stat_add("fa_alta_by", a, acid)
             if cb.react:
                 st_all["reactions"][d] += 1
@@ -1430,6 +1519,8 @@ class GameState:
             if cb.opposer is None:
                 self.stat_add("removals", a)                             # M12: sconfitta da Caccia
                 self.stat_add("removals_src", a, "caccia")
+            elif att_unit is not None and CARDS[att_unit.cid].has("breccia") and self.lose_life(d, "breccia"):
+                self.stat_add("breccia", a)                              # R-028 V3: batte chi si oppone, nel rispetto del Saldo
         if att_dead:
             pa.units.remove(att_unit)
             pa.discard.append(att_unit.cid)
