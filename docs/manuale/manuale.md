@@ -1,5 +1,5 @@
 ---
-versione: 1.2
+versione: 1.3
 basato_su: v0.2.8
 preset: V027
 ---
@@ -96,10 +96,6 @@ Se hai già {{max_units}} Unità non puoi giocarne una sesta, e con {{max_relics
 
 ::: ricorda Vantaggio di chi inizia
 Partire per primi è un vantaggio, quindi: **nessuno attacca nel round {{no_attack_round}}**, **G1 non pesca nel round 1** e **G2 prende 1 gemma in più nei round {{round_g2}}** (è stampato sul tracciato).
-:::
-
-::: prova Compensazione di G2
-La gemma in più di G2 nei round {{round_g2}} è la regola in vigore, ma i suoi valori sono ancora in prova: potrebbero cambiare dopo nuovi test.
 :::
 
 ## Il turno
