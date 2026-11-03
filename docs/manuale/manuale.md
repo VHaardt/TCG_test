@@ -1,6 +1,6 @@
 ---
 versione: 1.2
-basato_su: v0.2.7
+basato_su: v0.2.8
 preset: V027
 ---
 
