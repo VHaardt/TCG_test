@@ -62,6 +62,11 @@ class Rules2:
     react_min_cost: int = 0            # costo minimo di una Reazione in gemme; §8 C4 (a) non ne fissa uno (prima il motore usava 1)
     reazione_da_cicatrice_costo: int = 0   # R-027 P9b: gemme in più (−1 = una in meno) per una Reazione giocata da una Cicatrice
     g2_recupero: bool = True           # G2: un effetto che prende carte dagli Scarti non prende una carta che prende dagli Scarti
+    # R-028 (Q-028), leve di ritmo in prova: tutte spente per default (replay identici)
+    bruciare: bool = False             # V1: una volta per turno, giocando una carta, scarti un'altra carta dalla mano che paga 1 gemma del costo
+    bruciare_min_mano: int = 0         # V1b: Bruciare solo con almeno N carte in mano (contando la carta giocata)
+    tempra_tardo: int = 0              # V2 A: da questo round la Tempra di entrambi i Leader scende di 1 (0 = mai)
+    allo_scoperto: bool = False        # V2 B: un Leader a 0 Vite ha Tempra −1
 
     # limits
     max_units: int = 5

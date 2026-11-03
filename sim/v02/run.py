@@ -531,7 +531,7 @@ def render_r012(recs, traccia=()):
         for d in decks:
             x = per[d]; n = max(x["n"], 1); tr = x.get("tr", {})
             L.append(f"| {D.label(d)} | {x.get('fa_alta_wins', 0)/n:.2f} | " + " | ".join(f"{tr.get(c, {}).get('f', 0)/n:.2f}" for c in traccia) + " |")
-    return L + render_m5(recs) + render_q027(recs) + render_p9b(recs) + [""]
+    return L + render_m5(recs) + render_q027(recs) + render_p9b(recs) + render_q028(recs) + [""]
 
 
 def render_m5(recs):
@@ -632,6 +632,64 @@ def render_p9b(recs):
                 cells.append(str(n))
                 cells += [f"{x.get(f'{src}|{lv}|{g}', 0) / max(n, 1):.3f}" for lv in levs]
             L.append(f"| {D.label(d)} | {lab} | " + " | ".join(cells) + " |")
+    return L
+
+
+def _serie_r4_r10(r):
+    """Longest run of consecutive rounds 4–10 in which nobody lost a Life (lives at the start of each round)."""
+    tot = [x + y for x, y in r["stats"]["vite_round"]] + [sum(r["life_end"])]
+    best = cur = 0
+    for rd in range(4, 11):
+        if rd >= len(tot):
+            break
+        cur = cur + 1 if tot[rd - 1] == tot[rd] else 0
+        best = max(best, cur)
+    return best
+
+
+def render_q028(recs):
+    """R-028 (Q-028): ritmo e frustrazione per Leader (per partita del mazzo) e in totale."""
+    if not recs or "ritmo" not in recs[0]["stats"]:
+        return []
+    decks = sorted({d for r in recs for d in r["decks"]})
+    keys = ("turni", "blocc", "piena", "piena_blocc", "giocata", "r13", "r13_attivo", "bruciate")
+    per = {d: {"n": 0} for d in decks + ["Totale"]}
+    for r in recs:
+        st = r["stats"]
+        z = [x for x in st["zero_round"] if x is not None]
+        g = {"crep": r["end_reason"] == "crepuscolo", "serie": _serie_r4_r10(r), "r5": r["winner"] is not None and r["rounds"] <= 5,
+             "zero_n": bool(z), "dopo0": r["rounds"] - min(z) if z else 0}
+        for q in (0, 1):
+            for d in (r["decks"][q], "Totale"):
+                x = per[d]
+                x["n"] += 1
+                for k, v in g.items():
+                    x[k] = x.get(k, 0) + v
+                for k in keys:
+                    x[k] = x.get(k, 0) + st["ritmo"][q].get(k, 0)
+                for k in ("unit_turns", "unit_idle", "unit_noatk_opp", "fa_alta_r6", "breccia"):
+                    x[k] = x.get(k, 0) + st[k][q]
+                if st["zero_round"][q] is not None:
+                    x["a0"] = x.get("a0", 0) + 1
+                    x["a0_vince"] = x.get("a0_vince", 0) + (r["winner"] == q)
+    pc = lambda a, b: f"{100 * a / b:.1f}%" if b else "—"
+    L = ["", "## R-028 (Q-028): ritmo (per partita del mazzo; Totale = tutte le partite, ognuna contata due volte)", "",
+         "| Mazzo | n | Chiuse dal Crepuscolo | Serie più lunga senza Vite perse R4–R10 | Round dopo il primo 0 Vite | "
+         "Ribaltamenti da 0 Vite | Vittorie entro il R5 | Turni vuoti R1–3 | Turni senza giocare carte | "
+         "Mano piena senza nulla di giocabile | Bruciate | Unità ferme: si è opposta | mai coinvolta (M6) | R-017 entro il R6 | Breccia |",
+         "|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|"]
+    for d in decks + ["Totale"]:
+        x = per[d]; n = max(x["n"], 1)
+        L.append(f"| {D.label(d) if d != 'Totale' else d} | {x['n']} | {pc(x['crep'], n)} | {x['serie'] / n:.2f} | "
+                 f"{x['dopo0'] / x['zero_n']:.2f} | " if x.get("zero_n") else f"| {D.label(d) if d != 'Totale' else d} | {x['n']} | {pc(x['crep'], n)} | {x['serie'] / n:.2f} | — | ")
+        L[-1] += (f"{pc(x.get('a0_vince', 0), x.get('a0', 0))} | {pc(x['r5'], n)} | {pc(x['r13'] - x['r13_attivo'], x['r13'])} | "
+                  f"{pc(x['turni'] - x['giocata'], x['turni'])} | {pc(x['piena_blocc'], x['piena'])} | {x['bruciate'] / n:.2f} | "
+                  f"{pc(x['unit_noatk_opp'], x['unit_turns'])} | {pc(x['unit_idle'], x['unit_turns'])} | {x['fa_alta_r6'] / n:.2f} | "
+                  f"{x['breccia'] / n:.2f} |")
+    L += ["", "Turni vuoti R1–3: turni dei round 1–3 senza carta, attacco, Rimarginare o ⟳. Mano piena: almeno 6 carte alla prima scelta del turno, "
+          "senza nessuna azione «gioca» legale. Unità ferme: Unità Pronte nella fase principale che non attaccano; «si è opposta» = poi si oppone "
+          "nel turno avversario, «mai coinvolta» = no (è la M6). Round dopo il primo 0 Vite: sulle partite in cui un Leader arriva a 0 Vite. "
+          "Ribaltamenti: Leader arrivati a 0 Vite che vincono."]
     return L
 
 
