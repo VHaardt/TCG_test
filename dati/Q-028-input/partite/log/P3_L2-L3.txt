@@ -1,0 +1,121 @@
+--- Round 1, P1 | Vite 5-5
+  [opzioni] prima scelta: 1 azioni legali (G 0, A 0, R 0, ⟳ 0) · mano 5 · gemme 1 · scelte nel turno 1
+--- Round 1, P2 | Vite 5-5
+  P2 gioca ROS-010
+  [opzioni] prima scelta: 4 azioni legali (G 3, A 0, R 0, ⟳ 0) · mano 6 · gemme 2 · scelte nel turno 2
+--- Round 2, P1 | Vite 5-5
+  P1 gioca NEU-002
+  [opzioni] prima scelta: 3 azioni legali (G 1, A 1, R 0, ⟳ 0) · mano 6 · gemme 2 · scelte nel turno 2
+--- Round 2, P2 | Vite 5-5
+  P2 attacca con ROS-010#1
+    pugni: attaccante 2, difensore 0 -> 4 contro 4
+    P1 perde 1 Vita (attacco): restano 4
+  [opzioni] prima scelta: 5 azioni legali (G 2, A 2, R 0, ⟳ 0) · mano 6 · gemme 2 · scelte nel turno 2
+--- Round 3, P1 | Vite 4-5
+  P1 Rimargina BLU-009
+  [opzioni] prima scelta: 5 azioni legali (G 2, A 1, R 1, ⟳ 0) · mano 6 · gemme 3 · scelte nel turno 2
+--- Round 3, P2 | Vite 4-5
+  P2 attacca con ROS-010#1
+    pugni: attaccante 2, difensore 1 -> 2 contro 6
+  P2 attacca con Leader LDR-03
+    pugni: attaccante 0, difensore 0 -> 3 contro 4
+  [opzioni] prima scelta: 6 azioni legali (G 3, A 2, R 0, ⟳ 0) · mano 7 · gemme 4 · scelte nel turno 3
+--- Round 4, P1 | Vite 4-5
+  P1 gioca BLU-012
+  P1 attacca con Leader LDR-02
+    pugni: attaccante 0, difensore 0 -> 3 contro 4
+  [opzioni] prima scelta: 5 azioni legali (G 3, A 1, R 0, ⟳ 0) · mano 8 · gemme 4 · scelte nel turno 3
+--- Round 4, P2 | Vite 4-5
+  [opzioni] prima scelta: 7 azioni legali (G 4, A 2, R 0, ⟳ 0) · mano 8 · gemme 4 · scelte nel turno 1
+--- Round 5, P1 | Vite 4-5
+  P1 gioca BLU-016
+  [opzioni] prima scelta: 5 azioni legali (G 2, A 2, R 0, ⟳ 0) · mano 8 · gemme 5 · scelte nel turno 2
+--- Round 5, P2 | Vite 4-5
+  P2 gioca NER-017
+  P2 attacca con Leader LDR-03
+    pugni: attaccante 0, difensore 0 -> 3 contro 4
+  [opzioni] prima scelta: 8 azioni legali (G 5, A 2, R 0, ⟳ 0) · mano 9 · gemme 5 · scelte nel turno 3
+--- Round 6, P1 | Vite 4-5
+  P1 gioca BLU-007
+  P1 gioca NEU-003
+    NER-017 di P2: sconfitta da un effetto
+  P1 attacca con BLU-012#2
+    pugni: attaccante 0, difensore 0 -> 3 contro 4
+  [opzioni] prima scelta: 7 azioni legali (G 2, A 3, R 0, ⟳ 1) · mano 8 · gemme 6 · scelte nel turno 4
+--- Round 6, P2 | Vite 4-5
+  [opzioni] prima scelta: 9 azioni legali (G 6, A 2, R 0, ⟳ 0) · mano 9 · gemme 6 · scelte nel turno 1
+--- Round 7, P1 | Vite 4-5
+  P1 attacca con Leader LDR-02
+    pugni: attaccante 6, difensore 0 -> 9 contro 4
+    P2 perde 1 Vita (attacco_leader): restano 4
+  [opzioni] prima scelta: 7 azioni legali (G 1, A 4, R 0, ⟳ 1) · mano 7 · gemme 7 · scelte nel turno 2
+--- Round 7, P2 | Vite 4-4
+  P2 attacca con Leader LDR-03
+    P1 oppone BLU-012
+    pugni: attaccante 5, difensore 0 -> 8 contro 3
+    BLU-012 di P1 è sconfitta
+  [opzioni] prima scelta: 9 azioni legali (G 5, A 2, R 1, ⟳ 0) · mano 9 · gemme 7 · scelte nel turno 2
+--- Round 8, P1 | Vite 4-4
+  P1 attacca con BLU-007#5
+    P2 oppone ROS-010
+    pugni: attaccante 5, difensore 2 + NER-024 -> 7 contro 7
+    ROS-010 di P2 è sconfitta
+    BLU-007 di P1 è sconfitta
+  P1 usa ⟳ di BLU-016
+  P1 attacca con Leader LDR-02
+    pugni: attaccante 1, difensore 0 -> 4 contro 4
+    P2 perde 1 Vita (attacco_leader): restano 3
+  [opzioni] prima scelta: 6 azioni legali (G 1, A 3, R 0, ⟳ 1) · mano 8 · gemme 8 · scelte nel turno 4
+--- Round 8, P2 | Vite 4-3
+  P2 attacca con Leader LDR-03
+    pugni: attaccante 5, difensore 0 -> 8 contro 4
+    P1 perde 1 Vita (attacco_leader): restano 3
+  P2 gioca ROS-008
+    P2 perde 1 Vita (costo): restano 2
+    P2: il Leader si Risveglia
+  [opzioni] prima scelta: 9 azioni legali (G 5, A 1, R 2, ⟳ 0) · mano 8 · gemme 8 · scelte nel turno 3
+--- Round 9, P1 | Vite 3-2
+  P1 attacca con Leader LDR-02
+    pugni: attaccante 6, difensore 0 -> 9 contro 4
+    P2 perde 1 Vita (attacco_leader): restano 1
+  P1 gioca NEU-009
+  [opzioni] prima scelta: 7 azioni legali (G 2, A 2, R 1, ⟳ 1) · mano 9 · gemme 8 · scelte nel turno 3
+--- Round 9, P2 | Vite 3-1
+  P2 gioca NER-020
+  P2 gioca NER-010
+  P2 attacca con NER-010#9
+    P1 oppone BLU-016
+    pugni: attaccante 1, difensore 0 -> 4 contro 4
+    BLU-016 di P1 è sconfitta
+    NER-010 di P2 è sconfitta
+  P2 attacca con Leader LDR-03
+    pugni: attaccante 0, difensore 0 -> 4 contro 4
+    P1 perde 1 Vita (attacco_leader): restano 2
+    P1: il Leader si Risveglia
+  [opzioni] prima scelta: 11 azioni legali (G 4, A 2, R 4, ⟳ 0) · mano 8 · gemme 8 · scelte nel turno 5
+--- Round 10, P1 | Vite 2-1
+  P1 gioca NER-021
+  P1 attacca con NEU-009#7
+    P2 oppone ROS-008
+    pugni: attaccante 1, difensore 0 -> 3 contro 2
+    ROS-008 di P2 è sconfitta
+  P1 attacca con Leader LDR-02
+    pugni: attaccante 0, difensore 0 -> 4 contro 4
+    P2 perde 1 Vita (attacco_leader): restano 0
+  [opzioni] prima scelta: 7 azioni legali (G 2, A 2, R 2, ⟳ 0) · mano 9 · gemme 8 · scelte nel turno 4
+--- Round 10, P2 | Vite 2-0
+  P2 gioca NER-006
+  P2 Rimargina ROS-014
+  P2 gioca ROS-014
+  P2 gioca ROS-013
+    NEU-009 di P1: sconfitta da un effetto
+  P2 attacca con NER-020#8
+    pugni: attaccante 0, difensore 2 -> 8 contro 10
+  [opzioni] prima scelta: 11 azioni legali (G 3, A 2, R 5, ⟳ 0) · mano 7 · gemme 8 · scelte nel turno 6
+--- Round 11, P1 | Vite 2-0
+  P1 gioca BLU-012
+  P1 attacca con Leader LDR-02
+    pugni: attaccante 5, difensore 0 -> 9 contro 4
+*** P2 perde (colpo_finale)
+
+Vincitore: P1 (colpo_finale), round 11
