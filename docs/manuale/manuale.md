@@ -1,5 +1,5 @@
 ---
-versione: 1.1
+versione: 1.2
 basato_su: v0.2.7
 preset: V027
 ---
@@ -413,6 +413,8 @@ Al più tardi, un giocatore perde nel Ripristino di G1 di questi round, a second
 
 **Una Reazione a partita?** No: al massimo **una per attacco**. Puoi usarne una in ogni attacco avversario, se hai le gemme di Guardia per pagarle.
 
+**Reazioni a costo 0.** Alcune Reazioni non costano gemme: puoi giocarle anche senza impegnare Guardia. Hanno sempre una condizione stampata (per esempio quante Cicatrici devi avere) e non hanno effetti dopo lo scontro.
+
 **Reazione dalle Cicatrici.** Una Reazione tra le tue Cicatrici dritte si gioca come se fosse in mano. Dopo l'uso va negli Scarti.
 
 **Stanca nel turno avversario.** Un effetto Stanca che si risolverebbe nel turno avversario non ha effetto.
@@ -424,6 +426,9 @@ Al più tardi, un giocatore perde nel Ripristino di G1 di questi round, a second
 - Effetti sul tracciato del round o sulla Brace che riceve l'avversario.
 - Blocchi che impediscono a un personaggio di raddrizzarsi per più di un turno.
 - Dadi o monete: il caso sta solo nella pescata.
+- Perdite di Vita nel turno avversario: nessuna carta ti fa perdere Vite mentre difendi e nessuna dice "l'avversario perde Vite". I costi in Vita si pagano solo nella tua fase principale.
+- Pescate fuori dal tuo turno a mazzo vuoto: una carta che fa pescare nel turno avversario dice sempre "se il tuo mazzo non è vuoto".
+- Abilità :ruota: usate nel turno avversario: si attivano solo nel tuo turno.
 
 ## Riepilogo rapido
 
