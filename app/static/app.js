@@ -71,6 +71,10 @@ function colVars(cs) {
 
 const RARITA = { C: "Comune", NC: "Non comune", R: "Rara", E: "Epica", L: "Leggendaria" };
 
+// Q-029: le carte si mostrano col nome; l'ID resta la chiave (e compare solo nei suggerimenti)
+const nomeC = (id) => (CARTA[id] ? CARTA[id].nome : id);
+const nomeL = (id) => (LEAD[id] ? LEAD[id].nome : id);
+
 function cartaHTML(id, { classi = "", attr = "", stile = "" } = {}) {
   const c = CARTA[id];
   if (!c) return `<div class="carta ${classi}" ${attr}><div class="c-dentro">${esc(id)}</div></div>`;
@@ -103,7 +107,7 @@ function eroeHTML(id, L, ent) {
   const cl = L ? `${L.risvegliato ? "risv" : ""} ${L.pronto ? "" : "ruotato"}` : "";
   return `<div class="eroe ${cl}" style="${colVars(l.colori)}" ${ent ? `data-ent="${ent}"` : ""} data-leader="${id}">
     ${L && (!L.pronto || L.risvegliato) ? `<span class="stato">${[L.risvegliato ? "🔥 Risvegliato" : "", L.pronto ? "" : "⟳ Ruotato"].filter(Boolean).join(" · ")}</span>` : ""}
-    <div class="e-ritratto"><span class="icona">${iconaLeader(id)}</span><span class="nome">${esc(l.nome)}</span></div>
+    <div class="e-ritratto"><span class="icona">${iconaLeader(id)}</span><span class="nome" title="${esc(l.nome)}">${esc(l.nome.split(",")[0])}</span></div>
     <div class="e-forza" title="Forza">${forza}</div><div class="e-tempra" title="Tempra">${tempra}</div></div>`;
 }
 
@@ -118,7 +122,7 @@ function modHTML(el) {
   if (!el.dataset.mod) return "";
   const mod = JSON.parse(el.dataset.mod), c = CARTA[el.dataset.card];
   return `<div class="pannello mod-box"><b>Forza ${c.forza}</b> stampata${mod.map((m) =>
-    `<div class="${m.scontro ? "cond" : m.v > 0 ? "su" : "giu"}">${m.v > 0 ? "+" : ""}${m.v} ${m.fonte === "altro" ? "altri effetti" : m.fonte === el.dataset.card ? "propria abilità" : `da ${esc(m.fonte)}`}${m.scontro ? " (solo negli scontri, già attivo)" : ""}</div>`).join("")}</div>`;
+    `<div class="${m.scontro ? "cond" : m.v > 0 ? "su" : "giu"}">${m.v > 0 ? "+" : ""}${m.v} ${m.fonte === "altro" ? "altri effetti" : m.fonte === el.dataset.card ? "propria abilità" : `da ${esc(CARTA[m.fonte] ? nomeC(m.fonte) : nomeL(m.fonte))}`}${m.scontro ? " (solo negli scontri, già attivo)" : ""}</div>`).join("")}</div>`;
 }
 
 // spiegazioni delle parole chiave sotto l'anteprima ingrandita
@@ -147,7 +151,7 @@ function anteprima(e) {
   if (!el || el.closest("#anteprima") || el.closest(".offerta")) { box.style.opacity = 0; return; }
   if (el.dataset.card) box.innerHTML = cartaHTML(el.dataset.card, { classi: "grande" }) + modHTML(el)
     + spiegaHTML(CARTA[el.dataset.card] && CARTA[el.dataset.card].testo);
-  else box.innerHTML = `<div class="pannello" style="width:280px">${eroeHTML(el.dataset.leader)}<h3>${esc(el.dataset.leader)}</h3>${leaderTesti(el.dataset.leader)}</div>`
+  else box.innerHTML = `<div class="pannello" style="width:280px">${eroeHTML(el.dataset.leader)}<h3>${esc(nomeL(el.dataset.leader))}</h3>${leaderTesti(el.dataset.leader)}</div>`
     + spiegaHTML([...LEAD[el.dataset.leader].base, ...LEAD[el.dataset.leader].risvegliato].join(" "));
   const r = el.getBoundingClientRect();
   const w = 240, h = Math.max(340, box.offsetHeight);
@@ -275,8 +279,8 @@ function renderPronti() {
     <div class="mazzi-pronti">${CAT.mazzi.map((m, i) => {
       const L = LEAD[m.leader], n = Object.values(m.carte).reduce((a, b) => a + b, 0);
       return `<div class="pannello pronto-mazzo" style="${colVars(L.colori)}">
-        <div class="riga">${eroeHTML(m.leader)}<div><h3>${esc(m.nome.replace(/^(rif|mix)_/, "").replace(/_/g, " "))}</h3>
-          <p class="nota">${esc(m.leader)} · ${L.colori.map((c) => CAT.colori[c]).join("/")} · ${n} carte</p></div></div>
+        <div class="riga">${eroeHTML(m.leader)}<div><h3>${esc(m.nome.replace(/^(rif|mix)_/, "").replace(/LDR(\d\d)/g, (x, n) => nomeL("LDR-" + n).split(",")[0]).replace(/_/g, " "))}</h3>
+          <p class="nota">${esc(nomeL(m.leader))} · ${L.colori.map((c) => CAT.colori[c]).join("/")} · ${n} carte</p></div></div>
         <p>${esc(m.note || "")}</p>
         <details><summary>Carte</summary>${listaMazzo(m.carte)}</details>
         <button class="oro" data-pm="${i}">Gioca con questo mazzo</button></div>`;
@@ -290,7 +294,7 @@ function renderDraft(d) {
     $("#prep").innerHTML = `<h2 style="text-align:center">Draft: scegli il tuo Leader</h2>
       <p class="nota" style="text-align:center">Il Leader decide i colori: dopo ti verranno offerte solo carte dei suoi colori o Neutrali.</p>
       <div class="offerta">${d.leader_offerta.map((id) => `<div class="slot leader-scelta pannello">
-        ${eroeHTML(id)}<h3>${esc(id)} · ${LEAD[id].colori.map((c) => CAT.colori[c]).join("/")}</h3>${leaderTesti(id)}
+        ${eroeHTML(id)}<h3>${esc(nomeL(id))} · ${LEAD[id].colori.map((c) => CAT.colori[c]).join("/")}</h3>${leaderTesti(id)}
         <button class="oro" data-l="${id}">Scegli</button></div>`).join("")}</div>`;
     $$("[data-l]", $("#prep")).forEach((b) => (b.onclick = () => act("/api/draft/leader", { leader: b.dataset.l })));
     return;
@@ -301,7 +305,7 @@ function renderDraft(d) {
       <div class="offerta">${d.offerta.map((id) => `<div class="slot">
         ${cartaHTML(id, { classi: "grande", attr: `data-c="${id}"` })}<span class="nota">ne hai ${d.carte[id] || 0}</span></div>`).join("")}</div>
     </div>
-    <div class="pannello laterale"><div style="display:flex;gap:10px;align-items:center">${eroeHTML(d.leader)}<div><h3>${esc(d.leader)}</h3></div></div>
+    <div class="pannello laterale"><div style="display:flex;gap:10px;align-items:center">${eroeHTML(d.leader)}<div><h3>${esc(nomeL(d.leader))}</h3></div></div>
       <h3>Il tuo mazzo (${d.scelte}/${d.totale})</h3>${listaMazzo(d.carte)}</div></div>`;
   $$("[data-c]", $("#prep")).forEach((b) => (b.onclick = () => {
     b.style.transition = "transform .3s, opacity .3s"; b.style.transform = "translateY(-60px) scale(.6)"; b.style.opacity = 0;
@@ -315,7 +319,7 @@ function listaMazzo(carte, conBottoni = false) {
   if (!ids.length) return '<p class="nota">vuoto</p>';
   return `<table class="lista">${ids.map((id) => {
     const c = CARTA[id];
-    return `<tr data-card="${id}"><td><span class="pallino" style="${colVars(c.colori)}"></span></td><td>${carte[id]}×</td><td><b>${esc(id)}</b></td>
+    return `<tr data-card="${id}"><td><span class="pallino" style="${colVars(c.colori)}"></span></td><td>${carte[id]}×</td><td><b title="${esc(id)}">${esc(nomeC(id))}</b></td>
       <td>${c.costo}◆</td><td>${ICONA[c.tipo] || ""} ${c.forza != null ? c.forza : ""}</td>
       ${conBottoni ? `<td><button class="piccolo" data-meno="${id}">−</button></td>` : ""}</tr>`;
   }).join("")}</table>`;
@@ -356,7 +360,7 @@ function problemi() {
   if (n !== CAT.costruzione.carte) out.push(`${n} carte su ${CAT.costruzione.carte}`);
   for (const [id, k] of Object.entries(mazzo.carte)) {
     if (!CARTA[id]) { out.push(`${id}: carta sconosciuta`); continue; }
-    if (mazzo.leader && k > 0 && !legale(id)) out.push(`${id}: colore fuori dal Leader`);
+    if (mazzo.leader && k > 0 && !legale(id)) out.push(`${nomeC(id)}: colore fuori dal Leader`);
   }
   for (const [nome, x] of Object.entries(gruppi(mazzo.carte)))
     if (x.n > x.max) out.push(`${x.ids.length > 1 ? `${nome} (${x.ids.join(", ")})` : x.ids[0]}: ${x.n} copie, massimo ${x.max}`);
@@ -372,11 +376,11 @@ function renderCostruttore() {
       <div>
         <div class="pannello riga">
           <label>Leader <select id="leader"><option value="">—</option>${CAT.leader.map((l) =>
-            `<option value="${l.id}" ${l.id === mazzo.leader ? "selected" : ""}>${esc(l.id)} (${l.colori.map((c) => CAT.colori[c]).join("/")})</option>`).join("")}</select></label>
+            `<option value="${l.id}" ${l.id === mazzo.leader ? "selected" : ""}>${esc(l.nome)} (${l.colori.map((c) => CAT.colori[c]).join("/")})</option>`).join("")}</select></label>
           <label>Parti da un mazzo di riferimento <select id="rif"><option value="">—</option>${CAT.mazzi.map((m, i) =>
             `<option value="${i}">${esc(m.nome)}</option>`).join("")}</select></label>
         </div>
-        ${mazzo.leader ? `<div class="pannello riga">${eroeHTML(mazzo.leader)}<div style="flex:1;min-width:220px"><h3>${esc(mazzo.leader)}</h3>${leaderTesti(mazzo.leader)}</div></div>` : ""}
+        ${mazzo.leader ? `<div class="pannello riga">${eroeHTML(mazzo.leader)}<div style="flex:1;min-width:220px"><h3>${esc(nomeL(mazzo.leader))}</h3>${leaderTesti(mazzo.leader)}</div></div>` : ""}
         <div class="pannello riga">
           <input id="f-testo" placeholder="cerca ID, testo o parola chiave" value="${esc(filtro.testo)}">
           <select id="f-tipo"><option value="">tutti i tipi</option>${tipi.map((t) => `<option ${t === filtro.tipo ? "selected" : ""}>${esc(t)}</option>`).join("")}</select>
@@ -420,7 +424,7 @@ function renderCostruttore() {
 function cambia(id, d) {
   const k = Math.max(0, (mazzo.carte[id] || 0) + d);
   const g = gruppi(mazzo.carte)[CARTA[id].gruppo];
-  if (d > 0 && (g ? g.n : 0) >= CARTA[id].max) return errore(`${id}: al massimo ${CARTA[id].max} copie`);
+  if (d > 0 && (g ? g.n : 0) >= CARTA[id].max) return errore(`${nomeC(id)}: al massimo ${CARTA[id].max} copie`);
   if (k) mazzo.carte[id] = k; else delete mazzo.carte[id];
   salvaMazzo(); renderLista();
   const el = $(`[data-copie="${id}"]`); if (el) el.textContent = k;
@@ -429,7 +433,7 @@ function cambia(id, d) {
 function renderPool() {
   const t = filtro.testo.toLowerCase();
   const ids = CAT.carte.filter((c) => (!filtro.tipo || c.tipo === filtro.tipo)
-    && (!t || c.id.toLowerCase().includes(t) || c.testo.toLowerCase().includes(t) || c.parole.join(" ").includes(t))
+    && (!t || c.id.toLowerCase().includes(t) || c.nome.toLowerCase().includes(t) || c.testo.toLowerCase().includes(t) || c.parole.join(" ").includes(t))
     && (!filtro.solo_legali || legale(c.id))).map((c) => c.id);
   $("#pool").innerHTML = ids.map((id) => `<div class="slot">${cartaHTML(id, { classi: legale(id) ? "" : "illegale" })}
     <div class="contatore"><button class="piccolo" data-d="-1" data-id="${id}">−</button><b data-copie="${id}">${mazzo.carte[id] || 0}</b>
@@ -546,7 +550,7 @@ function unitaHTML(u, lato, extraCl = "") {
   const mod = u.mod || [], inScontro = mod.filter((m) => m.scontro).reduce((a, m) => a + m.v, 0);
   return `<div class="unita ${u.pronta ? "" : "ruotata"} ${c.parole.includes("scudo") ? "scudo" : ""} ${extraCl}" style="${colVars(c.colori)}"
       data-ent="${lato}:${u.uid}" data-card="${u.id}" data-uid="${lato}:${u.uid}" ${mod.length ? `data-mod="${esc(JSON.stringify(mod))}"` : ""}>
-    <div class="u-dentro"><span class="u-kw">${kw}</span><span class="icona">${ICONA[c.tipo]}</span><span class="u-nome">${esc(u.id)}</span></div>
+    <div class="u-dentro"><span class="u-kw">${kw}</span><span class="icona">${ICONA[c.tipo]}</span><span class="u-nome">${esc(nomeC(u.id))}</span></div>
     ${mod.length ? `<div class="u-mod">${mod.map((m) => `<span class="${m.scontro ? "cond" : m.v > 0 ? "su" : "giu"}">${m.v > 0 ? "+" : ""}${m.v}</span>`).join("")}</div>` : ""}
     <div class="u-forza ${delta}"><b>${u.forza}</b>${inScontro ? `<small>+${inScontro}⚔</small>` : ""}</div></div>`;
 }
@@ -554,7 +558,7 @@ function unitaHTML(u, lato, extraCl = "") {
 function reliquiaHTML(id, k) {
   const c = CARTA[id];
   return `<div class="unita reliquia" style="${colVars(c.colori)}" data-card="${id}" data-rel="${k}">
-    <div class="u-dentro"><span class="icona">${ICONA[c.tipo]}</span><span class="u-nome">${esc(id)}</span></div></div>`;
+    <div class="u-dentro"><span class="icona">${ICONA[c.tipo]}</span><span class="u-nome">${esc(nomeC(id))}</span></div></div>`;
 }
 
 function gemmeHTML(n, max, cl) {
@@ -569,7 +573,7 @@ function plancia(g, nome, lato) {
   let cuori = "";
   for (let i = 0; i < vmax; i++) cuori += `<span class="${i < g.vite ? "" : "perso"}">♥</span>`;
   const cic = g.cicatrici.map((s) => `<span class="cic ${s.fresca ? "fresca" : ""}" style="${colVars(CARTA[s.id]?.colori)}"
-      data-card="${s.id}" ${lato === "io" ? `data-scar="${s.id}"` : ""}>${esc(s.id)}</span>`).join("");
+      data-card="${s.id}" ${lato === "io" ? `data-scar="${s.id}"` : ""}>${esc(nomeC(s.id))}</span>`).join("");
   return `<div class="lato-info">
     ${eroeHTML(L.id, L, `${lato}:L`).replace('class="eroe', `class="eroe ${g.alle_corde ? "corde" : ""}`)}
     <div class="risorse">
