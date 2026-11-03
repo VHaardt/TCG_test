@@ -1,5 +1,5 @@
 ---
-versione: 1.1
+versione: 1.2
 basato_su: v0.2.7
 preset: V027
 ---
@@ -200,7 +200,7 @@ Un attacco è un'azione della fase principale e si risolve in **sei passi**. Il 
 1. **Dichiarazione.** Scegli un tuo personaggio dritto e **ruotalo**. Si risolvono gli effetti "quando attacca".
 2. **Opposizione (difensore).** Il difensore può ruotare **una** sua Unità dritta: diventa lei il bersaglio al posto del Leader. Il Leader non può opporsi.
 3. **Impegno dell'attaccante.** Metti al centro da 0 a tutte le tue gemme di Brace, **scoperte**. Ognuna vale +{{forza_per_gemma}}.
-4. **Risposta del difensore.** Dopo aver visto le tue gemme, il difensore mette al centro da 0 a tutte le sue gemme di Guardia e può giocare **al massimo una Reazione**, dalla mano o da una sua Cicatrice dritta. Le sue gemme pagano prima il costo della Reazione; ognuna delle restanti vale +{{parata_per_gemma}} (**Parata**).
+4. **Risposta del difensore.** Dopo aver visto le tue gemme, il difensore mette al centro da 0 a tutte le sue gemme di Guardia e può giocare **al massimo una Reazione**, dalla mano o da una sua Cicatrice dritta. Le sue gemme pagano prima il costo della Reazione (che si gioca solo se lo pagano e se vale la condizione che stampa, quando ne ha una); ognuna delle restanti vale +{{parata_per_gemma}} (**Parata**).
 5. **Confronto.** Si confrontano la Forza dell'attaccante e il valore di difesa del bersaglio.
 6. **Esiti.** Le Unità sconfitte vanno negli Scarti, il Leader colpito perde una Vita, tutte le gemme impegnate tornano nella scorta e si risolvono gli effetti "quando sconfigge" e "dopo lo scontro".
 
@@ -413,6 +413,8 @@ Al più tardi, un giocatore perde nel Ripristino di G1 di questi round, a second
 
 **Una Reazione a partita?** No: al massimo **una per attacco**. Puoi usarne una in ogni attacco avversario, se hai le gemme di Guardia per pagarle.
 
+**Reazioni a costo 0.** Alcune Reazioni non costano gemme: puoi giocarle anche senza impegnare Guardia. Hanno sempre una condizione stampata ("Giocala solo se…") e non hanno effetti dopo lo scontro.
+
 **Reazione dalle Cicatrici.** Una Reazione tra le tue Cicatrici dritte si gioca come se fosse in mano. Dopo l'uso va negli Scarti.
 
 **Stanca nel turno avversario.** Un effetto Stanca che si risolverebbe nel turno avversario non ha effetto.
@@ -424,6 +426,9 @@ Al più tardi, un giocatore perde nel Ripristino di G1 di questi round, a second
 - Effetti sul tracciato del round o sulla Brace che riceve l'avversario.
 - Blocchi che impediscono a un personaggio di raddrizzarsi per più di un turno.
 - Dadi o monete: il caso sta solo nella pescata.
+- Perdite di Vita nel turno avversario: nessuna carta ti fa perdere Vite mentre difendi e nessuna dice "l'avversario perde Vite". I costi in Vita si pagano solo nella tua fase principale.
+- Pescate fuori dal tuo turno a mazzo vuoto: una carta che fa pescare nel turno avversario dice sempre "se il tuo mazzo non è vuoto".
+- Abilità :ruota: usate fuori dalla tua fase principale: si attivano solo lì.
 
 ## Riepilogo rapido
 
