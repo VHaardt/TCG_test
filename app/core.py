@@ -2,11 +2,14 @@
 
 Il motore è sim/v02 usato come libreria: l'app non contiene regole del gioco.
 - Carte e Leader: il file del set (CICATRICI_SET, poi la cartella condivisa, poi app/dati).
+- Nomi delle carte (Q-029): la mappa ID → nome (CICATRICI_NOMI, poi la cartella condivisa, poi app/dati).
+  Gli ID restano le chiavi; il nome sostituisce l'ID ovunque l'app lo mostra.
 - Regole: un preset di sim/v02/config.py o un file json di variante (CICATRICI_REGOLE).
 - Costruzione: sim/v02/decks.problems con i limiti delle regole (decks.limits: carte, copie per nome,
   copie per rarità, multicolore).
 Ogni azione mostrata al giocatore è un elemento di GameState.legal_actions()."""
 import copy
+import dataclasses
 import json
 import os
 import random
@@ -22,6 +25,7 @@ from sim.v02.engine import CARDS, LEADERS, G1, G2, COMBAT_CONDS
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 SHARED = "/mnt/project-files/tcg/set/finale"
+NOMI_SHARED = "/mnt/project-files/tcg/set/nomi/nomi_v02.json"
 B0C05 = "/mnt/project-files/tcg/swarm/questioni/Q-026_feedback_playtest/liste_B0c05/mazzi.json"
 COLORI = {"R": "Rosso", "B": "Blu", "K": "Nero", "G": "Verde"}
 TIPI = {"unit": "Unità", "tactic": "Tattica", "reaction": "Reazione", "relic": "Reliquia"}
@@ -61,11 +65,19 @@ class Dati:
         self.rules = rules_from(spec)
         self.limiti = decks.limits(self.rules)
         engine.load_cards(self.set_path)
-        self.info = decks.card_info()
+        self.nomi_path = _first(os.environ.get("CICATRICI_NOMI"), NOMI_SHARED, os.path.join(HERE, "dati", "nomi_v02.json"))
+        self.nomi = applica_nomi(self.nomi_path)
         with open(self.set_path, encoding="utf-8") as f:
             raw = json.load(f)
         self.set_info = {k: raw.get(k) for k in ("version", "rules", "data")}
         self.rarity = {c["id"]: c.get("rarity") for c in raw["cards"]}
+        # rarità della tabella Q-026 (C/R/E/L), se la mappa dei nomi la porta: vale per mostrare la carta,
+        # per il draft e per il limite delle Leggendarie (la rarità non cambia le partite)
+        for cid, r in self.nomi.get("rarita", {}).items():
+            if cid in self.rarity:
+                self.rarity[cid] = r
+                engine.META.setdefault(cid, {})["rarity"] = r
+        self.info = decks.card_info()
         # mazzi di riferimento: il primo file che ne ha di legali con le regole in vigore
         # (a 2 copie: le liste B0c05 di Q-026; a 3 copie: i mazzi del set)
         self.riferimento, self.mazzi_path = [], None
@@ -86,7 +98,10 @@ class Dati:
                 break
 
     def problemi(self, leader, carte):
-        return decks.problems(leader, carte, rules=self.rules, info=self.info)
+        """Problemi di costruzione del motore, con il nome della carta al posto dell'ID in testa al messaggio."""
+        out = decks.problems(leader, carte, rules=self.rules, info=self.info)
+        return [CARDS[m.split(":", 1)[0]].name + ":" + m.split(":", 1)[1] if m.split(":", 1)[0] in CARDS else m
+                for m in out]
 
     def gruppo(self, cid):
         """Chiave del limite di copie: il nome (le gemelle contano insieme) o l'ID."""
@@ -113,6 +128,21 @@ class Dati:
                               "tempra": r.tempra, "vite": r.life, "guardia_max": r.guard_max,
                               "guardia_max_risvegliato": r.guard_max_awakened, "risveglio_a_vite": r.awaken_at_life},
         }
+
+
+def applica_nomi(path):
+    """Dà a carte e Leader caricati il nome della mappa Q-029 ({"carte": {id: nome}, "leader": {id: nome}}).
+    Il nome è anche la chiave del limite di copie per nome: le gemelle hanno lo stesso nome (Q-026 V1).
+    Senza mappa, o per gli ID che non ci sono, resta il nome del set (di solito l'ID)."""
+    if not path:
+        return {}
+    with open(path, encoding="utf-8") as f:
+        m = json.load(f)
+    for db, chiave in ((CARDS, "carte"), (LEADERS, "leader")):
+        for i, nome in m.get(chiave, {}).items():
+            if i in db:
+                db[i] = dataclasses.replace(db[i], name=nome)
+    return m
 
 
 def sort_key(c):
@@ -903,7 +933,7 @@ def _etichetta(s, q, act):
         txt = f"Impegna {gems} gemme di Guardia"
         if react:
             cid, src = react
-            txt += f" con la Reazione {cid} {'dalla mano' if src == 'hand' else 'dalle Cicatrici'} (costo {s.react_cost(cid)})"
+            txt += f" con la Reazione {CARDS[cid].name} {'dalla mano' if src == 'hand' else 'dalle Cicatrici'} (costo {s.react_cost(cid)})"
         cb = s.combat
         if cb.a is not None and (cb.a_visible or q == a):
             fa, db = _forza_su(s, cb.a, gems, react)

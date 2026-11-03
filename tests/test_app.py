@@ -149,7 +149,7 @@ def test_trigger_targets_are_asked_and_applied():
                 cid = st.partita["s"].unit(d["side"], alt).cid
                 n0 = len(st.partita["s"].log)
                 _api("/api/bersaglio", {**a, "versione": v["versione"], "uid": alt})
-                assert any(ln.strip().startswith(f"{cid} di P{d['side'] + 1}") for ln in st.partita["s"].log[n0:]), cid
+                assert any(ln.strip().startswith(f"{E.CARDS[cid].name} di P{d['side'] + 1}") for ln in st.partita["s"].log[n0:]), cid
                 asked += 1
                 continue
             _api("/api/azione", {**a, "versione": v["versione"], "indice": rng.choice(v["azioni"])["i"]})
@@ -364,6 +364,28 @@ def test_r026_free_reaction_shows_cost_0_and_counts():
         assert sum(x["v"] for x in conto["dif"] if x["v"]) == conto["db"]
     finally:
         _set_app()
+
+
+def test_q030_names_replace_ids_and_twins_share_the_copy_limit():
+    d = core.dati()
+    if not d.nomi:
+        return                                      # nessuna mappa dei nomi: l'app mostra gli ID
+    cat = d.catalogo()
+    nomi = {c["id"]: c["nome"] for c in cat["carte"]}
+    assert all(nomi[i] == d.nomi["carte"][i] for i in nomi if i in d.nomi["carte"])
+    assert all(l["nome"] != l["id"] for l in cat["leader"])
+    # gemelle Q-026 (gruppo 1: ROS-004, NER-005, VER-005): stesso nome, quindi stesso gruppo del limite di copie
+    gem = [c for c in cat["carte"] if c["id"] in ("ROS-004", "NER-005", "VER-005")]
+    if len(gem) == 3 and d.limiti["copies_by_name"]:
+        assert len({c["gruppo"] for c in gem}) == 1
+    # un nome diverso per ogni carta che non è gemella
+    per_nome = {}
+    for c in cat["carte"]:
+        per_nome.setdefault(c["nome"], set()).add(c["testo"])
+    assert all(len(t) == 1 for t in per_nome.values()), [n for n, t in per_nome.items() if len(t) > 1]
+    # i problemi di costruzione nominano la carta, non l'ID
+    probs = d.problemi("LDR-01", {"NER-001": 1})
+    assert any(p.startswith(nomi["NER-001"] + ":") for p in probs), probs
 
 
 def teardown_module():
