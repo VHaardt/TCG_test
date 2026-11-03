@@ -30,7 +30,9 @@ OPS = {"draw": {"n"}, "att_mod": {"n"}, "def_mod": {"n"},
        "bounce": {"target", "sel"},                  # R-026: l'Unità torna in mano al suo proprietario
        "recover": {"from", "sel", "n"}}              # R-026: riprendi in mano dai tuoi Scarti una carta che soddisfa "sel"
 RECOVER_SEL = {"kind", "cost_le", "without_trigger"}
-G1_NO_REWARD = {"draw", "recover"}                    # G1: un sacrificio non dà mai come premio pescare o riprendere carte
+G1_NO_REWARD = {"draw", "recover"}
+# R-027 (Q-029), regole di set ratificate: eventi che possono scattare nel turno avversario
+OPP_TURN_EVENTS = {"on_oppose", "on_defeats_attacker", "on_own_reaction", "on_own_unit_defeats_unit"}                    # G1: un sacrificio non dà mai come premio pescare o riprendere carte
 OP_TARGETS = {"chosen", "self", "opposer", "attacker"}
 
 
@@ -154,6 +156,14 @@ class _V:
                 if "sel" in o:
                     self.selector(w + ".sel", o["sel"])
 
+    def safe_draws(self, where, ops, outer=None):
+        """R-027 (2): fuori dal proprio turno ogni `draw` ha {"deck_nonempty": true} (mai Vita persa a mazzo vuoto)."""
+        guard = any(c == {"deck_nonempty": True} for c in outer or [] if isinstance(c, dict))
+        for i, o in enumerate(ops if isinstance(ops, list) else []):
+            if isinstance(o, dict) and o.get("op") == "draw" and not guard \
+                    and {"deck_nonempty": True} not in (o.get("if") or []):
+                self.err(f"{where}[{i}]", "R-027 (2): una pesca fuori dal tuo turno vuole {\"deck_nonempty\": true}")
+
     def costs(self, where, costs, tactic=False):
         if costs is None:
             return
@@ -221,6 +231,8 @@ class _V:
                 self.err(where, "'stack' vuole true/false")
             if ab["trigger"] not in EVENTS:
                 self.err(where, f"evento sconosciuto '{ab['trigger']}'")
+            if ab["trigger"] in OPP_TURN_EVENTS:
+                self.safe_draws(where + ".do", ab.get("do", []), ab.get("if"))
             self.conds(where + ".if", ab.get("if"))
             if "target" in ab:
                 self.selector(where + ".target", ab["target"])
@@ -273,7 +285,18 @@ class _V:
                 for k in ("do", "do_from_scars"):
                     if k in r:
                         self.ops(f"{cid}.react.{k}", r[k], False, True)
+                        self.safe_draws(f"{cid}.react.{k}", r[k])
                 self.conds(cid + ".react.play_if", r.get("play_if"))
+                if c.get("cost") == 0:                       # R-027 (4)
+                    if not r.get("play_if"):
+                        self.err(cid, "R-027 (4): una Reazione a costo 0 vuole almeno una condizione in 'play_if'")
+                    if any(isinstance(o, dict) and "target" in o for k in ("do", "do_from_scars") for o in r.get(k) or []):
+                        self.err(cid, "R-027 (4): una Reazione a costo 0 non ha effetti dopo lo scontro (op con 'target')")
+        if c.get("type") == "reaction":                      # R-027 (1): costi in Vita solo nella tua fase principale
+            def life(x):
+                return isinstance(x, dict) and ("lose_life" in x or any(life(y) for y in x.get("any") or []))
+            if any(life(x) for x in c.get("costs") or []):
+                self.err(cid, "R-027 (1): una Reazione non ha costi in Vita (si paga nel turno avversario)")
         if c.get("type") == "reaction" and not c.get("react"):
             self.err(cid, "Reazione senza 'react'")
 

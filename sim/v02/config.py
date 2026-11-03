@@ -60,6 +60,7 @@ class Rules2:
     rarity_scale: tuple = ()           # rarità ammesse; fuori scala è solo un avviso di `valida` (la rarità non cambia le partite)
     # R-026 (Q-027)
     react_min_cost: int = 0            # costo minimo di una Reazione in gemme; §8 C4 (a) non ne fissa uno (prima il motore usava 1)
+    reazione_da_cicatrice_costo: int = 0   # R-027 P9b: gemme in più (−1 = una in meno) per una Reazione giocata da una Cicatrice
     g2_recupero: bool = True           # G2: un effetto che prende carte dagli Scarti non prende una carta che prende dagli Scarti
 
     # limits

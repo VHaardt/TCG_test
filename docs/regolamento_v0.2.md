@@ -2,7 +2,7 @@
 
 | Campo | Valore |
 |---|---|
-| Versione | v0.2.7 (nucleo di v0.2.6; costruzione del mazzo da Q-026) |
+| Versione | v0.2.8 (nucleo di v0.2.6; costruzione del mazzo da Q-026; leggi di design da Q-029) |
 | Data | 2026-10-13 |
 | Stato | **ratificato dallo swarm (Q-013, 8/8 APPROVO); pilastri 2–3–4–6 in revisione, vedi pilastri** (`pilastri_design_v0.2.md`) |
 | Fonte normativa | `swarm/questioni/Q-013_rework_nucleo_v0.2/esito.md`, sezione A "Specifica consolidata". Dati: `swarm/esperimenti/E-014/sintesi_r3.md` |
@@ -253,7 +253,7 @@ L'attaccante sposta nell'impegno da 0 a tutte le sue gemme di Brace, **scoperte*
 
 ### C4. Risposta del difensore
 Dopo aver visto l'impegno dell'attaccante, il difensore sposta nell'impegno da 0 a tutte le sue gemme di Guardia, e può giocare **al massimo una** carta Reazione presa dalla mano o da una sua Cicatrice **dritta**.
-- **(a)** Le gemme del difensore pagano prima il costo della Reazione. Una Reazione si gioca solo se le gemme impegnate ne pagano il costo.
+- **(a)** Le gemme del difensore pagano prima il costo della Reazione. Una Reazione si gioca solo se le gemme impegnate ne pagano il costo, e solo se vale la sua condizione di gioco, quando ne stampa una. Una Reazione a costo 0 si gioca anche senza gemme impegnate (§14, legge 15).
 - **(b)** Ogni gemma restante del difensore dà **+2** al valore di difesa del bersaglio (**Parata**). L'**impegno** del difensore sono tutte le gemme che sposta in C4, compresa quella che paga la Reazione; la **Parata** sono quelle che restano dopo il costo. Le condizioni sulle gemme del difensore (Impeto da bersaglio, statiche dei Leader e delle carte) contano **solo la Parata** (Q-015 S-2). Per l'attaccante contano tutte le gemme impegnate.
 - **(c)** Ogni gemma dell'attaccante dà **+1** alla sua Forza [`forza_per_gemma` 1].
 - **(d)** Si risolve la Reazione. Si leggono le condizioni sulle gemme (**Impeto**, §12.2; per il difensore solo la Parata) e le abilità di Reazione dei Leader, che sono **statiche** (testi sempre attivi, che non ruotano il Leader e non si pagano).
@@ -488,7 +488,14 @@ Il costo di una Reazione si paga con le gemme di Guardia impegnate in C4. Le car
 10. **Risposte agli Scudo**: ogni colore ha almeno una risposta comune agli Scudo e ai muri (stancare, ignorare lo Scudo o colpire chi si oppone); almeno 3 colori su 4, più le Neutrali, hanno effetti Stanca economici.
 11. Ogni testo deve poter essere scritto nel simulatore senza casi speciali: un costo non pagabile rende l'azione illegale; i trigger hanno un punto fisso nella sequenza.
 
-**Regole di set proposte (al thread carte, non ancora leggi).** Ogni Reazione costa almeno 1 (il simulatore la applica già); nessun effetto rimette gemme in Guardia durante uno scontro; gli effetti che fanno perdere Vite si risolvono solo nella fase principale di chi li controlla, nessuna Reazione ha un costo in Vita e non esistono effetti "l'avversario perde Vite"; una Reazione a costo N dà più di 2N di difesa equivalente. **Vincolo in vigore fino al voto della variante P8 (§17.4):** nessuna carta stampa costi in Vita pagabili nel turno avversario né effetti "l'avversario perde Vite".
+12. **Vita solo nel tuo turno** (Q-029, P8 8/8): una carta fa perdere Vita al suo controllore solo con un costo pagato nella sua fase principale, anche dentro un costo a scelta. Nessuna Reazione ha un costo in Vita, nessun trigger che può scattare nel turno avversario fa perdere Vita e non esistono effetti "l'avversario perde Vite".
+13. **Pesca fuori dal tuo turno** (Q-029): ogni pesca che può avvenire nel turno avversario stampa "se il tuo mazzo non è vuoto" (pescare da un mazzo vuoto fa perdere Vita, §9).
+14. Le abilità ⟳ si attivano solo nella tua fase principale (§6.3).
+15. **Reazioni a costo 0** (Q-029, 8/8): una Reazione a costo stampato 0 stampa una condizione di gioco ("Giocala solo se…") e non ha effetti dopo lo scontro.
+
+Il simulatore controlla le leggi 12, 13 e 15 in `valida` e rifiuta le carte che non le rispettano; la 14 è nella struttura del turno.
+
+**Regole di set proposte (al thread carte, non ancora leggi).** Nessun effetto rimette gemme in Guardia durante uno scontro; una Reazione a costo N dà più di 2N di difesa equivalente.
 
 ---
 
@@ -589,6 +596,7 @@ Nomi dei parametri da `sim/v02/config.py`; preset del simulatore: `V02` (nucleo 
 | Muro di Scudi | 1 gemma, +4 | `muro_bonus` 4 | Provvisorio |
 | Grido dalla Cicatrice | 1 gemma; −3 dalla mano, −5 dalle Cicatrici | `grido_hand` 3, `grido_scars` 5 | Provvisorio |
 | Rimarginare | ⟳ del Leader + 1 Brace | — | Niente limite "1 volta per turno" |
+| Costo delle Reazioni | quello stampato, anche 0 (§14, legge 15) | `react_min_cost` 0, `reazione_da_cicatrice_costo` 0 | Q-029; −1 da Cicatrice è la variante P9b, in prova |
 
 ### 16.1 Numeri misurati (E-014, base finale: Tempra 4, impegno sequenziale)
 Mazzi convertiti da v0.1, mirror, IA semplice, 10.000 partite salvo dove indicato.
@@ -643,10 +651,9 @@ Le regole qui sotto sono già nel testo come default. Ogni variante si misura **
 - **Poi, se il problema è il costo:** variante di Ne, `reazione_da_cicatrice_costo` −1 (minimo 0) per le Reazioni giocate da Cicatrici dritte.
 - **Metrica:** ≥ 0.10 Reazioni per scontro sui mazzi del set; rimonte in salita.
 
-### 17.4 P8 — Cicatrici fresche: correzione in coda (livello 3)
-- **Buco latente** (trovato da Bl e Cr): un Leader Alle Corde senza fresche che perde Vita nel turno avversario (per un costo in Vita o per un effetto "l'avversario perde Vite") riceve una fresca e diventa immune al colpo finale per il resto del turno. Nessuna carta attuale lo apre.
-- **Correzione di Cr (nucleo):** una Vita pagata come costo entra dritta e non conta per il Saldo, come il Crepuscolo. Da votare **prima** che il set introduca costi in Vita nel turno avversario.
-- **Regole di set di Bl:** vedi §14. Fino al voto vale il vincolo del §14.
+### 17.4 P8 — Cicatrici fresche: CHIUSA (Q-029, 8/8)
+- **Buco latente** (trovato da Bl e Cr): un Leader Alle Corde senza fresche che perdesse Vita nel turno avversario riceverebbe una fresca e diventerebbe immune al colpo finale per il resto del turno.
+- **Esito:** il buco resta chiuso dalle leggi di design 12 e 13 del §14, rese permanenti e controllate da `valida`; la correzione di nucleo di Cr non serve.
 - **Condizione di revisione:** più di 1 errore di stato a partita sulle fresche nel playtest fisico → segnalino del Saldo.
 
 ### 17.5 Coda dei test, nell'ordine chiesto dai votanti
@@ -711,3 +718,4 @@ I moduli di v0.1 §17 (campo di battaglia, zone contese, round condiviso, Fulcro
 | v0.2.6 | 2026-10-18 | Q-022 (livello 3, ratificata 8/8; P6 scelta da Vittorio: opzione B, taratura sull'IA forte): compensazione di G2 nei soli round 1 e 3 (§2, §6, §11, §16, §17.1); al §11 la dichiarazione che a Vite pari allo spareggio perde G1 come parte del vantaggio di posto; spareggio `vite_attivo` invariato. Preset del simulatore V026. |
 | v0.2.6 (testo) | 2026-10-22 | Solo testo, nessuna regola cambiata: §10.1 chiude il rimando a Q-017; §12.3 Esposto "salvo Caccia"; Scudo "quando è il bersaglio" in §12.2, §12.3 e glossario, come già nel motore e nei testi del set. |
 | v0.2.7 | 2026-10-26 | Q-026 (V1 e V2 8/8, vincoli di Vittorio): §2.3 con 2 copie per nome (le gemelle contano insieme), Leggendarie in 1 copia, carta multicolore con tutti i suoi colori nel Leader, rarità Comune/Rara/Epica/Leggendaria; costo aggiuntivo "Stanca una tua Unità Pronta", anche in alternativa a un costo in Vita (M1). Glossario: Costo aggiuntivo, Gemelle, Leggendaria, Rarità, Stanca. Il gioco non cambia: preset V027 = V026 più la costruzione. |
+| v0.2.8 | 2026-11-03 | Q-029 (P8 e Reazioni a costo 0, 8/8): al §14 le leggi di design 12–15 (Vita solo nel tuo turno, pesca fuori dal tuo turno con "se il tuo mazzo non è vuoto", ⟳ solo nel tuo turno, Reazioni a costo 0 con condizione di gioco e senza effetti dopo lo scontro), controllate da `valida`; tolta la regola proposta "ogni Reazione costa almeno 1"; §8 C4 (a) con la condizione di gioco; §17.4 P8 chiusa; §16 con il costo delle Reazioni. Nessuna regola di partita cambiata. |

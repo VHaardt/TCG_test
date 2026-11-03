@@ -531,7 +531,7 @@ def render_r012(recs, traccia=()):
         for d in decks:
             x = per[d]; n = max(x["n"], 1); tr = x.get("tr", {})
             L.append(f"| {D.label(d)} | {x.get('fa_alta_wins', 0)/n:.2f} | " + " | ".join(f"{tr.get(c, {}).get('f', 0)/n:.2f}" for c in traccia) + " |")
-    return L + render_m5(recs) + render_q027(recs) + [""]
+    return L + render_m5(recs) + render_q027(recs) + render_p9b(recs) + [""]
 
 
 def render_m5(recs):
@@ -582,7 +582,7 @@ def render_q027(recs):
         return []
     decks = sorted({d for r in recs for d in r["decks"]})
     srcs = ("sconfiggi", "caccia", "rimbalzo", "sacrificio")
-    per = {d: {"n": 0, "idle": 0, "ut": 0, "react": 0, "def": 0, "comb": 0, "sac": 0, "rec": 0, "src": {}} for d in decks}
+    per = {d: {"n": 0, "idle": 0, "ut": 0, "react": 0, "legal": 0, "def": 0, "comb": 0, "sac": 0, "rec": 0, "src": {}} for d in decks}
     for r in recs:
         st = r["stats"]
         for q in (0, 1):
@@ -590,19 +590,48 @@ def render_q027(recs):
             x["n"] += 1
             x["idle"] += st["unit_idle"][q]; x["ut"] += st["unit_turns"][q]
             x["react"] += st["reactions"][q]; x["def"] += st["attacks"][1 - q]
+            x["legal"] += st.get("react_legal", [0, 0])[q]
             x["comb"] += st["units_defeated_in_combat"][q]
             x["sac"] += st["sacrifices"][q]; x["rec"] += st["recovers"][q]
             for k, v in st["removals_src"][q].items():
                 x["src"][k] = x["src"].get(k, 0) + v
     L = ["", "## R-026 (Q-027): interattività per Leader (per partita del mazzo)", "",
          "| Mazzo | n | Unità ferme (M6) | Reazioni per scontro difeso | Rimozioni: sconfiggi | caccia | rimbalzo | sacrificio (tue) "
-         "| Unità avversarie sconfitte in scontro | Sacrifici | Recuperi |",
-         "|---|---|---|---|---|---|---|---|---|---|---|"]
+         "| Unità avversarie sconfitte in scontro | Sacrifici | Recuperi | Scontri difesi con una Reazione giocabile |",
+         "|---|---|---|---|---|---|---|---|---|---|---|---|"]
     for d in decks:
         x = per[d]; n = max(x["n"], 1)
         L.append(f"| {D.label(d)} | {x['n']} | {100 * x['idle'] / max(x['ut'], 1):.1f}% | {x['react'] / max(x['def'], 1):.3f} | "
                  + " | ".join(f"{x['src'].get(k, 0) / n:.2f}" for k in srcs)
-                 + f" | {x['comb'] / n:.2f} | {x['sac'] / n:.2f} | {x['rec'] / n:.2f} |")
+                 + f" | {x['comb'] / n:.2f} | {x['sac'] / n:.2f} | {x['rec'] / n:.2f} | {x['legal'] / max(x['def'], 1):.3f} |")
+    return L
+
+
+def render_p9b(recs):
+    """R-027 P9b: Reazioni per scontro difeso, per fonte (mano / Cicatrice) e per livello: disponibile, giocabile con la Guardia,
+    legale con le gemme impegnate, giocata; a parte gli scontri in cui il difensore ha impegnato gemme e quelli a zero."""
+    if not recs or "react_diag" not in recs[0]["stats"]:
+        return []
+    decks = sorted({d for r in recs for d in r["decks"]})
+    per = {d: {} for d in decks}
+    for r in recs:
+        for q in (0, 1):
+            x = per[r["decks"][q]]
+            for k, v in r["stats"]["react_diag"][q].items():
+                x[k] = x.get(k, 0) + v
+    levs = ("disp", "guardia", "impegno", "giocata")
+    L = ["", "## R-027 P9b: Reazioni per scontro difeso (disponibile / giocabile con la Guardia / legale con l'impegno / giocata)", "",
+         "| Mazzo | Fonte | Scontri con gemme del difensore | disp | giocabile | con l'impegno | giocata | Scontri a zero gemme | disp | giocabile | con l'impegno | giocata |",
+         "|---|---|---|---|---|---|---|---|---|---|---|---|"]
+    for d in decks:
+        x = per[d]
+        for src, lab in (("hand", "mano"), ("scar", "Cicatrice")):
+            cells = []
+            for g in ("gemme", "zero"):
+                n = x.get(f"scontri|{g}", 0)
+                cells.append(str(n))
+                cells += [f"{x.get(f'{src}|{lv}|{g}', 0) / max(n, 1):.3f}" for lv in levs]
+            L.append(f"| {D.label(d)} | {lab} | " + " | ".join(cells) + " |")
     return L
 
 
