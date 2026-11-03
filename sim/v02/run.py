@@ -531,7 +531,7 @@ def render_r012(recs, traccia=()):
         for d in decks:
             x = per[d]; n = max(x["n"], 1); tr = x.get("tr", {})
             L.append(f"| {D.label(d)} | {x.get('fa_alta_wins', 0)/n:.2f} | " + " | ".join(f"{tr.get(c, {}).get('f', 0)/n:.2f}" for c in traccia) + " |")
-    return L + render_m5(recs) + render_q027(recs) + [""]
+    return L + render_m5(recs) + render_q027(recs) + render_p9b(recs) + [""]
 
 
 def render_m5(recs):
@@ -604,6 +604,34 @@ def render_q027(recs):
         L.append(f"| {D.label(d)} | {x['n']} | {100 * x['idle'] / max(x['ut'], 1):.1f}% | {x['react'] / max(x['def'], 1):.3f} | "
                  + " | ".join(f"{x['src'].get(k, 0) / n:.2f}" for k in srcs)
                  + f" | {x['comb'] / n:.2f} | {x['sac'] / n:.2f} | {x['rec'] / n:.2f} | {x['legal'] / max(x['def'], 1):.3f} |")
+    return L
+
+
+def render_p9b(recs):
+    """R-027 P9b: Reazioni per scontro difeso, per fonte (mano / Cicatrice) e per livello: disponibile, giocabile con la Guardia,
+    legale con le gemme impegnate, giocata; a parte gli scontri in cui il difensore ha impegnato gemme e quelli a zero."""
+    if not recs or "react_diag" not in recs[0]["stats"]:
+        return []
+    decks = sorted({d for r in recs for d in r["decks"]})
+    per = {d: {} for d in decks}
+    for r in recs:
+        for q in (0, 1):
+            x = per[r["decks"][q]]
+            for k, v in r["stats"]["react_diag"][q].items():
+                x[k] = x.get(k, 0) + v
+    levs = ("disp", "guardia", "impegno", "giocata")
+    L = ["", "## R-027 P9b: Reazioni per scontro difeso (disponibile / giocabile con la Guardia / legale con l'impegno / giocata)", "",
+         "| Mazzo | Fonte | Scontri con gemme del difensore | disp | giocabile | con l'impegno | giocata | Scontri a zero gemme | disp | giocabile | con l'impegno | giocata |",
+         "|---|---|---|---|---|---|---|---|---|---|---|---|"]
+    for d in decks:
+        x = per[d]
+        for src, lab in (("hand", "mano"), ("scar", "Cicatrice")):
+            cells = []
+            for g in ("gemme", "zero"):
+                n = x.get(f"scontri|{g}", 0)
+                cells.append(str(n))
+                cells += [f"{x.get(f'{src}|{lv}|{g}', 0) / max(n, 1):.3f}" for lv in levs]
+            L.append(f"| {D.label(d)} | {lab} | " + " | ".join(cells) + " |")
     return L
 
 

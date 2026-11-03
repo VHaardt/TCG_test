@@ -140,6 +140,7 @@
    "abilities": [
     {
      "trigger": "on_defeats_attacker",
+     "if": [{"deck_nonempty": true}],
      "do": [
       {
        "op": "draw",
@@ -275,6 +276,7 @@
    "abilities": [
     {
      "trigger": "on_own_unit_defeats_unit",
+     "if": [{"deck_nonempty": true}],
      "do": [
       {
        "op": "draw",

@@ -184,6 +184,7 @@ def new_stats():
         "removals_src": [{}, {}],                                        # "sconfiggi" / "caccia" / "rimbalzo" su Unità avversarie, "sacrificio" delle tue
         "sacrifices": [0, 0], "recovers": [0, 0],
         "react_legal": [0, 0],                                           # R-027 P9b: scontri difesi con una Reazione giocabile (costo e play_if)
+        "react_diag": [{}, {}],                                          # R-027 P9b: "<fonte>|<livello>|<gemme|zero>" per scontro difeso
     }
 
 
@@ -1366,8 +1367,22 @@ class GameState:
                 st_all["reactions"][d] += 1
             if any(self.react_cost(c, src) <= pd.guard for c, src in self.reaction_options(d)):
                 st_all["react_avail"][d] += 1                          # M1
-            if any(x[2] for x in self._parry_options(d)):
+            opts = [x[2] for x in self._parry_options(d) if x[2]]
+            if opts:
                 st_all["react_legal"][d] += 1                          # R-027 P9b
+            g = "gemme" if cb.d else "zero"                            # P9b: il difensore ha impegnato gemme?
+            diag = st_all["react_diag"][d]
+            diag[f"scontri|{g}"] = diag.get(f"scontri|{g}", 0) + 1
+            held = self.reaction_options(d)
+            for src in ("hand", "scar"):
+                levels = (("disp", any(r[1] == src for r in held)),          # in mano o su una Cicatrice dritta
+                          ("guardia", any(r[1] == src for r in opts)),       # giocabile con tutta la Guardia (costo e play_if)
+                          ("impegno", any(r[1] == src and self.react_paid(r, cb.d, cb.opposer) for r in held)),   # con le gemme impegnate
+                          ("giocata", paid and cb.react[1] == src))
+                for lev, ok in levels:
+                    if ok:
+                        key = f"{src}|{lev}|{g}"
+                        diag[key] = diag.get(key, 0) + 1
             if paid:                                                    # M2: stesse gemme di Parata, senza Reazione
                 fa2, db2, _ = self.compute(cb.a, cb.d - r_cost, None, cb.opposer)
                 st_all["react_decisive"][d] += self.outcome(fa2, db2, cb.opposer) != (hit, att_dead, tgt_dead)
