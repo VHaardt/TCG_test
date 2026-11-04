@@ -1,0 +1,160 @@
+--- Round 1, P1 | Vite 5-5
+--- Round 1, P2 | Vite 5-5
+  P2 gioca NEU-004
+--- Round 2, P1 | Vite 5-5
+--- Round 2, P2 | Vite 5-5
+  P2 attacca con Leader LDR-06
+    pugni: attaccante 0, difensore 0 -> 3 contro 4
+--- Round 3, P1 | Vite 5-5
+--- Round 3, P2 | Vite 5-5
+  P2 gioca VER-020
+--- Round 4, P1 | Vite 5-5
+  P1 gioca ROS-005
+  P1 gioca ROS-005
+  P1 attacca con Leader LDR-05
+    pugni: attaccante 1, difensore 0 -> 4 contro 4
+    P2 perde 1 Vita (attacco_leader): restano 4
+--- Round 4, P2 | Vite 5-4
+  P2 gioca VER-020
+--- Round 5, P1 | Vite 5-4
+  P1 gioca ROS-015
+  P1 attacca con ROS-005#3
+    P2 oppone NEU-004
+    pugni: attaccante 1, difensore 0 -> 4 contro 3
+    NEU-004 di P2 è sconfitta
+  P1 gioca BLU-004
+--- Round 5, P2 | Vite 5-4
+    P2 perde 1 Vita (costo): restano 3
+  P2 usa ⟳ del Leader su ROS-005#4
+    ROS-005 di P1: Stancata
+  P2 gioca NER-015
+  P2 attacca con VER-020#5 (Caccia: ROS-005#4)
+    pugni: attaccante 0, difensore 0 -> 6 contro 1
+    ROS-005 di P1 è sconfitta
+  P2 attacca con VER-020#2 (Caccia: ROS-015#6)
+    pugni: attaccante 0, difensore 0 -> 6 contro 3
+    ROS-015 di P1 è sconfitta
+--- Round 6, P1 | Vite 5-3
+  P1 gioca ROS-006
+  P1 gioca ROS-018
+  P1 attacca con Leader LDR-05
+    pugni: attaccante 0, difensore 0 -> 3 contro 4
+--- Round 6, P2 | Vite 5-3
+  P2 gioca NER-011
+    BLU-004 di P1: Stancata
+  P2 attacca con NER-015#8
+    pugni: attaccante 2, difensore 1 -> 4 contro 6
+  P2 gioca NER-011
+    ROS-005 di P1: Stancata
+  P2 attacca con VER-020#5 (Caccia: ROS-005#3)
+    pugni: attaccante 0, difensore 0 -> 6 contro 1
+    ROS-005 di P1 è sconfitta
+  P2 attacca con VER-020#2 (Caccia: ROS-006#9)
+    pugni: attaccante 0, difensore 0 -> 6 contro 1
+    ROS-006 di P1 è sconfitta
+--- Round 7, P1 | Vite 5-3
+  P1 gioca BLU-015
+--- Round 7, P2 | Vite 5-3
+  P2 gioca VER-021
+    BLU-015 di P1: sconfitta da un effetto
+    P2 perde 1 Vita (costo): restano 2
+  P2 usa ⟳ del Leader su BLU-004#7
+    BLU-004 di P1: Stancata
+    P2: il Leader si Risveglia
+  P2 attacca con VER-020#2
+    pugni: attaccante 0, difensore 0 -> 3 contro 4
+  P2 attacca con VER-020#5 (Caccia: BLU-004#7)
+    pugni: attaccante 1, difensore 0 -> 8 contro 1
+    BLU-004 di P1 è sconfitta
+--- Round 8, P1 | Vite 5-2
+  P1 attacca con Leader LDR-05
+    pugni: attaccante 6, difensore 0 -> 9 contro 4
+    P2 perde 1 Vita (attacco_leader): restano 1
+--- Round 8, P2 | Vite 5-1
+  P2 gioca NER-017
+  P2 gioca NER-018
+  P2 attacca con Leader LDR-06
+    pugni: attaccante 0, difensore 1 -> 4 contro 6
+--- Round 9, P1 | Vite 5-1
+  P1 gioca ROS-019
+  P1 gioca ROS-014
+  P1 attacca con Leader LDR-05
+    P2 oppone NER-015
+    pugni: attaccante 0, difensore 0 -> 3 contro 2
+    NER-015 di P2 è sconfitta
+--- Round 9, P2 | Vite 5-1
+  P2 gioca NER-017
+  P2 attacca con VER-020#2 (Caccia: ROS-019#13)
+    pugni: attaccante 0, difensore 1 + BLU-023 -> 7 contro 7
+    ROS-019 di P1 è sconfitta
+    VER-020 di P2 è sconfitta
+  P2 gioca VER-010
+  P2 attacca con VER-020#5 (Caccia: ROS-014#14)
+    pugni: attaccante 0, difensore 0 -> 7 contro 3
+    ROS-014 di P1 è sconfitta
+--- Round 10, P1 | Vite 5-1
+  P1 gioca ROS-020
+  P1 gioca BLU-008
+  P1 attacca con Leader LDR-05
+    pugni: attaccante 0, difensore 0 -> 3 contro 4
+--- Round 10, P2 | Vite 5-1
+  P2 attacca con VER-020#5 (Caccia: ROS-020#17)
+    pugni: attaccante 4, difensore 2 + ROS-007 -> 8 contro 8
+    ROS-020 di P1 è sconfitta
+    VER-020 di P2 è sconfitta
+  P2 Rimargina NER-007
+  P2 attacca con NER-018#12
+    pugni: attaccante 0, difensore 0 -> 4 contro 4
+    P1 perde 1 Vita (attacco): restano 4
+  P2 attacca con NER-017#11 (Caccia: BLU-008#18)
+    pugni: attaccante 0, difensore 0 -> 7 contro 2
+    BLU-008 di P1 è sconfitta
+  P2 attacca con NER-017#15
+    pugni: attaccante 0, difensore 0 -> 6 contro 4
+    P1 perde 1 Vita (attacco): restano 3
+--- Round 11, P1 | Vite 3-1
+  P1 Rimargina BLU-008
+  P1 gioca NEU-013
+  P1 gioca BLU-008
+--- Round 11, P2 | Vite 3-1
+  P2 gioca NEU-012
+  P2 attacca con NER-017#11 (Caccia: BLU-008#20)
+    pugni: attaccante 1, difensore 0 -> 8 contro 2
+    BLU-008 di P1 è sconfitta
+--- Round 12, P1 | Vite 3-1
+  P1 attacca con Leader LDR-05
+    pugni: attaccante 8, difensore 0 -> 11 contro 4
+    P2 perde 1 Vita (attacco_leader): restano 0
+--- Round 12, P2 | Vite 3-0
+  P2 Rimargina NER-015
+  P2 gioca NEW-V05
+    NEU-013 di P1: Stancata
+  P2 attacca con NER-017#15
+    pugni: attaccante 0, difensore 0 -> 6 contro 4
+    P1 perde 1 Vita (attacco): restano 2
+    P1: il Leader si Risveglia
+  P2 attacca con NER-017#11 (Caccia: NEU-013#19)
+    pugni: attaccante 0, difensore 0 -> 7 contro 3
+    NEU-013 di P1 è sconfitta
+  P2 attacca con NER-018#12
+    pugni: attaccante 0, difensore 0 -> 4 contro 4
+    P1 perde 1 Vita (attacco): restano 1
+--- Round 13, P1 | Vite 1-0
+  P1 attacca con Leader LDR-05
+    P2 oppone VER-010
+    pugni: attaccante 0, difensore 0 -> 4 contro 1
+    VER-010 di P2 è sconfitta
+  P1 gioca ROS-020
+--- Round 13, P2 | Vite 1-0
+  P2 gioca NER-015
+  P2 attacca con NER-017#11
+    pugni: attaccante 1, difensore 1 + BLU-023 -> 7 contro 8
+  P2 attacca con NER-017#15
+    pugni: attaccante 0, difensore 1 + BLU-021 -> 3 contro 4
+  P2 attacca con NER-018#12
+    pugni: attaccante 0, difensore 1 -> 4 contro 6
+  P2 attacca con NEU-012#21
+    pugni: attaccante 4, difensore 1 + ROS-007 -> 3 contro 4
+  P2 attacca con Leader LDR-06
+    pugni: attaccante 0, difensore 0 -> 4 contro 4
+*** P1 perde (colpo_finale)
