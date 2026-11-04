@@ -237,3 +237,12 @@ M2 forte:30 L4-L5 gia' fatto, salto
 M2 forte:30 L4-L6 gia' fatto, salto
 M2 forte:30 L5-L6 gia' fatto, salto
 2026-11-04T01:56:07Z fine M2 forte:30 3400
+2026-11-04T01:56:09Z push M2 forte ok
+2026-11-04T01:56:11Z copia nella cartella condivisa ok (M2 forte)
+2026-11-04T01:56:11Z inizio M3 forte:30 200 3400 6
+M3 forte:30 L1-L6 gia' fatto, salto
+M3 forte:30 L2-L6 gia' fatto, salto
+M3 forte:30 L3-L6 seed 3412 fatto
+M3 forte:30 L4-L6 seed 3414 fatto
+M3 forte:30 L5-L6 seed 3415 fatto
+2026-11-04T03:48:50Z fine M3 forte:30 3400
