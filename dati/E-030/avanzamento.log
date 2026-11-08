@@ -246,3 +246,11 @@ M3 forte:30 L3-L6 seed 3412 fatto
 M3 forte:30 L4-L6 seed 3414 fatto
 M3 forte:30 L5-L6 seed 3415 fatto
 2026-11-04T03:48:50Z fine M3 forte:30 3400
+2026-11-08T10:07:16Z ripresa dopo il reset del container (R5-2c da capo), motore ab6f2dd
+2026-11-08T10:07:16Z inizio R5-2c forte:30 200 3400 5
+R5-2c forte:30 L1-L5 seed 3404 fatto
+R5-2c forte:30 L2-L5 seed 3408 fatto
+R5-2c forte:30 L3-L5 seed 3411 fatto
+R5-2c forte:30 L4-L5 seed 3413 fatto
+R5-2c forte:30 L5-L6 seed 3415 fatto
+2026-11-08T12:56:59Z fine R5-2c forte:30 3400
