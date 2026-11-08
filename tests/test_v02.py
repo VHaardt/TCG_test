@@ -1068,7 +1068,7 @@ def test_r028_partite_con_le_leve():
 
 
 def test_r027_scudo_vince_pareggi_se_pronta():
-    """P7 (c): lo Scudo vince i pareggi se era Pronto quando è diventato il bersaglio (chi si oppone, o la cacciata Pronta)."""
+    """P7 (c): lo Scudo vince i pareggi solo se è Pronto allo scontro: da bersaglio cacciato Pronto; chi si oppone si è ruotato."""
     hunter, shield = _card("_r027h", power=3, keywords=["caccia"]), _card("_r027s", power=3, keywords=["scudo"])
     for mode, ready, survives in (("vince_pareggi", False, True), ("vince_pareggi_se_pronta", True, True),
                                   ("vince_pareggi_se_pronta", False, False)):
@@ -1083,7 +1083,7 @@ def test_r027_scudo_vince_pareggi_se_pronta():
     s.p[0].units = [Unit(900, _card("_r027a", power=3), True)]
     s.p[1].units = [Unit(901, shield, True)]
     _fight(s, ("attack", 900), oppose=901)
-    assert s.unit(1, 901) is not None and s.unit(0, 900) is None                     # chi si oppone era Pronto
+    assert s.unit(1, 901) is None and s.unit(0, 900) is None                         # chi si oppone è Ruotato: pareggio senza Scudo
 
 if __name__ == "__main__":
     for k, f in list(globals().items()):

@@ -11,7 +11,7 @@ class Rules2:
     pugno: str = "simultaneo"          # "sequenziale" (V1-B) | "nessuno" (V2-B: risposta unica a carte scoperte)
     opposizione: str = "prima"         # "dopo" (V3-B: dopo l'apertura del pugno)
     raddrizzo: str = "ripristino"      # "fine" (V4-B)
-    scudo: str = "oppone_senza_ruotarsi"   # "vince_pareggi" | "vince_pareggi_se_pronta" (R-027 P7: solo se il bersaglio era Pronto)
+    scudo: str = "oppone_senza_ruotarsi"   # "vince_pareggi" | "vince_pareggi_se_pronta" (R-027 P7: solo se il bersaglio è Pronto allo scontro: chi si oppone si è ruotato)
 
     forza_per_gemma: int = 1
     parata_per_gemma: int = 2
