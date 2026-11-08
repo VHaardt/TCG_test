@@ -1376,7 +1376,10 @@ class GameState:
         tu = self.unit(d, tgt)
         if tu is None:
             return False, False, False
-        pareggi = self.r.scudo == "vince_pareggi" and CARDS[tu.cid].has("scudo")    # "quando è il bersaglio"
+        pareggi = CARDS[tu.cid].has("scudo") and (                                   # "quando è il bersaglio"
+            self.r.scudo == "vince_pareggi"
+            or (self.r.scudo == "vince_pareggi_se_pronta"                            # R-027 P7 (c): solo se era Pronta,
+                and (tgt != cb.hunted or bool(cb.hunted_ready))))                     # cioè chi si oppone o la cacciata Pronta
         if cb.att == "L":
             return False, False, (fa > db) if pareggi else (db <= fa)
         if fa > db:

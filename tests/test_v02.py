@@ -1066,6 +1066,25 @@ def test_r028_partite_con_le_leve():
     assert any(sum(_play(_game(rules, k), [RuleAgent2(seed=1), RuleAgent2(seed=2)]).stats["ritmo"][q].get("bruciate", 0)
                    for q in (0, 1)) for k in range(4))
 
+
+def test_r027_scudo_vince_pareggi_se_pronta():
+    """P7 (c): lo Scudo vince i pareggi se era Pronto quando è diventato il bersaglio (chi si oppone, o la cacciata Pronta)."""
+    hunter, shield = _card("_r027h", power=3, keywords=["caccia"]), _card("_r027s", power=3, keywords=["scudo"])
+    for mode, ready, survives in (("vince_pareggi", False, True), ("vince_pareggi_se_pronta", True, True),
+                                  ("vince_pareggi_se_pronta", False, False)):
+        s = _arena()
+        s.r = s.r.with_(scudo=mode)
+        s.p[0].units = [Unit(900, hunter, True)]
+        s.p[1].units = [Unit(901, shield, ready)]
+        _fight(s, ("attack", 900, 901))
+        assert (s.unit(1, 901) is not None) == survives and s.unit(0, 900) is None
+    s = _arena()
+    s.r = s.r.with_(scudo="vince_pareggi_se_pronta")
+    s.p[0].units = [Unit(900, _card("_r027a", power=3), True)]
+    s.p[1].units = [Unit(901, shield, True)]
+    _fight(s, ("attack", 900), oppose=901)
+    assert s.unit(1, 901) is not None and s.unit(0, 900) is None                     # chi si oppone era Pronto
+
 if __name__ == "__main__":
     for k, f in list(globals().items()):
         if k.startswith("test_"):
