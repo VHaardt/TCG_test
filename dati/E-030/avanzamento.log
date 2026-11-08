@@ -254,3 +254,16 @@ R5-2c forte:30 L3-L5 seed 3411 fatto
 R5-2c forte:30 L4-L5 seed 3413 fatto
 R5-2c forte:30 L5-L6 seed 3415 fatto
 2026-11-08T12:56:59Z fine R5-2c forte:30 3400
+2026-11-08T12:57:01Z push R5-2c forte ok
+2026-11-08T12:57:02Z copia nella cartella condivisa ok (R5-2c forte)
+2026-11-08T12:57:02Z inizio M1 forte:30 200 3400 3,6
+M1 forte:30 L1-L3 seed 3402 fatto
+M1 forte:30 L1-L6 seed 3405 fatto
+M1 forte:30 L2-L3 seed 3406 fatto
+M1 forte:30 L2-L6 seed 3409 fatto
+M1 forte:30 L3-L4 seed 3410 fatto
+M1 forte:30 L3-L5 seed 3411 fatto
+M1 forte:30 L3-L6 seed 3412 fatto
+M1 forte:30 L4-L6 seed 3414 fatto
+M1 forte:30 L5-L6 seed 3415 fatto
+2026-11-08T16:55:40Z fine M1 forte:30 3400
