@@ -102,3 +102,10 @@ nessun errore
 A-r1 forte:30 L1-L2 seed 3401 fatto
 A-r1 forte:30 L1-L4 seed 3403 fatto
 2026-11-09T20:37:46Z fine A-r1
+2026-11-09T20:37:48Z push A-r1 forte ok
+2026-11-09T20:37:49Z copia nella cartella condivisa ok (A-r1 forte)
+costruzione (V027): 40 carte, 2 copie per nome, L 1, multicolore con tutti i colori nel Leader
+avviso: 43 carte con rarità fuori dalla scala C/R/E/L: BLU-001, BLU-002, BLU-008, BLU-010, BLU-014, BLU-017, BLU-018, BLU-021, BLU-024, NER-010, NER-012, NER-013 …
+nessun errore
+/home/claude/e031_in/B/carte.json: 123 carte, 6 Leader, 0 errori
+2026-11-09T20:37:50Z inizio B forte:30 200 3400 p:2,6
