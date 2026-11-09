@@ -1005,6 +1005,86 @@ def test_r027_p9b_diagnostic():
     s.step(("parry", 0, None))                                            # la tiene in mano, nessuna gemma
     assert s.stats["react_diag"][1] == {"scontri|zero": 1, "hand|disp|zero": 1, "hand|guardia|zero": 1}
 
+
+def test_r028_bruciare():
+    """V1: la stessa giocata con 1 gemma in meno, scartando una carta scelta come azione a sé; una volta per turno."""
+    big, a, b = _card("_r028u3", cost=3, power=3), _card("_r028a", cost=1, power=1), _card("_r028b", cost=2, power=2)
+    s = _arena()
+    s.p[0].brace, s.p[0].hand = 2, [big, a, b]
+    assert not any(x[1] == big for x in s.legal_actions() if x[0] == "play")          # default: spento
+    s.r = s.r.with_(bruciare=True)
+    plays = [x for x in s.legal_actions() if x[0] == "play"]
+    assert ("play", big, None, None, "brucia") in plays and ("play", big, None) not in plays
+    assert ("play", a, None) in plays and ("play", a, None, None, "brucia") in plays
+    s.step(("play", big, None, None, "brucia"))
+    assert s.phase == "brucia" and s.decider() == 0
+    assert s.legal_actions() == [("brucia", a), ("brucia", b)]
+    s.step(("brucia", b))
+    assert s.phase == "main" and s.p[0].brace == 0 and b in s.p[0].discard and s.p[0].hand == [a]
+    assert [u.cid for u in s.p[0].units] == [big] and s.stats["ritmo"][0]["bruciate"] == 1
+    s.p[0].brace, s.p[0].hand = 1, [a, b]
+    assert not any(len(x) > 4 for x in s.legal_actions())                             # una volta per turno
+    s2 = _arena()
+    s2.r = s2.r.with_(bruciare=True, bruciare_min_mano=4)
+    s2.p[0].brace, s2.p[0].hand = 2, [big, a, b]
+    assert not any(len(x) > 4 for x in s2.legal_actions())                            # V1b: servono 4 carte in mano
+
+
+def test_r028_tempra_tardo_e_allo_scoperto():
+    s = _arena()
+    s.r = s.r.with_(tempra_tardo=10)
+    s.round = 9
+    assert s.tempra(0) == s.tempra(1) == 4
+    s.round = 10
+    assert s.tempra(0) == s.tempra(1) == 3
+    s = _arena()
+    s.r = s.r.with_(allo_scoperto=True)
+    s.p[1].life = []
+    assert s.tempra(1) == 3 and s.tempra(0) == 4
+
+
+def test_r028_breccia():
+    """V3: se l'Unità con Breccia batte chi si oppone, il Leader avversario perde 1 Vita, nel rispetto del Saldo."""
+    br, small = _card("_r028br", power=5, keywords=["breccia"]), _card("_r028sm", power=1)
+    for fresh, lost in ((0, 1), (2, 0)):
+        s = _arena()
+        s.p[0].units = [Unit(900, br, True)]
+        s.p[1].units = [Unit(901, small, True)]
+        s.p[1].scars = [[c, True, "test"] for c in s.p[1].life[:fresh]]
+        n = len(s.p[1].life)
+        _fight(s, ("attack", 900), oppose=901)
+        assert s.unit(1, 901) is None and n - len(s.p[1].life) == lost
+        assert s.stats["breccia"][0] == lost
+
+
+def test_r028_partite_con_le_leve():
+    """Partite intere con tutte le leve accese: finiscono e riempiono i contatori di ritmo."""
+    rules = rules_from("V02").with_(bruciare=True, tempra_tardo=10, allo_scoperto=True)
+    for seed in range(4):
+        s = _play(_game(rules, seed), [RuleAgent2(seed=1), RuleAgent2(seed=2)])
+        assert s.over and s.stats["ritmo"][0]["turni"] > 0 and len(s.stats["vite_round"]) == s.round
+    assert any(sum(_play(_game(rules, k), [RuleAgent2(seed=1), RuleAgent2(seed=2)]).stats["ritmo"][q].get("bruciate", 0)
+                   for q in (0, 1)) for k in range(4))
+
+
+def test_r027_scudo_vince_pareggi_se_pronta():
+    """P7 (c): lo Scudo vince i pareggi solo se è Pronto allo scontro: da bersaglio cacciato Pronto; chi si oppone si è ruotato."""
+    hunter, shield = _card("_r027h", power=3, keywords=["caccia"]), _card("_r027s", power=3, keywords=["scudo"])
+    for mode, ready, survives in (("vince_pareggi", False, True), ("vince_pareggi_se_pronta", True, True),
+                                  ("vince_pareggi_se_pronta", False, False)):
+        s = _arena()
+        s.r = s.r.with_(scudo=mode)
+        s.p[0].units = [Unit(900, hunter, True)]
+        s.p[1].units = [Unit(901, shield, ready)]
+        _fight(s, ("attack", 900, 901))
+        assert (s.unit(1, 901) is not None) == survives and s.unit(0, 900) is None
+    s = _arena()
+    s.r = s.r.with_(scudo="vince_pareggi_se_pronta")
+    s.p[0].units = [Unit(900, _card("_r027a", power=3), True)]
+    s.p[1].units = [Unit(901, shield, True)]
+    _fight(s, ("attack", 900), oppose=901)
+    assert s.unit(1, 901) is None and s.unit(0, 900) is None                         # chi si oppone è Ruotato: pareggio senza Scudo
+
 if __name__ == "__main__":
     for k, f in list(globals().items()):
         if k.startswith("test_"):
