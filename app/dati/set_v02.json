@@ -1,8 +1,8 @@
 {
  "version": "set_v02",
- "rules": "v0.2.5",
- "data": "2026-10-13",
- "note": "Primo set CICATRICI v0.2. Generato da carte/bozza_*.json con genera_finale.py.",
+ "rules": "v0.2.9",
+ "data": "2026-11-08",
+ "note": "Primo set CICATRICI v0.2. Generato da carte/bozza_*.json con genera_finale.py. Ciclo 04 (esito_voto_finale.md): M1 (NER-002, NER-019 a costo alternativo), M2 (NEW-V05), M3 (NEW-B06); liste rif_ di B0c05 a 2 copie per nome (Q-026 V1).",
  "leaders": [
   {
    "id": "LDR-01",
@@ -1631,8 +1631,15 @@
    "play": {
     "costs": [
      {
-      "lose_life": 1,
-      "floor": 1
+      "any": [
+       {
+        "lose_life": 1,
+        "floor": 1
+       },
+       {
+        "stanca_own": 1
+       }
+      ]
      }
     ],
     "do": [
@@ -1642,9 +1649,10 @@
      }
     ]
    },
-   "text": "Costo aggiuntivo: il tuo Leader perde 1 Vita *(rispetta il Saldo)*. Non puoi giocarla se ha 1 Vita o meno. Pesca 1.",
+   "text": "Costo aggiuntivo: il tuo Leader perde 1 Vita *(rispetta il Saldo; non puoi pagarlo se ha 1 Vita o meno)* **oppure** Stanca *(ruota)* una tua Unità Pronta. Pesca 1.",
    "intent": "Converte 1 Vita in una carta e in una Cicatrice (Furia, Reazione dalle Cicatrici, Rimarginare).",
-   "vanilla_delta": "Tattica 1 = pesca 1; la Vita paga la Cicatrice, non la carta"
+   "vanilla_delta": "Tattica 1 = pesca 1; la Vita paga la Cicatrice, non la carta",
+   "_note": "Ciclo 04 F2 (M1): costo 'perdi 1 Vita oppure Stanca una tua Unità Pronta'."
   },
   {
    "id": "NER-003",
@@ -2115,8 +2123,15 @@
    "play": {
     "costs": [
      {
-      "lose_life": 2,
-      "floor": 1
+      "any": [
+       {
+        "lose_life": 1,
+        "floor": 1
+       },
+       {
+        "stanca_own": 1
+       }
+      ]
      }
     ],
     "target": {
@@ -2135,9 +2150,10 @@
      }
     ]
    },
-   "text": "Costo aggiuntivo: il tuo Leader perde 2 Vite *(rispetta il Saldo)*. Non puoi giocarla se ha 2 Vite o meno. Sconfiggi un'Unità avversaria Ruotata con costo ≤4. Pesca 1.",
+   "text": "Costo aggiuntivo: il tuo Leader perde 1 Vita *(rispetta il Saldo; non puoi pagarlo se ha 1 Vita o meno)* **oppure** Stanca *(ruota)* una tua Unità Pronta. Sconfiggi un'Unità avversaria Ruotata con costo ≤4. Pesca 1.",
    "intent": "Rimozione di rimonta: 2 Vite rendono una carta in più rispetto alla rimozione neutra, e 2 Cicatrici.",
-   "vanilla_delta": "rimozione economica su Ruotate costo ≤4 (regola 9) + pesca 1; le 2 Vite pagano la pesca"
+   "vanilla_delta": "rimozione economica su Ruotate costo ≤4 (regola 9) + pesca 1; le 2 Vite pagano la pesca",
+   "_note": "Ciclo 04 F2 (M1): costo 'perdi 1 Vita oppure Stanca una tua Unità Pronta'."
   },
   {
    "id": "NER-020",
@@ -3587,6 +3603,64 @@
    "text": "Reazione. Il bersaglio ha +3 in questo scontro.",
    "intent": "Reazione neutra ±3: con NEU-006/019 fa 9 copie possibili; ogni coppia arriva a ≥8 comuni.",
    "vanilla_delta": "Reazione comune a 1 gemma: ±3 = tabella (>2k)"
+  },
+  {
+   "id": "NEW-V05",
+   "name": "NEW-V05",
+   "type": "tactic",
+   "cost": 2,
+   "colors": [
+    "G"
+   ],
+   "rarity": "R",
+   "play": {
+    "target": {
+     "side": "opp",
+     "ready": true,
+     "keyword": "scudo"
+    },
+    "do": [
+     {
+      "op": "stanca",
+      "target": "chosen"
+     }
+    ]
+   },
+   "text": "Stanca *(ruota)* un'Unità avversaria Pronta con Scudo.",
+   "intent": "Q-026 M2: risposta verde allo Scudo senza tetto di costo (Thorn e LDR-06; misurata anche in LDR-01).",
+   "_note": "E-030 M2 (Q-026, esito_passata2.md, 8/8). Rarità R dal voto; scala delle rarità di B0c03 non ancora rietichettata. Entrata nel set con la chiusura del ciclo 04."
+  },
+  {
+   "id": "NEW-B06",
+   "name": "NEW-B06",
+   "type": "unit",
+   "cost": 6,
+   "colors": [
+    "K",
+    "G"
+   ],
+   "rarity": "L",
+   "power": 5,
+   "keywords": [
+    "caccia"
+   ],
+   "abilities": [
+    {
+     "static": "power",
+     "if": [
+      {
+       "attacking": true
+      },
+      {
+       "scars_ge": 3
+      }
+     ],
+     "value": 2
+    }
+   ],
+   "text": "Caccia *(quando attacca, puoi scegliere come bersaglio un'Unità avversaria, anche Ruotata, invece del Leader; l'avversario può ancora opporsi con un'altra Unità, che diventa il bersaglio)*. Quando attacca, se hai almeno 3 Cicatrici, +2 in questo scontro.",
+   "intent": "Q-026 M3: Leggendaria ponte N/V, chiusura a F7 per chi ha pagato Cicatrici.",
+   "_note": "E-030 M3 (Q-026, esito_passata2.md, 8/8; variante a costo 7 respinta). Stessa forma di BLU-015 + VER-020. Entrata nel set con la chiusura del ciclo 04."
   }
  ]
 }

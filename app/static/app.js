@@ -6,10 +6,10 @@
 const $ = (s, el = document) => el.querySelector(s);
 const $$ = (s, el = document) => [...el.querySelectorAll(s)];
 const esc = (t) => String(t ?? "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
-const mdish = (t) => esc(t).replace(/\*([^*]+)\*/g, "<em>$1</em>");
+const mdish = (t) => esc(t).replace(/\*\*([^*]+)\*\*/g, "<b>$1</b>").replace(/\*([^*]+)\*/g, "<em>$1</em>");
 // Testo di una carta senza le spiegazioni in corsivo "*(…)*": la parola chiave che precede resta sottolineata
 // e la spiegazione si legge passandoci sopra (o sotto l'anteprima ingrandita).
-const RX_SPIEGA = /([^.;,]*?)(\s*)\*\(([^*]+)\)\*/g;
+const RX_SPIEGA = /([^.;,*]*?)(\s*)\*\(([^*]+)\)\*/g;
 // dove inizia la parola chiave in "Costo: parola": dopo i due punti, salvo "Impeto 1: +2" (numeri dopo i due punti)
 function taglioFrase(f) {
   const k = f.lastIndexOf(":") + 1;
