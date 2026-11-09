@@ -388,6 +388,26 @@ def test_q030_names_replace_ids_and_twins_share_the_copy_limit():
     assert any(p.startswith(nomi["NER-001"] + ":") for p in probs), probs
 
 
+def test_any_cost_menu_on_ner002_ner019_and_cycle04_names():
+    """Ciclo 04: NER-002/NER-019 si pagano perdendo 1 Vita oppure Stancando una tua Unità Pronta (una voce per modo);
+    le carte nuove hanno il nome di Q-029 e i mazzi di riferimento sono le liste rif_ a 2 copie del set."""
+    d = core.dati()
+    C = {c["id"]: c for c in d.catalogo()["carte"]}
+    assert C["NEW-V05"]["nome"] != "NEW-V05" and C["NEW-B06"]["nome"] != "NEW-B06" and C["NEW-B06"]["max"] == 1
+    assert all(m["nome"].startswith("rif_") for m in d.riferimento) and any("NEW-B06" in m["carte"] for m in d.riferimento)
+    r0, r1 = d.riferimento[0], d.riferimento[1]
+    L = lambda m: [c for c, k in m["carte"].items() for _ in range(k)]
+    s = E.new_game(r0["leader"], L(r0), r1["leader"], L(r1), rules=d.rules, seed=1, log=True)
+    s.round = 3
+    q = s.active
+    s.p[q].hand, s.p[q].brace = ["NER-002", "NER-019"], 6
+    s.p[q].units = [E.Unit(950, "NEW-V05", True), E.Unit(951, "NEW-B06", False)]
+    s.p[1 - q].units = [E.Unit(960, "NEW-V05", False)]
+    for cid in ("NER-002", "NER-019"):
+        pag = sorted(core.etichetta(s, q, a)["pagamento"] for a in s.legal_actions() if a[0] == "play" and a[1] == cid)
+        assert pag == ["Stanca " + s.describe(q, 950), "perdi 1 Vita"], (cid, pag)    # solo le Unità Pronte
+
+
 def teardown_module():
     E.load_cards()          # the app loads the set into the engine: restore the default for the other tests
 

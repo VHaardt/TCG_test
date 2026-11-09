@@ -23,7 +23,7 @@ L'app non contiene regole: usa il motore `sim/v02` come libreria.
 |---|---|
 | Carte e Leader | `CICATRICI_SET`, poi `/mnt/project-files/tcg/set/finale/set_v02.json`, poi `app/dati/set_v02.json` |
 | Nomi delle carte (Q-030) | `CICATRICI_NOMI`, poi `/mnt/project-files/tcg/set/nomi/nomi_v02.json`, poi `app/dati/nomi_v02.json`: mappa ID → nome (più razza e rarità C/R/E/L della tabella Q-026). Il nome sostituisce l'ID ovunque e, con V027, è la chiave del limite di copie: le gemelle hanno lo stesso nome. Senza mappa si vedono gli ID |
-| Mazzi di riferimento | `CICATRICI_MAZZI`, poi le liste B0c05 di Q-026 (cartella condivisa, poi `app/dati/mazzi_B0c05.json`), poi i mazzi del set: vale il primo file con mazzi legali per le regole in vigore |
+| Mazzi di riferimento | `CICATRICI_MAZZI`, poi i mazzi del set (cartella condivisa, poi `app/dati/mazzi_v02.json`; dal ciclo 04 sono le liste rif_ a 2 copie), poi le liste B0c05 di Q-026: vale il primo file con mazzi legali per le regole in vigore |
 | Regole | `CICATRICI_REGOLE` (nome di preset o file json di variante), poi il preset `V027` (o `V026`), poi `app/dati/regole_V026.json` |
 | Costruzione | `sim/v02/decks.problems` con `decks.limits(regole)`: con V027 40 carte, max 2 copie per nome, 1 per le Leggendarie, colori del Leader o Neutrali (le multicolore vogliono tutti i colori nel Leader) |
 

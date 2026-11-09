@@ -79,10 +79,10 @@ class Dati:
                 engine.META.setdefault(cid, {})["rarity"] = r
         self.info = decks.card_info()
         # mazzi di riferimento: il primo file che ne ha di legali con le regole in vigore
-        # (a 2 copie: le liste B0c05 di Q-026; a 3 copie: i mazzi del set)
+        # (dal ciclo 04 i mazzi del set sono le liste rif_ a 2 copie; le liste B0c05 di Q-026 restano di riserva)
         self.riferimento, self.mazzi_path = [], None
-        for path in (os.environ.get("CICATRICI_MAZZI"), B0C05, os.path.join(HERE, "dati", "mazzi_B0c05.json"),
-                     os.path.join(SHARED, "mazzi_v02.json"), os.path.join(HERE, "dati", "mazzi_v02.json")):
+        for path in (os.environ.get("CICATRICI_MAZZI"), os.path.join(SHARED, "mazzi_v02.json"),
+                     os.path.join(HERE, "dati", "mazzi_v02.json"), B0C05, os.path.join(HERE, "dati", "mazzi_B0c05.json")):
             if not path or not os.path.exists(path):
                 continue
             with open(path, encoding="utf-8") as f:
