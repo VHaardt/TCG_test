@@ -1,12 +1,12 @@
 #!/usr/bin/env bash
-# R-027 (E-032) dopo E-033: P7 Scudo, due bracci, poi P9b. Motore: worktree tcg_p7 (claude/r027-p7-contatori 44f97f0 = main + contatori dello Scudo, replay identici).
+# R-027 (E-032) dopo E-033 e il braccio breccia: P7 Scudo, due bracci, poi P9b. Motore: worktree tcg_p7 (claude/r027-p7-contatori 44f97f0 = main + contatori dello Scudo, replay identici).
 # P7: 12 incroci con un mazzo da ≥5 Scudo (tutti tranne 1-3, 1-6, 3-6) su B0c05 + rott_LDR05_2c in 1-5 e 2-5 (input di E-030 R5-2c),
 #     forte:30, 200 partite, semi 3400+k; riferimento E-030 00_B0c05 e R5-2c (vince_pareggi).
 # P9b: reazione_da_cicatrice_costo −1 sulle liste di E-031 A, incroci p:2,4, forte:30, 100 partite, semi 3400+k; riferimento E-031 A (prime 100).
 RES=/home/claude/e020_res; C=$RES/dati/coda; OUTB=$RES/dati/E-032
 mkdir -p $OUTB; LOG=$OUTB/avanzamento.log
 log() { echo "$(date -u +%FT%TZ) $*" >> $LOG; }
-until [ -f $RES/dati/E-033/FINE ]; do sleep 300; done
+until [ -f $RES/dati/E-033/FINE_BRECCIA ]; do sleep 300; done
 pubblica() {  # braccio
   ( cd $RES && git add dati/E-032 && git commit -qm "E-032 (R-027): $1 forte (motore $(cd /home/claude/tcg_p7 && git rev-parse --short HEAD), V027)
 
