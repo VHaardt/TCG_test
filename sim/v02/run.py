@@ -531,7 +531,7 @@ def render_r012(recs, traccia=()):
         for d in decks:
             x = per[d]; n = max(x["n"], 1); tr = x.get("tr", {})
             L.append(f"| {D.label(d)} | {x.get('fa_alta_wins', 0)/n:.2f} | " + " | ".join(f"{tr.get(c, {}).get('f', 0)/n:.2f}" for c in traccia) + " |")
-    return L + render_m5(recs) + render_q027(recs) + render_p9b(recs) + render_q028(recs) + [""]
+    return L + render_m5(recs) + render_q027(recs) + render_p9b(recs) + render_q028(recs) + render_p7(recs) + [""]
 
 
 def render_m5(recs):
@@ -604,6 +604,35 @@ def render_q027(recs):
         L.append(f"| {D.label(d)} | {x['n']} | {100 * x['idle'] / max(x['ut'], 1):.1f}% | {x['react'] / max(x['def'], 1):.3f} | "
                  + " | ".join(f"{x['src'].get(k, 0) / n:.2f}" for k in srcs)
                  + f" | {x['comb'] / n:.2f} | {x['sac'] / n:.2f} | {x['rec'] / n:.2f} | {x['legal'] / max(x['def'], 1):.3f} |")
+    return L
+
+
+def render_p7(recs):
+    """R-027 P7: opposizioni e rimozioni delle Unità con Scudo, colpi al Leader, per Leader."""
+    if not recs or "scudo_opp" not in recs[0]["stats"]:
+        return []
+    decks = sorted({d for r in recs for d in r["decks"]})
+    srcs = ("scontro", "caccia", "attacco", "sconfiggi", "rimbalzo", "sacrificio")
+    per = {d: {"n": 0, "def": 0, "opp": 0, "rep": 0, "sopp": 0, "srep": 0, "hit": 0, "src": {}} for d in decks}
+    for r in recs:
+        st = r["stats"]
+        for q in (0, 1):
+            x = per[r["decks"][q]]
+            x["n"] += 1; x["def"] += st["attacks"][1 - q]
+            x["opp"] += st["opposed"][1 - q]; x["rep"] += st["opp_repeat"][q]
+            x["sopp"] += st["scudo_opp"][q]; x["srep"] += st["scudo_opp_rep"][q]
+            x["hit"] += st["attacks_leader_hit"][q]
+            for k, v in st["scudo_rimossa"][q].items():
+                x["src"][k] = x["src"].get(k, 0) + v
+    L = ["", "## R-027 P7: Scudo per Leader (per partita del mazzo)", "",
+         "| Mazzo | n | Opposizioni per scontro difeso | di cui con Scudo | Opposizioni ripetute nel turno (tutte) | ripetute con Scudo "
+         "| Unità con Scudo rimosse: scontro | caccia | attacco | sconfiggi | rimbalzo | sacrificio | Colpi al Leader avversario |",
+         "|---|---|---|---|---|---|---|---|---|---|---|---|---|"]
+    for d in decks:
+        x = per[d]; n = max(x["n"], 1); df = max(x["def"], 1)
+        L.append(f"| {D.label(d)} | {x['n']} | {x['opp'] / df:.3f} | {x['sopp'] / df:.3f} | {100 * x['rep'] / max(x['opp'], 1):.1f}% "
+                 f"| {100 * x['srep'] / max(x['sopp'], 1):.1f}% | "
+                 + " | ".join(f"{x['src'].get(k, 0) / n:.2f}" for k in srcs) + f" | {x['hit'] / n:.2f} |")
     return L
 
 
