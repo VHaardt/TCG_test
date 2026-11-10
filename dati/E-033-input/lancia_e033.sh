@@ -5,7 +5,8 @@
 #
 #   bash dati/E-033-input/lancia_e033.sh <braccio|tutti> [ia] [partite_per_incrocio] [seed_base] [celle]
 #
-#   braccio       bruciare | tempra_tardo | allo_scoperto | tutti (i tre in quest'ordine)
+#   braccio       bruciare | tempra_tardo | allo_scoperto | breccia | tutti (i quattro in quest'ordine)
+#                 breccia = V027 senza leve, con carte, liste e traccia di breccia/ (NEW-BR1–BR6, Q-028 V3)
 #                 00_rif = base B0c05 su V027 senza leve: NON fa parte del vaglio (il riferimento è E-030 00_B0c05 F_s3400),
 #                 si lancia solo a mano se servono i contatori R-028 della base (vedi LEGGIMI.md)
 #   ia            default forte:30
@@ -18,7 +19,7 @@
 #   E033_RIFAI    facoltativa: 1 per rigiocare anche gli incroci già finiti
 #
 # Stima su 4 core (forte:30, ~13 s a partita sulla macchina intera in E-030): 1.500 partite per braccio,
-# ~5.4 h tempra_tardo e allo_scoperto, ~8 h bruciare (più scelte per l'IA forte: +50% circa nella prova). Totale ~19 h.
+# ~5.4 h tempra_tardo e allo_scoperto, ~8 h bruciare (più scelte per l'IA forte: +50% circa nella prova), ~5.4 h breccia. Totale ~24.5 h.
 set -euo pipefail
 DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
 B=$1; IA=${2:-forte:30}; N=${3:-100}; SB=${4:-3400}; CELLE=${5:-tutti}
@@ -26,17 +27,19 @@ OUTB=${E033_OUT:-/mnt/project-files/tcg/swarm/esperimenti/E-033_ritmo}
 [ -d sim/v02 ] || { echo "eseguire dalla radice della repo (manca sim/v02)"; exit 1; }
 grep -q tempra_tardo sim/v02/config.py || { echo "motore senza R-028 (tempra_tardo): serve main 636e83e o successivo"; exit 1; }
 if [ "$B" = tutti ]; then
-  for b in bruciare tempra_tardo allo_scoperto; do bash "$DIR/lancia_e033.sh" "$b" "$IA" "$N" "$SB" "$CELLE"; done
+  for b in bruciare tempra_tardo allo_scoperto breccia; do bash "$DIR/lancia_e033.sh" "$b" "$IA" "$N" "$SB" "$CELLE"; done
   exit 0
 fi
+SRC=$DIR
 case "$B" in
   00_rif) VAR=V027 ;;
+  breccia) VAR=V027; SRC=$DIR/breccia ;;
   bruciare|tempra_tardo|allo_scoperto) VAR=$DIR/varianti/$B.json ;;
   *) echo "braccio sconosciuto: $B"; exit 1 ;;
 esac
 SUF=""; [ "$SB" != 2000 ] && [ "$SB" != 3000 ] && SUF="_s$SB"
 OUT=$OUTB/$B/$( [ "$IA" = semplice ] && echo S || echo F )$SUF
-TR=(--traccia "$(cat "$DIR/traccia.txt")")
+TR=(--traccia "$(cat "$SRC/traccia.txt")")
 [ "${E033_RIPRENDI:-1}" = 1 ] && TR+=(--riprendi)
 mkdir -p "$OUTB"; LOG=$OUTB/avanzamento.log
 fatto() { [ "${E033_RIFAI:-0}" != 1 ] && ls "$1"/*_torneo_*.md > /dev/null 2>&1 && [ ! -f "$1/.partite_fatte.pkl" ]; }
@@ -54,8 +57,8 @@ k=0
 for i in 1 2 3 4 5 6; do for j in $(seq $((i+1)) 6); do
   k=$((k+1)); tocca $i $j || continue
   if fatto "$OUT/L$i-L$j"; then echo "$B $IA L$i-L$j gia' fatto, salto" | tee -a "$LOG"; continue; fi
-  python3 -B -m sim.v02.run torneo --variante "$VAR" --carte "$DIR/carte.json" \
-    --mazzi "$DIR/mazzi.json#${DK[$i]}" "$DIR/mazzi.json#${DK[$j]}" \
+  python3 -B -m sim.v02.run torneo --variante "$VAR" --carte "$SRC/carte.json" \
+    --mazzi "$SRC/mazzi.json#${DK[$i]}" "$SRC/mazzi.json#${DK[$j]}" \
     --partite 0 --incroci "$N" --seed $((SB+k)) --ia "$IA" "${TR[@]}" --out "$OUT/L$i-L$j" > /dev/null
   echo "$(date -u +%FT%TZ) $B $IA L$i-L$j seed $((SB+k)) fatto" | tee -a "$LOG"
 done; done
