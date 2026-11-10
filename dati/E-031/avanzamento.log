@@ -124,3 +124,20 @@ R1-2c forte:30 L1-L2 gia' fatto, salto
 R1-2c forte:30 L1-L4 gia' fatto, salto
 R1-2c forte:30 L1-L6 gia' fatto, salto
 2026-11-10T00:33:48Z fine R1-2c
+2026-11-10T00:33:50Z push R1-2c forte ok
+2026-11-10T00:33:53Z copia nella cartella condivisa ok (R1-2c forte)
+costruzione (V027): 40 carte, 2 copie per nome, L 1, multicolore con tutti i colori nel Leader
+avviso: 43 carte con rarità fuori dalla scala C/R/E/L: BLU-001, BLU-002, BLU-008, BLU-010, BLU-014, BLU-017, BLU-018, BLU-021, BLU-024, NER-010, NER-012, NER-013 …
+nessun errore
+/home/claude/e031_in/A/carte.json: 123 carte, 6 Leader, 0 errori
+2026-11-10T00:33:53Z inizio A forte:30 200 3400 p:2,4
+A forte:30 L1-L2 gia' fatto, salto
+A forte:30 L1-L4 gia' fatto, salto
+A forte:30 L2-L3 gia' fatto, salto
+A forte:30 L2-L4 gia' fatto, salto
+A forte:30 L2-L5 gia' fatto, salto
+A forte:30 L2-L6 gia' fatto, salto
+A forte:30 L3-L4 gia' fatto, salto
+A forte:30 L4-L5 gia' fatto, salto
+A forte:30 L4-L6 gia' fatto, salto
+2026-11-10T00:33:53Z fine A
