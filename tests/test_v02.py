@@ -1055,6 +1055,14 @@ def test_r028_breccia():
         _fight(s, ("attack", 900), oppose=901)
         assert s.unit(1, 901) is None and n - len(s.p[1].life) == lost
         assert s.stats["breccia"][0] == lost
+        assert s.stats["breccia_by"][0] == ({"_r028br|tent": 1, "_r028br|ok": 1} if lost else {"_r028br|tent": 1})
+    s = _arena()                                                    # sconfitta reciproca: la Breccia scatta e si conta a parte
+    eq = _card("_r028eq", power=5)
+    s.p[0].units = [Unit(900, br, True)]
+    s.p[1].units = [Unit(901, eq, True)]
+    _fight(s, ("attack", 900), oppose=901)
+    assert s.unit(0, 900) is None and s.unit(1, 901) is None
+    assert s.stats["breccia_by"][0] == {"_r028br|tent": 1, "_r028br|ok": 1, "_r028br|ok_pari": 1}
 
 
 def test_r028_partite_con_le_leve():

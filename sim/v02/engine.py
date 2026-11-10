@@ -194,6 +194,7 @@ def new_stats():
         "zero_round": [None, None],     # round in cui il Leader arriva a 0 Vite la prima volta
         "unit_noatk": [0, 0], "unit_noatk_opp": [0, 0],   # Unità Pronte che non attaccano; di queste, quelle che poi si oppongono
         "breccia": [0, 0],              # Vite tolte da Breccia
+        "breccia_by": [{}, {}],         # per carta: "<cid>|tent" (ha battuto chi si opponeva), "<cid>|ok" (Vita tolta), "<cid>|ok_pari" (Vita tolta nella sconfitta reciproca)
         "fa_alta_r6": [0, 0],           # R-017 entro il round 6                                          # R-027 P9b: "<fonte>|<livello>|<gemme|zero>" per scontro difeso
     }
 
@@ -1534,8 +1535,13 @@ class GameState:
             if cb.opposer is None:
                 self.stat_add("removals", a)                             # M12: sconfitta da Caccia
                 self.stat_add("removals_src", a, "caccia")
-            elif att_unit is not None and CARDS[att_unit.cid].has("breccia") and self.lose_life(d, "breccia"):
-                self.stat_add("breccia", a)                              # R-028 V3: batte chi si oppone, nel rispetto del Saldo
+            elif att_unit is not None and CARDS[att_unit.cid].has("breccia"):
+                self.stat_add("breccia_by", a, f"{att_unit.cid}|tent")
+                if self.lose_life(d, "breccia"):
+                    self.stat_add("breccia", a)                          # R-028 V3: batte chi si oppone, nel rispetto del Saldo
+                    self.stat_add("breccia_by", a, f"{att_unit.cid}|ok")
+                    if att_dead:
+                        self.stat_add("breccia_by", a, f"{att_unit.cid}|ok_pari")
         if att_dead:
             pa.units.remove(att_unit)
             pa.discard.append(att_unit.cid)

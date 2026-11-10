@@ -531,7 +531,7 @@ def render_r012(recs, traccia=()):
         for d in decks:
             x = per[d]; n = max(x["n"], 1); tr = x.get("tr", {})
             L.append(f"| {D.label(d)} | {x.get('fa_alta_wins', 0)/n:.2f} | " + " | ".join(f"{tr.get(c, {}).get('f', 0)/n:.2f}" for c in traccia) + " |")
-    return L + render_m5(recs) + render_q027(recs) + render_p9b(recs) + render_q028(recs) + render_p7(recs) + [""]
+    return L + render_m5(recs) + render_q027(recs) + render_p9b(recs) + render_q028(recs) + render_p7(recs) + render_breccia(recs) + [""]
 
 
 def render_m5(recs):
@@ -633,6 +633,30 @@ def render_p7(recs):
         L.append(f"| {D.label(d)} | {x['n']} | {x['opp'] / df:.3f} | {x['sopp'] / df:.3f} | {100 * x['rep'] / max(x['opp'], 1):.1f}% "
                  f"| {100 * x['srep'] / max(x['sopp'], 1):.1f}% | "
                  + " | ".join(f"{x['src'].get(k, 0) / n:.2f}" for k in srcs) + f" | {x['hit'] / n:.2f} |")
+    return L
+
+
+def render_breccia(recs):
+    """R-028 V3: Brecce per carta (solo se una carta del torneo ha Breccia)."""
+    if not recs or "breccia_by" not in recs[0]["stats"]:
+        return []
+    per, nd = {}, {}
+    for r in recs:
+        st = r["stats"]
+        for q in (0, 1):
+            nd[r["decks"][q]] = nd.get(r["decks"][q], 0) + 1
+            for k, v in st["breccia_by"][q].items():
+                cid, kind = k.split("|")
+                x = per.setdefault((r["decks"][q], cid), {"tent": 0, "ok": 0, "ok_pari": 0})
+                x[kind] += v
+    if not per:
+        return []
+    L = ["", "## R-028 V3: Brecce per carta (per partita del mazzo)", "",
+         "| Mazzo | Carta | Ha battuto chi si opponeva | Vita tolta (Breccia riuscita) | di cui nella sconfitta reciproca | Bloccate (Saldo o 0 Vite) |",
+         "|---|---|---|---|---|---|"]
+    for (d, cid), x in sorted(per.items()):
+        n = max(nd[d], 1)
+        L.append(f"| {D.label(d)} | {cid} | {x['tent'] / n:.3f} | {x['ok'] / n:.3f} | {x['ok_pari'] / n:.3f} | {(x['tent'] - x['ok']) / n:.3f} |")
     return L
 
 
