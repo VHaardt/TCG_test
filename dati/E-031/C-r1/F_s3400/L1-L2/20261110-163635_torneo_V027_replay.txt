@@ -1,0 +1,59 @@
+--- Round 1, P1 | Vite 5-5
+  P1 gioca ROS-005
+--- Round 1, P2 | Vite 5-5
+  P2 gioca NEU-009
+--- Round 2, P1 | Vite 5-5
+  P1 attacca con ROS-005#1
+    pugni: attaccante 1, difensore 0 -> 4 contro 4
+    P2 perde 1 Vita (attacco): restano 4
+  P1 attacca con Leader LDR-01
+    pugni: attaccante 1, difensore 0 -> 4 contro 4
+    P2 perde 1 Vita (attacco_leader): restano 3
+--- Round 2, P2 | Vite 5-3
+  P2 gioca BLU-001
+--- Round 3, P1 | Vite 5-3
+  P1 gioca ROS-017
+    P1 perde 1 Vita (costo): restano 4
+    P1 perde 1 Vita (costo): restano 3
+  P1 attacca con ROS-017#4
+    pugni: attaccante 0, difensore 0 -> 5 contro 4
+    P2 perde 1 Vita (attacco): restano 2
+    P2: il Leader si Risveglia
+--- Round 3, P2 | Vite 3-2
+  P2 attacca con NEU-009#2
+    pugni: attaccante 2, difensore 0 -> 4 contro 4
+    P1 perde 1 Vita (attacco): restano 2
+    P1: il Leader si Risveglia
+  P2 attacca con BLU-001#3
+    pugni: attaccante 2, difensore 0 -> 4 contro 4
+    P1 perde 1 Vita (attacco): restano 1
+  P2 attacca con Leader LDR-02
+    pugni: attaccante 0, difensore 0 -> 4 contro 4
+--- Round 4, P1 | Vite 1-2
+  P1 gioca VER-001
+  P1 attacca con ROS-017#4
+    pugni: attaccante 0, difensore 0 -> 6 contro 4
+    P2 perde 1 Vita (attacco): restano 1
+  P1 attacca con Leader LDR-01
+    pugni: attaccante 0, difensore 0 -> 4 contro 4
+    P2 perde 1 Vita (attacco_leader): restano 0
+--- Round 4, P2 | Vite 1-0
+  P2 gioca BLU-001
+  P2 attacca con Leader LDR-02
+    pugni: attaccante 0, difensore 1 -> 4 contro 6
+--- Round 5, P1 | Vite 1-0
+  P1 gioca ROS-003
+  P1 attacca con ROS-017#4
+    P2 oppone BLU-001
+    pugni: attaccante 0, difensore 1 + BLU-021 -> 3 contro 4
+    ROS-017 di P1 è sconfitta
+  P1 attacca con ROS-003#7
+    P2 oppone NEU-009
+    pugni: attaccante 0, difensore 1 -> 5 contro 5
+    ROS-003 di P1 è sconfitta
+  P1 attacca con VER-001#5 (Caccia: NEU-009#2)
+    pugni: attaccante 1, difensore 0 -> 3 contro 2
+    NEU-009 di P2 è sconfitta
+  P1 attacca con Leader LDR-01
+    pugni: attaccante 0, difensore 0 -> 4 contro 4
+*** P2 perde (colpo_finale)
