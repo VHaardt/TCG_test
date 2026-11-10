@@ -36,3 +36,10 @@ nessun errore
 2026-11-10T22:55:42Z 00_rif forte:30 L5-L6 seed 3415 fatto
 2026-11-10T22:55:42Z fine 00_rif forte:30 3400
 2026-11-10T22:55:42Z fine braccio 00_rif
+2026-11-10T22:55:44Z push 00_rif forte ok
+2026-11-10T22:55:46Z copia nella cartella condivisa ok (00_rif)
+costruzione (/home/claude/e033_in/varianti/bruciare.json): 40 carte, 2 copie per nome, L 1, multicolore con tutti i colori nel Leader
+avviso: 43 carte con rarità fuori dalla scala C/R/E/L: BLU-001, BLU-002, BLU-008, BLU-010, BLU-014, BLU-017, BLU-018, BLU-021, BLU-024, NER-010, NER-012, NER-013 …
+nessun errore
+/home/claude/e033_in/carte.json: 120 carte, 6 Leader, 0 errori
+2026-11-10T22:55:46Z inizio bruciare forte:30 100 3400 tutti, motore 636e83e
