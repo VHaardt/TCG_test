@@ -15,6 +15,9 @@ for f in sorted(glob.glob(os.path.join(sys.argv[1], "*", "partite.pkl"))):
 L = [f"# {sys.argv[1].rstrip('/').split('/')[-2]}: ritmo (R-028), interattività (R-026) e Reazioni (R-027 P9b)", "",
      f"Partite: {len(recs)}, dai record per partita di {len(glob.glob(os.path.join(sys.argv[1], '*', 'partite.pkl')))} incroci."]
 L += run.render_q028(recs) + run.render_q027(recs) + run.render_p9b(recs)
+for f in ("render_p7", "render_breccia"):          # solo sul branch dei contatori (PR #24)
+    if hasattr(run, f):
+        L += getattr(run, f)(recs)
 txt = "\n".join(L).replace("rif_LDR0", "L").replace("/home/claude/e031_in/", "").replace("/home/claude/e033_in/", "") + "\n"
 if len(sys.argv) > 2:
     open(sys.argv[2], "w", encoding="utf-8").write(txt)
