@@ -217,3 +217,40 @@ nessun errore
 2026-11-11T11:54:04Z E-033 finita
 2026-11-11T11:54:06Z push fine forte ok
 2026-11-11T11:54:09Z copia nella cartella condivisa ok (fine)
+costruzione (V027): 40 carte, 2 copie per nome, L 1, multicolore con tutti i colori nel Leader
+avviso: 43 carte con rarità fuori dalla scala C/R/E/L: BLU-001, BLU-002, BLU-008, BLU-010, BLU-014, BLU-017, BLU-018, BLU-021, BLU-024, NER-010, NER-012, NER-013 …
+nessun errore
+/home/claude/e033b_in/breccia/carte.json: 126 carte, 6 Leader, 0 errori
+2026-11-11T11:56:53Z inizio breccia forte:30 100 3400 tutti, motore 7ec6380
+2026-11-11T12:21:59Z breccia forte:30 L1-L2 seed 3401 fatto
+2026-11-11T12:21:59Z breccia forte:30 L1-L2 seed 3401 fatto
+2026-11-11T12:35:39Z breccia forte:30 L1-L3 seed 3402 fatto
+2026-11-11T12:35:39Z breccia forte:30 L1-L3 seed 3402 fatto
+2026-11-11T12:53:06Z breccia forte:30 L1-L4 seed 3403 fatto
+2026-11-11T12:53:06Z breccia forte:30 L1-L4 seed 3403 fatto
+2026-11-11T13:13:46Z breccia forte:30 L1-L5 seed 3404 fatto
+2026-11-11T13:13:46Z breccia forte:30 L1-L5 seed 3404 fatto
+2026-11-11T13:27:01Z breccia forte:30 L1-L6 seed 3405 fatto
+2026-11-11T13:27:01Z breccia forte:30 L1-L6 seed 3405 fatto
+2026-11-11T13:47:11Z breccia forte:30 L2-L3 seed 3406 fatto
+2026-11-11T13:47:11Z breccia forte:30 L2-L3 seed 3406 fatto
+2026-11-11T14:19:04Z breccia forte:30 L2-L4 seed 3407 fatto
+2026-11-11T14:19:04Z breccia forte:30 L2-L4 seed 3407 fatto
+2026-11-11T14:46:33Z breccia forte:30 L2-L5 seed 3408 fatto
+2026-11-11T14:46:33Z breccia forte:30 L2-L5 seed 3408 fatto
+2026-11-11T15:10:26Z breccia forte:30 L2-L6 seed 3409 fatto
+2026-11-11T15:10:26Z breccia forte:30 L2-L6 seed 3409 fatto
+2026-11-11T15:27:07Z breccia forte:30 L3-L4 seed 3410 fatto
+2026-11-11T15:27:07Z breccia forte:30 L3-L4 seed 3410 fatto
+2026-11-11T15:43:30Z breccia forte:30 L3-L5 seed 3411 fatto
+2026-11-11T15:43:30Z breccia forte:30 L3-L5 seed 3411 fatto
+2026-11-11T15:55:24Z breccia forte:30 L3-L6 seed 3412 fatto
+2026-11-11T15:55:24Z breccia forte:30 L3-L6 seed 3412 fatto
+2026-11-11T16:16:54Z breccia forte:30 L4-L5 seed 3413 fatto
+2026-11-11T16:16:54Z breccia forte:30 L4-L5 seed 3413 fatto
+2026-11-11T16:33:46Z breccia forte:30 L4-L6 seed 3414 fatto
+2026-11-11T16:33:46Z breccia forte:30 L4-L6 seed 3414 fatto
+2026-11-11T16:49:57Z breccia forte:30 L5-L6 seed 3415 fatto
+2026-11-11T16:49:57Z breccia forte:30 L5-L6 seed 3415 fatto
+2026-11-11T16:49:57Z fine breccia forte:30 3400
+2026-11-11T16:49:57Z fine braccio breccia
