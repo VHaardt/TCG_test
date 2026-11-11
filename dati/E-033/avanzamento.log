@@ -43,3 +43,55 @@ avviso: 43 carte con rarità fuori dalla scala C/R/E/L: BLU-001, BLU-002, BLU-00
 nessun errore
 /home/claude/e033_in/carte.json: 120 carte, 6 Leader, 0 errori
 2026-11-10T22:55:46Z inizio bruciare forte:30 100 3400 tutti, motore 636e83e
+2026-11-10T23:24:25Z bruciare forte:30 L1-L2 seed 3401 fatto
+2026-11-10T23:24:25Z bruciare forte:30 L1-L2 seed 3401 fatto
+2026-11-10T23:37:36Z bruciare forte:30 L1-L3 seed 3402 fatto
+2026-11-10T23:37:36Z bruciare forte:30 L1-L3 seed 3402 fatto
+2026-11-10T23:58:24Z bruciare forte:30 L1-L4 seed 3403 fatto
+2026-11-10T23:58:24Z bruciare forte:30 L1-L4 seed 3403 fatto
+2026-11-11T00:17:27Z bruciare forte:30 L1-L5 seed 3404 fatto
+2026-11-11T00:17:27Z bruciare forte:30 L1-L5 seed 3404 fatto
+2026-11-11T00:31:57Z bruciare forte:30 L1-L6 seed 3405 fatto
+2026-11-11T00:31:57Z bruciare forte:30 L1-L6 seed 3405 fatto
+2026-11-11T00:56:07Z bruciare forte:30 L2-L3 seed 3406 fatto
+2026-11-11T00:56:07Z bruciare forte:30 L2-L3 seed 3406 fatto
+2026-11-11T01:34:32Z bruciare forte:30 L2-L4 seed 3407 fatto
+2026-11-11T01:34:32Z bruciare forte:30 L2-L4 seed 3407 fatto
+2026-11-11T02:01:52Z E-033 (R-028, input e9b7dcd), motore 636e83e, V027, --riprendi
+costruzione (V027): 40 carte, 2 copie per nome, L 1, multicolore con tutti i colori nel Leader
+avviso: 43 carte con rarità fuori dalla scala C/R/E/L: BLU-001, BLU-002, BLU-008, BLU-010, BLU-014, BLU-017, BLU-018, BLU-021, BLU-024, NER-010, NER-012, NER-013 …
+nessun errore
+/home/claude/e033_in/carte.json: 120 carte, 6 Leader, 0 errori
+2026-11-11T02:01:52Z inizio 00_rif forte:30 100 3400 tutti, motore 636e83e
+00_rif forte:30 L1-L2 gia' fatto, salto
+00_rif forte:30 L1-L2 gia' fatto, salto
+00_rif forte:30 L1-L3 gia' fatto, salto
+00_rif forte:30 L1-L3 gia' fatto, salto
+00_rif forte:30 L1-L4 gia' fatto, salto
+00_rif forte:30 L1-L4 gia' fatto, salto
+00_rif forte:30 L1-L5 gia' fatto, salto
+00_rif forte:30 L1-L5 gia' fatto, salto
+00_rif forte:30 L1-L6 gia' fatto, salto
+00_rif forte:30 L1-L6 gia' fatto, salto
+00_rif forte:30 L2-L3 gia' fatto, salto
+00_rif forte:30 L2-L3 gia' fatto, salto
+00_rif forte:30 L2-L4 gia' fatto, salto
+00_rif forte:30 L2-L4 gia' fatto, salto
+00_rif forte:30 L2-L5 gia' fatto, salto
+00_rif forte:30 L2-L5 gia' fatto, salto
+00_rif forte:30 L2-L6 gia' fatto, salto
+00_rif forte:30 L2-L6 gia' fatto, salto
+00_rif forte:30 L3-L4 gia' fatto, salto
+00_rif forte:30 L3-L4 gia' fatto, salto
+00_rif forte:30 L3-L5 gia' fatto, salto
+00_rif forte:30 L3-L5 gia' fatto, salto
+00_rif forte:30 L3-L6 gia' fatto, salto
+00_rif forte:30 L3-L6 gia' fatto, salto
+00_rif forte:30 L4-L5 gia' fatto, salto
+00_rif forte:30 L4-L5 gia' fatto, salto
+00_rif forte:30 L4-L6 gia' fatto, salto
+00_rif forte:30 L4-L6 gia' fatto, salto
+00_rif forte:30 L5-L6 gia' fatto, salto
+00_rif forte:30 L5-L6 gia' fatto, salto
+2026-11-11T02:01:52Z fine 00_rif forte:30 3400
+2026-11-11T02:01:52Z fine braccio 00_rif
