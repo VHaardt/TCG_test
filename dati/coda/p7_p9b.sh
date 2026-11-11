@@ -2,6 +2,7 @@
 # R-027 (E-032) dopo E-033 e il braccio breccia: P7 Scudo, due bracci, poi P9b. Motore: worktree tcg_p7 (claude/r027-p7-contatori 44f97f0 = main + contatori dello Scudo, replay identici).
 # P7: 12 incroci con un mazzo da ≥5 Scudo (tutti tranne 1-3, 1-6, 3-6) su B0c05 + rott_LDR05_2c in 1-5 e 2-5 (input di E-030 R5-2c),
 #     forte:30, 200 partite, semi 3400+k; riferimento E-030 00_B0c05 e R5-2c (vince_pareggi).
+# Poi E-033 00_rif e tempra_tardo a 200 partite (e033_200.sh).
 # P9b: reazione_da_cicatrice_costo −1 sulle liste di E-031 A, incroci p:2,4, forte:30, 100 partite, semi 3400+k; riferimento E-031 A (prime 100).
 RES=/home/claude/e020_res; C=$RES/dati/coda; OUTB=$RES/dati/E-032
 mkdir -p $OUTB; LOG=$OUTB/avanzamento.log
@@ -27,6 +28,16 @@ log "E-032 R-027 P7 + P9b, motore $(git rev-parse --short HEAD), V027, --riprend
 for a in oppone_senza_ruotarsi vince_pareggi_se_pronta; do
   corsa P7-$a    /home/claude/e033_in      $C/varianti/scudo_$a.json 200 -1-3,1-6,3-6 || exit 1
   corsa P7-$a-r5 /home/claude/e030_in/R5-2c $C/varianti/scudo_$a.json 200 1-5,2-5      || exit 1
+done
+for b in 00_rif tempra_tardo; do                      # E-033 a 200 partite (richiesta del 2026-11-11), prima di P9b
+  log "inizio E-033 $b-200"
+  if bash $C/e033_200.sh $b >> $LOG 2>&1; then log "fine E-033 $b-200"
+    ( cd $RES && git add dati/E-033 && git commit -qm "E-033: $b a 200 partite per incrocio (motore 636e83e, V027)
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+Claude-Session: https://claude.ai/code/session_01QuaTVB8qUoSm5xLkGQbgcC";
+      for w in 2 4 8 16 0; do git push -q -u origin dati/e020-v024-forte && { log "push $b-200 forte ok"; break; }; [ $w = 0 ] && log "PUSH FALLITO $b-200"; sleep $w; done )
+  else log "ERRORE E-033 $b-200"; exit 1; fi
 done
 corsa P9b /home/claude/e031_in/A $C/varianti/p9b_cicatrice_meno1.json 100 p:2,4 || exit 1
 touch $OUTB/FINE; log "E-032 finita"; pubblica "fine"

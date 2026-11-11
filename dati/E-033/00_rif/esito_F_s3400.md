@@ -40,6 +40,7 @@ Motore commit 636e83e (branch `claude/regolamento-v0.1`), preset V027, un torneo
 | L4 | 500 | 0.27 | 32% (79) | 52.6% | 0.00 | 5.43 | 2.00 | 5.70 / 0.00 | 0.00 | 0.78 | 4.9 | 10 | B 41%, G 59% | 2.23 | 0.81 |
 | L5 | 500 | 0.00 | 38% (50) | 54.4% | 0.00 | 4.03 | 0.00 | 3.67 / 0.00 | 0.00 | 0.87 | 4.5 | 13 | B 48%, R 52% | 1.92 | 0.00 |
 | L6 | 500 | 0.19 | 18% (144) | 47.8% | 0.86 | 3.74 | 0.00 | 2.55 / 0.06 | 0.00 | 0.18 | 5.1 | 10 | G 55%, K 45% | 2.34 | 1.68 |
+| Totale (pesato) | 3000 | — | 29% (567) | — | — | — | — | — | — | — | — | — | — | — | — |
 
 ## Carte tracciate (per partita del mazzo: giocate / attivazioni / colpi a segno sul Leader / Unità sconfitte)
 

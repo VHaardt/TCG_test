@@ -177,6 +177,10 @@ def render(name, ia, cells, base, ref="00_B0"):
                  f"{g('Attivazioni del Leader (⟳ e trigger) / ⟳ seguite da un colpo a segno'):.2f} / {g('Attivazioni del Leader (⟳ e trigger) / ⟳ seguite da un colpo a segno (2)'):.2f} | "
                  f"{g('Scontri con furia_bonus'):.2f} | {g('Scudo a ≥2 gemme'):.2f} | {x['fh']/max(x['fhn'],1):.1f} | {x['peak']:.0f} | {cols} | "
                  + (f"{g('Turni con una sola Unità in campo'):.2f} | {g('Attacchi al Leader di Unità con Caccia'):.2f} |" if 'Turni con una sola Unità in campo' in x['cnt'] else "non misurati | non misurati |"))
+    ds = [o for o in ORDER if o in per]
+    if ds:                                                           # Rimonte R9-8 come totale pesato (richiesta del thread delle carte, 2026-11-11)
+        rk, rn = sum(per[d]["rk"] for d in ds), sum(per[d]["rn"] for d in ds)
+        L.append(f"| Totale (pesato) | {sum(per[d]['n'] for d in ds)} | — | {100*rk/max(rn,1):.0f}% ({rn}) |" + " — |" * 12)
     cards = sorted({card for x in per.values() for card in x["trk"]})
     if cards:
         L += ["", "## Carte tracciate (per partita del mazzo: giocate / attivazioni / colpi a segno sul Leader / Unità sconfitte)", "",
