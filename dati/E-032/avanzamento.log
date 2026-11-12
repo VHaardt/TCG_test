@@ -60,3 +60,43 @@ nessun errore
 2026-11-12T11:16:40Z push P7-vince_pareggi_se_pronta-r5 forte ok
 2026-11-12T11:16:42Z copia nella cartella condivisa ok (P7-vince_pareggi_se_pronta-r5)
 2026-11-12T11:16:42Z inizio E-033 00_rif-200
+2026-11-12T11:43:16Z 00_rif-200 L1-L2 seed 3401 fatto
+2026-11-12T11:55:41Z 00_rif-200 L1-L3 seed 3402 fatto
+2026-11-12T12:14:20Z 00_rif-200 L1-L4 seed 3403 fatto
+2026-11-12T12:36:32Z 00_rif-200 L1-L5 seed 3404 fatto
+2026-11-12T12:49:49Z 00_rif-200 L1-L6 seed 3405 fatto
+2026-11-12T13:10:19Z 00_rif-200 L2-L3 seed 3406 fatto
+2026-11-12T13:43:17Z 00_rif-200 L2-L4 seed 3407 fatto
+2026-11-12T14:11:10Z 00_rif-200 L2-L5 seed 3408 fatto
+2026-11-12T14:37:41Z 00_rif-200 L2-L6 seed 3409 fatto
+2026-11-12T14:51:59Z 00_rif-200 L3-L4 seed 3410 fatto
+2026-11-12T15:07:30Z 00_rif-200 L3-L5 seed 3411 fatto
+2026-11-12T15:19:39Z 00_rif-200 L3-L6 seed 3412 fatto
+2026-11-12T15:40:17Z 00_rif-200 L4-L5 seed 3413 fatto
+2026-11-12T15:55:02Z 00_rif-200 L4-L6 seed 3414 fatto
+2026-11-12T16:12:06Z 00_rif-200 L5-L6 seed 3415 fatto
+2026-11-12T16:12:06Z fine E-033 00_rif-200
+2026-11-12T16:12:09Z push 00_rif-200 forte ok
+2026-11-12T16:12:09Z inizio E-033 tempra_tardo-200
+2026-11-12T16:34:33Z tempra_tardo-200 L1-L2 seed 3401 fatto
+2026-11-12T16:47:41Z tempra_tardo-200 L1-L3 seed 3402 fatto
+2026-11-12T17:03:18Z tempra_tardo-200 L1-L4 seed 3403 fatto
+2026-11-12T17:21:55Z tempra_tardo-200 L1-L5 seed 3404 fatto
+2026-11-12T17:33:33Z tempra_tardo-200 L1-L6 seed 3405 fatto
+2026-11-12T17:50:15Z tempra_tardo-200 L2-L3 seed 3406 fatto
+2026-11-12T18:15:20Z tempra_tardo-200 L2-L4 seed 3407 fatto
+2026-11-12T18:40:41Z tempra_tardo-200 L2-L5 seed 3408 fatto
+2026-11-12T19:00:57Z tempra_tardo-200 L2-L6 seed 3409 fatto
+2026-11-12T19:12:14Z tempra_tardo-200 L3-L4 seed 3410 fatto
+2026-11-12T19:26:29Z tempra_tardo-200 L3-L5 seed 3411 fatto
+2026-11-12T19:35:47Z tempra_tardo-200 L3-L6 seed 3412 fatto
+2026-11-12T19:53:47Z tempra_tardo-200 L4-L5 seed 3413 fatto
+2026-11-12T20:04:57Z tempra_tardo-200 L4-L6 seed 3414 fatto
+2026-11-12T20:18:37Z tempra_tardo-200 L5-L6 seed 3415 fatto
+2026-11-12T20:18:37Z fine E-033 tempra_tardo-200
+2026-11-12T20:18:39Z push tempra_tardo-200 forte ok
+costruzione (/home/claude/e020_res/dati/coda/varianti/p9b_cicatrice_meno1.json): 40 carte, 2 copie per nome, L 1, multicolore con tutti i colori nel Leader
+avviso: 43 carte con rarità fuori dalla scala C/R/E/L: BLU-001, BLU-002, BLU-008, BLU-010, BLU-014, BLU-017, BLU-018, BLU-021, BLU-024, NER-010, NER-012, NER-013 …
+nessun errore
+/home/claude/e031_in/A/carte.json: 123 carte, 6 Leader, 0 errori
+2026-11-12T20:18:40Z inizio P9b forte:30 100 3400 p:2,4
