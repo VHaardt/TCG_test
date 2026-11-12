@@ -1,0 +1,19 @@
+2026-11-11T16:52:15Z E-032 R-027 P7 + P9b, motore 7ec6380, V027, --riprendi
+costruzione (/home/claude/e020_res/dati/coda/varianti/scudo_oppone_senza_ruotarsi.json): 40 carte, 2 copie per nome, L 1, multicolore con tutti i colori nel Leader
+avviso: 43 carte con rarità fuori dalla scala C/R/E/L: BLU-001, BLU-002, BLU-008, BLU-010, BLU-014, BLU-017, BLU-018, BLU-021, BLU-024, NER-010, NER-012, NER-013 …
+nessun errore
+/home/claude/e033_in/carte.json: 120 carte, 6 Leader, 0 errori
+2026-11-11T16:52:16Z inizio P7-oppone_senza_ruotarsi forte:30 200 3400 -1-3,1-6,3-6
+2026-11-11T17:42:10Z L1-L2 seed 3401 fatto
+2026-11-11T18:16:38Z L1-L4 seed 3403 fatto
+2026-11-11T18:55:46Z L1-L5 seed 3404 fatto
+2026-11-11T19:36:21Z L2-L3 seed 3406 fatto
+2026-11-11T20:36:48Z L2-L4 seed 3407 fatto
+2026-11-11T21:32:21Z L2-L5 seed 3408 fatto
+2026-11-11T22:19:01Z L2-L6 seed 3409 fatto
+2026-11-11T22:44:56Z L3-L4 seed 3410 fatto
+2026-11-11T23:11:15Z L3-L5 seed 3411 fatto
+2026-11-11T23:49:14Z L4-L5 seed 3413 fatto
+2026-11-12T00:16:50Z L4-L6 seed 3414 fatto
+2026-11-12T00:46:12Z L5-L6 seed 3415 fatto
+2026-11-12T00:46:12Z fine P7-oppone_senza_ruotarsi
