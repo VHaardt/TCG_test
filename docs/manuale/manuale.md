@@ -1,6 +1,6 @@
 ---
-versione: 1.3
-basato_su: v0.2.8
+versione: 1.4
+basato_su: v0.2.9
 preset: V027
 ---
 
@@ -224,10 +224,6 @@ Un attacco è un'azione della fase principale e si risolve in **sei passi**. Il 
 | Leader | **Unità** | Se l'attacco è pari o superiore, l'Unità è sconfitta. Altrimenti non succede nulla. Il Leader non viene mai sconfitto |
 
 **Scudo**: un'Unità con Scudo vince i pareggi quando è il bersaglio. Contro un'Unità a pari è sconfitto solo l'attaccante; contro un Leader l'Unità con Scudo è sconfitta solo se l'attacco è **superiore**.
-
-::: prova Scudo
-"Lo Scudo vince i pareggi" è la regola in vigore, ma è ancora in prova.
-:::
 
 ::: esempio Un attacco al Leader
 Round 5. G1 attacca con un'Unità di Forza 3 e il difensore non si oppone: il bersaglio è il Leader di G2, Tempra {{tempra}}. G1 impegna 2 gemme: attacco 3 + 2 = **5**.
