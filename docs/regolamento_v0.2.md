@@ -2,7 +2,7 @@
 
 | Campo | Valore |
 |---|---|
-| Versione | v0.2.9 (nucleo di v0.2.6; costruzione del mazzo da Q-026; leggi di design e P6 confermata da Q-029) |
+| Versione | v0.2.10 (nucleo di v0.2.6; costruzione del mazzo da Q-026; leggi di design, P6 e P7 confermate da Q-029) |
 | Data | 2026-10-13 |
 | Stato | **ratificato dallo swarm (Q-013, 8/8 APPROVO); pilastri 2–3–4–6 in revisione, vedi pilastri** (`pilastri_design_v0.2.md`) |
 | Fonte normativa | `swarm/questioni/Q-013_rework_nucleo_v0.2/esito.md`, sezione A "Specifica consolidata". Dati: `swarm/esperimenti/E-014/sintesi_r3.md` |
@@ -19,7 +19,7 @@
 > 6. Saldo e colpo finale si leggono dalle Cicatrici fresche: niente istantanea, niente contatore del Saldo.
 > 7. Ultimo respiro diventa +1 Guardia Alle Corde; spariscono finestra e limite di reazioni.
 > 8. Infondere sparisce ("se hai impegnato almeno N gemme"); le abilità di Reazione dei Leader sono statiche.
-> 9. Esponi diventa Stanca, Intercetto diventa opposizione; lo Scudo vince i pareggi [aperto: P7].
+> 9. Esponi diventa Stanca, Intercetto diventa opposizione; lo Scudo vince i pareggi [P7 confermata da Q-029].
 > 10. G2 prende 1 gemma in più nei round 1 e 3 [P6 confermata da Q-029; ritarata da Q-022 sull'IA forte].
 > 11. Crepuscolo di round (Q-019): un solo controllo nel Ripristino di G1, per entrambi i Leader.
 
@@ -271,7 +271,7 @@ Furia, Bracconiere, Scudo e le altre condizioni stampate si leggono qui.
 | Leader | Unità | L'Unità è sconfitta se Db ≤ Fa (**con Scudo: se Db < Fa**); altrimenti non succede nulla. Il Leader non è mai sconfitto |
 | Unità o Leader | Leader | L'attacco **va a segno** se Fa ≥ Db; altrimenti non succede nulla. L'attaccante non è mai sconfitto |
 
-Scudo nella tabella: **[default, aperto: P7; `scudo` vince_pareggi]**.
+Scudo nella tabella: **[P7 confermata da Q-029; `scudo` vince_pareggi]**.
 
 ### C6. Esiti
 In quest'ordine:
@@ -405,7 +405,7 @@ Un'abilità del Leader che inizia con **"Quando il tuo Leader attacca"** è un t
 
 ### 12.2 Parole chiave (ognuna compare in almeno due colori)
 - **Assalto**: questa Unità entra **Pronta**, quindi può attaccare nel turno in cui entra (mai nel round 1).
-- **Scudo**: quando questa Unità è il bersaglio (si oppone o è cacciata), vince i pareggi nel Confronto: contro un'Unità a pari è sconfitto solo l'attaccante; contro un Leader è sconfitta solo se Db < Fa. Si ruota come le altre Unità **[default, aperto: P7]**.
+- **Scudo**: quando questa Unità è il bersaglio (si oppone o è cacciata), vince i pareggi nel Confronto: contro un'Unità a pari è sconfitto solo l'attaccante; contro un Leader è sconfitta solo se Db < Fa. Si ruota come le altre Unità **[P7 confermata da Q-029]**.
 - **Impeto N: +X** *(se nell'impegno hai almeno N gemme, +X in questo scontro; quando è il bersaglio contano solo le gemme di Parata)*: si legge in C4 (d), è pubblica. Il difensore conta solo la Parata (C4 b). Sostituisce Infuso N (Q-014, forma Q-015 M2).
 - **Caccia** *(quando attacca, puoi scegliere come bersaglio un'Unità avversaria, anche Ruotata, invece del Leader; l'avversario può ancora opporsi con un'altra Unità, che diventa il bersaglio)*: il bersaglio cacciato può essere Pronto o Ruotato e si difende con la sua Forza, la Parata, la Reazione e lo Scudo; non "si oppone", quindi i suoi "quando si oppone" non scattano (Q-014).
 - **Furia N: +X**: +X al Confronto se hai almeno N Cicatrici, contando **tutte** le Cicatrici (dritte e fresche). Si legge solo in C5: non è mai un'aura.
@@ -422,7 +422,7 @@ Un'abilità del Leader che inizia con **"Quando il tuo Leader attacca"** è un t
 | Esponi | **Stanca**: ruota un'Unità avversaria Pronta; solo nel tuo turno, mai il Leader |
 | Bracconiere +X | Bracconiere X: +X quando attacca e il suo bersaglio è un'Unità |
 | Furia N | +X al Confronto se hai almeno N Cicatrici, contando tutte le Cicatrici; mai come aura |
-| Scudo (può intercettare) | vince i pareggi quando è il bersaglio (C5) **[aperto: P7]** |
+| Scudo (può intercettare) | vince i pareggi quando è il bersaglio (C5) **[P7 confermata da Q-029]** |
 | Rinnovo | quando attacca e sconfigge un'Unità, si raddrizza |
 | "fino a fine turno" | "per questo scontro", oppure effetto permanente |
 | Rimozione economica (legge 7) | solo su Unità Ruotate; legge 8: gli effetti che stancano hanno per bersaglio solo Unità |
@@ -550,7 +550,7 @@ Il simulatore controlla le leggi 12, 13 e 15 in `valida` e rifiuta le carte che 
 | **Scontro** | Un attacco da C1 a C6. |
 | **Sconfiggere** | Mandare un'Unità negli Scarti per esito di scontro o per effetto. |
 | **Scorta** | Riserva comune delle gemme. Spendere = rimettere nella scorta. |
-| **Scudo** | L'Unità che è il bersaglio (si oppone o è cacciata) vince i pareggi [aperto: P7]. |
+| **Scudo** | L'Unità che è il bersaglio (si oppone o è cacciata) vince i pareggi [P7 confermata da Q-029]. |
 | **Stanca** | Ruota un'Unità avversaria Pronta; solo nel tuo turno, mai il Leader. Come costo aggiuntivo, "Stanca una tua Unità Pronta" ruota invece una tua Unità. |
 | **Tempra** | Valore di difesa del Leader: 4. |
 | **Tracciato del round** | Carta con il segnalino del round e le soglie stampate. |
@@ -583,7 +583,7 @@ Nomi dei parametri da `sim/v02/config.py`; preset del simulatore: `V02` (nucleo 
 | Impegno | sequenziale, a vista | `pugno` sequenziale | Deciso 8/8 |
 | Opposizione | prima dell'impegno | `opposizione` prima | Deciso 8/8 |
 | Raddrizzo dei personaggi | nel Ripristino del controllore | `raddrizzo` ripristino | Deciso 8/8; con "Fine": 86.6% al round 13+ |
-| Scudo | vince i pareggi | `scudo` vince_pareggi | **[aperto: P7]** |
+| Scudo | vince i pareggi | `scudo` vince_pareggi | **[P7 confermata da Q-029]** |
 | Saldo | 2 fresche; 3 dal round 10 | `saldo` 2, `saldo_late` 3, `saldo_late_round` 10 | |
 | Alle Corde a 1 Vita | dal round 13 | `corde_one_life_round` 13 | |
 | Crepuscolo | dal round 15, −2 Vite dritte | `crepuscolo_round` 15, `crepuscolo_loss` 2 | |
@@ -641,10 +641,11 @@ Le regole qui sotto sono già nel testo come default. Ogni variante si misura **
 - **Esito (Q-029, regola a tre esiti votata 8/8; E-032, 2026-11-03):** G1 50.0 [48.2–51.8] su 3000 partite con l'IA forte (00_B0c05, tutti i 15 incroci, semi 3400), IC tutto dentro 48–52; vittorie prima del round 6 0.30%; rimonte G1 29.6, G2 25.2. **Il default è confermato**; i bracci `scintilla_extra_round` e `scintilla_guardia_g2` non servono. Dati: `dati/E-032/P6_posti.md`.
 - **Da sapere:** tutte le compensazioni in gemme abbassano le rimonte (da 14.3 a 9.8–12.8); fa eccezione la Guardia (15.1).
 
-### 17.2 P7 — Scudo **[default: vince i pareggi]**
+### 17.2 P7 — Scudo: CONFERMATA (Q-029, 8/8) **[vince i pareggi]**
 - **Voti:** vince i pareggi 5; si oppone senza ruotarsi 3.
 - **Bracci:** `scudo` = `vince_pareggi` contro `oppone_senza_ruotarsi`, su mazzi del set con almeno 5 Scudo (con i mazzi convertiti l'A/B non distingue nulla).
 - **Metrica:** partite al round 13+ nei matchup con ≥ 5 Scudo: ≤ 12% (Ar) / < 5% (Cr); opposizioni nella fascia 15–35%; mazzi Blu 45–55%. Compromesso di Cr: "senza ruotarsi" solo se resta su ≤ 1 Unità per colore.
+- **Esito (Q-029, regola di cambio votata 8/8; E-032, 2026-11-12):** due bracci contro "vince i pareggi" con l'IA forte, 12 incroci con un mazzo da ≥ 5 Scudo a 200 partite (semi 3400), più la lista di rottura di LDR-05. `oppone_senza_ruotarsi` non passa: le distanze dalla fascia 45–55 di L2, L4 e L5 salgono da 10.6 a 15.3, Maera perde 3.6 punti, Δ01+Δ05 +1.9. Il terzo braccio di Q-025, `vince_pareggi_se_pronta` (lo Scudo vince i pareggi solo se l'Unità è Pronta), non passa: Δ05 −0.4 (serviva ≤ −3), distanze 15.8, Maera −5.1, Δ01+Δ05 +4.1. **Il default è confermato** e P7 esce dalle regole in prova; Q-025 si chiude senza cambio del nucleo. Dati: `dati/E-032/P7-*`; esito in `swarm/questioni/Q-029_regole_in_prova/esito_P7.md`.
 
 ### 17.3 P9b — Costo delle Reazioni in gemme di Guardia **[default: regola C4 (a), le Reazioni si pagano con le gemme impegnate]**
 - **Voti:** va bene 3; non va bene 4; astenuto 1. Nessuna alternativa di nucleo con più di un voto.
@@ -721,3 +722,4 @@ I moduli di v0.1 §17 (campo di battaglia, zone contese, round condiviso, Fulcro
 | v0.2.7 | 2026-10-26 | Q-026 (V1 e V2 8/8, vincoli di Vittorio): §2.3 con 2 copie per nome (le gemelle contano insieme), Leggendarie in 1 copia, carta multicolore con tutti i suoi colori nel Leader, rarità Comune/Rara/Epica/Leggendaria; costo aggiuntivo "Stanca una tua Unità Pronta", anche in alternativa a un costo in Vita (M1). Glossario: Costo aggiuntivo, Gemelle, Leggendaria, Rarità, Stanca. Il gioco non cambia: preset V027 = V026 più la costruzione. |
 | v0.2.8 | 2026-11-03 | Q-029 (P8 e Reazioni a costo 0, 8/8): al §14 le leggi di design 12–15 (Vita solo nel tuo turno, pesca fuori dal tuo turno con "se il tuo mazzo non è vuoto", ⟳ solo nel tuo turno, Reazioni a costo 0 con condizione di gioco e senza effetti dopo lo scontro), controllate da `valida`; tolta la regola proposta "ogni Reazione costa almeno 1"; §8 C4 (a) con la condizione di gioco; §17.4 P8 chiusa; §16 con il costo delle Reazioni. Nessuna regola di partita cambiata. |
 | v0.2.9 | 2026-11-03 | Q-029, P6 confermata (regola a tre esiti, 8/8; E-032: G1 50.0 [48.2–51.8] con l'IA forte): "G2 +1 gemma nei round 1 e 3" non è più aperta (§2, §6, §11, §16, §17.1, §17.5). Nessuna regola di partita cambiata. |
+| v0.2.10 | 2026-11-12 | Q-029, P7 confermata (regola di cambio, 8/8; E-032: nessuno dei bracci `oppone_senza_ruotarsi` e `vince_pareggi_se_pronta` passa): "lo Scudo vince i pareggi" non è più aperta (§1, C5, §12.2, §12.3, §15, §16, §17.2); Q-025 chiusa senza cambio del nucleo. Fra le regole in prova resta solo P9b. Nessuna regola di partita cambiata. |
