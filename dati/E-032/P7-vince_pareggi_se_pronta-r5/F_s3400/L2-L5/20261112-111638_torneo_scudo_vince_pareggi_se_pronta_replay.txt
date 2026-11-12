@@ -1,0 +1,128 @@
+--- Round 1, P1 | Vite 5-5
+--- Round 1, P2 | Vite 5-5
+--- Round 2, P1 | Vite 5-5
+  P1 attacca con Leader LDR-02
+    pugni: attaccante 0, difensore 0 -> 3 contro 4
+--- Round 2, P2 | Vite 5-5
+  P2 gioca NEU-001
+--- Round 3, P1 | Vite 5-5
+  P1 gioca NEU-003
+    NEU-001 di P2: sconfitta da un effetto
+--- Round 3, P2 | Vite 5-5
+  P2 gioca NEU-013
+--- Round 4, P1 | Vite 5-5
+  P1 gioca BLU-016
+--- Round 4, P2 | Vite 5-5
+  P2 gioca ROS-005
+  P2 attacca con NEU-013#2
+    pugni: attaccante 1, difensore 0 -> 6 contro 4
+    P1 perde 1 Vita (attacco): restano 4
+  P2 attacca con Leader LDR-05
+    pugni: attaccante 1, difensore 0 -> 4 contro 4
+    P1 perde 1 Vita (attacco_leader): restano 3
+--- Round 5, P1 | Vite 3-5
+  P1 gioca BLU-016
+  P1 attacca con BLU-016#3
+    pugni: attaccante 0, difensore 1 -> 4 contro 6
+  P1 Rimargina NEU-015
+--- Round 5, P2 | Vite 3-5
+  P2 gioca BLU-010
+  P2 attacca con NEU-013#2
+    pugni: attaccante 1, difensore 0 -> 6 contro 4
+    P1 perde 1 Vita (attacco): restano 2
+    P1: il Leader si Risveglia
+--- Round 6, P1 | Vite 2-5
+  P1 usa ⟳ di BLU-016
+  P1 gioca NEU-015
+--- Round 6, P2 | Vite 2-5
+  P2 gioca BLU-015
+  P2 attacca con Leader LDR-05
+    P1 oppone BLU-016
+    pugni: attaccante 0, difensore 0 -> 3 contro 4
+--- Round 7, P1 | Vite 2-5
+--- Round 7, P2 | Vite 2-5
+--- Round 8, P1 | Vite 2-5
+  P1 Rimargina NEU-002
+  P1 gioca BLU-001
+--- Round 8, P2 | Vite 2-5
+  P2 gioca BLU-001
+  P2 attacca con BLU-015#8
+    pugni: attaccante 3, difensore 2 -> 8 contro 10
+--- Round 9, P1 | Vite 2-5
+--- Round 9, P2 | Vite 2-5
+--- Round 10, P1 | Vite 2-5
+  P1 attacca con NEU-015#7
+    pugni: attaccante 6, difensore 0 -> 10 contro 4
+    P2 perde 1 Vita (attacco): restano 4
+--- Round 10, P2 | Vite 2-4
+  P2 attacca con BLU-010#6
+    P1 oppone BLU-016
+    pugni: attaccante 5, difensore 0 -> 11 contro 4
+    BLU-016 di P1 è sconfitta
+--- Round 11, P1 | Vite 2-4
+  P1 Rimargina BLU-002
+  P1 gioca BLU-017
+    BLU-010 di P2: sconfitta da un effetto
+  P1 gioca NEU-002
+--- Round 11, P2 | Vite 2-4
+--- Round 12, P1 | Vite 2-4
+--- Round 12, P2 | Vite 2-4
+  P2 gioca ROS-021
+  P2 attacca con BLU-015#8
+    P1 oppone NEU-015
+    pugni: attaccante 0, difensore 1 -> 5 contro 7
+    BLU-015 di P2 è sconfitta
+  P2 gioca BLU-008
+  P2 attacca con Leader LDR-05
+    P1 oppone BLU-016
+    pugni: attaccante 0, difensore 0 -> 3 contro 4
+--- Round 13, P1 | Vite 2-4
+  P1 attacca con BLU-001#9
+    P2 oppone BLU-001
+    pugni: attaccante 4, difensore 1 + ROS-007 -> 3 contro 4
+    BLU-001 di P1 è sconfitta
+  P1 usa ⟳ di BLU-016
+  P1 attacca con NEU-015#7
+    P2 oppone ROS-005
+    pugni: attaccante 0, difensore 0 -> 4 contro 1
+    ROS-005 di P2 è sconfitta
+  P1 attacca con Leader LDR-02
+    P2 oppone NEU-013
+    pugni: attaccante 0, difensore 0 -> 4 contro 3
+    NEU-013 di P2 è sconfitta
+--- Round 13, P2 | Vite 2-4
+  P2 gioca BLU-015
+  P2 gioca BLU-010
+  P2 attacca con ROS-021#11
+    pugni: attaccante 0, difensore 1 -> 5 contro 7
+  P2 attacca con Leader LDR-05
+    pugni: attaccante 0, difensore 0 -> 3 contro 4
+--- Round 14, P1 | Vite 2-4
+  P1 attacca con BLU-016#3
+    P2 oppone BLU-001
+    pugni: attaccante 4, difensore 1 + BLU-021 -> 4 contro 4
+    BLU-001 di P2 è sconfitta
+    BLU-016 di P1 è sconfitta
+  P1 attacca con NEU-015#7
+    P2 oppone BLU-008
+    pugni: attaccante 0, difensore 0 -> 4 contro 2
+    BLU-008 di P2 è sconfitta
+  P1 attacca con Leader LDR-02
+    pugni: attaccante 0, difensore 0 -> 4 contro 4
+    P2 perde 1 Vita (attacco_leader): restano 3
+  P1 gioca NEU-009
+--- Round 14, P2 | Vite 2-3
+  P2 gioca BLU-008
+  P2 gioca ROS-005
+  P2 attacca con ROS-021#11
+    pugni: attaccante 3, difensore 0 -> 11 contro 4
+    P1 perde 1 Vita (attacco): restano 1
+  P2 attacca con BLU-015#13
+    pugni: attaccante 0, difensore 2 + BLU-025 -> 0 contro 4
+    BLU-015 di P2: sconfitta da un effetto
+  P2 gioca NEU-001
+  P2 attacca con BLU-010#14
+    pugni: attaccante 1, difensore 0 -> 5 contro 4
+    P1 perde 1 Vita (attacco): restano 0
+--- Round 15, P1 | Vite 0-3
+*** P1 perde (crepuscolo)
