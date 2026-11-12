@@ -185,12 +185,16 @@ def new_stats():
         "sacrifices": [0, 0], "recovers": [0, 0],
         "react_legal": [0, 0],                                           # R-027 P9b: scontri difesi con una Reazione giocabile (costo e play_if)
         "react_diag": [{}, {}],
+        # R-027 P7: Unità con Scudo (solo lettura): opposizioni, opposizioni ripetute nel turno, rimozioni subite per fonte
+        "scudo_opp": [0, 0], "scudo_opp_rep": [0, 0],
+        "scudo_rimossa": [{}, {}],      # del proprietario: "scontro" / "caccia" / "attacco" / "sconfiggi" / "rimbalzo" / "sacrificio"
         # R-028 (Q-028): contatori di ritmo (solo lettura, non cambiano le partite)
         "ritmo": [{}, {}],              # per turno del giocatore attivo: turni, blocc, piena, piena_blocc, giocata, r13, r13_attivo, bruciate
         "vite_round": [],               # (Vite G1, Vite G2) all'inizio di ogni round
         "zero_round": [None, None],     # round in cui il Leader arriva a 0 Vite la prima volta
         "unit_noatk": [0, 0], "unit_noatk_opp": [0, 0],   # Unità Pronte che non attaccano; di queste, quelle che poi si oppongono
         "breccia": [0, 0],              # Vite tolte da Breccia
+        "breccia_by": [{}, {}],         # per carta: "<cid>|tent" (ha battuto chi si opponeva), "<cid>|ok" (Vita tolta), "<cid>|ok_pari" (Vita tolta nella sconfitta reciproca)
         "fa_alta_r6": [0, 0],           # R-017 entro il round 6                                          # R-027 P9b: "<fonte>|<livello>|<gemme|zero>" per scontro difeso
     }
 
@@ -874,6 +878,8 @@ class GameState:
                 self.p[q].discard.append(u.cid)
                 self.stat_add("sacrifices", q)
                 self.stat_add("removals_src", q, "sacrificio")
+                if CARDS[u.cid].has("scudo"):
+                    self.stat_add("scudo_rimossa", q, "sacrificio")
                 self.say(f"    P{q+1} sacrifica {CARDS[u.cid].name} per pagare il costo")
             else:
                 u = self.unit(q, x[1])
@@ -1148,6 +1154,8 @@ class GameState:
                 else:                                       # defeat: negli Scarti; bounce: in mano al proprietario
                     self.p[owner].units.remove(u)
                     (self.p[owner].hand if k == "bounce" else self.p[owner].discard).append(u.cid)
+                    if owner != q and CARDS[u.cid].has("scudo"):
+                        self.stat_add("scudo_rimossa", owner, "rimbalzo" if k == "bounce" else "sconfiggi")
                     if owner != q:
                         self.stat_add("removals", q)
                         self.stat_add("removals_src", q, "rimbalzo" if k == "bounce" else "sconfiggi")
@@ -1259,6 +1267,9 @@ class GameState:
             self.stats["opp_impeto"][d] += CARDS[u.cid].has("impeto")
             if self.track is not None:
                 self.stats["opp_repeat"][d] += uid in self.track["opposed"]     # M7
+                if CARDS[u.cid].has("scudo"):
+                    self.stats["scudo_opp"][d] += 1
+                    self.stats["scudo_opp_rep"][d] += uid in self.track["opposed"]
                 self.track["opposed"].add(uid)
         self.say(f"    P{d+1} oppone {CARDS[u.cid].name}")
         self.fire(d, CARDS[u.cid].abilities, "on_oppose", dict(self.combat_ctx(self.combat), self=uid), src=u.cid)
@@ -1518,16 +1529,25 @@ class GameState:
             pd.discard.append(tgt_unit.cid)
             self.say(f"    {CARDS[tgt_unit.cid].name} di P{d+1} è sconfitta")
             self.stat_add("units_defeated_in_combat", a)
+            if CARDS[tgt_unit.cid].has("scudo"):
+                self.stat_add("scudo_rimossa", d, "caccia" if cb.opposer is None else "scontro")
             self._stancata_rimossa(a, d, tgt_unit)
             if cb.opposer is None:
                 self.stat_add("removals", a)                             # M12: sconfitta da Caccia
                 self.stat_add("removals_src", a, "caccia")
-            elif att_unit is not None and CARDS[att_unit.cid].has("breccia") and self.lose_life(d, "breccia"):
-                self.stat_add("breccia", a)                              # R-028 V3: batte chi si oppone, nel rispetto del Saldo
+            elif att_unit is not None and CARDS[att_unit.cid].has("breccia"):
+                self.stat_add("breccia_by", a, f"{att_unit.cid}|tent")
+                if self.lose_life(d, "breccia"):
+                    self.stat_add("breccia", a)                          # R-028 V3: batte chi si oppone, nel rispetto del Saldo
+                    self.stat_add("breccia_by", a, f"{att_unit.cid}|ok")
+                    if att_dead:
+                        self.stat_add("breccia_by", a, f"{att_unit.cid}|ok_pari")
         if att_dead:
             pa.units.remove(att_unit)
             pa.discard.append(att_unit.cid)
             self.say(f"    {CARDS[att_unit.cid].name} di P{a+1} è sconfitta")
+            if CARDS[att_unit.cid].has("scudo"):
+                self.stat_add("scudo_rimossa", a, "attacco")
         if hit:
             self.stat_add("attacks_leader_hit", a)
             if cb.att == "L" and self.stats is not None:

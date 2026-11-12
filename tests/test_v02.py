@@ -1055,6 +1055,14 @@ def test_r028_breccia():
         _fight(s, ("attack", 900), oppose=901)
         assert s.unit(1, 901) is None and n - len(s.p[1].life) == lost
         assert s.stats["breccia"][0] == lost
+        assert s.stats["breccia_by"][0] == ({"_r028br|tent": 1, "_r028br|ok": 1} if lost else {"_r028br|tent": 1})
+    s = _arena()                                                    # sconfitta reciproca: la Breccia scatta e si conta a parte
+    eq = _card("_r028eq", power=5)
+    s.p[0].units = [Unit(900, br, True)]
+    s.p[1].units = [Unit(901, eq, True)]
+    _fight(s, ("attack", 900), oppose=901)
+    assert s.unit(0, 900) is None and s.unit(1, 901) is None
+    assert s.stats["breccia_by"][0] == {"_r028br|tent": 1, "_r028br|ok": 1, "_r028br|ok_pari": 1}
 
 
 def test_r028_partite_con_le_leve():
@@ -1084,6 +1092,24 @@ def test_r027_scudo_vince_pareggi_se_pronta():
     s.p[1].units = [Unit(901, shield, True)]
     _fight(s, ("attack", 900), oppose=901)
     assert s.unit(1, 901) is None and s.unit(0, 900) is None                         # chi si oppone è Ruotato: pareggio senza Scudo
+
+def test_r027_p7_contatori_scudo():
+    """P7: i contatori dello Scudo (solo lettura) contano opposizioni, ripetute e rimozioni subite per fonte."""
+    shield = _card("_r027c", power=3, keywords=["scudo"])
+    s = _arena()
+    assert s.stats is not None and s.track is not None
+    s.p[0].units = [Unit(900, _card("_r027b", power=5), True)]
+    s.p[1].units = [Unit(901, shield, True)]
+    _fight(s, ("attack", 900), oppose=901)
+    assert s.unit(1, 901) is None
+    assert s.stats["scudo_opp"][1] == 1 and s.stats["scudo_opp_rep"][1] == 0
+    assert s.stats["scudo_rimossa"][1] == {"scontro": 1}
+    s = _arena()
+    s.p[0].units = [Unit(900, _card("_r027d", power=5, keywords=["caccia"]), True)]
+    s.p[1].units = [Unit(901, shield, False)]
+    _fight(s, ("attack", 900, 901))
+    assert s.unit(1, 901) is None and s.stats["scudo_rimossa"][1] == {"caccia": 1} and s.stats["scudo_opp"][1] == 0
+
 
 if __name__ == "__main__":
     for k, f in list(globals().items()):
