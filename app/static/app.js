@@ -630,8 +630,8 @@ function centroHTML(p) {
   if (p.bersaglio) {
     const b = p.bersaglio;
     if (b.tipo === "recupero")
-      return `${s}<span class="fase"><b>Effetto di ${esc(b.fonte || "una carta")}</b>: ${b.tuo ? "scegli la carta da riprendere dagli Scarti" : `${esc(p.decide)} sceglie una carta dagli Scarti…`}</span>`;
-    return `${s}<span class="fase"><b>Effetto di ${esc(b.fonte || "una carta")}</b>: ${b.tuo ? "scegli il bersaglio fra quelli illuminati di rosso" : `${esc(p.decide)} sceglie il bersaglio…`}</span>`;
+      return `${s}<span class="fase"><b>Effetto di ${esc(b.fonte ? nomeC(b.fonte) : "una carta")}</b>: ${b.tuo ? "scegli la carta da riprendere dagli Scarti" : `${esc(p.decide)} sceglie una carta dagli Scarti…`}</span>`;
+    return `${s}<span class="fase"><b>Effetto di ${esc(b.fonte ? nomeC(b.fonte) : "una carta")}</b>: ${b.tuo ? "scegli il bersaglio fra quelli illuminati di rosso" : `${esc(p.decide)} sceglie il bersaglio…`}</span>`;
   }
   if (!p.tocca_a_te) return `${s}<span class="fase" style="opacity:.7">… decide ${esc(p.decide)}</span>`;
   const az = p.azioni;
@@ -643,7 +643,7 @@ function centroHTML(p) {
     const parate = az.filter((a) => a.gruppo === "parata");
     s += `<div class="scelte"><span class="titolo">Difenditi: gemme di Guardia (+2 l'una) ed eventuale Reazione</span>${parate.map((a) =>
       `<button class="scelta-gemme" data-i="${a.i}" ${a.carta ? `data-card="${a.carta}"` : ""}><span class="gg">${gemmeHTML(a.n, 0, "guardia") || "—"}</span>
-        ${a.carta ? `⛨ ${esc(a.carta)}${a.da === "scar" ? " (Cicatrice)" : ""}` : `${a.n} gemme`}
+        ${a.carta ? `⛨ ${esc(nomeC(a.carta))}${a.da === "scar" ? " (Cicatrice)" : ""}` : `${a.n} gemme`}
         ${a.fa != null ? `<small>attacco ${a.fa} contro difesa ${a.db}</small>` : ""}</button>`).join("")}</div>`;
     if (az.some((a) => a.gruppo === "opposizione")) s += `<span class="fase">oppure clicca una tua Unità Pronta per opporla</span>`;
   } else if (p.fase === "oppose" || p.fase === "oppose_after") {
@@ -769,7 +769,7 @@ function mostraScarti(lato) {
 function sceltaRecupero(b) {
   const el = document.createElement("div");
   el.id = "recupero";
-  el.innerHTML = `<div class="pannello"><h3>Effetto di ${esc(b.fonte || "una carta")}: riprendi una carta dagli Scarti</h3>
+  el.innerHTML = `<div class="pannello"><h3>Effetto di ${esc(b.fonte ? nomeC(b.fonte) : "una carta")}: riprendi una carta dagli Scarti</h3>
     ${b.testo ? `<p class="nota">${esc(b.testo)}</p>` : ""}
     <div class="recupero-carte">${b.carte.map((id) => cartaHTML(id, { attr: `data-riprendi="${esc(id)}"` })).join("")}</div></div>`;
   $("#gioco").appendChild(el);
@@ -934,7 +934,7 @@ function scoppioScontro(e, ign) {
   effimero(`<span class="vs"><span class="att">${e.fa}</span> ⚔ <span class="dif">${e.db}</span></span>
     <span class="esito ${colpo ? "colpo" : "parato"}">${colpo ? "A SEGNO!" : "RESPINTO"}</span>
     ${ign ? `<span class="esito perche">Nessuna Vita persa: ${esc(ign.perche)}</span>` : ""}
-    ${e.carta ? `<span class="esito" style="font-size:16px">Reazione ${esc(e.carta)}</span>` : ""}`,
+    ${e.carta ? `<span class="esito" style="font-size:16px">Reazione ${esc(nomeC(e.carta))}</span>` : ""}`,
     ign ? "scontro-pop lungo" : "scontro-pop", ign ? 2600 : 1400);
   return sleep(ign ? 1500 : 900);
 }

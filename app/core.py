@@ -701,21 +701,31 @@ def esegui_con_scelte(s, act, scelte):
 
 EVENTI = [
     ("turno", re.compile(r"^--- Round (?P<round>\d+), P(?P<p>[12])")),
-    ("gioca", re.compile(r"^  P(?P<p>[12]) gioca (?P<carta>\S+)$")),
-    ("rimargina", re.compile(r"^  P(?P<p>[12]) Rimargina (?P<carta>\S+)$")),
+    ("gioca", re.compile(r"^  P(?P<p>[12]) gioca (?P<carta>.+)$")),
+    ("rimargina", re.compile(r"^  P(?P<p>[12]) Rimargina (?P<carta>.+)$")),
     ("abilita", re.compile(r"^  P(?P<p>[12]) usa ⟳")),
     ("attacco", re.compile(r"^  P(?P<p>[12]) attacca con")),
-    ("oppone", re.compile(r"^    P(?P<p>[12]) oppone (?P<carta>\S+)")),
-    ("scontro", re.compile(r"pugni: attaccante (?P<a>\d+), difensore (?P<d>\d+)(?: \+ (?P<carta>\S+))? -> (?P<fa>-?\d+) contro (?P<db>-?\d+)")),
+    ("oppone", re.compile(r"^    P(?P<p>[12]) oppone (?P<carta>.+)$")),
+    ("scontro", re.compile(r"pugni: attaccante (?P<a>\d+), difensore (?P<d>\d+)(?: \+ (?P<carta>.+?))? -> (?P<fa>-?\d+) contro (?P<db>-?\d+)")),
     ("vita", re.compile(r"^    P(?P<p>[12]) perde 1 Vita")),
-    ("sconfitta", re.compile(r"^    (?P<carta>\S+) di P(?P<p>[12]) è sconfitta")),
+    ("sconfitta", re.compile(r"^    (?P<carta>.+?) di P(?P<p>[12]) è sconfitta")),
     ("risveglio", re.compile(r"^    P(?P<p>[12]): il Leader si Risveglia")),
     ("ignorata", re.compile(r"^    P(?P<p>[12]) non perde Vite: (?P<perche>.+)$")),
-    ("rimbalzo", re.compile(r"^    (?P<carta>\S+) di P(?P<p>[12]): torna in mano")),
-    ("sacrifica", re.compile(r"^    P(?P<p>[12]) sacrifica (?P<carta>\S+) per pagare")),
-    ("riprende", re.compile(r"^    P(?P<p>[12]) riprende (?P<carta>\S+) dagli Scarti")),
+    ("rimbalzo", re.compile(r"^    (?P<carta>.+?) di P(?P<p>[12]): torna in mano")),
+    ("sacrifica", re.compile(r"^    P(?P<p>[12]) sacrifica (?P<carta>.+?) per pagare")),
+    ("riprende", re.compile(r"^    P(?P<p>[12]) riprende (?P<carta>.+?) dagli Scarti")),
 ]
 EVENTI_RX = dict(EVENTI)
+
+
+def id_da_nome(nome):
+    """ID di una carta dal nome scritto nel registro (le gemelle hanno lo stesso nome: va bene la prima)."""
+    if nome in CARDS:
+        return nome
+    for cid, c in CARDS.items():
+        if c.name == nome:
+            return cid
+    return nome
 
 
 def eventi(log, q, start):
@@ -727,6 +737,8 @@ def eventi(log, q, start):
             m = rx.search(log[n])
             if m:
                 e = {"n": n, "t": tipo, **{k: v for k, v in m.groupdict().items() if v is not None and k != "p"}}
+                if "carta" in e:                  # il registro usa i nomi (Q-029): il client vuole l'ID
+                    e["carta"] = id_da_nome(e["carta"])
                 if m.groupdict().get("p"):
                     e["chi"] = "io" if int(m["p"]) - 1 == q else "avv"
                 out.append(e)

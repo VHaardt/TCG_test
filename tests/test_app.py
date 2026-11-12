@@ -408,6 +408,68 @@ def test_any_cost_menu_on_ner002_ner019_and_cycle04_names():
         assert pag == ["Stanca " + s.describe(q, 950), "perdi 1 Vita"], (cid, pag)    # solo le Unità Pronte
 
 
+def test_q027_new_i04_free_reaction_only_with_no_gems_on_own_unit():
+    """Q-027: NEW-I04 (costo 0) si offre solo quando il bersaglio è una tua Unità e impegni 0 gemme;
+    nell'app risulta "costo 0" e il conto dello scontro la conta (gratis)."""
+    d = core.dati()
+    C = {c["id"]: c for c in d.catalogo()["carte"]}
+    assert C["NEW-I04"]["nome"] != "NEW-I04" and C["NEW-I04"]["costo"] == 0
+    r0, r1 = d.riferimento[0], d.riferimento[1]
+    L = lambda m: [c for c, k in m["carte"].items() for _ in range(k)]
+
+    def scontro(bersaglio):
+        s = E.new_game(r0["leader"], L(r0), r1["leader"], L(r1), rules=d.rules, seed=3, log=True)
+        s.round = 3
+        a = s.active
+        s.p[a].units = [E.Unit(900, "NEW-V05", True)]
+        s.p[1 - a].units = [E.Unit(901, "NEW-V05", True)]
+        s.p[1 - a].guard, s.p[1 - a].hand = 2, ["NEW-I04"]
+        s.step(("attack", 900))
+        if s.phase == "oppose":
+            s.step(("oppose", 901) if bersaglio == "unita" else ("no_oppose",))
+        s.step(("gems", 0))
+        return s, 1 - a
+    s, q = scontro("leader")
+    assert not [x for x in s.legal_actions() if x[0] == "parry" and x[2]]          # bersaglio il Leader
+    s, q = scontro("unita")
+    con = [x for x in s.legal_actions() if x[0] == "parry" and x[2]]
+    assert [x[1] for x in con] == [0]                                              # solo con 0 gemme
+    lab = core.etichetta(s, q, con[0])
+    assert "(costo 0)" in lab["testo"] and lab["carta"] == "NEW-I04"
+    s.combat.d, s.combat.react = 0, None
+    senza = core.conto_scontro(s, s.combat, 0, 0)
+    s.combat.react = con[0][2]
+    conto = core.conto_scontro(s, s.combat, 0, 0)
+    assert any(x["t"] == "Reazione NEW-I04 (gratis)" for x in conto["dif"]) and conto["db"] == senza["db"] + 2
+
+
+def test_log_events_find_cards_by_their_q029_names():
+    """Il registro scrive i nomi (anche di più parole): ogni giocata, opposizione e Reazione diventa un evento
+    con l'ID della carta, così il client può animarla."""
+    import random
+    d = core.dati()
+    r0, r1 = d.riferimento[1], d.riferimento[3]
+    L = lambda m: [c for c, k in m["carte"].items() for _ in range(k)]
+    seen = {"gioca": 0, "scontro": 0}
+    for seed in range(6):
+        rng = random.Random(seed)
+        s = E.new_game(r0["leader"], L(r0), r1["leader"], L(r1), rules=d.rules, seed=seed, log=True)
+        for _ in range(3000):
+            if s.over:
+                break
+            acts = s.legal_actions()
+            core.passo(s, rng.choice([x for x in acts if x[0] != "end"] or acts))
+        ev = {e["n"]: e for e in core.eventi(s.log, 0, 0)}
+        for n, ln in enumerate(s.log):
+            if " gioca " in ln and ln.startswith("  P"):
+                assert ev[n]["t"] == "gioca" and ev[n]["carta"] in E.CARDS, ln
+                seen["gioca"] += 1
+            if "pugni:" in ln and " + " in ln:
+                assert ev[n]["t"] == "scontro" and ev[n]["carta"] in E.CARDS, ln
+                seen["scontro"] += 1
+    assert seen["gioca"] and seen["scontro"], seen
+
+
 def teardown_module():
     E.load_cards()          # the app loads the set into the engine: restore the default for the other tests
 
