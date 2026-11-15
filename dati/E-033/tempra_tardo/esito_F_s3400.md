@@ -1,6 +1,6 @@
 # E-020 / tempra_tardo — dati con IA forte:30 (v2)
 
-Motore commit 636e83e (branch `claude/regolamento-v0.1`), preset V027, un torneo per incrocio (`lancia_e020.sh`), partite appaiate per seme con B0. Incroci: 15 rif; partite: 1500 (100 per incrocio). Solo dati: le regole d'uscita sono nel piano e nel LEGGIMI.
+Motore commit 636e83e (branch `claude/regolamento-v0.1`), preset /home/claude/e033_in/varianti/tempra_tardo.json, un torneo per incrocio (`lancia_e020.sh`), partite appaiate per seme con B0. Incroci: 15 rif; partite: 1500 (100 per incrocio). Solo dati: le regole d'uscita sono nel piano e nel LEGGIMI.
 
 ## Vittorie per Leader (incroci rif)
 

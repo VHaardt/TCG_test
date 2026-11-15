@@ -1,6 +1,6 @@
 # E-020 / P7-vince_pareggi_se_pronta-r5 — dati con IA forte:30 (v2)
 
-Motore commit 7ec6380 (branch `claude/regolamento-v0.1`), preset /home/claude/e020_res/dati/coda/varianti/scudo_oppone_senza_ruotarsi.json, un torneo per incrocio (`lancia_e020.sh`), partite appaiate per seme con B0. Incroci: 2 rif; partite: 400 (200 per incrocio). Solo dati: le regole d'uscita sono nel piano e nel LEGGIMI.
+Motore commit 7ec6380 (branch `claude/regolamento-v0.1`), preset /home/claude/e020_res/dati/coda/varianti/scudo_vince_pareggi_se_pronta.json, un torneo per incrocio (`lancia_e020.sh`), partite appaiate per seme con B0. Incroci: 2 rif; partite: 400 (200 per incrocio). Solo dati: le regole d'uscita sono nel piano e nel LEGGIMI.
 
 ## Vittorie per Leader (incroci rif)
 
