@@ -1,9 +1,9 @@
 {
- "set": "set_v02 (ciclo 04 + Q-027)",
+ "set": "set_v02 (ciclo 04 + Q-027 + ciclo 05 V4)",
  "autore": "programmatore (swarm)",
- "data": "2026-11-10",
+ "data": "2026-11-15",
  "formato": "lista 'cards' con ID ripetuti per le copie; 'leader' = ID del Leader (LDR-0N)",
- "nota": "Le 6 liste rif_ di B0c05 (Q-026 V1, 2 copie per nome, correzioni del critico) con le modifiche del ciclo 04: M2 in L1, L4, L6; M3 in L6. M1 cambia solo le carte: la lista di L6 non prende il cambio di lista del braccio M1. Q-027 (braccio A di E-031, 8/8): NEW-I04, NEW-I05, NEW-I06 in L2 (Maera, lista del braccio A) e NEW-I04, NEW-I05 in L4 (Thorn: scambi di A sopra M2, senza sovrapposizioni). Le liste mix_ (3 copie, non rifatte a 2) sono in mazzi_v02_mix_da_rifare.json.",
+ "nota": "Le 6 liste rif_ di B0c05 (Q-026 V1, 2 copie per nome, correzioni del critico) con le modifiche del ciclo 04: M2 in L1, L4, L6; M3 in L6. M1 cambia solo le carte: la lista di L6 non prende il cambio di lista del braccio M1. Q-027 (braccio A di E-031, 8/8): NEW-I04, NEW-I05, NEW-I06 in L2 (Maera, lista del braccio A) e NEW-I04, NEW-I05 in L4 (Thorn: scambi di A sopra M2, senza sovrapposizioni). Ciclo 05 (Q-031 A, liste V4): L2, L4, L6 come in tcg/swarm/cicli/ciclo-05/liste_V4/; le 6 liste rif_ sono il riferimento B0c06. Le liste mix_ (3 copie, non rifatte a 2) sono in mazzi_v02_mix_da_rifare.json.",
  "mazzi": [
   {
    "name": "rif_LDR01_puntata_e_preda",
@@ -57,13 +57,13 @@
    "name": "rif_LDR02_muro_di_parata",
    "leader": "LDR-02",
    "tipo": "riferimento",
-   "note": "Riferimento Maera: muri Scudo + 17 Reazioni (anche dalle Cicatrici), rimozione su Ruotate, chiusura con BLU-020/BLU-003/NER-022. B0c05 (Q-026 V1): max 2 copie per nome; sostituzioni in liste_B0c05/LEGGIMI.md. E-031 A: −BLU-023, −BLU-023; +NEW-I04, +NEW-I04. E-031 A: −BLU-009, −NER-023; +NEW-I05, +NEW-I05. E-031 A: −NER-003, −NER-003; +NEW-I06, +NEW-I06.",
+   "note": "Riferimento Maera: muri Scudo + 17 Reazioni (anche dalle Cicatrici), rimozione su Ruotate, chiusura con BLU-020/BLU-003/NER-022. B0c05 (Q-026 V1): max 2 copie per nome; sostituzioni in liste_B0c05/LEGGIMI.md. E-031 A: −BLU-023, −BLU-023; +NEW-I04, +NEW-I04. E-031 A: −BLU-009, −NER-023; +NEW-I05, +NEW-I05. E-031 A: −NER-003, −NER-003; +NEW-I06, +NEW-I06. Ciclo 05 V4 (Q-031, liste_V4/LDR-02.md): −NEW-I05 ×2, −NEW-I06 ×2, −BLU-022; +BLU-005 ×2, +BLU-004 ×2, +NEU-004.",
    "cards": [
     "BLU-002",
     "BLU-002",
     "BLU-021",
     "BLU-021",
-    "BLU-022",
+    "NEU-004",
     "BLU-001",
     "BLU-001",
     "BLU-007",
@@ -95,10 +95,10 @@
     "NER-022",
     "NEW-I04",
     "NEW-I04",
-    "NEW-I05",
-    "NEW-I05",
-    "NEW-I06",
-    "NEW-I06"
+    "BLU-005",
+    "BLU-005",
+    "BLU-004",
+    "BLU-004"
    ]
   },
   {
@@ -153,7 +153,7 @@
    "name": "rif_LDR04_stanca_e_smonta",
    "leader": "LDR-04",
    "tipo": "riferimento",
-   "note": "Riferimento Thorn: Stanca dal Leader e dalle carte, BLU-011/VER-006 tolgono le Unita Ruotate, cacciatori e muri che vincono gli scontri fra Unita. B0c05 (Q-026 V1): max 2 copie per nome; sostituzioni in liste_B0c05/LEGGIMI.md. Correzione del critico (verifica_critico.md): −1 VER-012, +1 NEU-011. E-030: −NEU-011, −VER-002; +NEW-V05, +NEW-V05. E-031 A (Q-027): −BLU-023, −BLU-023; +NEW-I04, +NEW-I04. E-031 A: −VER-024, −VER-025; +NEW-I05, +NEW-I05.",
+   "note": "Riferimento Thorn: Stanca dal Leader e dalle carte, BLU-011/VER-006 tolgono le Unita Ruotate, cacciatori e muri che vincono gli scontri fra Unita. B0c05 (Q-026 V1): max 2 copie per nome; sostituzioni in liste_B0c05/LEGGIMI.md. Correzione del critico (verifica_critico.md): −1 VER-012, +1 NEU-011. E-030: −NEU-011, −VER-002; +NEW-V05, +NEW-V05. E-031 A (Q-027): −BLU-023, −BLU-023; +NEW-I04, +NEW-I04. E-031 A: −VER-024, −VER-025; +NEW-I05, +NEW-I05. Ciclo 05 V4 (Q-031, liste_V4/LDR-04.md): −NEU-003; +VER-002.",
    "cards": [
     "BLU-005",
     "VER-002",
@@ -177,7 +177,7 @@
     "BLU-011",
     "BLU-011",
     "BLU-012",
-    "NEU-003",
+    "VER-002",
     "VER-014",
     "VER-014",
     "VER-015",
@@ -249,12 +249,12 @@
    "name": "rif_LDR06_ferite_e_caccia",
    "leader": "LDR-06",
    "tipo": "riferimento",
-   "note": "Riferimento LDR-06: Vita pagata -> Cicatrici -> Stanca (NER-015, Leader, NER-011) -> Caccia (VER-020/008/001, NER-017) e rimozione su Ruotate. E-025 A-FV_c02: −3 NER-002, −2 NER-019, +3 NER-013, +2 VER-019 (A-FV di E-024). B0c05 (Q-026 V1): max 2 copie per nome; sostituzioni in liste_B0c05/LEGGIMI.md. Correzione del critico (verifica_critico.md): −1 VER-009, +1 NEU-012. Ciclo 04: M2 (−2 VER-013, +2 NEW-V05) e M3 (−1 VER-023, +1 NEW-B06).",
+   "note": "Riferimento LDR-06: Vita pagata -> Cicatrici -> Stanca (NER-015, Leader, NER-011) -> Caccia (VER-020/008/001, NER-017) e rimozione su Ruotate. E-025 A-FV_c02: −3 NER-002, −2 NER-019, +3 NER-013, +2 VER-019 (A-FV di E-024). B0c05 (Q-026 V1): max 2 copie per nome; sostituzioni in liste_B0c05/LEGGIMI.md. Correzione del critico (verifica_critico.md): −1 VER-009, +1 NEU-012. Ciclo 04: M2 (−2 VER-013, +2 NEW-V05) e M3 (−1 VER-023, +1 NEW-B06). Ciclo 05 V4 (Q-031, liste_V4/LDR-06.md): −NER-007, −VER-024; +NER-006, +VER-004.",
    "cards": [
     "NER-001",
     "NER-003",
     "NER-003",
-    "NER-007",
+    "NER-006",
     "NER-009",
     "NER-009",
     "NER-011",
@@ -289,7 +289,7 @@
     "VER-020",
     "VER-021",
     "VER-021",
-    "VER-024",
+    "VER-004",
     "VER-024"
    ]
   }
