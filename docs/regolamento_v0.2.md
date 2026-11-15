@@ -2,13 +2,13 @@
 
 | Campo | Valore |
 |---|---|
-| Versione | v0.2.10 (nucleo di v0.2.6; costruzione del mazzo da Q-026; leggi di design, P6 e P7 confermate da Q-029) |
+| Versione | v0.2.11 (nucleo di v0.2.6; costruzione del mazzo da Q-026; leggi di design, P6, P7 e P9b confermate da Q-029) |
 | Data | 2026-11-15 |
-| Stato | **ratificato dallo swarm (Q-013, 8/8 APPROVO)**; pilastri 2, 3, 4 e 6 già riscritti per v0.2 (Q-013 e Q-017, `pilastri_design_v0.2.md`); fra le regole in prova resta solo P9b (§17.3) |
+| Stato | **ratificato dallo swarm (Q-013, 8/8 APPROVO)**; pilastri 2, 3, 4 e 6 già riscritti per v0.2 (Q-013 e Q-017, `pilastri_design_v0.2.md`); nessuna regola in prova: P6, P7 e P9b confermate da Q-029 (§17) |
 | Fonte normativa | `swarm/questioni/Q-013_rework_nucleo_v0.2/esito.md`, sezione A "Specifica consolidata". Dati: `swarm/esperimenti/E-014/sintesi_r3.md` |
 | Sostituisce | `regolamento_v0.1.md`. Le parti di v0.1 non toccate da Q-013 restano valide e sono riportate qui |
 
-> Convenzioni. "Deve", "non può", "è illegale" sono vincolanti anche per il simulatore. I punti marcati **[default, aperto: Px]** sono regole in vigore scelte come default da un voto senza maggioranza: ognuno ha una variante con metrica nel §17. I nomi fra parentesi quadre, come [`tempra`], sono i parametri del simulatore (`sim/v02/config.py`, preset `V02`).
+> Convenzioni. "Deve", "non può", "è illegale" sono vincolanti anche per il simulatore. I punti marcati **[Px confermata da Q-029]** erano default scelti da un voto senza maggioranza, poi confermati con l'IA forte; storia, bracci misurati ed esiti nel §17. I nomi fra parentesi quadre, come [`tempra`], sono i parametri del simulatore (`sim/v02/config.py`, preset `V02`).
 
 > **Cosa cambia da v0.1**
 > 1. Componenti: solo carte, gemme di una sola specie e una carta-tracciato del round. Spariscono Fornace, contatori, Scintilla.
@@ -596,7 +596,7 @@ Nomi dei parametri da `sim/v02/config.py`; preset del simulatore: `V02` (nucleo 
 | Muro di Scudi | 1 gemma, +4 | `muro_bonus` 4 | Provvisorio |
 | Grido dalla Cicatrice | 1 gemma; −3 dalla mano, −5 dalle Cicatrici | `grido_hand` 3, `grido_scars` 5 | Provvisorio |
 | Rimarginare | ⟳ del Leader + 1 Brace | — | Niente limite "1 volta per turno" |
-| Costo delle Reazioni | quello stampato, anche 0 (§14, legge 15) | `react_min_cost` 0, `reazione_da_cicatrice_costo` 0 | Q-029; −1 da Cicatrice è la variante P9b, in prova |
+| Costo delle Reazioni | quello stampato, anche 0 (§14, legge 15) | `react_min_cost` 0, `reazione_da_cicatrice_costo` 0 | Q-029; P9b confermata da Q-029 (il −1 da Cicatrice non passa, §17.3) |
 
 ### 16.1 Numeri misurati (E-014, base finale: Tempra 4, impegno sequenziale)
 Mazzi convertiti da v0.1, mirror, IA semplice, 10.000 partite salvo dove indicato.
@@ -627,9 +627,9 @@ Mazzi convertiti da v0.1, mirror, IA semplice, 10.000 partite salvo dove indicat
 
 ---
 
-## 17. Varianti aperte e coda dei test
+## 17. Varianti misurate e coda dei test
 
-Le regole qui sotto sono già nel testo come default. Ogni variante si misura **una alla volta**, contro la base vigente, con seed appaiati.
+Le regole qui sotto sono nel testo e sono tutte confermate (Q-029): nessuna resta in prova. Le varianti si sono misurate **una alla volta**, contro la base vigente, con seed appaiati; le nuove si misurano allo stesso modo.
 
 ### 17.1 P6 — Compensazione di G1: CONFERMATA (Q-029, 8/8) **[G2 +1 gemma nei round 1 e 3]**
 - **Q-019 (2026-10-12):** il default passa da {1,3} a {1,3,5} insieme al Crepuscolo di round; P6 resta **[aperto]**. Tarato solo con l'IA semplice (E-019: G1 nei mirror 48.9 [47.0–50.7]); con la forte v2 va rimisurato (R-3, condizione di revisione 2 di Q-019).
@@ -647,11 +647,12 @@ Le regole qui sotto sono già nel testo come default. Ogni variante si misura **
 - **Metrica:** partite al round 13+ nei matchup con ≥ 5 Scudo: ≤ 12% (Ar) / < 5% (Cr); opposizioni nella fascia 15–35%; mazzi Blu 45–55%. Compromesso di Cr: "senza ruotarsi" solo se resta su ≤ 1 Unità per colore.
 - **Esito (Q-029, regola di cambio votata 8/8; E-032, 2026-11-12):** due bracci contro "vince i pareggi" con l'IA forte, 12 incroci con un mazzo da ≥ 5 Scudo a 200 partite (semi 3400), più la lista di rottura di LDR-05. `oppone_senza_ruotarsi` non passa: le distanze dalla fascia 45–55 di L2, L4 e L5 salgono da 10.6 a 15.3, Maera perde 3.6 punti, Δ01+Δ05 +1.9. Il terzo braccio di Q-025, `vince_pareggi_se_pronta` (lo Scudo vince i pareggi solo se l'Unità è Pronta), non passa: Δ05 −0.4 (serviva ≤ −3), distanze 15.8, Maera −5.1, Δ01+Δ05 +4.1. **Il default è confermato** e P7 esce dalle regole in prova; Q-025 si chiude senza cambio del nucleo. Dati: `dati/E-032/P7-*`; esito in `swarm/questioni/Q-029_regole_in_prova/esito_P7.md`.
 
-### 17.3 P9b — Costo delle Reazioni in gemme di Guardia **[default: regola C4 (a), le Reazioni si pagano con le gemme impegnate]**
+### 17.3 P9b — Costo delle Reazioni in gemme di Guardia: CONFERMATA (Q-029, 8/8) **[regola C4 (a), le Reazioni si pagano con le gemme impegnate]**
 - **Voti:** va bene 3; non va bene 4; astenuto 1. Nessuna alternativa di nucleo con più di un voto.
 - **Prima la diagnostica:** Reazioni disponibili contro giocate; mazzo di prova con 9 Reazioni.
 - **Poi, se il problema è il costo:** variante di Ne, `reazione_da_cicatrice_costo` −1 (minimo 0) per le Reazioni giocate da Cicatrici dritte.
 - **Metrica:** ≥ 0.10 Reazioni per scontro sui mazzi del set; rimonte in salita.
+- **Esito (Q-029, regola votata 8/8; E-032, 2026-11-15):** `reazione_da_cicatrice_costo` −1 sulle liste del braccio A di E-031 (9 incroci, 100 partite, semi 3400, confronto appaiato): le Reazioni per scontro difeso salgono (da +0.012 a +0.059 per Leader) e Maera resta a 54.2, ma le partite al round 13+ salgono di 6.9 punti (64.8% contro 57.9%, limite +2). **Il −1 non entra; C4 (a) è confermata.** Dati: `dati/E-032/P9b/`; esito in `swarm/questioni/Q-029_regole_in_prova/esito_P9b.md`.
 
 ### 17.4 P8 — Cicatrici fresche: CHIUSA (Q-029, 8/8)
 - **Buco latente** (trovato da Bl e Cr): un Leader Alle Corde senza fresche che perdesse Vita nel turno avversario riceverebbe una fresca e diventerebbe immune al colpo finale per il resto del turno.
@@ -660,11 +661,11 @@ Le regole qui sotto sono già nel testo come default. Ogni variante si misura **
 
 ### 17.5 Coda dei test, nell'ordine chiesto dai votanti
 1. Mazzi bicolori 20/20 contro 32/8 (Po), insieme ai mazzi convertiti riequilibrati (Thorn al 10% falsa la misura).
-2. Diagnostica "Reazioni disponibili contro giocate" (P9b).
+2. ~~Diagnostica "Reazioni disponibili contro giocate" (P9b).~~ Fatto in R-027 (tabella P9b del report) ed E-032: P9b confermata, vedi §17.3.
 3. ~~G1 con 10.000 partite appaiate (P6), con il vincolo "vittorie prima del round 6 < 1%".~~ Fatto in E-032 (Q-029): P6 confermata, vedi §17.1.
 4. Metrica nuova nel motore: **quota di scontri decisi prima dell'impegno** (l'attaccante non arriva alla soglia oppure la garantisce). Allarme sopra il 60%.
 5. Rimonte ≥ 20% e archetipi 45–55% negli incroci, misurati insieme.
-6. Varianti legate alla condizione "rimonte ≥ 20%": `reazione_da_cicatrice_costo` −1 e Guardia Alle Corde +2 (Ne).
+6. Varianti legate alla condizione "rimonte ≥ 20%": ~~`reazione_da_cicatrice_costo` −1~~ (misurata in P9b, non passa: §17.3) e Guardia Alle Corde +2 (Ne).
 
 ### 17.6 Condizioni di revisione (primo ciclo del set, mazzi veri, anche incroci)
 1. **Rimonte ≥ 20%.** Leve se restano sotto, da misurare una alla volta (ordine non votato): il difensore impegna per primo, a vista (Po; si misura subito se le rimonte restano sotto il 20%); Guardia Alle Corde +2 (Ne); Tempra 4 sul Base e 5 sul Risvegliato (Cr, innesco: rimonte < 12% dopo la compensazione).
@@ -723,4 +724,4 @@ I moduli di v0.1 §17 (campo di battaglia, zone contese, round condiviso, Fulcro
 | v0.2.8 | 2026-11-03 | Q-029 (P8 e Reazioni a costo 0, 8/8): al §14 le leggi di design 12–15 (Vita solo nel tuo turno, pesca fuori dal tuo turno con "se il tuo mazzo non è vuoto", ⟳ solo nel tuo turno, Reazioni a costo 0 con condizione di gioco e senza effetti dopo lo scontro), controllate da `valida`; tolta la regola proposta "ogni Reazione costa almeno 1"; §8 C4 (a) con la condizione di gioco; §17.4 P8 chiusa; §16 con il costo delle Reazioni. Nessuna regola di partita cambiata. |
 | v0.2.9 | 2026-11-03 | Q-029, P6 confermata (regola a tre esiti, 8/8; E-032: G1 50.0 [48.2–51.8] con l'IA forte): "G2 +1 gemma nei round 1 e 3" non è più aperta (§2, §6, §11, §16, §17.1, §17.5). Nessuna regola di partita cambiata. |
 | v0.2.10 | 2026-11-12 | Q-029, P7 confermata (regola di cambio, 8/8; E-032: nessuno dei bracci `oppone_senza_ruotarsi` e `vince_pareggi_se_pronta` passa): "lo Scudo vince i pareggi" non è più aperta (§1, C5, §12.2, §12.3, §15, §16, §17.2); Q-025 chiusa senza cambio del nucleo. Fra le regole in prova resta solo P9b. Nessuna regola di partita cambiata. |
-| v0.2.10 (testo) | 2026-11-15 | Solo testo, nessuna regola cambiata (pulizia della roadmap 1.0): l'intestazione non dice più "pilastri 2–3–4–6 in revisione", perché sono già riscritti; data aggiornata. Q-001…Q-011 chiuse come superate dal nucleo v0.2. |
+| v0.2.11 | 2026-11-15 | Q-029, P9b confermata (regola votata 8/8; E-032: con `reazione_da_cicatrice_costo` −1 il round 13+ sale di 6.9 punti, oltre il limite di +2): C4 (a) resta, il −1 da Cicatrice non entra (§16, §17.3, §17.5). Con questo nessuna regola è più in prova (convenzioni, §17). Pulizia della roadmap 1.0: l'intestazione non dice più "pilastri 2–3–4–6 in revisione", perché sono già riscritti; Q-001…Q-011 chiuse come superate dal nucleo v0.2. Nessuna regola di partita cambiata. |
