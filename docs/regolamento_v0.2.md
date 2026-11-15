@@ -3,8 +3,8 @@
 | Campo | Valore |
 |---|---|
 | Versione | v0.2.10 (nucleo di v0.2.6; costruzione del mazzo da Q-026; leggi di design, P6 e P7 confermate da Q-029) |
-| Data | 2026-10-13 |
-| Stato | **ratificato dallo swarm (Q-013, 8/8 APPROVO); pilastri 2–3–4–6 in revisione, vedi pilastri** (`pilastri_design_v0.2.md`) |
+| Data | 2026-11-15 |
+| Stato | **ratificato dallo swarm (Q-013, 8/8 APPROVO)**; pilastri 2, 3, 4 e 6 già riscritti per v0.2 (Q-013 e Q-017, `pilastri_design_v0.2.md`); fra le regole in prova resta solo P9b (§17.3) |
 | Fonte normativa | `swarm/questioni/Q-013_rework_nucleo_v0.2/esito.md`, sezione A "Specifica consolidata". Dati: `swarm/esperimenti/E-014/sintesi_r3.md` |
 | Sostituisce | `regolamento_v0.1.md`. Le parti di v0.1 non toccate da Q-013 restano valide e sono riportate qui |
 
@@ -723,3 +723,4 @@ I moduli di v0.1 §17 (campo di battaglia, zone contese, round condiviso, Fulcro
 | v0.2.8 | 2026-11-03 | Q-029 (P8 e Reazioni a costo 0, 8/8): al §14 le leggi di design 12–15 (Vita solo nel tuo turno, pesca fuori dal tuo turno con "se il tuo mazzo non è vuoto", ⟳ solo nel tuo turno, Reazioni a costo 0 con condizione di gioco e senza effetti dopo lo scontro), controllate da `valida`; tolta la regola proposta "ogni Reazione costa almeno 1"; §8 C4 (a) con la condizione di gioco; §17.4 P8 chiusa; §16 con il costo delle Reazioni. Nessuna regola di partita cambiata. |
 | v0.2.9 | 2026-11-03 | Q-029, P6 confermata (regola a tre esiti, 8/8; E-032: G1 50.0 [48.2–51.8] con l'IA forte): "G2 +1 gemma nei round 1 e 3" non è più aperta (§2, §6, §11, §16, §17.1, §17.5). Nessuna regola di partita cambiata. |
 | v0.2.10 | 2026-11-12 | Q-029, P7 confermata (regola di cambio, 8/8; E-032: nessuno dei bracci `oppone_senza_ruotarsi` e `vince_pareggi_se_pronta` passa): "lo Scudo vince i pareggi" non è più aperta (§1, C5, §12.2, §12.3, §15, §16, §17.2); Q-025 chiusa senza cambio del nucleo. Fra le regole in prova resta solo P9b. Nessuna regola di partita cambiata. |
+| v0.2.10 (testo) | 2026-11-15 | Solo testo, nessuna regola cambiata (pulizia della roadmap 1.0): l'intestazione non dice più "pilastri 2–3–4–6 in revisione", perché sono già riscritti; data aggiornata. Q-001…Q-011 chiuse come superate dal nucleo v0.2. |
