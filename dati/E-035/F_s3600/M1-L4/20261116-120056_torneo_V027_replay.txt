@@ -1,0 +1,127 @@
+--- Round 1, P1 | Vite 5-5
+--- Round 1, P2 | Vite 5-5
+  P2 gioca BLU-001
+--- Round 2, P1 | Vite 5-5
+  P1 gioca BLU-001
+--- Round 2, P2 | Vite 5-5
+  P2 gioca VER-009
+--- Round 3, P1 | Vite 5-5
+  P1 attacca con Leader LDR-02
+    pugni: attaccante 1, difensore 0 -> 4 contro 4
+    P2 perde 1 Vita (attacco_leader): restano 4
+  P1 gioca BLU-004
+--- Round 3, P2 | Vite 5-4
+  P2 gioca VER-014
+  P2 gioca VER-002
+    BLU-001 di P1: Stancata
+  P2 attacca con Leader LDR-04
+    pugni: attaccante 0, difensore 0 -> 3 contro 4
+--- Round 4, P1 | Vite 5-4
+  P1 gioca BLU-017
+    VER-014 di P2: sconfitta da un effetto
+--- Round 4, P2 | Vite 5-4
+--- Round 5, P1 | Vite 5-4
+  P1 gioca NEU-002
+  P1 attacca con BLU-004#4
+    pugni: attaccante 0, difensore 0 -> 1 contro 4
+--- Round 5, P2 | Vite 5-4
+--- Round 6, P1 | Vite 5-4
+  P1 attacca con BLU-004#4
+    pugni: attaccante 3, difensore 1 -> 4 contro 6
+  P1 attacca con BLU-001#2
+    pugni: attaccante 0, difensore 0 -> 2 contro 4
+--- Round 6, P2 | Vite 5-4
+  P2 gioca BLU-010
+  P2 Rimargina NEU-009
+  P2 gioca BLU-005
+--- Round 7, P1 | Vite 5-4
+  P1 gioca BLU-017
+    BLU-010 di P2: sconfitta da un effetto
+--- Round 7, P2 | Vite 5-4
+  P2 gioca NEW-V05
+    BLU-001 di P1: Stancata
+  P2 gioca BLU-011
+  P2 gioca VER-010
+    BLU-004 di P1: Stancata
+  P2 attacca con Leader LDR-04
+    pugni: attaccante 0, difensore 0 -> 3 contro 4
+--- Round 8, P1 | Vite 5-4
+--- Round 8, P2 | Vite 5-4
+  P2 attacca con VER-009#3
+    P1 oppone BLU-001
+    pugni: attaccante 5, difensore 1 -> 5 contro 6
+    VER-009 di P2 è sconfitta
+  P2 gioca VER-015
+    BLU-004 di P1: Stancata
+  P2 attacca con Leader LDR-04
+    pugni: attaccante 0, difensore 0 -> 3 contro 4
+--- Round 9, P1 | Vite 5-4
+  P1 gioca BLU-001
+  P1 attacca con BLU-001#2
+    pugni: attaccante 2, difensore 0 -> 4 contro 4
+    P2 perde 1 Vita (attacco): restano 3
+  P1 attacca con Leader LDR-02
+    pugni: attaccante 1, difensore 0 -> 4 contro 4
+    P2 perde 1 Vita (attacco_leader): restano 2
+    P2: il Leader si Risveglia
+--- Round 9, P2 | Vite 5-2
+  P2 attacca con VER-010#9
+    pugni: attaccante 3, difensore 2 + BLU-025 -> -1 contro 4
+    VER-010 di P2: sconfitta da un effetto
+  P2 gioca VER-001
+  P2 usa ⟳ di BLU-011 su BLU-001#11
+    BLU-001 di P1: sconfitta da un effetto
+--- Round 10, P1 | Vite 5-2
+  P1 attacca con BLU-001#2
+    P2 oppone BLU-001
+    pugni: attaccante 4, difensore 0 -> 6 contro 5
+    BLU-001 di P2 è sconfitta
+--- Round 10, P2 | Vite 5-2
+  P2 attacca con Leader LDR-04
+    pugni: attaccante 4, difensore 2 -> 6 contro 8
+  P2 usa ⟳ di BLU-011 su BLU-001#2
+    BLU-001 di P1: sconfitta da un effetto
+--- Round 11, P1 | Vite 5-2
+--- Round 11, P2 | Vite 5-2
+--- Round 12, P1 | Vite 5-2
+  P1 attacca con Leader LDR-02
+    P2 oppone VER-015
+    pugni: attaccante 4, difensore 2 -> 7 contro 8
+  P1 gioca NER-014
+--- Round 12, P2 | Vite 5-2
+  P2 gioca VER-002
+    BLU-004 di P1: Stancata
+  P2 usa ⟳ di BLU-011 su BLU-004#4
+    BLU-004 di P1: sconfitta da un effetto
+  P2 gioca NEU-009
+  P2 Rimargina NEU-009
+  P2 attacca con VER-001#12 (Caccia: NER-014#13)
+    pugni: attaccante 0, difensore 0 -> 3 contro 3
+    VER-001 di P2 è sconfitta
+  P2 attacca con VER-015#10
+    pugni: attaccante 0, difensore 0 -> 3 contro 4
+--- Round 13, P1 | Vite 5-2
+  P1 attacca con NER-014#13
+    pugni: attaccante 3, difensore 0 -> 6 contro 4
+    P2 perde 1 Vita (attacco): restano 1
+  P1 attacca con Leader LDR-02
+    P2 oppone BLU-005
+    pugni: attaccante 1, difensore 0 -> 4 contro 2
+    BLU-005 di P2 è sconfitta
+--- Round 13, P2 | Vite 5-1
+  P2 gioca BLU-017
+    NER-014 di P1: sconfitta da un effetto
+  P2 gioca BLU-012
+  P2 Rimargina VER-019
+--- Round 14, P1 | Vite 5-1
+  P1 gioca BLU-004
+  P1 attacca con Leader LDR-02
+    P2 oppone BLU-011
+    pugni: attaccante 0, difensore 0 -> 3 contro 2
+    BLU-011 di P2 è sconfitta
+--- Round 14, P2 | Vite 5-1
+  P2 gioca BLU-015
+  P2 gioca VER-008
+  P2 Rimargina VER-001
+--- Round 15, P1 | Vite 5-1
+*** P2 perde (crepuscolo)
