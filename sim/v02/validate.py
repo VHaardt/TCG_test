@@ -23,6 +23,7 @@ MODIFIERS = {"rim_cost"}
 # condition -> type of its value
 CONDITIONS = {"furia": int, "scars_ge": int, "awakened": bool, "attacking": bool, "pugno_ge": int, "no_own_gems": bool,
               "deck_nonempty": bool, "target_is_unit": bool, "opposing": bool, "attacker_has": str,
+              "target_has": str, "first_attack_kw": str,                   # R-031
               "react_from_scars": bool, "hunted_ready": bool, "survived": bool}
 SELECTOR = {"side", "cost_le", "ready", "power_le", "keyword", "attacker", "kind", "any", "if"}
 OPS = {"draw": {"n"}, "att_mod": {"n"}, "def_mod": {"n"},
@@ -96,7 +97,7 @@ class _V:
                 self.err(where, f"condizione '{k}' vuole un intero")
             elif t is not int and not isinstance(v, t):
                 self.err(where, f"condizione '{k}' vuole {t.__name__}")
-            elif k == "attacker_has" and v not in KEYWORDS:
+            elif k in ("attacker_has", "target_has", "first_attack_kw") and v not in KEYWORDS:
                 self.err(where, f"parola chiave sconosciuta '{v}'")
 
     def selector(self, where, sel):

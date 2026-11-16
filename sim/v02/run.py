@@ -493,6 +493,8 @@ def render_r012(recs, traccia=()):
                 x[k] = x.get(k, 0) + st[k][q]
             x["act_then_hit"] = x.get("act_then_hit", 0) + sum(st["act_then_hit"][q].values())
             x["lead_act"] = x.get("lead_act", 0) + sum(v for c, v in st["activations"][q].items() if c in LEADERS or c.startswith("LDR"))
+            for side, v in (st.get("leader_act_side") or [{}, {}])[q].items():      # R-031
+                x["side_" + side] = x.get("side_" + side, 0) + v
             fh = st["first_hit_round"][q]
             if fh is not None:
                 x.setdefault("fh", []).append(fh)
@@ -518,6 +520,12 @@ def render_r012(recs, traccia=()):
                  f"{x.get('scudo_atk2', 0)/n:.2f} | {(sum(fh)/len(fh)) if fh else float('nan'):.1f} ({len(fh)}) | {x.get('peak2', 0)} | "
                  + ", ".join(f"{c} {100*v/ct:.0f}%" for c, v in sorted(col.items()))
                  + f" | {x.get('solo_unit_turns', 0)/n:.2f} | {x.get('caccia_leader_atk', 0)/n:.2f} |")
+    L += ["", "## R-031: attivazioni del Leader per lato (per partita del mazzo)", "",
+          "Le stesse attivazioni della colonna R-012 (⟳, trigger e statiche in scontro), divise secondo il lato del Leader al momento dell'attivazione.", "",
+          "| Mazzo | Base | Risvegliato |", "|---|---|---|"]
+    for d in decks:
+        x = per[d]; n = max(x["n"], 1)
+        L.append(f"| {D.label(d)} | {x.get('side_base', 0)/n:.2f} | {x.get('side_awakened', 0)/n:.2f} |")
     if traccia:
         L += ["", "## R-012: carte tracciate (per partita del mazzo: giocate / attivazioni / colpi a segno sul Leader / Unità sconfitte)", "",
               "| Mazzo | " + " | ".join(traccia) + " |", "|---|" + "---|" * len(traccia)]
