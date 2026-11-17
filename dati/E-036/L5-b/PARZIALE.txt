@@ -1,0 +1,1 @@
+L5-b fermato il 2026-11-17 alle 12:43 UTC su decisione del thread delle carte: solo 2 incroci su 7 completi (L1-L5, L2-L5), seme base 3700, motore 8ff53fc, input 2a2cec8. L3-L5 era a metà e non è incluso.
