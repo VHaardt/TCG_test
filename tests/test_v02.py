@@ -1205,6 +1205,16 @@ def test_r032_validate_leader_fields():
     assert validate(db) == []
 
 
+def test_v0212_preset_is_v027_plus_tempra_tardo():
+    """v0.2.12 (Q-028/Q-031): V0212 = V027 + tempra_tardo 10, nothing else; it is the runner default."""
+    a, b = rules_from("V027").as_dict(), rules_from("V0212").as_dict()
+    assert {k for k in a if a[k] != b[k]} == {"tempra_tardo"} and b["tempra_tardo"] == 10
+    import inspect
+    from sim.v02 import run
+    src = inspect.getsource(run)
+    assert 'default="V026"' not in src and src.count('default="V0212"') == 3
+
+
 if __name__ == "__main__":
     for k, f in list(globals().items()):
         if k.startswith("test_"):

@@ -60,7 +60,7 @@ class Dati:
                                os.path.join(HERE, "dati", "set_v02.json"))
         spec = os.environ.get("CICATRICI_REGOLE")
         if not spec:
-            spec = next((p for p in ("V027", "V026") if p in PRESETS), os.path.join(HERE, "dati", "regole_V026.json"))
+            spec = next((p for p in ("V0212", "V027", "V026") if p in PRESETS), os.path.join(HERE, "dati", "regole_V026.json"))
         self.regole_spec = spec
         self.rules = rules_from(spec)
         self.limiti = decks.limits(self.rules)
