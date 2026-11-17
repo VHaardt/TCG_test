@@ -1082,7 +1082,7 @@ class GameState:
     def tempra(self, q):
         """Tempra of q's Leader: tempra_awakened when set and q is Awakened, else the Leader's own (R-032) or the rules'."""
         t = self.r.tempra_awakened if self.p[q].awakened and self.r.tempra_awakened else (LEADERS[self.p[q].leader].tempra or self.r.tempra)   # R-032
-        if self.r.tempra_tardo and self.round >= self.r.tempra_tardo:      # R-028 V2 A
+        if self.r.tempra_tardo and self.round >= self.r.tempra_tardo and not LEADERS[self.p[q].leader].tempra_fissa:   # R-028 V2 A (R-032: non se fissa)
             t -= 1
         if self.r.allo_scoperto and not self.p[q].life:                     # R-028 V2 B
             t -= 1

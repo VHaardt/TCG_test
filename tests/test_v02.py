@@ -1181,6 +1181,10 @@ def test_r032_leader_life_and_tempra_override():
         a = _game(rules_from("V027").with_(tempra_tardo=10), 1)
         a.round = 10
         assert a.tempra(0) == 4 and a.tempra(1) == 3
+        E.LEADERS[lid] = dataclasses.replace(keep, tempra=3, tempra_fissa=True)
+        f = _game(rules_from("V027").with_(tempra_tardo=10), 1)
+        f.round = 10
+        assert f.tempra(0) == 3 and f.tempra(1) == 3
     finally:
         E.LEADERS[lid] = keep
     s1 = _game(rules_from("V027"), 1)
@@ -1194,6 +1198,11 @@ def test_r032_validate_leader_fields():
     for bad in (0, "6", True, -1):
         db["leaders"][0]["life"] = bad
         assert any("R-032" in e for e in validate(db)), bad
+    db["leaders"][0]["life"] = 6
+    db["leaders"][0]["tempra_fissa"] = 1
+    assert any("tempra_fissa" in e for e in validate(db))
+    db["leaders"][0]["tempra_fissa"] = True
+    assert validate(db) == []
 
 
 if __name__ == "__main__":
