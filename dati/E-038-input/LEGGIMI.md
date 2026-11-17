@@ -3,7 +3,7 @@
 Autore: programmatore (swarm), 2026-11-17. Voto: `tcg/swarm/cicli/ciclo-05/voto_lampo.md` (V2, 8/8 con emendamenti). Gli input sono preparati in anticipo: si lancia la combinazione scelta appena chiude E-037.
 
 ## Combinazioni
-Ci sono 6 cartelle, una per ogni coppia di bracci, H5-x+H6-y con H5-x in {H5-t, H5-v, H5-r} e H6-y in {H6-v, H6-c}. `genera_e038.py` le produce dai `carte.json` di E-037 (prima va rigenerato E-037):
+Ci sono 7 cartelle. Sei sono le coppie di bracci H5-x+H6-y, con H5-x in {H5-t, H5-v, H5-r} e H6-y in {H6-v, H6-c}. La settima è **L5ref+H6-v**: LDR-05 resta quello di B0c06 (`set/finale`, senza modifiche) e LDR-06 è quello di H6-v. `genera_e038.py` le produce dai `carte.json` di E-037 (prima va rigenerato E-037):
 - LDR-05 viene dal braccio H5-x;
 - LDR-06 viene dal braccio H6-y;
 - tutto il resto del set (125 carte) e le liste `rif_` di B0c06 (V4) restano invariati. Nessun braccio cambia le liste.
@@ -39,7 +39,7 @@ Dalla radice della repo, su un motore con R-032 (612057d o successivo):
 - Prima di giocare lancia `valida` e, se non passa, salta la combinazione.
 
 ## Verifiche fatte (motore 612057d, branch claude/r032-leader-vita-tempra)
-- `valida` dà 0 errori su tutte e 6 le combinazioni, sia con `--variante varianti/tempra_tardo.json` sia con V027 (resta l'avviso delle 43 NC). Sullo stesso motore anche i 5 bracci di E-037 danno 0 errori.
+- `valida` dà 0 errori su tutte e 7 le combinazioni, sia con `--variante varianti/tempra_tardo.json` sia con V027 (resta l'avviso delle 43 NC). Sullo stesso motore anche i 5 bracci di E-037 danno 0 errori.
 - Partita di prova H5-t+H6-v con A, cella L5-L6, seme 3715:
   - parte con "Vite 5-6", quindi LDR-06 ha 6 Vite;
   - LDR-05 difende a 3 di Tempra senza gemme ("3 contro 3"), quindi H5-t è attivo.

@@ -6,7 +6,7 @@
 #
 #   bash dati/E-038-input/lancia_e038.sh <combinazione> <conA|senzaA> [ia] [partite_per_incrocio] [seed_base]
 #
-#   combinazione  H5-t+H6-v | H5-t+H6-c | H5-v+H6-v | H5-v+H6-c | H5-r+H6-v | H5-r+H6-c
+#   combinazione  H5-t+H6-v | H5-t+H6-c | H5-v+H6-v | H5-v+H6-c | H5-r+H6-v | H5-r+H6-c | L5ref+H6-v (LDR-05 di B0c06)
 #                 (LDR-05 del braccio H5-x di E-037, LDR-06 del braccio H6-y; liste rif_ di B0c06 V4 invariate)
 #   conA          V027 + Tempra 3 dal round 10 (varianti/tempra_tardo.json), default 200 partite per incrocio
 #   senzaA        V027, default 100 partite per incrocio (test P1 di A, a bassa potenza)
