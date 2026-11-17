@@ -528,7 +528,7 @@ class GameState:
             (mulligan or default_mulligan)(self, q)
             if q == G2:
                 self.draw(q, self.r.g2_hand_extra)
-            for _ in range(self.r.life):
+            for _ in range(LEADERS[lid].life or self.r.life):         # R-032: Vite per Leader
                 pl.life.append(pl.deck.pop())
         self.active = G1
         if self.stats is not None:
@@ -1080,9 +1080,9 @@ class GameState:
         return "ROS-022" in ids and "VER-022" in ids
 
     def tempra(self, q):
-        """Tempra of q's Leader (tempra_awakened when set and q is Awakened)."""
-        t = self.r.tempra_awakened if self.p[q].awakened and self.r.tempra_awakened else self.r.tempra
-        if self.r.tempra_tardo and self.round >= self.r.tempra_tardo:      # R-028 V2 A
+        """Tempra of q's Leader: tempra_awakened when set and q is Awakened, else the Leader's own (R-032) or the rules'."""
+        t = self.r.tempra_awakened if self.p[q].awakened and self.r.tempra_awakened else (LEADERS[self.p[q].leader].tempra or self.r.tempra)   # R-032
+        if self.r.tempra_tardo and self.round >= self.r.tempra_tardo and not LEADERS[self.p[q].leader].tempra_fissa:   # R-028 V2 A (R-032: non se fissa)
             t -= 1
         if self.r.allo_scoperto and not self.p[q].life:                     # R-028 V2 B
             t -= 1

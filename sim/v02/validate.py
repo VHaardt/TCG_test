@@ -7,7 +7,7 @@ import numbers
 
 DESCRIPTIVE = {"text", "name", "rarity", "slot", "tags", "intent", "vanilla_delta", "note", "notes", "test"}
 CARD_KEYS = {"id", "type", "cost", "colors", "power", "keywords", "kw_params", "abilities", "play", "react", "costs"}
-LEADER_KEYS = {"id", "colors", "base", "awakened"}
+LEADER_KEYS = {"id", "colors", "base", "awakened", "life", "tempra", "tempra_fissa"}   # life, tempra, tempra_fissa: R-032
 TYPES = {"unit", "tactic", "reaction", "relic"}
 KEYWORDS = {"assalto", "scudo", "bracconiere", "caccia", "impeto", "infuso", "furia", "rinnovo", "breccia"}
 KW_PARAMS = {"bracconiere"}
@@ -304,6 +304,11 @@ class _V:
     def leader(self, l):
         lid = l.get("id", "?")
         self.keys(lid, l, LEADER_KEYS)
+        for k in ("life", "tempra"):                         # R-032: valori per Leader, interi positivi
+            if k in l and (not isinstance(l[k], int) or isinstance(l[k], bool) or l[k] < 1):
+                self.err(lid, f"R-032: '{k}' del Leader deve essere un intero ≥ 1")
+        if "tempra_fissa" in l and not isinstance(l["tempra_fissa"], bool):
+            self.err(lid, "R-032: 'tempra_fissa' del Leader è true o false")
         for side in ("base", "awakened"):
             for i, ab in enumerate(l.get(side) or []):
                 self.ability(f"{lid}.{side}[{i}]", ab)
