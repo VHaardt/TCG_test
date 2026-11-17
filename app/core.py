@@ -882,11 +882,28 @@ def pagamento(s, q, plan):
     return (", ".join(parti) or None), unita
 
 
+def costi_fissi(s, q, act):
+    """Costi aggiuntivi senza alternative di un'azione (carta giocata o abilità ⟳)."""
+    try:
+        if act[0] == "play":
+            c = CARDS[act[1]]
+            return tuple(c.costs or ()) + tuple(((c.play or {}).get("costs") or ()) if c.type == "tactic" else ())
+        if act[0] == "ability":
+            ab = s.leader_abilities(q)[act[2]] if act[1] == "L" else CARDS[s.unit(q, act[1]).cid].abilities[act[2]]
+            return tuple(ab.get("costs") or ())
+    except Exception:
+        pass
+    return ()
+
+
 def etichetta(s, q, act):
     """Testo leggibile di un'azione legale, con il gruppo per l'interfaccia. Un'azione con più modi di
     pagare il costo porta "pagamento": ogni modo è un'azione a parte."""
     out = _etichetta(s, q, act)
     plan = act[3] if act[0] == "play" and len(act) > 3 else act[4] if act[0] == "ability" and len(act) > 4 else None
+    if plan is None:                          # costo fisso in Vita (es. il ⟳ "perdi 1 Vita" accanto al suo gemello "Stanca")
+        vita = sum(c.get("lose_life", 0) for c in costi_fissi(s, q, act))
+        plan = (("vita", vita, 0),) if vita else None
     if plan is not None:
         testo, unita = pagamento(s, q, plan)
         if testo:
