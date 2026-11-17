@@ -75,7 +75,8 @@ def test_constructed_room_two_humans():
 def test_v027_limits_two_copies_and_rarity():
     D = core.dati()
     assert D.limiti["max_copies"] == 2 and D.limiti["max_copies_rarity"].get("L") == 1
-    assert len(D.riferimento) == 6 and all(max(m["carte"].values()) <= 2 for m in D.riferimento)
+    rif = [m for m in D.riferimento if m["nome"].startswith("rif_")]          # più eventuali liste mix_ legali
+    assert len(rif) == 6 and all(max(m["carte"].values()) <= 2 for m in D.riferimento)
     m = D.riferimento[0]
     tre = dict(m["carte"]); cid = next(iter(tre)); tre[cid] = 3
     tre[next(c for c in tre if c != cid)] -= 1
@@ -394,7 +395,7 @@ def test_any_cost_menu_on_ner002_ner019_and_cycle04_names():
     d = core.dati()
     C = {c["id"]: c for c in d.catalogo()["carte"]}
     assert C["NEW-V05"]["nome"] != "NEW-V05" and C["NEW-B06"]["nome"] != "NEW-B06" and C["NEW-B06"]["max"] == 1
-    assert all(m["nome"].startswith("rif_") for m in d.riferimento) and any("NEW-B06" in m["carte"] for m in d.riferimento)
+    assert sum(m["nome"].startswith("rif_") for m in d.riferimento) == 6 and any("NEW-B06" in m["carte"] for m in d.riferimento)
     r0, r1 = d.riferimento[0], d.riferimento[1]
     L = lambda m: [c for c, k in m["carte"].items() for _ in range(k)]
     s = E.new_game(r0["leader"], L(r0), r1["leader"], L(r1), rules=d.rules, seed=1, log=True)
