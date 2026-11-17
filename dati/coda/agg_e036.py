@@ -1,17 +1,19 @@
 """E-036: confronto appaiato per seme di un braccio con il riferimento 00_B0c06A, per il Leader protagonista.
-Uso (dalla radice di una copia del simulatore): python3 -B agg_e036.py <E-036> <braccio> [out.md]"""
+Uso (dalla radice di una copia del simulatore): python3 -B agg_e036.py <E-036> <braccio> [out.md]
+Riferimento: AGG_REF_DIR (default <E-036>/00_B0c06A) e AGG_REF (nome nel report). Con 100 partite nel braccio si appaiano le prime 100 del riferimento."""
 import glob, math, os, pickle, re, sys
 
 ROOT, ARM = sys.argv[1], sys.argv[2]
-REF = "00_B0c06A"
-PROT = "L6" if ARM.startswith("L6") else "L5"
+REF = os.environ.get("AGG_REF", "00_B0c06A")
+REF_DIR = os.environ.get("AGG_REF_DIR", f"{ROOT}/00_B0c06A")
+PROT = "L6" if ARM[1] == "6" else "L5"
 LID = {"L5": "LDR-05", "L6": "LDR-06"}[PROT]
 lab = lambda d: (lambda n: re.sub(r"rif_LDR0(\d)_\w+", r"L\1", n).replace("rott_LDR05_2c", "R5"))(d.split("#")[-1])
 
 
-def load(arm):
+def load(d):
     out = {}
-    for c in sorted(glob.glob(f"{ROOT}/{arm}/F_s3700/*/partite.pkl")):
+    for c in sorted(glob.glob(f"{d}/F_s3700/*/partite.pkl")):
         rs = []
         with open(c, "rb") as fh:
             while True:
@@ -40,7 +42,7 @@ def seat(r, who):
     return next((i for i, d in enumerate(r["decks"]) if lab(d) == who), None)
 
 
-A, R = load(ARM), load(REF)
+A, R = load(f"{ROOT}/{ARM}"), load(REF_DIR)
 cells = [c for c in A if PROT in c.split("-") and c in R]
 L = [f"# E-036 / {ARM}: {PROT} appaiato per seme con {REF}", "",
      f"Celle di {PROT} comuni ai due bracci: {len(cells)}; partite appaiate per seme. Δ = vittorie di {PROT} nel braccio meno nel riferimento, IC 95% sulle differenze appaiate.", "",
@@ -59,10 +61,12 @@ for c in cells:
 L.append(f"| **Totale** | **{wilson(kA, nA)}** | {wilson(kR, nA)} | **{paired(allD)}** |")
 
 
-def prof(data, cs):
+def prof(data, cs, other):
     p = {"n": 0, "act": 0, "act_b": 0, "act_a": 0, "side": False, "life": 0, "scudo2": 0, "w5": 0, "wlt5": 0, "r13": 0, "f20": 0, "f21": 0, "opp20": 0, "opp21": 0}
     for c in cs:
-        for r in data[c].values():
+        for sd, r in data[c].items():
+            if sd not in other[c]:
+                continue
             i = seat(r, PROT); s = r["stats"]
             p["n"] += 1
             p["act"] += s["activations"][i].get(LID, 0)
@@ -76,7 +80,7 @@ def prof(data, cs):
     return p
 
 
-pa, pr = prof(A, cells), prof(R, cells)
+pa, pr = prof(A, cells, R), prof(R, cells, A)
 row = lambda name, f: f"| {name} | {f(pa)} | {f(pr)} |"
 per = lambda k: (lambda p: f"{p[k]/p['n']:.2f}")
 L += ["", f"## {PROT}: misure per partita del protagonista (stesse celle)", "", f"| Misura | {ARM} | {REF} |", "|---|---|---|",
