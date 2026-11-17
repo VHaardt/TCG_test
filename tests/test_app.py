@@ -489,6 +489,26 @@ def test_r032_hearts_and_tempra_follow_the_leader():
         E.LEADERS["LDR-05"] = orig
 
 
+def test_ldr06_base_two_ways_to_pay_are_two_labelled_entries():
+    """Ciclo 05: la Base di LDR-06 sono due ⟳ gemelle, una si paga perdendo 1 Vita e l'altra Stancando un'Unità
+    Pronta; l'app le mostra come due voci, ognuna con il suo pagamento."""
+    d = core.dati()
+    L = {l["id"]: l for l in d.catalogo()["leader"]}
+    assert L["LDR-06"]["vite"] == 6 and L["LDR-05"]["vite"] == 4
+    r = next(m for m in d.riferimento if m["leader"] == "LDR-06")
+    cards = [c for c, k in r["carte"].items() for _ in range(k)]
+    s = E.new_game("LDR-06", cards, "LDR-06", cards, rules=d.rules, seed=2, log=True)
+    s.round = 3
+    q = s.active
+    p = s.p[q]
+    assert len(p.life) == 6
+    p.scars = [[p.life.pop(), False, "t"] for _ in range(3)]
+    p.units = [E.Unit(950, "NEW-V05", True)]
+    s.p[1 - q].units = [E.Unit(960, "NEW-V05", True)]
+    pag = sorted(core.etichetta(s, q, a)["pagamento"] for a in s.legal_actions() if a[0] == "ability" and a[1] == "L")
+    assert pag == ["Stanca " + s.describe(q, 950), "perdi 1 Vita"], pag
+
+
 def teardown_module():
     E.load_cards()          # the app loads the set into the engine: restore the default for the other tests
 
