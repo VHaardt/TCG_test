@@ -1,7 +1,7 @@
 # CICATRICI — Pilastri di design e obiettivi misurabili (v0.2)
 
 > Copia di `pilastri_design.md` (v0.1) aggiornata all'esito ratificato di Q-013 (`swarm/questioni/Q-013_rework_nucleo_v0.2/esito.md`, 8 APPROVO su 8, 2026-10-08). Le regole sono in `regolamento_v0.2.md`.
-> **Stato:** i pilastri 3, 4 e 6 sono riscritti come previsto dall'esito; il pilastro 2 è riscritto (Esposto in Q-013; "il Leader non colpisce gratis" in Q-017, ratificata 8/8). Il pilastro 9 è confermato. Gli altri pilastri non cambiano nel merito. Cambiare un pilastro richiede l'ok di Vittorio (esito, sezione B).
+> **Stato:** i pilastri 3, 4 e 6 sono riscritti come previsto dall'esito; il pilastro 2 è riscritto (Esposto in Q-013; "il Leader non colpisce gratis" in Q-017, ratificata 8/8). Il pilastro 9 è confermato. Gli altri pilastri non cambiano nel merito. Cambiare un pilastro richiede l'ok di Vittorio (esito, sezione B). Allineati al regolamento v0.2.11 (2026-11-15).
 
 ## 1. Ogni colpo racconta una storia
 Il danno subito non sparisce: diventa Cicatrici pubbliche che danno carte, Reazioni e Furia. Dopo **3 Vite perse** il Leader si Risveglia (Forza +1, Guardia +1), indipendentemente da quante Cicatrici hai recuperato. Chi è sotto ha sempre una risorsa nuova, ma deve guadagnarsela: recuperare una Cicatrice costa un'azione del Leader e abbassa la Furia.
