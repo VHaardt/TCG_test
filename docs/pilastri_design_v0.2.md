@@ -1,7 +1,7 @@
 # CICATRICI — Pilastri di design e obiettivi misurabili (v0.2)
 
 > Copia di `pilastri_design.md` (v0.1) aggiornata all'esito ratificato di Q-013 (`swarm/questioni/Q-013_rework_nucleo_v0.2/esito.md`, 8 APPROVO su 8, 2026-10-08). Le regole sono in `regolamento_v0.2.md`.
-> **Stato:** i pilastri 3, 4 e 6 sono riscritti come previsto dall'esito; il pilastro 2 è riscritto (Esposto in Q-013; "il Leader non colpisce gratis" in Q-017, ratificata 8/8). Il pilastro 9 è confermato. Gli altri pilastri non cambiano nel merito. Cambiare un pilastro richiede l'ok di Vittorio (esito, sezione B). Allineati al regolamento v0.2.11 (2026-11-15).
+> **Stato:** i pilastri 3, 4 e 6 sono riscritti come previsto dall'esito; il pilastro 2 è riscritto (Esposto in Q-013; "il Leader non colpisce gratis" in Q-017, ratificata 8/8). Il pilastro 9 è confermato. Gli altri pilastri non cambiano nel merito. Cambiare un pilastro richiede l'ok di Vittorio (esito, sezione B). Allineati al regolamento v0.2.12 (2026-11-17).
 
 ## 1. Ogni colpo racconta una storia
 Il danno subito non sparisce: diventa Cicatrici pubbliche che danno carte, Reazioni e Furia. Dopo **3 Vite perse** il Leader si Risveglia (Forza +1, Guardia +1), indipendentemente da quante Cicatrici hai recuperato. Chi è sotto ha sempre una risorsa nuova, ma deve guadagnarsela: recuperare una Cicatrice costa un'azione del Leader e abbassa la Furia.
@@ -9,7 +9,7 @@ Il danno subito non sparisce: diventa Cicatrici pubbliche che danno carte, Reazi
 ## 2. Agire costa la difesa *(riscritto in v0.2; ultima frase da Q-017)*
 Ogni carta in campo è Pronta o Ruotata. Attaccare, opporsi, usare abilità ⟳ e **Rimarginare** ruotano il personaggio, che si raddrizza solo nel Ripristino del suo controllore: chi ha agito nel proprio turno non può opporsi nel turno avversario. Ruotata vuol dire solo "ha agito": non rende mai bersaglio, perché il bersaglio di un attacco è sempre il Leader avversario, salvo opposizione. Ogni turno il Leader sceglie tra attaccare e curarsi.
 
-**Il Leader non colpisce gratis: attaccare lo ruota, quindi nel turno in cui colpisce non Rimargina. Con Forza 3 contro Tempra 4 il Leader Base di norma deve anche impegnare Brace; il Risveglio toglie questo secondo costo.** *(Q-017, livello 3, ratificata 8/8 il 2026-10-08, con l'ok di Vittorio "va bene che il leader colpisca gratis ma lo devono valutare gli agenti". Nessuna regola cambia. Dati in `swarm/esperimenti/E-017/esito.md`: nessuna leva alternativa rispetta le fasce; il costo della rotazione è reale, Rimarginare era legale nel 62–100% dei colpi a vuoto del Risvegliato. Variante di minoranza e condizioni di revisione nell'esito.)*
+**Il Leader non colpisce gratis: attaccare lo ruota, quindi nel turno in cui colpisce non Rimargina. Con Forza 3 contro Tempra 4 il Leader Base di norma deve anche impegnare Brace; il Risveglio toglie questo secondo costo, e dal round 10 lo toglie anche la Tempra 3 (v0.2.12, Q-028 e Q-031).** *(Q-017, livello 3, ratificata 8/8 il 2026-10-08, con l'ok di Vittorio "va bene che il leader colpisca gratis ma lo devono valutare gli agenti". Nessuna regola cambia. Dati in `swarm/esperimenti/E-017/esito.md`: nessuna leva alternativa rispetta le fasce; il costo della rotazione è reale, Rimarginare era legale nel 62–100% dei colpi a vuoto del Risvegliato. Variante di minoranza e condizioni di revisione nell'esito.)*
 
 *Testo di v0.1, superato:* "Il Leader non colpisce gratis: con Forza 3 contro Tempra 5 deve investire Brace per ferire, e ogni turno sceglie tra attaccare e curarsi."
 

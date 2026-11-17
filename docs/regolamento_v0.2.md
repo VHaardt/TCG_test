@@ -2,8 +2,8 @@
 
 | Campo | Valore |
 |---|---|
-| Versione | v0.2.11 (nucleo di v0.2.6; costruzione del mazzo da Q-026; leggi di design, P6, P7 e P9b confermate da Q-029) |
-| Data | 2026-11-15 |
+| Versione | v0.2.12 (nucleo di v0.2.6 con Tempra 3 dal round 10 da Q-028/Q-031; costruzione del mazzo da Q-026; leggi di design, P6, P7 e P9b confermate da Q-029; Vita iniziale per Leader da Q-031) |
+| Data | 2026-11-17 |
 | Stato | **ratificato dallo swarm (Q-013, 8/8 APPROVO)**; pilastri 2, 3, 4 e 6 già riscritti per v0.2 (Q-013 e Q-017, `pilastri_design_v0.2.md`); nessuna regola in prova: P6, P7 e P9b confermate da Q-029 (§17) |
 | Fonte normativa | `swarm/questioni/Q-013_rework_nucleo_v0.2/esito.md`, sezione A "Specifica consolidata". Dati: `swarm/esperimenti/E-014/sintesi_r3.md` |
 | Sostituisce | `regolamento_v0.1.md`. Le parti di v0.1 non toccate da Q-013 restano valide e sono riportate qui |
@@ -15,7 +15,7 @@
 > 2. Pronto/Ruotato sostituisce Esposto: Ruotata vuol dire solo "ha agito" e non rende bersaglio. I tuoi personaggi si raddrizzano nel tuo Ripristino.
 > 3. Si attacca sempre il Leader avversario; il difensore può opporre una sua Unità Pronta.
 > 4. Combattimento in 6 passi: l'attaccante impegna gemme a vista, poi il difensore risponde con la Guardia (+2 per gemma) e al massimo una Reazione.
-> 5. Tempra del Leader 4 su entrambi i lati.
+> 5. Tempra del Leader 4 su entrambi i lati; dal round 10 scende a 3 (Q-028, v0.2.12).
 > 6. Saldo e colpo finale si leggono dalle Cicatrici fresche: niente istantanea, niente contatore del Saldo.
 > 7. Ultimo respiro diventa +1 Guardia Alle Corde; spariscono finestra e limite di reazioni.
 > 8. Infondere sparisce ("se hai impegnato almeno N gemme"); le abilità di Reazione dei Leader sono statiche.
@@ -60,16 +60,18 @@ Non servono altri segnalini, contatori o dadi. Gli stati si mostrano ruotando le
 ### 2.2 Il Leader
 Ogni Leader stampa: nome, 1 o 2 colori, **Forza**, **Tempra**, **Vita iniziale**, un'abilità sul lato Base e una sul lato Risvegliato.
 
-Valori standard per tutti i Leader del set base [`leader_power`, `leader_power_awakened`, `tempra`, `life`, `guard_max`, `guard_max_awakened`]:
+Valori standard per i Leader del set base [`leader_power`, `leader_power_awakened`, `tempra`, `tempra_tardo`, `life`, `guard_max`, `guard_max_awakened`]:
 
 | | Forza | Tempra | Vita iniziale | Massimo di Guardia |
 |---|---|---|---|---|
-| Lato Base | 3 | **4** | 5 | 2 |
-| Lato Risvegliato | 4 | **4** | — | 3 |
+| Lato Base | 3 | **4**; **3 dal round 10** | 5 (scritta sul Leader) | 2 |
+| Lato Risvegliato | 4 | **4**; **3 dal round 10** | — | 3 |
 
 - **Forza**: il valore con cui il Leader attacca.
-- **Tempra**: il valore che un attacco deve eguagliare o superare per andare a segno sul Leader.
-- Il Risveglio dà +1 Forza e +1 al massimo di Guardia; la Tempra resta 4.
+- **Tempra**: il valore che un attacco deve eguagliare o superare per andare a segno sul Leader. **Dal round 10** la Tempra di entrambi i Leader scende di 1, su tutti e due i lati: 3 invece di 4 (Q-028, ratificata nel ciclo 05, Q-031) [`tempra_tardo` 10]. Il round 10 è anche quello da cui il Saldo sale a 3 (§9.3): sulla carta-tracciato del round le due regole stanno sulla stessa casella.
+- **Vita iniziale**: è scritta sul Leader. È 5, salvo **Salgemma (LDR-05) 4** e **Sanguinella (LDR-06) 6** (Q-031, ciclo 05) [`life` del Leader; senza valore vale la regola `life` 5].
+- Il Risveglio dà +1 Forza e +1 al massimo di Guardia; la Tempra non cambia (4, poi 3 dal round 10).
+- Un Leader può stampare una Tempra sua o una Tempra fissa, che non scende dal round 10 [`tempra` e `tempra_fissa` del Leader, R-032]. Nel set base nessun Leader le usa.
 
 ### 2.3 Regole di costruzione (Q-026, v0.2.7)
 - Esattamente 40 carte [`deck_size` 40], al massimo **2 copie per nome** [`max_copies` 2, `copies_by_name`]. Il nome è quello stampato sulla carta: le carte che hanno lo stesso nome (le **gemelle**, con tipo, costo, Forza e testo identici) contano insieme. Una carta senza un nome proprio è identificata dal suo ID (es. ROS-007). Due carte con lo stesso testo ma costo diverso hanno nomi diversi.
@@ -121,7 +123,7 @@ In quest'ordine:
 2. Ogni giocatore mette il Leader sul Campo, lato **Base**, **Pronto** (dritto).
 3. Ogni giocatore mescola il mazzo e pesca **5 carte** [`hand` 5].
 4. **Mulligan**, una sola volta, prima G1 poi G2: scegli da 0 a 3 carte della mano, mettile in fondo al mazzo nell'ordine che preferisci e pesca altrettante carte dalla cima [`mulligan_max` 3]. Il mazzo non si rimescola.
-5. Ogni giocatore mette le prime **5 carte** del mazzo coperte sotto il Leader, senza guardarle: è la sua **Vita** [`life` 5].
+5. Ogni giocatore mette le prime carte del mazzo coperte sotto il Leader, senza guardarle, tante quante la **Vita iniziale** scritta sul Leader (5; Salgemma 4, Sanguinella 6, §2.2): è la sua **Vita** [`life`].
 6. Il segnalino del round va sulla casella **0** (prima della casella 1). Tutte le gemme sono nella scorta.
 7. Inizia il turno di G1.
 
@@ -328,7 +330,7 @@ Si vince **solo** così:
 Se due condizioni si verificano nello stesso momento, **perde il giocatore attivo**. Non esistono patte, vittorie ai punti o vittorie alternative.
 
 ### 9.8 Risveglio
-- Quando il tuo Leader ha **Vita ≤ 2** (almeno 3 Vite perse), al controllo di stato successivo si gira sul lato **Risvegliato**: Forza 4, Tempra 4, massimo di Guardia 3, abilità del lato Risvegliato [`awaken_at_life` 2].
+- Quando il tuo Leader ha **Vita ≤ 2** (almeno 3 Vite perse), al controllo di stato successivo si gira sul lato **Risvegliato**: Forza 4, Tempra 4 (3 dal round 10), massimo di Guardia 3, abilità del lato Risvegliato [`awaken_at_life` 2].
 - Succede una volta per partita ed è permanente, anche a metà del turno avversario. Il numero di Cicatrici è irrilevante.
 - Lo stato (Pronto o Ruotato) si conserva.
 - Le Vite perse col Crepuscolo possono causare il Risveglio.
@@ -355,6 +357,7 @@ Il simulatore interrompe e registra come "non conclusa" una partita che superi i
 ### 10.1 Attacco del Leader
 Il Leader attacca come un personaggio (§8) con la sua Forza: 3, Risvegliato 4. Attaccare lo ruota, quindi attacca al massimo una volta per turno, salvo effetti che lo raddrizzano.
 - Contro un Leader che non si difende (Tempra 4, nessuna gemma impegnata, nessuna opposizione) il Leader Base deve impegnare **almeno 1 gemma** per andare a segno. Il Leader Risvegliato va a segno **senza impegnare gemme**.
+- Dal round 10, con Tempra 3, anche il Leader Base va a segno senza impegnare gemme contro un Leader che non si difende (§2.2).
 - Se il difensore gli oppone un'Unità, il Leader la sconfigge se Db ≤ Fa (con Scudo: se Db < Fa) e non è mai sconfitto.
 
 Il pilastro 2 di v0.1 ("il Leader non colpisce gratis") non vale sul lato Risvegliato: l'eccezione è stata ratificata 8/8 (Q-017, 2026-10-08) e il pilastro 2 riformulato. Vedi `pilastri_design_v0.2.md`, pilastro 2.
@@ -439,7 +442,7 @@ Un'abilità del Leader che inizia con **"Quando il tuo Leader attacca"** è un t
 
 Sono le carte di v0.1 convertite con la tabella del §12.3, così come le usa il simulatore (`sim/v02/cards_v02.json`) per le misure del nucleo. **Non sono il set**: le carte e i Leader del primo set (LDR-01…06, con i testi approvati, es. Thorn = LDR-04 "Quando il tuo Leader attacca, Stanca … costo ≤3", da Q-020) sono in `tcg/set/finale/set_v02.json`. Le conversioni dei Leader sono provvisorie e i valori vanno al thread carte. Formato: **Nome** — costo · tipo · Forza · testo. Il costo è in gemme.
 
-**Leader** (tutti F3 / Tempra 4 / Vita 5; Risvegliati F4 / Tempra 4)
+**Leader** (tutti F3 / Tempra 4, 3 dal round 10 / Vita 5; Risvegliati F4 / Tempra 4, 3 dal round 10). Nel set la Vita iniziale è scritta sul Leader: 5, salvo LDR-05 4 e LDR-06 6 (§2.2).
 - **Arden, Fabbro di Guerra** (Rosso/Verde). Base: se un tuo attaccante ha almeno 2 gemme impegnate, ha +1 Forza in questo scontro. Risvegliato: le tue Unità con Assalto hanno +1 Forza.
 - **Maera, Custode del Passo** (Blu/Nero). Base, statica: quando difendi, se nell'impegno hai almeno 1 gemma di Parata, l'attaccante ha −2 in questo scontro. Risvegliato, statica: le tue gemme di Parata valgono +3 invece di +2.
 - **Sorella Vey, la Segnata** (Nero/Rosso). Base: la tua Furia conta 1 Cicatrice in più. Risvegliato: Rimarginare non costa gemme (resta ⟳).
@@ -552,7 +555,7 @@ Il simulatore controlla le leggi 12, 13 e 15 in `valida` e rifiuta le carte che 
 | **Scorta** | Riserva comune delle gemme. Spendere = rimettere nella scorta. |
 | **Scudo** | L'Unità che è il bersaglio (si oppone o è cacciata) vince i pareggi [P7 confermata da Q-029]. |
 | **Stanca** | Ruota un'Unità avversaria Pronta; solo nel tuo turno, mai il Leader. Come costo aggiuntivo, "Stanca una tua Unità Pronta" ruota invece una tua Unità. |
-| **Tempra** | Valore di difesa del Leader: 4. |
+| **Tempra** | Valore di difesa del Leader: 4, 3 dal round 10. |
 | **Tracciato del round** | Carta con il segnalino del round e le soglie stampate. |
 | **Trigger** | Abilità "quando…" o "a fine turno"; ordine del §7.5. Quelli "quando il tuo Leader attacca" si risolvono in C1, prima dell'opposizione (§10.4). |
 | **Turno** | Sempre il turno del giocatore attivo. |
@@ -564,16 +567,16 @@ Il simulatore controlla le leggi 12, 13 e 15 in `valida` e rifiuta le carte che 
 
 ## 16. Parametri numerici v0.2
 
-Nomi dei parametri da `sim/v02/config.py`; preset del simulatore: `V02` (nucleo ratificato), `V024` (con Q-019), `V026` (con Q-022, default), `V027` (V026 più la costruzione di Q-026; partite identiche a V026).
+Nomi dei parametri da `sim/v02/config.py`; preset del simulatore: `V02` (nucleo ratificato), `V024` (con Q-019), `V026` (con Q-022), `V027` (V026 più la costruzione di Q-026; partite identiche a V026), **`V0212` (V027 più Tempra 3 dal round 10: è il default dalla v0.2.12)**.
 
 | Regola | Valore | Parametro del simulatore | Note |
 |---|---|---|---|
 | Carte nel mazzo | 40, max 2 copie per nome, Leggendarie 1 | `deck_size` 40, `max_copies` 2, `copies_by_name`, `max_copies_rarity` L 1, `multicolor_all` | Q-026 (V027); V026 e precedenti: 3 copie per ID, un colore in comune |
 | Mano iniziale | 5 / 5 | `hand` 5, `g2_hand_extra` 0 | G2 a 6 carte non sposta G1 (55.9%) |
 | Mulligan | fino a 3 carte | `mulligan_max` 3 | |
-| Vita iniziale | 5 | `life` 5 | |
+| Vita iniziale | scritta sul Leader: 5, salvo LDR-05 4 e LDR-06 6 | `life` del Leader; regola `life` 5 se il Leader non la scrive | Q-031 (ciclo 05, 8/8); R-032 |
 | Forza del Leader | 3 / Risvegliato 4 | `leader_power` 3, `leader_power_awakened` 4 | |
-| Tempra del Leader | **4** (entrambi i lati) | `tempra` 4 | Deciso 8/8; con 5: mediana 11, round 13+ 13.2% |
+| Tempra del Leader | **4** (entrambi i lati); **3 dal round 10** | `tempra` 4, `tempra_tardo` 10 | Deciso 8/8; con 5: mediana 11, round 13+ 13.2%. Tempra 3 dal round 10: Q-028 (8/8) ratificata nel ciclo 05 (Q-031, 8/8); E-033 a 200 partite: round 13+ da 51 a 39%, Crepuscolo da 19 a 13% |
 | Risveglio | Vita ≤ 2 | `awaken_at_life` 2 | |
 | Brace | min(round, 8) | `brace_max` 8 | |
 | Compensazione di G2 | +1 gemma nei round 1 e 3 | `scintilla_g2_gems` 1, `scintilla_extra_gems` 1, `scintilla_extra_round` 3, `scintilla_extra_rounds` (), `scintilla_guardia_g2` 0 | **[P6 confermata da Q-029]**; Q-022 (scelta di Vittorio: taratura sull'IA forte); G1 49.0% nei mirror con l'IA forte (E-022) |
@@ -725,3 +728,4 @@ I moduli di v0.1 §17 (campo di battaglia, zone contese, round condiviso, Fulcro
 | v0.2.9 | 2026-11-03 | Q-029, P6 confermata (regola a tre esiti, 8/8; E-032: G1 50.0 [48.2–51.8] con l'IA forte): "G2 +1 gemma nei round 1 e 3" non è più aperta (§2, §6, §11, §16, §17.1, §17.5). Nessuna regola di partita cambiata. |
 | v0.2.10 | 2026-11-12 | Q-029, P7 confermata (regola di cambio, 8/8; E-032: nessuno dei bracci `oppone_senza_ruotarsi` e `vince_pareggi_se_pronta` passa): "lo Scudo vince i pareggi" non è più aperta (§1, C5, §12.2, §12.3, §15, §16, §17.2); Q-025 chiusa senza cambio del nucleo. Fra le regole in prova resta solo P9b. Nessuna regola di partita cambiata. |
 | v0.2.11 | 2026-11-15 | Q-029, P9b confermata (regola votata 8/8; E-032: con `reazione_da_cicatrice_costo` −1 il round 13+ sale di 6.9 punti, oltre il limite di +2): C4 (a) resta, il −1 da Cicatrice non entra (§16, §17.3, §17.5). Con questo nessuna regola è più in prova (convenzioni, §17). Pulizia della roadmap 1.0: l'intestazione non dice più "pilastri 2–3–4–6 in revisione", perché sono già riscritti; Q-001…Q-011 chiuse come superate dal nucleo v0.2. Nessuna regola di partita cambiata. |
+| v0.2.12 | 2026-11-17 | Q-028 e Q-031 (ciclo 05, voto finale 8/8, voci F1 e F2): **Tempra 3 dal round 10** per entrambi i Leader, su tutti e due i lati (§1, §2.2, §9.8, §10.1, §13, glossario, §16) [`tempra_tardo` 10]; **la Vita iniziale è scritta sul Leader**: 5, salvo Salgemma (LDR-05) 4 e Sanguinella (LDR-06) 6 (§2.2, §4, §16), con i campi `life`, `tempra` e `tempra_fissa` del Leader (R-032). Preset del simulatore `V0212` (V027 più `tempra_tardo` 10), default del runner. E-038 (15 incroci, IA forte, 200 partite): tutti i Leader fra 42 e 58, round 13+ 43.8%, Crepuscolo 13.1%. |

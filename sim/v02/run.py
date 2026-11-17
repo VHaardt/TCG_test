@@ -962,7 +962,7 @@ def main(argv=None):
     sub = p.add_subparsers(dest="cmd", required=True)
 
     def common(x, partite=100):
-        x.add_argument("--variante", default="V026")
+        x.add_argument("--variante", default="V0212")
         x.add_argument("--ia", default="semplice")
         x.add_argument("--partite", type=int, default=partite)
         x.add_argument("--mazzi", nargs="*", help="nomi in sim/decks, file .json o file.json#nome")
@@ -974,14 +974,14 @@ def main(argv=None):
     t.add_argument("--riprendi", action="store_true",
                    help="salva ogni partita finita in --out e, se la corsa si interrompe, al rilancio gioca solo quelle mancanti")
     t.add_argument("--traccia", help="R-012: ID di carte e Leader da tracciare, separati da virgola")
-    ab = sub.add_parser("ab"); common(ab); ab.add_argument("--base", default="V026")
+    ab = sub.add_parser("ab"); common(ab); ab.add_argument("--base", default="V0212")
     lm = sub.add_parser("lambda"); common(lm, 200)
     co = sub.add_parser("collaudo"); common(co, 250)
     fo = sub.add_parser("forte"); common(fo, 25); fo.add_argument("--forte", default="forte:60")
     vi = sub.add_parser("vita"); common(vi, 100)
     pa = sub.add_parser("partita"); common(pa); pa.add_argument("mazzo1"); pa.add_argument("mazzo2")
     va = sub.add_parser("valida"); va.add_argument("file"); va.add_argument("--mazzi", nargs="*")
-    va.add_argument("--variante", default="V026", help="regole di costruzione (§2.3): V027 = 2 copie per nome, Leggendarie 1")
+    va.add_argument("--variante", default="V0212", help="regole di costruzione (§2.3): da V027 2 copie per nome, Leggendarie 1")
     a = p.parse_args(argv)
     if a.cmd == "valida":
         return cmd_valida(a)
