@@ -41,6 +41,8 @@ class LeaderCard:
     colors: tuple
     base: tuple = ()
     awakened: tuple = ()
+    life: int = 0        # R-032: Vite iniziali di questo Leader (0 = quelle della configurazione)
+    tempra: int = 0      # R-032: Tempra di questo Leader (0 = quella della configurazione)
 
     def side(self, awakened):
         return self.awakened if awakened else self.base
@@ -66,7 +68,8 @@ def load(path=None):
     leaders = {}
     for l in raw["leaders"]:
         leaders[l["id"]] = LeaderCard(id=l["id"], name=l["name"], colors=_tuple(l["colors"]),
-                                      base=_tuple(l.get("base")), awakened=_tuple(l.get("awakened")))
+                                      base=_tuple(l.get("base")), awakened=_tuple(l.get("awakened")),
+                                      life=l.get("life", 0), tempra=l.get("tempra", 0))
     return cards, leaders
 
 

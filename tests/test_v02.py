@@ -1167,6 +1167,35 @@ def test_r031_leader_act_side_sums_to_leader_activations():
             assert sum(s.stats["leader_act_side"][q].values()) == tot, (seed, q)
 
 
+def test_r032_leader_life_and_tempra_override():
+    """R-032: Vite e Tempra per Leader come dato; senza i campi non cambia nulla, A toglie 1 dal suo round."""
+    import dataclasses
+    s0 = _game(rules_from("V027"), 1)
+    lid = s0.p[0].leader
+    keep = E.LEADERS[lid]
+    try:
+        E.LEADERS[lid] = dataclasses.replace(keep, life=6, tempra=5)
+        s = _game(rules_from("V027"), 1)
+        assert len(s.p[0].life) == 6 and len(s.p[1].life) == 5
+        assert s.tempra(0) == 5 and s.tempra(1) == 4
+        a = _game(rules_from("V027").with_(tempra_tardo=10), 1)
+        a.round = 10
+        assert a.tempra(0) == 4 and a.tempra(1) == 3
+    finally:
+        E.LEADERS[lid] = keep
+    s1 = _game(rules_from("V027"), 1)
+    assert len(s1.p[0].life) == 5 and s1.tempra(0) == 4
+
+
+def test_r032_validate_leader_fields():
+    from sim.v02.validate import validate
+    db = {"cards": [], "leaders": [{"id": "LDR-X", "name": "x", "colors": ["R"], "life": 6, "tempra": 3}]}
+    assert validate(db) == []
+    for bad in (0, "6", True, -1):
+        db["leaders"][0]["life"] = bad
+        assert any("R-032" in e for e in validate(db)), bad
+
+
 if __name__ == "__main__":
     for k, f in list(globals().items()):
         if k.startswith("test_"):
