@@ -103,7 +103,7 @@ function iconaLeader(id) {
 function eroeHTML(id, L, ent) {
   const l = LEAD[id];
   const v = CAT.valori_leader;
-  const forza = L ? L.forza : v.forza, tempra = L ? L.tempra : v.tempra;
+  const forza = L ? L.forza : v.forza, tempra = L ? L.tempra : (l.tempra || v.tempra);
   const cl = L ? `${L.risvegliato ? "risv" : ""} ${L.pronto ? "" : "ruotato"}` : "";
   return `<div class="eroe ${cl}" style="${colVars(l.colori)}" ${ent ? `data-ent="${ent}"` : ""} data-leader="${id}">
     ${L && (!L.pronto || L.risvegliato) ? `<span class="stato">${[L.risvegliato ? "🔥 Risvegliato" : "", L.pronto ? "" : "⟳ Ruotato"].filter(Boolean).join(" · ")}</span>` : ""}
@@ -113,7 +113,9 @@ function eroeHTML(id, L, ent) {
 
 function leaderTesti(id, risv = null) {
   const l = LEAD[id];
-  return `<div class="testi"><div style="${risv === true ? "opacity:.45" : ""}"><b>Base.</b> ${l.base.map(testoCarta).join(" ")}</div>
+  const v = CAT.valori_leader, vite = l.vite || v.vite, tempra = l.tempra || v.tempra;
+  return `<div class="testi"><div class="nota">Vite iniziali ${vite} · Tempra ${tempra}${vite !== v.vite || tempra !== v.tempra ? " (propri di questo Leader)" : ""}</div>
+    <div style="${risv === true ? "opacity:.45" : ""}"><b>Base.</b> ${l.base.map(testoCarta).join(" ")}</div>
     <div style="${risv === false ? "opacity:.45" : ""}"><b>Risvegliato.</b> ${l.risvegliato.map(testoCarta).join(" ")}</div></div>`;
 }
 
@@ -569,7 +571,7 @@ function gemmeHTML(n, max, cl) {
 
 function plancia(g, nome, lato) {
   const L = g.leader;
-  const vmax = Math.max(CAT.valori_leader.vite, g.vite);
+  const vmax = Math.max(L.vite_iniziali || CAT.valori_leader.vite, g.vite);   // R-032: Vite iniziali del Leader
   let cuori = "";
   for (let i = 0; i < vmax; i++) cuori += `<span class="${i < g.vite ? "" : "perso"}">♥</span>`;
   const cic = g.cicatrici.map((s) => `<span class="cic ${s.fresca ? "fresca" : ""}" style="${colVars(CARTA[s.id]?.colori)}"

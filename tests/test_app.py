@@ -471,6 +471,24 @@ def test_log_events_find_cards_by_their_q029_names():
     assert seen["gioca"] and seen["scontro"], seen
 
 
+def test_r032_hearts_and_tempra_follow_the_leader():
+    """R-032: un Leader con Vite proprie (es. 4 o 6) mostra quei cuori e quella Tempra, non i valori delle regole."""
+    import dataclasses
+    d = core.dati()
+    r5 = next(m for m in d.riferimento if m["leader"] == "LDR-05")
+    orig = E.LEADERS["LDR-05"]
+    E.LEADERS["LDR-05"] = dataclasses.replace(orig, life=4, tempra=3)
+    try:
+        lv = core.leader_dict(E.LEADERS["LDR-05"], d.rules)
+        assert (lv["vite"], lv["tempra"]) == (4, 3)
+        L = [c for c, k in r5["carte"].items() for _ in range(k)]
+        s = E.new_game("LDR-05", L, "LDR-05", L, rules=d.rules, seed=1, log=True)
+        v = core.vista_giocatore(s, 0, True)
+        assert v["vite"] == 4 and v["leader"]["vite_iniziali"] == 4
+    finally:
+        E.LEADERS["LDR-05"] = orig
+
+
 def teardown_module():
     E.load_cards()          # the app loads the set into the engine: restore the default for the other tests
 

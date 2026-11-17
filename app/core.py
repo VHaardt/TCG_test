@@ -120,7 +120,7 @@ class Dati:
                             "per_nome": self.limiti["copies_by_name"], "copie_rarita": self.limiti["max_copies_rarity"],
                             "multicolore_tutti": self.limiti["multicolor_all"], "rarita": self.limiti["rarity_scale"]},
             "colori": COLORI,
-            "leader": [leader_dict(l) for l in LEADERS.values()],
+            "leader": [leader_dict(l, r) for l in LEADERS.values()],
             "carte": [dict(card_dict(c, self.rarity.get(c.id)), gruppo=self.gruppo(c.id), max=self.copie_max(c.id))
                       for c in sorted(CARDS.values(), key=sort_key)],
             "mazzi": self.riferimento,
@@ -155,11 +155,13 @@ def card_dict(c, rarity=None):
             "parole": sorted(c.keywords), "testo": c.text, "rarita": rarity}
 
 
-def leader_dict(l):
+def leader_dict(l, r):
+    """Leader per il client; Vite e Tempra sono quelle del Leader (R-032), altrimenti quelle delle regole."""
     def texts(side):
         return [ab.get("text", "") for ab in side if ab.get("text")]
     return {"id": l.id, "nome": l.name, "colori": list(l.colors), "base": texts(l.base),
-            "risvegliato": texts(l.awakened)}
+            "risvegliato": texts(l.awakened), "vite": getattr(l, "life", 0) or r.life,
+            "tempra": getattr(l, "tempra", 0) or r.tempra}
 
 
 def legale_per(leader, cid):
@@ -755,7 +757,8 @@ def vista_giocatore(s, q, mio):
     lid = pl.leader
     out = {
         "leader": {"id": lid, "colori": list(LEADERS[lid].colors), "risvegliato": pl.awakened,
-                   "pronto": pl.l_ready, "forza": s.leader_power(q), "tempra": s.tempra(q)},
+                   "pronto": pl.l_ready, "forza": s.leader_power(q), "tempra": s.tempra(q),
+                   "vite_iniziali": getattr(LEADERS[lid], "life", 0) or s.r.life},
         "vite": len(pl.life), "alle_corde": s.alle_corde(q), "brace": pl.brace, "guardia": pl.guard,
         "guardia_max": s.guard_max(q), "mazzo": len(pl.deck), "mano_n": len(pl.hand),
         "cicatrici": [{"id": sc[0], "fresca": bool(sc[1])} for sc in pl.scars],
