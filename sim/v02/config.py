@@ -122,6 +122,10 @@ PRESETS = {
               "multicolor_all": True, "rarity_scale": ("C", "R", "E", "L"),
               "tempra_tardo": 10},
 }
+# CICATRICI 1.0 (2026-11-18): le regole di v0.2.12, congelate. Unica differenza tecnica: il limite di
+# sicurezza sale a 18 round, perché Sanguinella (LDR-06, 6 Vite) con 6 Vite al round 15 perde al più
+# tardi nel Ripristino di G1 del round 18 (§9.10). Le partite che finiscono entro il round 17 sono identiche.
+PRESETS["V10"] = dict(PRESETS["V0212"], max_rounds=18)
 
 
 def rules_from(spec, base=B0):

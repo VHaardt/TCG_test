@@ -1,7 +1,7 @@
 # CICATRICI — note per le sessioni Claude
 
-- Regolamento e pilastri: `docs/regolamento_v0.2.md` e `docs/pilastri_design_v0.2.md` (copie di `/mnt/project-files/tcg/`; v0.1 resta per storia). Esito del rework: `docs/discussione/Q-013_esito.md`.
-- Simulatore v0.2: `sim/v02/` (preset `V02` = nucleo ratificato); `sim/` principale = v0.1.
+- Regolamento e pilastri: `docs/regolamento_v1.0.md` e `docs/pilastri_design_v0.2.md` (copie di `/mnt/project-files/tcg/`; v0.1 resta per storia). Esito del rework: `docs/discussione/Q-013_esito.md`.
+- Simulatore v0.2: `sim/v02/` (preset `V10` = regole della 1.0, congelate il 2026-11-18; `V02` = nucleo ratificato del 2026-10-08); `sim/` principale = v0.1.
 - Simulatore: `sim/` (istruzioni in `sim/README.md`). Regole e carte sono dati modificabili: niente regole scritte nel codice del motore.
 - App online per giocare fra amici (POC): `app/` (istruzioni in `app/README.md`); usa `sim/v02` come libreria e legge il set dalla cartella condivisa, senza regole proprie.
 

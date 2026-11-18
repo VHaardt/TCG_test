@@ -1,7 +1,7 @@
 ---
-versione: 1.5
-basato_su: v0.2.11
-preset: V027
+versione: 2.0
+basato_su: v1.0
+preset: V10
 ---
 
 ## La partita in un minuto
@@ -11,7 +11,7 @@ Due giocatori, un **Leader** a testa e un mazzo di {{mazzo}} carte. Il Leader re
 <div class="griglia" markdown="1">
 <div markdown="1">
 #### Come si vince
-Togli all'avversario tutte le {{life}} Vite: il suo Leader è **Alle Corde**. Poi colpiscilo ancora quando non ha ferite fresche (prese in questo turno): è il **colpo finale**.
+Togli all'avversario tutte le Vite (di solito {{life}}; il numero è scritto sul suo Leader): il suo Leader è **Alle Corde**. Poi colpiscilo ancora quando non ha ferite fresche (prese in questo turno): è il **colpo finale**.
 </div>
 <div markdown="1">
 #### La risorsa
@@ -40,7 +40,7 @@ I turni sono **chiusi**: gioca solo il giocatore attivo. L'avversario interviene
 
 Niente dadi, contatori o altri segnalini. Tutti gli stati si mostrano **ruotando le carte**.
 
-[[figura:carta_leader|Il Leader nei due lati. Il lato Risvegliato si usa dopo che il Leader ha perso {{vite_risveglio}} Vite.]]
+[[figura:carta_leader|Il Leader nei due lati. Il lato Risvegliato si usa quando il Leader scende a {{awaken_at_life}} Vite o meno.]]
 
 ### Come si legge una carta
 
@@ -73,7 +73,7 @@ Un **round** è un turno di G1 seguito da un turno di G2. Il tracciato dice a en
 |---|---|---|
 | **Mazzo** | Nessuno | Si pesca dalla cima |
 | **Mano** | Solo tu | Al massimo {{hand_limit}} carte alla fine del tuo turno |
-| **Vita** | **Nessuno, neanche tu** | {{life}} carte coperte sotto il Leader; si prende sempre quella in cima |
+| **Vita** | **Nessuno, neanche tu** | tante carte coperte sotto il Leader quante la Vita iniziale scritta su di lui ({{life}}; Salgemma 4, Sanguinella 6); si prende sempre quella in cima |
 | **Cicatrici** | Tutti | Le Vite perse, a faccia in su |
 | **Campo** | Tutti | Il Leader, fino a {{max_units}} Unità e fino a {{max_relics}} Reliquie |
 | **Scarti** | Tutti | Unità sconfitte, Tattiche e Reazioni usate, carte scartate |
@@ -90,7 +90,7 @@ Se hai già {{max_units}} Unità non puoi giocarne una sesta, e con {{max_relics
 2. Mettete il Leader in campo sul lato **Base**, dritto.
 3. Mescolate il mazzo e pescate **{{hand}} carte**.
 4. **Mulligan**, una volta sola, prima G1 e poi G2: puoi mettere in fondo al mazzo da 0 a {{mulligan_max}} carte della mano, nell'ordine che vuoi, e pescarne altrettante. Il mazzo non si rimescola.
-5. Mettete le prime **{{life}} carte** del mazzo coperte sotto il Leader, senza guardarle: sono le vostre **Vite**.
+5. Mettete le prime **{{life}} carte** del mazzo (4 con Salgemma, 6 con Sanguinella: la Vita iniziale è scritta sul Leader) coperte sotto il Leader, senza guardarle: sono le vostre **Vite**.
 6. Il segnalino del round va prima della casella 1. Tutte le gemme sono nella scorta.
 7. Comincia G1.
 
@@ -211,7 +211,7 @@ Un attacco è un'azione della fase principale e si risolve in **sei passi**. Il 
 </div>
 <div markdown="1">
 #### <span class="dif">Difesa</span>
-- **Tempra** del Leader ({{tempra}}) oppure Forza dell'Unità bersaglio
+- **Tempra** del Leader ({{tempra}}; {{tempra_tarda}} dal round {{tempra_tardo}}) oppure Forza dell'Unità bersaglio
 - \+ {{parata_per_gemma}} per ogni gemma di Parata
 - \+ Reazione e bonus delle carte
 </div>
@@ -278,7 +278,7 @@ Ogni Leader ha questa abilità. Siccome ruota il Leader, in un turno il tuo Lead
 
 ### Il Risveglio
 
-Quando il tuo Leader scende a **{{awaken_at_life}} Vite o meno** (ne ha perse almeno {{vite_risveglio}}), si gira sul lato **Risvegliato**: Forza {{leader_power_awakened}}, Tempra {{tempra_risv}}, massimo di Guardia {{guard_max_awakened}} e la sua abilità del lato Risvegliato. Succede una volta sola, è permanente e può accadere anche nel turno avversario. Se era ruotato resta ruotato.
+Quando il tuo Leader scende a **{{awaken_at_life}} Vite o meno** (con {{life}} Vite iniziali vuol dire averne perse almeno {{vite_risveglio}}), si gira sul lato **Risvegliato**: Forza {{leader_power_awakened}}, Tempra {{tempra_risv}} ({{tempra_tarda}} dal round {{tempra_tardo}}), massimo di Guardia {{guard_max_awakened}} e la sua abilità del lato Risvegliato. Succede una volta sola, è permanente e può accadere anche nel turno avversario. Se era ruotato resta ruotato.
 
 ## Come si vince
 
@@ -315,6 +315,7 @@ Il tracciato garantisce che la partita finisca. Più si va avanti, più si risch
 | Dal round | Cosa cambia |
 |---|---|
 | {{saldo_late_round}} | Il Saldo sale a {{saldo_late}} Cicatrici fresche |
+| {{tempra_tardo}} | La Tempra di entrambi i Leader scende a {{tempra_tarda}} |
 | {{corde_one_life_round}} | Un Leader con 1 Vita è già Alle Corde |
 | {{crepuscolo_round}} | **Crepuscolo** a ogni Ripristino di G1 |
 
@@ -340,12 +341,12 @@ Al più tardi, un giocatore perde nel Ripristino di G1 di questi round, a second
 
 | | Forza | Tempra | Vite iniziali | Massimo di Guardia |
 |---|---|---|---|---|
-| Lato Base | {{leader_power}} | {{tempra}} | {{life}} | {{guard_max}} |
-| Lato Risvegliato | {{leader_power_awakened}} | {{tempra_risv}} | — | {{guard_max_awakened}} |
+| Lato Base | {{leader_power}} | {{tempra}} ({{tempra_tarda}} dal round {{tempra_tardo}}) | {{life}} (Salgemma 4, Sanguinella 6) | {{guard_max}} |
+| Lato Risvegliato | {{leader_power_awakened}} | {{tempra_risv}} ({{tempra_tarda}} dal round {{tempra_tardo}}) | — | {{guard_max_awakened}} |
 
 - Il Leader è sempre in gioco: non può essere sconfitto, rimosso né Stancato. Non può opporsi.
 - **Attacca** come un'Unità, con la sua Forza. Attaccare lo ruota, quindi attacca al massimo una volta per turno.
-- Contro un Leader che non si difende (Tempra {{tempra}}, niente Parata), il Leader Base deve impegnare almeno {{gemme_leader_base}} gemma per andare a segno; il Leader Risvegliato va a segno anche senza gemme.
+- Contro un Leader che non si difende (Tempra {{tempra}}, niente Parata), il Leader Base deve impegnare almeno {{gemme_leader_base}} gemma per andare a segno; il Leader Risvegliato va a segno anche senza gemme. Dal round {{tempra_tardo}}, con Tempra {{tempra_tarda}}, ci va anche il Leader Base.
 - Ogni Leader ha **Rimarginare** e un'abilità propria per lato. Le abilità di difesa del Leader sono **sempre attive**: non lo ruotano e non costano gemme.
 - Le abilità "**Quando il tuo Leader attacca**" si risolvono subito dopo la dichiarazione, **prima** che il difensore scelga se opporsi.
 
@@ -443,7 +444,7 @@ Al più tardi, un giocatore perde nel Ripristino di G1 di questi round, a second
 </div>
 <div markdown="1">
 #### Numeri
-<p>Vite {{life}} · Tempra {{tempra}} · Forza Leader {{leader_power}}/{{leader_power_awakened}}</p>
+<p>Vite {{life}} (scritte sul Leader) · Tempra {{tempra}}, {{tempra_tarda}} dal round {{tempra_tardo}} · Forza Leader {{leader_power}}/{{leader_power_awakened}}</p>
 <p>Brace = round, max {{brace_max}} · G2 +1 nei round {{round_g2}}</p>
 <p>Saldo {{saldo}} fresche ({{saldo_late}} dal round {{saldo_late_round}})</p>
 <p>Risveglio a {{awaken_at_life}} Vite · Unità max {{max_units}} · Reliquie max {{max_relics}}</p>
@@ -479,4 +480,4 @@ Al più tardi, un giocatore perde nel Ripristino di G1 di questi round, a second
 | **Ruotato** | Ha già agito: non può attaccare, opporsi né usare :ruota: |
 | **Saldo** | Massimo di Cicatrici fresche: {{saldo}}, {{saldo_late}} dal round {{saldo_late_round}} |
 | **Scorta** | La riserva comune di gemme. Spendere = rimettere nella scorta |
-| **Tempra** | La difesa del Leader: {{tempra}} |
+| **Tempra** | La difesa del Leader: {{tempra}}, {{tempra_tarda}} dal round {{tempra_tardo}} |

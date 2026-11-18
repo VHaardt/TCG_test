@@ -1,6 +1,6 @@
 # Regolamento illustrato (manuale per giocatori)
 
-Presentazione per giocatori del regolamento di CICATRICI: testo semplice, esempi, schemi del tavolo, del turno, dell'attacco, delle gemme e delle Cicatrici, riepilogo rapido e glossario. **Non è una fonte di regole**: il testo di riferimento resta `docs/regolamento_v0.2.md`; se i due differiscono, vale il regolamento.
+Presentazione per giocatori del regolamento di CICATRICI: testo semplice, esempi, schemi del tavolo, del turno, dell'attacco, delle gemme e delle Cicatrici, riepilogo rapido e glossario. **Non è una fonte di regole**: il testo di riferimento resta `docs/regolamento_v1.0.md`; se i due differiscono, vale il regolamento.
 
 ## File
 
@@ -30,6 +30,6 @@ python3 tools/manuale/build.py --pdf --copia /mnt/project-files/tcg/regolamento_
 ## Quando cambiano le regole
 
 1. **Cambia solo un numero** (per esempio Tempra, Saldo, round del Crepuscolo): aggiorna il preset in `sim/v02/config.py` (o metti il nuovo preset nel front matter) e rigenera. Testo, tabelle, schemi e tracciato si aggiornano da soli.
-2. **Cambia una regola o arriva una nuova versione del regolamento**: lo script avvisa quando `basato_su` non coincide con la versione in testa a `docs/regolamento_v0.2.md` (con `--rigido` si ferma). Leggi il registro modifiche del regolamento, correggi le sezioni toccate di `manuale.md` (e le figure, se serve), aggiorna `basato_su`, alza `versione` e rigenera.
+2. **Cambia una regola o arriva una nuova versione del regolamento**: lo script avvisa quando `basato_su` non coincide con la versione in testa a `docs/regolamento_v1.0.md` (con `--rigido` si ferma). Leggi il registro modifiche del regolamento, correggi le sezioni toccate di `manuale.md` (e le figure, se serve), aggiorna `basato_su`, alza `versione` e rigenera.
 3. **Regole "in prova"**: quando un default aperto viene deciso, togli il riquadro `::: prova` relativo.
 4. Ripubblica l'artifact con `build/regolamento_illustrato.artifact.html` e fai il commit di sorgente e uscite insieme.
