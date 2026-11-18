@@ -277,7 +277,7 @@ figcaption { margin-top: .5rem; font-size: .88rem; color: var(--tenue); max-widt
       <p class="occhiello">Gioco di carte 1 contro 1 · regolamento per giocatori</p>
       <h1 class="marchio">CICATRICI<span class="cucitura" aria-hidden="true"></span></h1>
       <p class="sottotitolo">Ogni ferita resta sul tavolo. Usala.</p>
-      <p class="meta">Manuale 1.5 · regole <strong>v0.2.11</strong> · numeri dal preset V027 · generato il 2026-11-15</p>
+      <p class="meta">Manuale 2.0 · regole <strong>v1.0</strong> · numeri dal preset V10 · generato il 2026-11-18</p>
     </div>
   </header>
   <div class="corpo">
@@ -311,7 +311,7 @@ figcaption { margin-top: .5rem; font-size: .88rem; color: var(--tenue); max-widt
 <div class="griglia">
 <div>
 <h4 id="come-si-vince">Come si vince</h4>
-<p>Togli all'avversario tutte le 5 Vite: il suo Leader è <strong>Alle Corde</strong>. Poi colpiscilo ancora quando non ha ferite fresche (prese in questo turno): è il <strong>colpo finale</strong>.</p>
+<p>Togli all'avversario tutte le Vite (di solito 5; il numero è scritto sul suo Leader): il suo Leader è <strong>Alle Corde</strong>. Poi colpiscilo ancora quando non ha ferite fresche (prese in questo turno): è il <strong>colpo finale</strong>.</p>
 </div>
 <div>
 <h4 id="la-risorsa">La risorsa</h4>
@@ -384,7 +384,7 @@ figcaption { margin-top: .5rem; font-size: .88rem; color: var(--tenue); max-widt
     <text x="16" y="230">+ Rimarginare</text>
     <text x="16" y="252" class="t-tenue">Una volta sola, per sempre</text>
   </g>
-</svg></div><figcaption>Il Leader nei due lati. Il lato Risvegliato si usa dopo che il Leader ha perso 3 Vite.</figcaption></figure>
+</svg></div><figcaption>Il Leader nei due lati. Il lato Risvegliato si usa quando il Leader scende a 2 Vite o meno.</figcaption></figure>
 
 <h3 id="come-si-legge-una-carta">Come si legge una carta</h3>
 <p>Le carte del primo set non hanno illustrazione, e quelle senza un nome proprio si riconoscono dall'<strong>ID</strong> (per esempio ROS-001). Il prefisso indica il colore: ROS Rosso, BLU Blu, NER Nero, VER Verde, NEU Neutrale. Ogni carta ha anche una <strong>rarità</strong>: Comune, Rara, Epica o Leggendaria.</p>
@@ -603,7 +603,7 @@ figcaption { margin-top: .5rem; font-size: .88rem; color: var(--tenue); max-widt
 <tr>
 <td><strong>Vita</strong></td>
 <td><strong>Nessuno, neanche tu</strong></td>
-<td>5 carte coperte sotto il Leader; si prende sempre quella in cima</td>
+<td>tante carte coperte sotto il Leader quante la Vita iniziale scritta su di lui (5; Salgemma 4, Sanguinella 6); si prende sempre quella in cima</td>
 </tr>
 <tr>
 <td><strong>Cicatrici</strong></td>
@@ -633,7 +633,7 @@ figcaption { margin-top: .5rem; font-size: .88rem; color: var(--tenue); max-widt
 <li>Mettete il Leader in campo sul lato <strong>Base</strong>, dritto.</li>
 <li>Mescolate il mazzo e pescate <strong>5 carte</strong>.</li>
 <li><strong>Mulligan</strong>, una volta sola, prima G1 e poi G2: puoi mettere in fondo al mazzo da 0 a 3 carte della mano, nell'ordine che vuoi, e pescarne altrettante. Il mazzo non si rimescola.</li>
-<li>Mettete le prime <strong>5 carte</strong> del mazzo coperte sotto il Leader, senza guardarle: sono le vostre <strong>Vite</strong>.</li>
+<li>Mettete le prime <strong>5 carte</strong> del mazzo (4 con Salgemma, 6 con Sanguinella: la Vita iniziale è scritta sul Leader) coperte sotto il Leader, senza guardarle: sono le vostre <strong>Vite</strong>.</li>
 <li>Il segnalino del round va prima della casella 1. Tutte le gemme sono nella scorta.</li>
 <li>Comincia G1.</li>
 </ol>
@@ -920,7 +920,7 @@ figcaption { margin-top: .5rem; font-size: .88rem; color: var(--tenue); max-widt
 <div>
 <h4 id="difesa"><span class="dif">Difesa</span></h4>
 <ul>
-<li><strong>Tempra</strong> del Leader (4) oppure Forza dell'Unità bersaglio</li>
+<li><strong>Tempra</strong> del Leader (4; 3 dal round 10) oppure Forza dell'Unità bersaglio</li>
 <li>+ 2 per ogni gemma di Parata</li>
 <li>+ Reazione e bonus delle carte</li>
 </ul>
@@ -1036,7 +1036,7 @@ figcaption { margin-top: .5rem; font-size: .88rem; color: var(--tenue); max-widt
 </blockquote>
 <p>Ogni Leader ha questa abilità. Siccome ruota il Leader, in un turno il tuo Leader <strong>o attacca o Rimargina</strong>. Rimarginare non ti restituisce la Vita: recuperi la carta. Puoi farlo anche con 8 o più carte in mano (l'eccesso si scarta nella Fine).</p>
 <h3 id="il-risveglio">Il Risveglio</h3>
-<p>Quando il tuo Leader scende a <strong>2 Vite o meno</strong> (ne ha perse almeno 3), si gira sul lato <strong>Risvegliato</strong>: Forza 4, Tempra 4, massimo di Guardia 3 e la sua abilità del lato Risvegliato. Succede una volta sola, è permanente e può accadere anche nel turno avversario. Se era ruotato resta ruotato.</p>
+<p>Quando il tuo Leader scende a <strong>2 Vite o meno</strong> (con 5 Vite iniziali vuol dire averne perse almeno 3), si gira sul lato <strong>Risvegliato</strong>: Forza 4, Tempra 4 (3 dal round 10), massimo di Guardia 3 e la sua abilità del lato Risvegliato. Succede una volta sola, è permanente e può accadere anche nel turno avversario. Se era ruotato resta ruotato.</p>
 <h2 id="come-si-vince_1">Come si vince</h2>
 <h3 id="alle-corde">Alle Corde</h3>
 <p>Un Leader è <strong>Alle Corde</strong> quando ha <strong>0 Vite</strong>. Dal round 13 lo è anche con <strong>1 Vita</strong>. Non serve segnarlo: si vede dalla Vita e dal tracciato.</p>
@@ -1069,6 +1069,10 @@ figcaption { margin-top: .5rem; font-size: .88rem; color: var(--tenue); max-widt
 <tr>
 <td>10</td>
 <td>Il Saldo sale a 3 Cicatrici fresche</td>
+</tr>
+<tr>
+<td>10</td>
+<td>La Tempra di entrambi i Leader scende a 3</td>
 </tr>
 <tr>
 <td>13</td>
@@ -1111,6 +1115,10 @@ figcaption { margin-top: .5rem; font-size: .88rem; color: var(--tenue); max-widt
 <td>Ripristino di G1 del round 17</td>
 <td>4 o 5</td>
 </tr>
+<tr>
+<td>Ripristino di G1 del round 18</td>
+<td>6</td>
+</tr>
 </tbody>
 </table></div>
 </div>
@@ -1129,14 +1137,14 @@ figcaption { margin-top: .5rem; font-size: .88rem; color: var(--tenue); max-widt
 <tr>
 <td>Lato Base</td>
 <td>3</td>
-<td>4</td>
-<td>5</td>
+<td>4 (3 dal round 10)</td>
+<td>5 (Salgemma 4, Sanguinella 6)</td>
 <td>2</td>
 </tr>
 <tr>
 <td>Lato Risvegliato</td>
 <td>4</td>
-<td>4</td>
+<td>4 (3 dal round 10)</td>
 <td>—</td>
 <td>3</td>
 </tr>
@@ -1145,7 +1153,7 @@ figcaption { margin-top: .5rem; font-size: .88rem; color: var(--tenue); max-widt
 <ul>
 <li>Il Leader è sempre in gioco: non può essere sconfitto, rimosso né Stancato. Non può opporsi.</li>
 <li><strong>Attacca</strong> come un'Unità, con la sua Forza. Attaccare lo ruota, quindi attacca al massimo una volta per turno.</li>
-<li>Contro un Leader che non si difende (Tempra 4, niente Parata), il Leader Base deve impegnare almeno 1 gemma per andare a segno; il Leader Risvegliato va a segno anche senza gemme.</li>
+<li>Contro un Leader che non si difende (Tempra 4, niente Parata), il Leader Base deve impegnare almeno 1 gemma per andare a segno; il Leader Risvegliato va a segno anche senza gemme. Dal round 10, con Tempra 3, ci va anche il Leader Base.</li>
 <li>Ogni Leader ha <strong>Rimarginare</strong> e un'abilità propria per lato. Le abilità di difesa del Leader sono <strong>sempre attive</strong>: non lo ruotano e non costano gemme.</li>
 <li>Le abilità "<strong>Quando il tuo Leader attacca</strong>" si risolvono subito dopo la dichiarazione, <strong>prima</strong> che il difensore scelga se opporsi.</li>
 </ul>
@@ -1261,7 +1269,7 @@ figcaption { margin-top: .5rem; font-size: .88rem; color: var(--tenue); max-widt
 </div>
 <div>
 <h4 id="numeri">Numeri</h4>
-<p>Vite 5 · Tempra 4 · Forza Leader 3/4</p>
+<p>Vite 5 (scritte sul Leader) · Tempra 4, 3 dal round 10 · Forza Leader 3/4</p>
 <p>Brace = round, max 8 · G2 +1 nei round 1 e 3</p>
 <p>Saldo 2 fresche (3 dal round 10)</p>
 <p>Risveglio a 2 Vite · Unità max 5 · Reliquie max 2</p>
@@ -1357,12 +1365,12 @@ figcaption { margin-top: .5rem; font-size: .88rem; color: var(--tenue); max-widt
 </tr>
 <tr>
 <td><strong>Tempra</strong></td>
-<td>La difesa del Leader: 4</td>
+<td>La difesa del Leader: 4, 3 dal round 10</td>
 </tr>
 </tbody>
 </table></div>
       <footer class="piede">
-        <p>Questo manuale presenta le regole del <strong>regolamento v0.2.11</strong> (docs/regolamento_v0.2.md), che resta il testo di riferimento: se i due non dicono la stessa cosa, vale il regolamento. Si rigenera da <code>docs/manuale/</code> con <code>tools/manuale/build.py</code>.</p>
+        <p>Questo manuale presenta le regole del <strong>regolamento v1.0</strong> (docs/regolamento_v1.0.md), che resta il testo di riferimento: se i due non dicono la stessa cosa, vale il regolamento. Si rigenera da <code>docs/manuale/</code> con <code>tools/manuale/build.py</code>.</p>
       </footer>
     </main>
   </div>

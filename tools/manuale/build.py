@@ -30,7 +30,7 @@ from sim.v02.config import rules_from  # noqa: E402
 
 SORGENTE = os.path.join(RADICE, "docs", "manuale")
 USCITA = os.path.join(SORGENTE, "build")
-REGOLAMENTO = os.path.join(RADICE, "docs", "regolamento_v0.2.md")
+REGOLAMENTO = os.path.join(RADICE, "docs", "regolamento_v1.0.md")
 NOME = "regolamento_illustrato"
 CHROMIUM = ["/opt/pw-browsers/chromium", "chromium", "chromium-browser", "google-chrome"]
 
@@ -42,10 +42,13 @@ def elenco(numeri, cong="e"):
     return numeri[0] if len(numeri) == 1 else ", ".join(numeri[:-1]) + f" {cong} " + numeri[-1]
 
 
+VITE_MAX_SET = 6   # 1.0: Sanguinella (LDR-06) parte con 6 Vite (Q-031)
+
+
 def fine_garantita(r):
     """Round in cui un Leader con v Vite perde al più tardi (Ripristino di G1), simulando il Crepuscolo."""
     righe = {}
-    for vite in range(r.life + 1):
+    for vite in range(max(r.life, VITE_MAX_SET) + 1):
         v, rnd = vite, r.crepuscolo_round
         while True:
             corde = v == 0 or (v == 1 and rnd >= r.corde_one_life_round)
@@ -65,6 +68,7 @@ def parametri(preset):
     p["copie_per"] = "nome" if r.copies_by_name else "ID"
     p["copie_leggendarie"] = dict(r.max_copies_rarity).get("L", r.max_copies)
     p["tempra_risv"] = r.tempra_awakened or r.tempra
+    p["tempra_tarda"] = r.tempra - 1 if r.tempra_tardo else r.tempra   # v0.2.12: dal round tempra_tardo
     p["gemme_leader_base"] = max(0, -(-(r.tempra - r.leader_power) // r.forza_per_gemma))
     p["gemme_leader_risv"] = max(0, -(-(p["tempra_risv"] - r.leader_power_awakened) // r.forza_per_gemma))
     extra = set(r.scintilla_extra_rounds)
@@ -214,7 +218,7 @@ def costruisci(args):
     reg = versione_regolamento()
     if meta.get("basato_su") != reg:
         msg = (f"ATTENZIONE: manuale.md dice basato_su {meta.get('basato_su')}, "
-               f"ma docs/regolamento_v0.2.md è {reg}. Rileggi il registro modifiche del regolamento "
+               f"ma docs/regolamento_v1.0.md è {reg}. Rileggi il registro modifiche del regolamento "
                f"e aggiorna il testo (LEGGIMI.md, passo 2).")
         if args.rigido:
             raise SystemExit(msg)

@@ -1,14 +1,14 @@
-# CICATRICI — Regolamento v0.2
+# CICATRICI — Regolamento 1.0
 
 | Campo | Valore |
 |---|---|
-| Versione | v0.2.12 (nucleo di v0.2.6 con Tempra 3 dal round 10 da Q-028/Q-031; costruzione del mazzo da Q-026; leggi di design, P6, P7 e P9b confermate da Q-029; Vita iniziale per Leader da Q-031) |
-| Data | 2026-11-17 |
-| Stato | **ratificato dallo swarm (Q-013, 8/8 APPROVO)**; pilastri 2, 3, 4 e 6 già riscritti per v0.2 (Q-013 e Q-017, `pilastri_design_v0.2.md`); nessuna regola in prova: P6, P7 e P9b confermate da Q-029 (§17) |
+| Versione | v1.0 (2026-11-18): le regole di v0.2.12, congelate. Storia: v0.2.12 (nucleo di v0.2.6 con Tempra 3 dal round 10 da Q-028/Q-031; costruzione del mazzo da Q-026; leggi di design, P6, P7 e P9b confermate da Q-029; Vita iniziale per Leader da Q-031) |
+| Data | 2026-11-18 |
+| Stato | **congelato (1.0)**: ogni cambio successivo è una versione 1.1 e passa dal changelog dello swarm. Nucleo ratificato dallo swarm (Q-013, 8/8 APPROVO); pilastri 2, 3, 4 e 6 già riscritti per v0.2 (Q-013 e Q-017, `pilastri_design_v0.2.md`); nessuna regola in prova: P6, P7 e P9b confermate da Q-029 (§17) |
 | Fonte normativa | `swarm/questioni/Q-013_rework_nucleo_v0.2/esito.md`, sezione A "Specifica consolidata". Dati: `swarm/esperimenti/E-014/sintesi_r3.md` |
 | Sostituisce | `regolamento_v0.1.md`. Le parti di v0.1 non toccate da Q-013 restano valide e sono riportate qui |
 
-> Convenzioni. "Deve", "non può", "è illegale" sono vincolanti anche per il simulatore. I punti marcati **[Px confermata da Q-029]** erano default scelti da un voto senza maggioranza, poi confermati con l'IA forte; storia, bracci misurati ed esiti nel §17. I nomi fra parentesi quadre, come [`tempra`], sono i parametri del simulatore (`sim/v02/config.py`, preset `V02`).
+> Convenzioni. "Deve", "non può", "è illegale" sono vincolanti anche per il simulatore. I punti marcati **[Px confermata da Q-029]** erano default scelti da un voto senza maggioranza, poi confermati con l'IA forte; storia, bracci misurati ed esiti nel §17. I nomi fra parentesi quadre, come [`tempra`], sono i parametri del simulatore (`sim/v02/config.py`; la 1.0 è il preset `V10`, uguale a `V0212`).
 
 > **Cosa cambia da v0.1**
 > 1. Componenti: solo carte, gemme di una sola specie e una carta-tracciato del round. Spariscono Fornace, contatori, Scintilla.
@@ -330,7 +330,7 @@ Si vince **solo** così:
 Se due condizioni si verificano nello stesso momento, **perde il giocatore attivo**. Non esistono patte, vittorie ai punti o vittorie alternative.
 
 ### 9.8 Risveglio
-- Quando il tuo Leader ha **Vita ≤ 2** (almeno 3 Vite perse), al controllo di stato successivo si gira sul lato **Risvegliato**: Forza 4, Tempra 4 (3 dal round 10), massimo di Guardia 3, abilità del lato Risvegliato [`awaken_at_life` 2].
+- Quando il tuo Leader ha **Vita ≤ 2** (con Vita iniziale 5 vuol dire almeno 3 Vite perse; Salgemma dopo 2, Sanguinella dopo 4), al controllo di stato successivo si gira sul lato **Risvegliato**: Forza 4, Tempra 4 (3 dal round 10), massimo di Guardia 3, abilità del lato Risvegliato [`awaken_at_life` 2].
 - Succede una volta per partita ed è permanente, anche a metà del turno avversario. Il numero di Cicatrici è irrilevante.
 - Lo stato (Pronto o Ruotato) si conserva.
 - Le Vite perse col Crepuscolo possono causare il Risveglio.
@@ -346,9 +346,10 @@ Se due condizioni si verificano nello stesso momento, **perde il giocatore attiv
 Dal round 13 un Leader con 1 Vita è Alle Corde. Dal round 15, nel Ripristino di G1, il Crepuscolo toglie 2 Vite a ciascun Leader o fa perdere chi è Alle Corde (§6.1 b). Quindi ogni giocatore, G1 o G2, perde al più tardi nel Ripristino di G1:
 - del round **15** se in quel momento ha ≤ 1 Vita;
 - del round **16** se ne ha 2 o 3;
-- del round **17** se ne ha 4 o 5.
+- del round **17** se ne ha 4 o 5;
+- del round **18** se ne ha 6 (solo Sanguinella, che parte con 6 Vite).
 
-Il simulatore interrompe e registra come "non conclusa" una partita che superi il round 17 [`max_rounds` 17]: sarebbe un errore di implementazione, non una patta. Misurato (E-019, set v0.2, IA semplice): 4.6% di partite oltre il round 15; 84.4% chiuse dal colpo finale e 15.6% dal Crepuscolo.
+Il simulatore interrompe e registra come "non conclusa" una partita che superi il round 18 [`max_rounds` 18 nel preset `V10`; 17 fino a v0.2.12]: sarebbe un errore di implementazione, non una patta. Misurato (E-019, set v0.2, IA semplice): 4.6% di partite oltre il round 15; 84.4% chiuse dal colpo finale e 15.6% dal Crepuscolo.
 
 ---
 
@@ -595,7 +596,7 @@ Nomi dei parametri da `sim/v02/config.py`; preset del simulatore: `V02` (nucleo 
 | Nessun attacco | round 1 | `no_attack_round` 1 | |
 | Unità / Reliquie | max 5 / max 2 | `max_units` 5, `max_relics` 2 | |
 | Limite di mano | 8 a fine turno | `hand_limit` 8 | |
-| Limite tecnico | round 17 | `max_rounds` 17 | Oltre: "non conclusa" |
+| Limite tecnico | round 18 | `max_rounds` 18 (1.0) | Oltre: "non conclusa" |
 | Muro di Scudi | 1 gemma, +4 | `muro_bonus` 4 | Provvisorio |
 | Grido dalla Cicatrice | 1 gemma; −3 dalla mano, −5 dalle Cicatrici | `grido_hand` 3, `grido_scars` 5 | Provvisorio |
 | Rimarginare | ⟳ del Leader + 1 Brace | — | Niente limite "1 volta per turno" |
@@ -630,7 +631,9 @@ Mazzi convertiti da v0.1, mirror, IA semplice, 10.000 partite salvo dove indicat
 
 ---
 
-## 17. Varianti misurate e coda dei test
+## 17. Storia delle varianti misurate e coda per la 1.1
+
+Nella 1.0 non c'è nessuna regola in prova. I §17.1–§17.4 sono la storia delle varianti chiuse; le code dei §17.5–§17.8 non bloccano la 1.0 e sono il punto di partenza della 1.1, insieme alla lista "dopo la 1.0" di `tcg/roadmap_v1.md` (prima voce: Maera, 57.8 [54.7–60.8] nella misura finale del ciclo 05, dentro la deroga 42–58 della 1.0 ma fuori dalla fascia 45–55).
 
 Le regole qui sotto sono nel testo e sono tutte confermate (Q-029): nessuna resta in prova. Le varianti si sono misurate **una alla volta**, contro la base vigente, con seed appaiati; le nuove si misurano allo stesso modo.
 
@@ -729,3 +732,4 @@ I moduli di v0.1 §17 (campo di battaglia, zone contese, round condiviso, Fulcro
 | v0.2.10 | 2026-11-12 | Q-029, P7 confermata (regola di cambio, 8/8; E-032: nessuno dei bracci `oppone_senza_ruotarsi` e `vince_pareggi_se_pronta` passa): "lo Scudo vince i pareggi" non è più aperta (§1, C5, §12.2, §12.3, §15, §16, §17.2); Q-025 chiusa senza cambio del nucleo. Fra le regole in prova resta solo P9b. Nessuna regola di partita cambiata. |
 | v0.2.11 | 2026-11-15 | Q-029, P9b confermata (regola votata 8/8; E-032: con `reazione_da_cicatrice_costo` −1 il round 13+ sale di 6.9 punti, oltre il limite di +2): C4 (a) resta, il −1 da Cicatrice non entra (§16, §17.3, §17.5). Con questo nessuna regola è più in prova (convenzioni, §17). Pulizia della roadmap 1.0: l'intestazione non dice più "pilastri 2–3–4–6 in revisione", perché sono già riscritti; Q-001…Q-011 chiuse come superate dal nucleo v0.2. Nessuna regola di partita cambiata. |
 | v0.2.12 | 2026-11-17 | Q-028 e Q-031 (ciclo 05, voto finale 8/8, voci F1 e F2): **Tempra 3 dal round 10** per entrambi i Leader, su tutti e due i lati (§1, §2.2, §9.8, §10.1, §13, glossario, §16) [`tempra_tardo` 10]; **la Vita iniziale è scritta sul Leader**: 5, salvo Salgemma (LDR-05) 4 e Sanguinella (LDR-06) 6 (§2.2, §4, §16), con i campi `life`, `tempra` e `tempra_fissa` del Leader (R-032). Preset del simulatore `V0212` (V027 più `tempra_tardo` 10), default del runner. E-038 (15 incroci, IA forte, 200 partite): tutti i Leader fra 42 e 58, round 13+ 43.8%, Crepuscolo 13.1%. |
+| **1.0** | 2026-11-18 | Freeze della 1.0 (roadmap 1.0, regola di arresto approvata da Vittorio il 2026-11-16; ciclo 05 chiuso con tutti i Leader fra 42 e 58). Nessuna regola di partita cambia rispetto a v0.2.12: file rinominato in `regolamento_v1.0.md`, preset `V10` (= `V0212`), §17 come storia e coda per la 1.1, nel §9.8 il Risveglio scritto anche per le Vite iniziali 4 e 6 (il motore usa già Vita ≤ 2); nel §9.10 la fine garantita con 6 Vite (round 18) e il limite tecnico del simulatore portato a 18 round. |

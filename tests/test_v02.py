@@ -1212,7 +1212,7 @@ def test_v0212_preset_is_v027_plus_tempra_tardo():
     import inspect
     from sim.v02 import run
     src = inspect.getsource(run)
-    assert 'default="V026"' not in src and src.count('default="V0212"') == 3
+    assert 'default="V026"' not in src and src.count('default="V10"') == 3
 
 
 if __name__ == "__main__":

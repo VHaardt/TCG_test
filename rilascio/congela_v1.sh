@@ -1,11 +1,10 @@
 #!/bin/sh
 # Congela il set della 1.0: copia set, mazzi e nomi da set/finale in set/v1.0, controlla tutto con
 # `valida`, scrive le impronte SHA-256 e aggiorna app/dati. Non cambia regole né carte.
-# Uso: rilascio/congela_v1.sh con_A|senza_A   (dall'esito del voto di Tempra 3 nel ciclo 05)
+# Uso: sh rilascio/congela_v1.sh
 set -e
-SCELTA=${1:?"serve con_A o senza_A"}
 RADICE=$(cd "$(dirname "$0")/.." && pwd)
-REGOLE="$RADICE/rilascio/regole_v1_$SCELTA.json"
+REGOLE="$RADICE/rilascio/regole_v1.0.json"
 [ -f "$REGOLE" ] || { echo "regole sconosciute: $REGOLE"; exit 1; }
 TCG=${TCG:-/mnt/project-files/tcg}
 SRC="$TCG/set/finale"
@@ -37,6 +36,5 @@ cd "$RADICE"
 python3 -m sim.v02.run valida "$DST/set_v1.0.json" --mazzi "$DST/mazzi_v1.0.json" --variante "$DST/regole_v1.0.json" | tee "$DST/valida.txt"
 ( cd "$DST" && sha256sum set_v1.0.json mazzi_v1.0.json nomi_v1.0.json regole_v1.0.json > SHA256SUMS )
 sh app/aggiorna_dati.sh "$SRC"
-cp "$REGOLE" app/dati/regole_v1.0.json
 echo "set congelato in $DST ($(git rev-parse --short HEAD)); app/dati aggiornata."
 echo "Prossimi passi: rilascio/LEGGIMI.md, punti 3-6."
