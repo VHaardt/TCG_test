@@ -493,6 +493,8 @@ def render_r012(recs, traccia=()):
                 x[k] = x.get(k, 0) + st[k][q]
             x["act_then_hit"] = x.get("act_then_hit", 0) + sum(st["act_then_hit"][q].values())
             x["lead_act"] = x.get("lead_act", 0) + sum(v for c, v in st["activations"][q].items() if c in LEADERS or c.startswith("LDR"))
+            for side, v in (st.get("leader_act_side") or [{}, {}])[q].items():      # R-031
+                x["side_" + side] = x.get("side_" + side, 0) + v
             fh = st["first_hit_round"][q]
             if fh is not None:
                 x.setdefault("fh", []).append(fh)
@@ -518,6 +520,12 @@ def render_r012(recs, traccia=()):
                  f"{x.get('scudo_atk2', 0)/n:.2f} | {(sum(fh)/len(fh)) if fh else float('nan'):.1f} ({len(fh)}) | {x.get('peak2', 0)} | "
                  + ", ".join(f"{c} {100*v/ct:.0f}%" for c, v in sorted(col.items()))
                  + f" | {x.get('solo_unit_turns', 0)/n:.2f} | {x.get('caccia_leader_atk', 0)/n:.2f} |")
+    L += ["", "## R-031: attivazioni del Leader per lato (per partita del mazzo)", "",
+          "Le stesse attivazioni della colonna R-012 (⟳, trigger e statiche in scontro), divise secondo il lato del Leader al momento dell'attivazione.", "",
+          "| Mazzo | Base | Risvegliato |", "|---|---|---|"]
+    for d in decks:
+        x = per[d]; n = max(x["n"], 1)
+        L.append(f"| {D.label(d)} | {x.get('side_base', 0)/n:.2f} | {x.get('side_awakened', 0)/n:.2f} |")
     if traccia:
         L += ["", "## R-012: carte tracciate (per partita del mazzo: giocate / attivazioni / colpi a segno sul Leader / Unità sconfitte)", "",
               "| Mazzo | " + " | ".join(traccia) + " |", "|---|" + "---|" * len(traccia)]
@@ -954,7 +962,7 @@ def main(argv=None):
     sub = p.add_subparsers(dest="cmd", required=True)
 
     def common(x, partite=100):
-        x.add_argument("--variante", default="V026")
+        x.add_argument("--variante", default="V0212")
         x.add_argument("--ia", default="semplice")
         x.add_argument("--partite", type=int, default=partite)
         x.add_argument("--mazzi", nargs="*", help="nomi in sim/decks, file .json o file.json#nome")
@@ -966,14 +974,14 @@ def main(argv=None):
     t.add_argument("--riprendi", action="store_true",
                    help="salva ogni partita finita in --out e, se la corsa si interrompe, al rilancio gioca solo quelle mancanti")
     t.add_argument("--traccia", help="R-012: ID di carte e Leader da tracciare, separati da virgola")
-    ab = sub.add_parser("ab"); common(ab); ab.add_argument("--base", default="V026")
+    ab = sub.add_parser("ab"); common(ab); ab.add_argument("--base", default="V0212")
     lm = sub.add_parser("lambda"); common(lm, 200)
     co = sub.add_parser("collaudo"); common(co, 250)
     fo = sub.add_parser("forte"); common(fo, 25); fo.add_argument("--forte", default="forte:60")
     vi = sub.add_parser("vita"); common(vi, 100)
     pa = sub.add_parser("partita"); common(pa); pa.add_argument("mazzo1"); pa.add_argument("mazzo2")
     va = sub.add_parser("valida"); va.add_argument("file"); va.add_argument("--mazzi", nargs="*")
-    va.add_argument("--variante", default="V026", help="regole di costruzione (§2.3): V027 = 2 copie per nome, Leggendarie 1")
+    va.add_argument("--variante", default="V0212", help="regole di costruzione (§2.3): da V027 2 copie per nome, Leggendarie 1")
     a = p.parse_args(argv)
     if a.cmd == "valida":
         return cmd_valida(a)

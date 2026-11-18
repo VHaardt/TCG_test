@@ -75,7 +75,8 @@ def test_constructed_room_two_humans():
 def test_v027_limits_two_copies_and_rarity():
     D = core.dati()
     assert D.limiti["max_copies"] == 2 and D.limiti["max_copies_rarity"].get("L") == 1
-    assert len(D.riferimento) == 6 and all(max(m["carte"].values()) <= 2 for m in D.riferimento)
+    rif = [m for m in D.riferimento if m["nome"].startswith("rif_")]          # più eventuali liste mix_ legali
+    assert len(rif) == 6 and all(max(m["carte"].values()) <= 2 for m in D.riferimento)
     m = D.riferimento[0]
     tre = dict(m["carte"]); cid = next(iter(tre)); tre[cid] = 3
     tre[next(c for c in tre if c != cid)] -= 1
@@ -394,7 +395,7 @@ def test_any_cost_menu_on_ner002_ner019_and_cycle04_names():
     d = core.dati()
     C = {c["id"]: c for c in d.catalogo()["carte"]}
     assert C["NEW-V05"]["nome"] != "NEW-V05" and C["NEW-B06"]["nome"] != "NEW-B06" and C["NEW-B06"]["max"] == 1
-    assert all(m["nome"].startswith("rif_") for m in d.riferimento) and any("NEW-B06" in m["carte"] for m in d.riferimento)
+    assert sum(m["nome"].startswith("rif_") for m in d.riferimento) == 6 and any("NEW-B06" in m["carte"] for m in d.riferimento)
     r0, r1 = d.riferimento[0], d.riferimento[1]
     L = lambda m: [c for c, k in m["carte"].items() for _ in range(k)]
     s = E.new_game(r0["leader"], L(r0), r1["leader"], L(r1), rules=d.rules, seed=1, log=True)
@@ -468,6 +469,44 @@ def test_log_events_find_cards_by_their_q029_names():
                 assert ev[n]["t"] == "scontro" and ev[n]["carta"] in E.CARDS, ln
                 seen["scontro"] += 1
     assert seen["gioca"] and seen["scontro"], seen
+
+
+def test_r032_hearts_and_tempra_follow_the_leader():
+    """R-032: un Leader con Vite proprie (es. 4 o 6) mostra quei cuori e quella Tempra, non i valori delle regole."""
+    import dataclasses
+    d = core.dati()
+    r5 = next(m for m in d.riferimento if m["leader"] == "LDR-05")
+    orig = E.LEADERS["LDR-05"]
+    E.LEADERS["LDR-05"] = dataclasses.replace(orig, life=4, tempra=3)
+    try:
+        lv = core.leader_dict(E.LEADERS["LDR-05"], d.rules)
+        assert (lv["vite"], lv["tempra"]) == (4, 3)
+        L = [c for c, k in r5["carte"].items() for _ in range(k)]
+        s = E.new_game("LDR-05", L, "LDR-05", L, rules=d.rules, seed=1, log=True)
+        v = core.vista_giocatore(s, 0, True)
+        assert v["vite"] == 4 and v["leader"]["vite_iniziali"] == 4
+    finally:
+        E.LEADERS["LDR-05"] = orig
+
+
+def test_ldr06_base_two_ways_to_pay_are_two_labelled_entries():
+    """Ciclo 05: la Base di LDR-06 sono due ⟳ gemelle, una si paga perdendo 1 Vita e l'altra Stancando un'Unità
+    Pronta; l'app le mostra come due voci, ognuna con il suo pagamento."""
+    d = core.dati()
+    L = {l["id"]: l for l in d.catalogo()["leader"]}
+    assert L["LDR-06"]["vite"] == 6 and L["LDR-05"]["vite"] == 4
+    r = next(m for m in d.riferimento if m["leader"] == "LDR-06")
+    cards = [c for c, k in r["carte"].items() for _ in range(k)]
+    s = E.new_game("LDR-06", cards, "LDR-06", cards, rules=d.rules, seed=2, log=True)
+    s.round = 3
+    q = s.active
+    p = s.p[q]
+    assert len(p.life) == 6
+    p.scars = [[p.life.pop(), False, "t"] for _ in range(3)]
+    p.units = [E.Unit(950, "NEW-V05", True)]
+    s.p[1 - q].units = [E.Unit(960, "NEW-V05", True)]
+    pag = sorted(core.etichetta(s, q, a)["pagamento"] for a in s.legal_actions() if a[0] == "ability" and a[1] == "L")
+    assert pag == ["Stanca " + s.describe(q, 950), "perdi 1 Vita"], pag
 
 
 def teardown_module():

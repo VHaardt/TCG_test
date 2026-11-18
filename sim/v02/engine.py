@@ -112,7 +112,8 @@ class Player:
 
 
 # conditions that exist only inside a combat (R-009 T-9: not read by the "Forza attuale" filters)
-COMBAT_CONDS = {"attacking", "opposing", "pugno_ge", "target_is_unit", "attacker_has", "react_from_scars",
+COMBAT_CONDS = {"attacking", "opposing", "pugno_ge", "target_is_unit", "attacker_has", "target_has", "first_attack_kw",
+                "react_from_scars",
                 "hunted_ready", "survived"}
 
 class Combat:
@@ -167,6 +168,7 @@ def new_stats():
         "double_gems": [0, 0],                                           # M8
         "opp_elig": [0, 0], "opp_elig_impeto": [0, 0], "opp_impeto": [0, 0],   # M9
         "activations": [{}, {}],                                         # M11
+        "leader_act_side": [{"base": 0, "awakened": 0}, {"base": 0, "awakened": 0}],   # R-031: M11 del Leader per lato
         "removals": [0, 0],                                              # M12
         "life_costs": [0, 0],                                            # M14
         # R-012 (E-020): uso delle carte e contatori
@@ -216,6 +218,7 @@ class GameState:
         self.crep = {}
         self.track = None           # stato delle metriche M6/M7 (solo la partita vera, non i cloni)
         self.burned = False         # R-028: Bruciare già usato in questo turno
+        self.first_kw = {}          # R-031: parola chiave -> uid della prima Unità con essa che ha attaccato in questo turno
         self.pending = None         # R-028: carta in gioco in attesa della carta da bruciare (cid, bersaglio, piano)
         self._turn = None           # R-028: contatori del turno in corso (solo la partita vera)
 
@@ -228,6 +231,7 @@ class GameState:
         s.combat = self.combat.clone() if self.combat else None
         s.winner, s.end_reason, s.next_uid = self.winner, self.end_reason, self.next_uid
         s.burned, s.pending, s._turn = self.burned, self.pending, None
+        s.first_kw = dict(self.first_kw)
         s.rng = random.Random(self.rng.random())
         s.stats = None
         s.log = None
@@ -251,6 +255,8 @@ class GameState:
         else:
             d = self.stats[key][q]
             d[sub] = d.get(sub, 0) + n
+            if key == "activations" and sub in (self.p[q].leader, LEADERS[self.p[q].leader].id):
+                self.stats["leader_act_side"][q]["awakened" if self.p[q].awakened else "base"] += n   # R-031
 
     def decider(self):
         if self.over:
@@ -395,6 +401,15 @@ class GameState:
                 cid = ctx.get("attacker_cid")
                 if cid is None or not CARDS[cid].has(KW_ALIAS.get(v, v)):
                     return False
+            if k == "target_has":                           # R-031: bersaglio finale (preda o chi si oppone)
+                tid = ctx.get("target_uid")
+                tu = self.unit(1 - self.active, tid) if tid is not None else None
+                if tu is None or not CARDS[tu.cid].has(KW_ALIAS.get(v, v)):
+                    return False
+            if k == "first_attack_kw":                      # R-031: l'attaccante è la prima Unità con v che attacca nel turno
+                att = ctx.get("attacker_uid")
+                if att is None or att == "L" or self.first_kw.get(KW_ALIAS.get(v, v)) != att:
+                    return False
             if k not in CONDS:
                 raise ValueError(f"condizione sconosciuta in v0.2: {k}")
         return True
@@ -513,7 +528,7 @@ class GameState:
             (mulligan or default_mulligan)(self, q)
             if q == G2:
                 self.draw(q, self.r.g2_hand_extra)
-            for _ in range(self.r.life):
+            for _ in range(LEADERS[lid].life or self.r.life):         # R-032: Vite per Leader
                 pl.life.append(pl.deck.pop())
         self.active = G1
         if self.stats is not None:
@@ -555,6 +570,7 @@ class GameState:
                     self.lose_life(a, "crepuscolo", ignore_saldo=True)
         pl.guard = 0                                        # 7c
         self.burned = False                                 # R-028: Bruciare, una volta per turno
+        self.first_kw = {}                                  # R-031: primi attacchi per parola chiave, per turno
         if self.r.raddrizzo == "ripristino":                # 7d
             self._straighten(a)
         pl.brace = min(self.round, self.r.brace_max)        # 7e
@@ -1064,9 +1080,9 @@ class GameState:
         return "ROS-022" in ids and "VER-022" in ids
 
     def tempra(self, q):
-        """Tempra of q's Leader (tempra_awakened when set and q is Awakened)."""
-        t = self.r.tempra_awakened if self.p[q].awakened and self.r.tempra_awakened else self.r.tempra
-        if self.r.tempra_tardo and self.round >= self.r.tempra_tardo:      # R-028 V2 A
+        """Tempra of q's Leader: tempra_awakened when set and q is Awakened, else the Leader's own (R-032) or the rules'."""
+        t = self.r.tempra_awakened if self.p[q].awakened and self.r.tempra_awakened else (LEADERS[self.p[q].leader].tempra or self.r.tempra)   # R-032
+        if self.r.tempra_tardo and self.round >= self.r.tempra_tardo and not LEADERS[self.p[q].leader].tempra_fissa:   # R-028 V2 A (R-032: non se fissa)
             t -= 1
         if self.r.allo_scoperto and not self.p[q].life:                     # R-028 V2 B
             t -= 1
@@ -1227,6 +1243,8 @@ class GameState:
         else:
             u = self.unit(a, att)
             u.ready = False
+            for kw in CARDS[u.cid].keywords:                # R-031: first_attack_kw
+                self.first_kw.setdefault(kw, att)
             self.fire(a, CARDS[u.cid].abilities, "on_attack", dict(self.combat_ctx(self.combat), self=att), src=u.cid)
         self.stat_add("attacks", a)
         if self.round >= 13 and self.stats is not None:     # Q-019 R-1: attacchi dichiarati nei round finali

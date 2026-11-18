@@ -1111,6 +1111,110 @@ def test_r027_p7_contatori_scudo():
     assert s.unit(1, 901) is None and s.stats["scudo_rimossa"][1] == {"caccia": 1} and s.stats["scudo_opp"][1] == 0
 
 
+def test_r031_first_attack_kw():
+    """R-031 n.1: +1 solo alla prima Unità con Scudo che attacca nel turno; si azzera a ogni turno e passa ai cloni."""
+    E.LEADERS["_r031l"] = LeaderCard(id="_r031l", name="r031", colors=("B", "R"), base=(
+        {"static": "power", "applies_to": {"side": "own", "attacker": True, "keyword": "scudo"},
+         "if": [{"first_attack_kw": "scudo"}], "value": 1},), awakened=())
+    sh, plain = _card("_r031s", power=3, keywords=["scudo"]), _card("_r031p", power=3)
+    s = _arena()
+    s.p[0].leader = "_r031l"
+    s.p[0].units = [Unit(900, sh, True), Unit(902, sh, True), Unit(904, plain, True)]
+    s.step(("attack", 904))
+    assert s.compute(0, 0, None, None)[0] == 3 and s.first_kw == {}       # senza Scudo: non conta
+    s.step(("gems", 0)); s.step(("parry", 0, None))
+    s.step(("attack", 900))
+    assert s.compute(0, 0, None, None)[0] == 3 + 1                       # prima Unità con Scudo del turno
+    c = s.clone()
+    assert c.first_kw == s.first_kw and c.first_kw is not s.first_kw
+    s.step(("gems", 0)); s.step(("parry", 0, None))
+    s.step(("attack", 902))
+    assert s.compute(0, 0, None, None)[0] == 3                           # seconda: niente bonus
+    s.step(("gems", 0)); s.step(("parry", 0, None))
+    s.step(("end",))
+    assert s.first_kw == {}                                              # nuovo turno
+
+
+def test_r031_target_has():
+    """R-031 n.2: target_has legge il bersaglio finale (preda di Caccia o chi si oppone)."""
+    p31 = _card("_r031h", power=3, keywords=["caccia"],
+                abilities=[{"static": "power", "if": [{"attacking": True}, {"target_has": "scudo"}], "value": 2}])
+    sh, plain = _card("_r031t", power=1, keywords=["scudo"]), _card("_r031u", power=1)
+    s = _arena()
+    s.p[0].units = [Unit(900, p31, True)]
+    s.p[1].units = [Unit(901, sh, False), Unit(903, plain, True), Unit(905, sh, True)]
+    s.step(("attack", 900, 901))
+    assert s.compute(0, 0, None, None)[0] == 3 + 2                       # preda con Scudo
+    assert s.compute(0, 0, None, 903)[0] == 3                            # si oppone un'Unità senza Scudo
+    s.combat = E.Combat(900)
+    assert s.compute(0, 0, None, None)[0] == 3                           # bersaglio: il Leader
+    assert s.compute(0, 0, None, 905)[0] == 3 + 2                        # si oppone un'Unità con Scudo
+    from sim.v02.validate import validate
+    db = {"cards": [{"id": "_x", "type": "unit", "cost": 1, "colors": ["G"], "power": 1,
+                     "abilities": [{"static": "power", "if": [{"target_has": "volo"}], "value": 1}]}]}
+    assert any("volo" in e for e in validate(db))                        # parola chiave sconosciuta
+    db["cards"][0]["abilities"][0]["if"] = [{"target_has": "scudo"}, {"first_attack_kw": "scudo"}]
+    assert not any("condizione" in e or "parola chiave" in e for e in validate(db))
+
+
+def test_r031_leader_act_side_sums_to_leader_activations():
+    """R-031 n.3: le attivazioni del Leader divise per lato sommano a quelle di M11."""
+    for seed in range(3):
+        s = _play(_game(rules_from("V027"), seed), [RuleAgent2(seed), RuleAgent2(seed + 1)])
+        for q in (0, 1):
+            pl = s.p[q]
+            tot = sum(v for k, v in s.stats["activations"][q].items() if k in (pl.leader, E.LEADERS[pl.leader].id))
+            assert sum(s.stats["leader_act_side"][q].values()) == tot, (seed, q)
+
+
+def test_r032_leader_life_and_tempra_override():
+    """R-032: Vite e Tempra per Leader come dato; senza i campi non cambia nulla, A toglie 1 dal suo round."""
+    import dataclasses
+    s0 = _game(rules_from("V027"), 1)
+    lid = s0.p[0].leader
+    keep = E.LEADERS[lid]
+    try:
+        E.LEADERS[lid] = dataclasses.replace(keep, life=6, tempra=5)
+        s = _game(rules_from("V027"), 1)
+        assert len(s.p[0].life) == 6 and len(s.p[1].life) == 5
+        assert s.tempra(0) == 5 and s.tempra(1) == 4
+        a = _game(rules_from("V027").with_(tempra_tardo=10), 1)
+        a.round = 10
+        assert a.tempra(0) == 4 and a.tempra(1) == 3
+        E.LEADERS[lid] = dataclasses.replace(keep, tempra=3, tempra_fissa=True)
+        f = _game(rules_from("V027").with_(tempra_tardo=10), 1)
+        f.round = 10
+        assert f.tempra(0) == 3 and f.tempra(1) == 3
+    finally:
+        E.LEADERS[lid] = keep
+    s1 = _game(rules_from("V027"), 1)
+    assert len(s1.p[0].life) == 5 and s1.tempra(0) == 4
+
+
+def test_r032_validate_leader_fields():
+    from sim.v02.validate import validate
+    db = {"cards": [], "leaders": [{"id": "LDR-X", "name": "x", "colors": ["R"], "life": 6, "tempra": 3}]}
+    assert validate(db) == []
+    for bad in (0, "6", True, -1):
+        db["leaders"][0]["life"] = bad
+        assert any("R-032" in e for e in validate(db)), bad
+    db["leaders"][0]["life"] = 6
+    db["leaders"][0]["tempra_fissa"] = 1
+    assert any("tempra_fissa" in e for e in validate(db))
+    db["leaders"][0]["tempra_fissa"] = True
+    assert validate(db) == []
+
+
+def test_v0212_preset_is_v027_plus_tempra_tardo():
+    """v0.2.12 (Q-028/Q-031): V0212 = V027 + tempra_tardo 10, nothing else; it is the runner default."""
+    a, b = rules_from("V027").as_dict(), rules_from("V0212").as_dict()
+    assert {k for k in a if a[k] != b[k]} == {"tempra_tardo"} and b["tempra_tardo"] == 10
+    import inspect
+    from sim.v02 import run
+    src = inspect.getsource(run)
+    assert 'default="V026"' not in src and src.count('default="V0212"') == 3
+
+
 if __name__ == "__main__":
     for k, f in list(globals().items()):
         if k.startswith("test_"):

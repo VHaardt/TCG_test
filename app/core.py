@@ -60,7 +60,7 @@ class Dati:
                                os.path.join(HERE, "dati", "set_v02.json"))
         spec = os.environ.get("CICATRICI_REGOLE")
         if not spec:
-            spec = next((p for p in ("V027", "V026") if p in PRESETS), os.path.join(HERE, "dati", "regole_V026.json"))
+            spec = next((p for p in ("V0212", "V027", "V026") if p in PRESETS), os.path.join(HERE, "dati", "regole_V026.json"))
         self.regole_spec = spec
         self.rules = rules_from(spec)
         self.limiti = decks.limits(self.rules)
@@ -120,7 +120,7 @@ class Dati:
                             "per_nome": self.limiti["copies_by_name"], "copie_rarita": self.limiti["max_copies_rarity"],
                             "multicolore_tutti": self.limiti["multicolor_all"], "rarita": self.limiti["rarity_scale"]},
             "colori": COLORI,
-            "leader": [leader_dict(l) for l in LEADERS.values()],
+            "leader": [leader_dict(l, r) for l in LEADERS.values()],
             "carte": [dict(card_dict(c, self.rarity.get(c.id)), gruppo=self.gruppo(c.id), max=self.copie_max(c.id))
                       for c in sorted(CARDS.values(), key=sort_key)],
             "mazzi": self.riferimento,
@@ -155,11 +155,13 @@ def card_dict(c, rarity=None):
             "parole": sorted(c.keywords), "testo": c.text, "rarita": rarity}
 
 
-def leader_dict(l):
+def leader_dict(l, r):
+    """Leader per il client; Vite e Tempra sono quelle del Leader (R-032), altrimenti quelle delle regole."""
     def texts(side):
         return [ab.get("text", "") for ab in side if ab.get("text")]
     return {"id": l.id, "nome": l.name, "colori": list(l.colors), "base": texts(l.base),
-            "risvegliato": texts(l.awakened)}
+            "risvegliato": texts(l.awakened), "vite": getattr(l, "life", 0) or r.life,
+            "tempra": getattr(l, "tempra", 0) or r.tempra}
 
 
 def legale_per(leader, cid):
@@ -755,7 +757,8 @@ def vista_giocatore(s, q, mio):
     lid = pl.leader
     out = {
         "leader": {"id": lid, "colori": list(LEADERS[lid].colors), "risvegliato": pl.awakened,
-                   "pronto": pl.l_ready, "forza": s.leader_power(q), "tempra": s.tempra(q)},
+                   "pronto": pl.l_ready, "forza": s.leader_power(q), "tempra": s.tempra(q),
+                   "vite_iniziali": getattr(LEADERS[lid], "life", 0) or s.r.life},
         "vite": len(pl.life), "alle_corde": s.alle_corde(q), "brace": pl.brace, "guardia": pl.guard,
         "guardia_max": s.guard_max(q), "mazzo": len(pl.deck), "mano_n": len(pl.hand),
         "cicatrici": [{"id": sc[0], "fresca": bool(sc[1])} for sc in pl.scars],
@@ -879,11 +882,28 @@ def pagamento(s, q, plan):
     return (", ".join(parti) or None), unita
 
 
+def costi_fissi(s, q, act):
+    """Costi aggiuntivi senza alternative di un'azione (carta giocata o abilità ⟳)."""
+    try:
+        if act[0] == "play":
+            c = CARDS[act[1]]
+            return tuple(c.costs or ()) + tuple(((c.play or {}).get("costs") or ()) if c.type == "tactic" else ())
+        if act[0] == "ability":
+            ab = s.leader_abilities(q)[act[2]] if act[1] == "L" else CARDS[s.unit(q, act[1]).cid].abilities[act[2]]
+            return tuple(ab.get("costs") or ())
+    except Exception:
+        pass
+    return ()
+
+
 def etichetta(s, q, act):
     """Testo leggibile di un'azione legale, con il gruppo per l'interfaccia. Un'azione con più modi di
     pagare il costo porta "pagamento": ogni modo è un'azione a parte."""
     out = _etichetta(s, q, act)
     plan = act[3] if act[0] == "play" and len(act) > 3 else act[4] if act[0] == "ability" and len(act) > 4 else None
+    if plan is None:                          # costo fisso in Vita (es. il ⟳ "perdi 1 Vita" accanto al suo gemello "Stanca")
+        vita = sum(c.get("lose_life", 0) for c in costi_fissi(s, q, act))
+        plan = (("vita", vita, 0),) if vita else None
     if plan is not None:
         testo, unita = pagamento(s, q, plan)
         if testo:

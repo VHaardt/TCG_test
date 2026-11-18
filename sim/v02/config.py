@@ -113,6 +113,14 @@ PRESETS = {
              "crepuscolo_simultaneo": True, "crepuscolo_spareggio": "vite_attivo",
              "max_copies": 2, "copies_by_name": True, "max_copies_rarity": (("L", 1),),
              "multicolor_all": True, "rarity_scale": ("C", "R", "E", "L")},
+    # v0.2.12: V027 + Tempra 3 dal round 10 (Q-028 V2 A, ratificata nel ciclo 05, Q-031 F2, 8/8).
+    # La Vita iniziale per Leader (Q-031 F1) è un dato del set (campo life del Leader, R-032), non del preset.
+    "V0212": {"tempra": 4, "pugno": "sequenziale", "scudo": "vince_pareggi",
+              "scintilla_extra_gems": 1, "scintilla_extra_round": 3, "scintilla_extra_rounds": (),
+              "crepuscolo_simultaneo": True, "crepuscolo_spareggio": "vite_attivo",
+              "max_copies": 2, "copies_by_name": True, "max_copies_rarity": (("L", 1),),
+              "multicolor_all": True, "rarity_scale": ("C", "R", "E", "L"),
+              "tempra_tardo": 10},
 }
 
 

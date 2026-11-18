@@ -193,7 +193,9 @@
      "value": 1,
      "text": "Le tue Unità con Impeto hanno +1 in questo scontro quando attaccano."
     }
-   ]
+   ],
+   "life": 4,
+   "_note": "Ciclo 05 F1: Vita iniziale 4 (R-032)."
   },
   {
    "id": "LDR-06",
@@ -227,8 +229,35 @@
        "target": "chosen"
       }
      ],
-     "text": "⟳, il tuo Leader perde 1 Vita *(rispetta il Saldo)*: Stanca un'Unità avversaria Pronta con Forza attuale inferiore alle tue Cicatrici. Non puoi usarla se il tuo Leader ha 2 Vite o meno.",
-     "_note": "il json conta le Cicatrici prima di pagare con ≤: stessi esiti di 'inferiore' dopo il pagamento"
+     "text": "⟳, il tuo Leader perde 1 Vita *(rispetta il Saldo)* oppure Stanca una tua Unità Pronta: Stanca un'Unità avversaria Pronta con Forza attuale inferiore alle tue Cicatrici. Non puoi pagare in Vita se il tuo Leader ha 2 Vite o meno.",
+     "_note": "Ciclo 05 F1 (proposta_voto_finale.md), modo 'perdi 1 Vita' (floor 2): Cicatrici contate prima di pagare, con ≤."
+    },
+    {
+     "activated": true,
+     "cost": 0,
+     "costs": [
+      {
+       "stanca_own": 1
+      }
+     ],
+     "target": {
+      "side": "opp",
+      "ready": true,
+      "power_le": {
+       "n": {
+        "scars": "own"
+       },
+       "plus": -1
+      }
+     },
+     "do": [
+      {
+       "op": "stanca",
+       "target": "chosen"
+      }
+     ],
+     "text": "",
+     "_note": "Ciclo 05 F1, modo 'Stanca una tua Unità Pronta' della stessa ⟳: il pagamento non aggiunge Cicatrici, quindi 'inferiore' è ≤ Cicatrici − 1. Due abilità con la stessa ⟳ = costo 'oppure' con bersaglio che dipende dal modo."
     }
    ],
    "awakened": [
@@ -250,7 +279,9 @@
      "value": 1,
      "text": "Le tue Unità con Caccia hanno +1 in questo scontro quando attaccano e il loro bersaglio è un'Unità."
     }
-   ]
+   ],
+   "life": 6,
+   "_note": "Ciclo 05 F1: Vita iniziale 6 (R-032), Base L6-a."
   }
  ],
  "cards": [

@@ -7,7 +7,7 @@ import numbers
 
 DESCRIPTIVE = {"text", "name", "rarity", "slot", "tags", "intent", "vanilla_delta", "note", "notes", "test"}
 CARD_KEYS = {"id", "type", "cost", "colors", "power", "keywords", "kw_params", "abilities", "play", "react", "costs"}
-LEADER_KEYS = {"id", "colors", "base", "awakened"}
+LEADER_KEYS = {"id", "colors", "base", "awakened", "life", "tempra", "tempra_fissa"}   # life, tempra, tempra_fissa: R-032
 TYPES = {"unit", "tactic", "reaction", "relic"}
 KEYWORDS = {"assalto", "scudo", "bracconiere", "caccia", "impeto", "infuso", "furia", "rinnovo", "breccia"}
 KW_PARAMS = {"bracconiere"}
@@ -23,6 +23,7 @@ MODIFIERS = {"rim_cost"}
 # condition -> type of its value
 CONDITIONS = {"furia": int, "scars_ge": int, "awakened": bool, "attacking": bool, "pugno_ge": int, "no_own_gems": bool,
               "deck_nonempty": bool, "target_is_unit": bool, "opposing": bool, "attacker_has": str,
+              "target_has": str, "first_attack_kw": str,                   # R-031
               "react_from_scars": bool, "hunted_ready": bool, "survived": bool}
 SELECTOR = {"side", "cost_le", "ready", "power_le", "keyword", "attacker", "kind", "any", "if"}
 OPS = {"draw": {"n"}, "att_mod": {"n"}, "def_mod": {"n"},
@@ -96,7 +97,7 @@ class _V:
                 self.err(where, f"condizione '{k}' vuole un intero")
             elif t is not int and not isinstance(v, t):
                 self.err(where, f"condizione '{k}' vuole {t.__name__}")
-            elif k == "attacker_has" and v not in KEYWORDS:
+            elif k in ("attacker_has", "target_has", "first_attack_kw") and v not in KEYWORDS:
                 self.err(where, f"parola chiave sconosciuta '{v}'")
 
     def selector(self, where, sel):
@@ -303,6 +304,11 @@ class _V:
     def leader(self, l):
         lid = l.get("id", "?")
         self.keys(lid, l, LEADER_KEYS)
+        for k in ("life", "tempra"):                         # R-032: valori per Leader, interi positivi
+            if k in l and (not isinstance(l[k], int) or isinstance(l[k], bool) or l[k] < 1):
+                self.err(lid, f"R-032: '{k}' del Leader deve essere un intero ≥ 1")
+        if "tempra_fissa" in l and not isinstance(l["tempra_fissa"], bool):
+            self.err(lid, "R-032: 'tempra_fissa' del Leader è true o false")
         for side in ("base", "awakened"):
             for i, ab in enumerate(l.get(side) or []):
                 self.ability(f"{lid}.{side}[{i}]", ab)
